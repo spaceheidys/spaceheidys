@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import heroBg from "@/assets/hero-bg.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
-import { Navigation, ScrollIndicator } from "@/components/Navigation";
+
 import MascotSection from "@/components/MascotSection";
 import SocialLinks from "@/components/SocialLinks";
 
@@ -48,27 +48,19 @@ const Index = () => {
 
         {/* Main content */}
         <div className="flex-1 flex items-center px-8 md:px-16">
-          <div className="w-full flex items-center justify-between">
-            {/* Left side: nav + scroll indicators */}
-            <div className="hidden lg:flex flex-col gap-12">
-              <Navigation />
-              <ScrollIndicator activeSection="Main" />
-            </div>
-
-            {/* Center: Logo */}
-            <div className="flex-1 flex justify-center">
-              <BikoKuLogo />
-            </div>
+          <div className="w-full flex items-center justify-center">
+            <BikoKuLogo />
           </div>
         </div>
 
         {/* Bottom section */}
-        <div className="flex items-end justify-between px-8 md:px-16 pb-8">
-          {/* Mascot - bottom left */}
-          <MascotSection />
-
-          {/* Social links - bottom right */}
-          <SocialLinks />
+        <div className="flex items-end justify-between px-8 md:px-16 pb-0">
+          <div className="flex items-end">
+            <MascotSection />
+          </div>
+          <div className="pb-8">
+            <SocialLinks />
+          </div>
         </div>
       </div>
     </div>
