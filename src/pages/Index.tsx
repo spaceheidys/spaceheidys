@@ -48,7 +48,28 @@ const Index = () => {
 
         {/* Main content */}
         <div className="flex-1 flex items-center px-8 md:px-16">
-          <div className="w-full flex items-center justify-center">
+          {/* Left side nav */}
+          <nav className="hidden lg:flex flex-col gap-8 mr-auto">
+            {[
+              { jp: "アバウト", en: "ABOUT" },
+              { jp: "ポートフォリオ", en: "PORTFOLIO" },
+              { jp: "コンタクト", en: "CONTACT" },
+            ].map((item, i) => (
+              <motion.a
+                key={item.en}
+                href={`#${item.en.toLowerCase()}`}
+                className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 + i * 0.15 }}
+              >
+                <span className="font-jp text-xs tracking-widest">{item.jp}</span>
+                <span className="text-[10px] tracking-[0.3em] font-display">{item.en}</span>
+              </motion.a>
+            ))}
+          </nav>
+
+          <div className="flex-1 flex justify-center">
             <BikoKuLogo />
           </div>
         </div>
