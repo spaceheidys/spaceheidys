@@ -3,12 +3,23 @@ import { motion } from "framer-motion";
 const navItems = ["About", "Portfolio", "Contacts"];
 
 const ScrollIndicator = ({ activeSection = "Main" }: { activeSection?: string }) => {
+  const sections = ["About", "Portfolio", "Contacts"];
   return (
-    <div className="flex flex-col gap-8 w-48">
-      {navItems.map((item) => (
-        <div key={item} className="line-indicator text-xs tracking-[0.3em] uppercase text-muted-foreground font-display">
-          {activeSection === item ? item : ""}
-        </div>
+    <div className="flex flex-col gap-3">
+      {sections.map((item, i) => (
+        <motion.div
+          key={item}
+          className="w-16 h-16 border border-border/50 flex items-center justify-center cursor-pointer hover:border-foreground/40 transition-colors duration-300"
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.8 + i * 0.1, duration: 0.5 }}
+        >
+          {(i === 0 || activeSection === item) && (
+            <span className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground font-display">
+              {item}
+            </span>
+          )}
+        </motion.div>
       ))}
     </div>
   );
