@@ -110,7 +110,11 @@ const Index = () => {
                   <motion.a
                     key={item.en}
                     href={item.action ? undefined : `#${item.en.toLowerCase()}`}
-                    onClick={item.action}
+                    onClick={() => {
+                      const bell = new Audio("/audio/bell-sounds.mp3");
+                      bell.play().catch(() => {});
+                      item.action?.();
+                    }}
                     className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
