@@ -5,9 +5,11 @@ import BikoKuLogo from "@/components/BikoKuLogo";
 
 import MascotSection from "@/components/MascotSection";
 import SocialLinks from "@/components/SocialLinks";
+import AboutModal from "@/components/AboutModal";
 
 const Index = () => {
   const [showNav, setShowNav] = useState(true);
+  const [showAbout, setShowAbout] = useState(false);
 
   return (
     <div className="relative min-h-screen bg-background overflow-hidden">
@@ -67,14 +69,15 @@ const Index = () => {
                 transition={{ duration: 0.4 }}
               >
                 {[
-                  { jp: "アバウト", en: "ABOUT" },
+                  { jp: "アバウト", en: "ABOUT", action: () => setShowAbout(true) },
                   { jp: "ポートフォリオ", en: "PORTFOLIO" },
                   { jp: "コンタクト", en: "CONTACT" },
                 ].map((item, i) => (
                   <motion.a
                     key={item.en}
-                    href={`#${item.en.toLowerCase()}`}
-                    className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300"
+                    href={item.action ? undefined : `#${item.en.toLowerCase()}`}
+                    onClick={item.action}
+                    className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
@@ -104,6 +107,8 @@ const Index = () => {
           </div>
         </div>
       </div>
+
+      <AboutModal open={showAbout} onClose={() => setShowAbout(false)} />
     </div>
   );
 };
