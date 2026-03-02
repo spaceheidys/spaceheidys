@@ -19,7 +19,7 @@ const AboutModal = ({ open, onClose }: AboutModalProps) => {
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
             <motion.div
-              className="w-[760px] max-w-[90vw] h-[471px] max-h-[80vh] bg-white/80 rounded-tl-2xl rounded-br-2xl p-10 overflow-auto pointer-events-auto relative"
+              className="w-[760px] max-w-[90vw] max-h-[80vh] bg-white/80 border-2 border-gray-400 rounded-tl-2xl rounded-br-2xl p-10 overflow-auto pointer-events-auto relative"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
