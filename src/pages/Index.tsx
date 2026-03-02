@@ -6,13 +6,19 @@ import BikoKuLogo from "@/components/BikoKuLogo";
 import MascotSection from "@/components/MascotSection";
 import SocialLinks from "@/components/SocialLinks";
 import AboutModal from "@/components/AboutModal";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const Index = () => {
   const [showNav, setShowNav] = useState(true);
   const [showAbout, setShowAbout] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   return (
-    <div className="relative min-h-screen bg-background overflow-hidden">
+    <>
+      <AnimatePresence>
+        {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
+      </AnimatePresence>
+      <div className="relative min-h-screen bg-background overflow-hidden">
       {/* Hero background illustration */}
       <div className="absolute inset-0 w-full h-screen">
         <img
@@ -110,6 +116,7 @@ const Index = () => {
 
       <AboutModal open={showAbout} onClose={() => setShowAbout(false)} />
     </div>
+    </>
   );
 };
 
