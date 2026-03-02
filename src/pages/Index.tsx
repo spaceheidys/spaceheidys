@@ -63,18 +63,18 @@ const Index = () => {
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Top nav bar */}
         <motion.header
-          className="flex items-center justify-between px-8 md:px-16 py-8"
+          className="flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           <span
-            className="font-jp text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
+            className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
             onClick={() => setShowNav((prev) => !prev)}
           >
             ビコ・ク
           </span>
-          <nav className="hidden md:flex items-center gap-12">
+          <nav className="hidden md:flex items-center gap-8 lg:gap-12">
             {["Portfolio", "Contacts", "Social"].map((item, i) => (
               <motion.a
                 key={item}
@@ -91,7 +91,7 @@ const Index = () => {
         </motion.header>
 
         {/* Main content */}
-        <div className="flex-1 flex items-center px-8 md:px-16 relative">
+        <div className="flex-1 flex items-center px-4 sm:px-8 md:px-16 relative">
           {/* Left side nav */}
           <AnimatePresence>
             {showNav && (
@@ -132,11 +132,11 @@ const Index = () => {
         </div>
 
         {/* Bottom section */}
-        <div className="flex items-end justify-between px-8 md:px-16 pb-0">
+        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between px-4 sm:px-8 md:px-16 pb-4 sm:pb-0 gap-4 sm:gap-0">
           <div className="flex items-end">
             <MascotSection />
           </div>
-          <div className="pb-8">
+          <div className="pb-4 sm:pb-8">
             <SocialLinks />
           </div>
         </div>
