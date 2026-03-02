@@ -55,7 +55,7 @@ const Index = () => {
         </motion.header>
 
         {/* Main content */}
-        <div className="flex-1 flex items-center px-8 md:px-16">
+        <div className="flex-1 flex items-center px-8 md:px-16 relative">
           {/* Left side nav */}
           <AnimatePresence>
             {showNav && (
@@ -87,8 +87,10 @@ const Index = () => {
             )}
           </AnimatePresence>
 
-          <div className="flex-1 flex justify-center">
-            <BikoKuLogo />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="pointer-events-auto">
+              <BikoKuLogo />
+            </div>
           </div>
         </div>
 
