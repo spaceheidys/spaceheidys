@@ -148,10 +148,7 @@ const Index = () => {
 
         {/* Footer */}
         <div className="px-4 sm:px-8 md:px-16 pt-2 pb-3">
-          <div className="flex items-end gap-3">
-            <img src={teddyImg} alt="Teddy" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
-            <div className="flex-1 border-t-[3px] border-white" />
-          </div>
+          <div className="border-t-[3px] border-white" />
           <div className="text-center mt-2 text-[10px] sm:text-xs tracking-widest text-foreground/40 font-display">
             © 2026 Spaceheidys. All rights reserved.
           </div>
