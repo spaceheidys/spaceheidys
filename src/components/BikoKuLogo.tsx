@@ -14,11 +14,11 @@ const BikoKuLogo = () => {
       className="flex items-center justify-center select-none"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-    >
-      <img src={selectedLogo} alt="BIKO KU logo" className="h-[420px] w-auto" />
-    </motion.div>
-  );
+      transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}>
+      
+      <img src={selectedLogo} alt="BIKO KU logo" className="h-[420px] w-auto object-scale-down" />
+    </motion.div>);
+
 };
 
 export default BikoKuLogo;
