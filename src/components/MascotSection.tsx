@@ -8,10 +8,10 @@ const MascotSection = () => {
     <div className="relative flex items-end gap-4">
       {/* Mascot */}
       <img
-        src="/lovable-uploads/9a756186-dec2-4b1a-8cd3-510182fe6192.png"
+
         alt="BIKO KU mascot"
         className="w-24 sm:w-32 md:w-40 lg:w-48 drop-shadow-2xl relative z-10 cursor-pointer"
-        onClick={() => setShowBubble((prev) => !prev)} />
+        onClick={() => setShowBubble((prev) => !prev)} src="/lovable-uploads/0e7b57a2-a6b3-414a-aa68-00208e5b6265.png" />
       
 
       {/* Speech bubble - to the right */}
