@@ -137,7 +137,7 @@ const Index = () => {
         </div>
 
         {/* Bottom section */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between px-4 sm:px-8 md:px-16 pb-4 sm:pb-0 gap-4 sm:gap-0">
+        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between px-4 sm:px-8 md:px-16 pb-0 gap-4 sm:gap-0">
           <div className="flex items-end">
             <MascotSection />
           </div>
@@ -147,7 +147,7 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <div className="px-4 sm:px-8 md:px-16 pt-2 pb-3">
+        <div className="px-4 sm:px-8 md:px-16 pb-3">
           <div className="border-t-[3px] border-white" />
           <div className="text-center mt-2 text-[10px] sm:text-xs tracking-widest text-foreground/40 font-display">
             © 2026 Spaceheidys. All rights reserved.
