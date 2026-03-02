@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroBg from "@/assets/hero-bg.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
@@ -12,6 +12,34 @@ const Index = () => {
   const [showNav, setShowNav] = useState(true);
   const [showAbout, setShowAbout] = useState(false);
   const [loading, setLoading] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio("/audio/main_buddhist.mp3");
+    audio.loop = false;
+    audioRef.current = audio;
+
+    const playAudio = () => {
+      audio.play().catch(() => {});
+      window.removeEventListener("click", playAudio);
+      window.removeEventListener("keydown", playAudio);
+      window.removeEventListener("touchstart", playAudio);
+    };
+
+    // Try autoplay first, fall back to first interaction
+    audio.play().catch(() => {
+      window.addEventListener("click", playAudio);
+      window.addEventListener("keydown", playAudio);
+      window.addEventListener("touchstart", playAudio);
+    });
+
+    return () => {
+      audio.pause();
+      window.removeEventListener("click", playAudio);
+      window.removeEventListener("keydown", playAudio);
+      window.removeEventListener("touchstart", playAudio);
+    };
+  }, []);
 
   return (
     <>
