@@ -26,7 +26,7 @@ const SocialLinks = () => {
           className="text-muted-foreground hover:text-foreground transition-colors duration-300"
           aria-label={s.label}
         >
-          <img src={s.icon} alt={s.label} className="w-6 h-6 opacity-60 hover:opacity-100 transition-opacity invert" />
+          <img src={s.icon} alt={s.label} className="h-5 w-auto opacity-60 hover:opacity-100 transition-opacity invert" />
         </a>
       ))}
     </motion.div>
