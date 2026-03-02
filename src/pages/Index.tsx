@@ -144,6 +144,11 @@ const Index = () => {
             <SocialLinks />
           </div>
         </div>
+
+        {/* Footer */}
+        <div className="text-center py-3 text-[10px] sm:text-xs tracking-widest text-foreground/40 font-display">
+          © 2026 Spaceheidys. All rights reserved.
+        </div>
       </div>
 
       <AboutModal open={showAbout} onClose={() => setShowAbout(false)} />
