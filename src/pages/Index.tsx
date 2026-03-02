@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroBg from "@/assets/hero-bg.png";
-import mascotImg from "@/assets/mascot.png";
+import teddyImg from "@/assets/Teddy.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
 
 import MascotSection from "@/components/MascotSection";
@@ -149,7 +149,7 @@ const Index = () => {
         {/* Footer */}
         <div className="px-4 sm:px-8 md:px-16 pt-2 pb-3">
           <div className="flex items-end gap-3">
-            <img src={mascotImg} alt="Biko mascot" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+            <img src={teddyImg} alt="Teddy" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             <div className="flex-1 border-t-[3px] border-white" />
           </div>
           <div className="text-center mt-2 text-[10px] sm:text-xs tracking-widest text-foreground/40 font-display">
