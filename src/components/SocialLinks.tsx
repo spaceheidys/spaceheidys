@@ -25,6 +25,7 @@ const SocialLinks = () => {
           rel="noopener noreferrer"
           className="text-muted-foreground hover:text-foreground transition-colors duration-300"
           aria-label={s.label}
+          onClick={(e) => { e.preventDefault(); window.open(s.href, '_blank'); }}
         >
           <img src={s.icon} alt={s.label} className="h-5 w-auto opacity-60 hover:opacity-100 transition-opacity invert" />
         </a>
