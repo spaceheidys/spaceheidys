@@ -265,6 +265,18 @@ const Index = () => {
     </div>
     {/* Black banner below main screen */}
     <div className="w-full h-16 bg-black" />
+    {/* White section with image placeholders */}
+    <div className="w-full bg-white flex items-center justify-center" style={{ height: 1080 }}>
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            className="bg-gray-300"
+            style={{ width: 620, height: 320 }}
+          />
+        ))}
+      </div>
+    </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
     </>);
 
