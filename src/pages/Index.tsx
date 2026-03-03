@@ -18,7 +18,7 @@ const Index = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | null>(null);
-  const [bgImage, setBgImage] = useState(heroBg);
+  const [bgImage, setBgImage] = useState(mainBiko01);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const bgOptions = [mainBiko01, mainBiko02, mainBiko03];
