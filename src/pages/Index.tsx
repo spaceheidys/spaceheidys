@@ -116,7 +116,8 @@ const Index = () => {
               {bgOptions.map((bg, i) => (
                 <div
                   key={i}
-                  className={`w-6 h-6 bg-white cursor-pointer transition-opacity duration-300 ${bgImage === bg ? "opacity-100" : "opacity-50 hover:opacity-80"}`}
+                  className={`cursor-pointer transition-opacity duration-300 ${bgImage === bg ? "opacity-100" : "opacity-50 hover:opacity-80"}`}
+                  style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
                   onClick={() => setBgImage(bg)}
                 />
               ))}
