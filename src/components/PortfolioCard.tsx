@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 interface PortfolioCardProps {
   name: string;
-  flipAxis?: "x" | "y";
+  flipAxis?: "x" | "y-right";
 }
 
 const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
@@ -20,11 +20,13 @@ const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
     );
   }
 
-  const animateProps = flipAxis === "x"
-    ? { rotateX: flipped ? 180 : 0 }
-    : { rotateY: flipped ? 180 : 0 };
+  const isYRight = flipAxis === "y-right";
+  const animateProps = isYRight
+    ? { rotateY: flipped ? -180 : 0 }
+    : { rotateX: flipped ? 180 : 0 };
 
-  const backTransform = flipAxis === "x" ? "rotateX(180deg)" : "rotateY(180deg)";
+  const backTransform = isYRight ? "rotateY(180deg)" : "rotateX(180deg)";
+  const origin = isYRight ? "right center" : "center center";
 
   return (
     <div
@@ -34,7 +36,7 @@ const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
     >
       <motion.div
         className="relative w-full h-full"
-        style={{ transformStyle: "preserve-3d" }}
+        style={{ transformStyle: "preserve-3d", transformOrigin: origin }}
         animate={animateProps}
         transition={{ duration: 0.6, ease: "easeInOut" }}
       >
