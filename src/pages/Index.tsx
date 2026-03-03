@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroBg from "@/assets/hero-bg.png";
+import mainBiko01 from "@/assets/main_biko_01.png";
+import mainBiko02 from "@/assets/main_biko_02.png";
+import mainBiko03 from "@/assets/main_biko_03.png";
 import teddyImg from "@/assets/Teddy.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
 
@@ -14,7 +17,9 @@ const Index = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | null>(null);
+  const [bgImage, setBgImage] = useState(heroBg);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bgOptions = [mainBiko01, mainBiko02, mainBiko03];
 
   const handleAboutClick = () => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
@@ -65,7 +70,7 @@ const Index = () => {
       {/* Hero background illustration */}
       <div className="absolute inset-0 w-full h-screen">
         <img
-          src={heroBg}
+          src={bgImage}
           alt="BIKO KU manga illustration"
           className="w-full h-full object-cover object-top opacity-60"
         />
@@ -108,8 +113,12 @@ const Index = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="w-6 h-6 bg-white" />
+              {bgOptions.map((bg, i) => (
+                <div
+                  key={i}
+                  className={`w-6 h-6 bg-white cursor-pointer transition-opacity duration-300 ${bgImage === bg ? "opacity-100" : "opacity-50 hover:opacity-80"}`}
+                  onClick={() => setBgImage(bg)}
+                />
               ))}
             </motion.div>
           </nav>
