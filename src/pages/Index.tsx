@@ -27,7 +27,7 @@ const Index = () => {
     // Hide after 1 minute
     aboutTimerRef.current = setTimeout(() => {
       setShowAboutText(false);
-    }, 60000);
+    }, 30000);
   };
 
   useEffect(() => {
