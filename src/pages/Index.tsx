@@ -11,6 +11,7 @@ import MascotSection from "@/components/MascotSection";
 import SocialLinks from "@/components/SocialLinks";
 import AboutModal from "@/components/AboutModal";
 import LoadingScreen from "@/components/LoadingScreen";
+import SecretDoorOverlay from "@/components/SecretDoorOverlay";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,7 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState<"about" | "contact" | null>(null);
   const [bgImage, setBgImage] = useState(heroBg);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const bgOptions = [mainBiko01, mainBiko02, mainBiko03];
 
   const handleAboutClick = () => {
@@ -98,8 +100,9 @@ const Index = () => {
             {["Secret Door", "Shop"].map((item, i) => (
               <motion.a
                 key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display"
+                href={item === "Secret Door" ? undefined : `#${item.toLowerCase()}`}
+                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : undefined}
+                className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.1 }}
@@ -226,6 +229,7 @@ const Index = () => {
         </div>
       </div>
     </div>
+    <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
     </>
   );
 };
