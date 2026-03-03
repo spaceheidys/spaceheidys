@@ -10,24 +10,23 @@ import AboutModal from "@/components/AboutModal";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const Index = () => {
-  const [showNav, setShowNav] = useState(true);
-  const [showAboutText, setShowAboutText] = useState(false);
   const [loading, setLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [showNav, setShowNav] = useState(true);
+  const [activeSection, setActiveSection] = useState<"about" | "contact" | null>(null);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleAboutClick = () => {
-    // Clear any existing timer
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
-    // Play bell sound
-    const bell = new Audio("/audio/bell-sounds.mp3");
-    bell.play().catch(() => {});
-    // Show text
-    setShowAboutText(true);
-    // Hide after 1 minute
+    setActiveSection("about");
     aboutTimerRef.current = setTimeout(() => {
-      setShowAboutText(false);
+      setActiveSection((prev) => (prev === "about" ? null : prev));
     }, 30000);
+  };
+
+  const handleContactClick = () => {
+    if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
+    setActiveSection("contact");
   };
 
   useEffect(() => {
@@ -121,7 +120,7 @@ const Index = () => {
                 {[
                   { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
                   { jp: "ポートフォリオ", en: "PORTFOLIO" },
-                  { jp: "コンタクト", en: "CONTACT" },
+                  { jp: "コンタクト", en: "CONTACT", action: handleContactClick },
                 ].map((item, i) => (
                   <motion.a
                     key={item.en}
@@ -152,9 +151,10 @@ const Index = () => {
         </div>
 
         {/* About text - between logo and bottom illustration */}
-        <AnimatePresence>
-          {showAboutText && (
+        <AnimatePresence mode="wait">
+          {activeSection === "about" && (
             <motion.div
+              key="about"
               className="flex justify-center px-4 sm:px-8 md:px-16"
               style={{ marginBottom: 30 }}
               initial={{ opacity: 0, y: 10 }}
@@ -166,6 +166,23 @@ const Index = () => {
                 Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work.
                 This space is dedicated to sharing visual storytelling and artistic expression across various styles and mediums.
               </p>
+            </motion.div>
+          )}
+          {activeSection === "contact" && (
+            <motion.div
+              key="contact"
+              className="flex justify-center px-4 sm:px-8 md:px-16"
+              style={{ marginBottom: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
+                <p className="font-display tracking-widest text-foreground/90 mb-2">Cooperation & Commissions</p>
+                <p>For collaboration projects or custom commissions, please contact me via email. I'd be happy to discuss any ideas or concepts you have in mind.</p>
+                <p className="mt-2 text-foreground/90">spaceheidys@gmail.com</p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
