@@ -90,7 +90,7 @@ const Index = () => {
             ビコ・ク
           </span>
           <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-            {["Portfolio", "Contacts", "Social"].map((item, i) => (
+            {["Portfolio", "Contacts"].map((item, i) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase()}`}
@@ -102,6 +102,16 @@ const Index = () => {
                 {item}
               </motion.a>
             ))}
+            <motion.div
+              className="flex items-center gap-2"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="w-6 h-6 bg-white" />
+              ))}
+            </motion.div>
           </nav>
         </motion.header>
 
