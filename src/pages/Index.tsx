@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
 import heroBg from "@/assets/hero-bg.png";
 import mainBiko01 from "@/assets/main_biko_01.png";
 import mainBiko02 from "@/assets/main_biko_02.png";
 import mainBiko03 from "@/assets/main_biko_03.png";
 import teddyImg from "@/assets/Teddy.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
+import { useSoundContext } from "@/contexts/SoundContext";
 
 import MascotSection from "@/components/MascotSection";
 import SocialLinks from "@/components/SocialLinks";
@@ -21,6 +23,7 @@ const Index = () => {
   const [bgImage, setBgImage] = useState(mainBiko01);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
+  const { muted, toggleMute } = useSoundContext();
   const bgOptions = [mainBiko01, mainBiko02, mainBiko03];
 
   const handleAboutClick = () => {
@@ -48,7 +51,6 @@ const Index = () => {
       window.removeEventListener("touchstart", playAudio);
     };
 
-    // Try autoplay first, fall back to first interaction
     audio.play().catch(() => {
       window.addEventListener("click", playAudio);
       window.addEventListener("keydown", playAudio);
@@ -62,6 +64,13 @@ const Index = () => {
       window.removeEventListener("touchstart", playAudio);
     };
   }, []);
+
+  // Mute/unmute the background audio when muted state changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = muted;
+    }
+  }, [muted]);
 
   return (
     <>
@@ -124,6 +133,13 @@ const Index = () => {
                   onClick={() => setBgImage(bg)}
                 />
               ))}
+              <div
+                className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
+                onClick={toggleMute}
+                aria-label={muted ? "Unmute sound" : "Mute sound"}
+              >
+                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </div>
             </motion.div>
           </nav>
         </motion.header>
@@ -149,8 +165,10 @@ const Index = () => {
                     key={item.en}
                     href={item.action ? undefined : `#${item.en.toLowerCase()}`}
                     onClick={() => {
-                      const bell = new Audio("/audio/bell-sounds.mp3");
-                      bell.play().catch(() => {});
+                      if (!muted) {
+                        const bell = new Audio("/audio/bell-sounds.mp3");
+                        bell.play().catch(() => {});
+                      }
                       item.action?.();
                     }}
                     className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
