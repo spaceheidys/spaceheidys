@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX, ArrowUp } from "lucide-react";
 import heroBg from "@/assets/hero-bg.png";
@@ -14,6 +14,7 @@ import SocialLinks from "@/components/SocialLinks";
 import AboutModal from "@/components/AboutModal";
 import LoadingScreen from "@/components/LoadingScreen";
 import SecretDoorOverlay from "@/components/SecretDoorOverlay";
+import PortfolioCard from "@/components/PortfolioCard";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
@@ -277,15 +278,12 @@ const Index = () => {
         <ArrowUp size={32} />
       </div>
       <div className="flex gap-1">
-        {["Portfolio_1", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => (
-          <div
-            key={name}
-            className="bg-gray-300 flex items-center justify-center text-gray-500 text-xs"
-            style={{ width: 269, height: 521 }}
-          >
-            {name}
-          </div>
-        ))}
+        {["Portfolio_1", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => {
+          const isFlippable = name === "Portfolio_1";
+          return (
+            <PortfolioCard key={name} name={name} isFlippable={isFlippable} />
+          );
+        })}
       </div>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
