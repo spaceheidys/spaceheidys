@@ -279,7 +279,7 @@ const Index = () => {
       </div>
       <div className="flex gap-1">
         {["Portfolio_1", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => {
-          const flipAxis = name === "Portfolio_1" ? "x" as const : "y-right" as const;
+          const flipAxis = name === "Portfolio_1" ? "x" as const : name === "Portfolio_2" ? "y-center" as const : "y-right" as const;
           return (
             <PortfolioCard key={name} name={name} flipAxis={flipAxis} />
           );
