@@ -30,7 +30,7 @@ const Index = () => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
     setActiveSection("about");
     aboutTimerRef.current = setTimeout(() => {
-      setActiveSection((prev) => (prev === "about" ? null : prev));
+      setActiveSection((prev) => prev === "about" ? null : prev);
     }, 30000);
   };
 
@@ -81,10 +81,10 @@ const Index = () => {
       {/* Hero background illustration */}
       <div className="absolute inset-0 w-full h-screen">
         <img
-          src={bgImage}
-          alt="BIKO KU manga illustration"
-          className="w-full h-full object-cover object-top opacity-60"
-        />
+            src={bgImage}
+            alt="BIKO KU manga illustration"
+            className="w-full h-full object-cover object-top opacity-60" />
+          
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/40" />
@@ -94,19 +94,19 @@ const Index = () => {
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Top nav bar */}
         <motion.header
-          className="flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+            className="flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}>
+            
           <span
-            className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
-            onClick={() => setShowNav((prev) => !prev)}
-          >
+              className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
+              onClick={() => setShowNav((prev) => !prev)}>
+              
             ビコ・ク
           </span>
           <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-            {["Secret Door", "Shop"].map((item, i) => (
+            {["Secret Door", "Shop"].map((item, i) =>
               <motion.a
                 key={item}
                 href={item === "Secret Door" || item === "Shop" ? undefined : `#${item.toLowerCase()}`}
@@ -114,30 +114,30 @@ const Index = () => {
                 className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-              >
+                transition={{ delay: 0.3 + i * 0.1 }}>
+                
                 {item}
               </motion.a>
-            ))}
+              )}
             <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              {bgOptions.map((bg, i) => (
+                className="flex items-center gap-2"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}>
+                
+              {bgOptions.map((bg, i) =>
                 <div
                   key={i}
                   className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
                   style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
-                  onClick={() => setBgImage(bg)}
-                />
-              ))}
+                  onClick={() => setBgImage(bg)} />
+
+                )}
               <div
-                className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
-                onClick={toggleMute}
-                aria-label={muted ? "Unmute sound" : "Mute sound"}
-              >
+                  className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
+                  onClick={toggleMute}
+                  aria-label={muted ? "Unmute sound" : "Mute sound"}>
+                  
                 {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
               </div>
             </motion.div>
@@ -148,40 +148,40 @@ const Index = () => {
         <div className="flex-1 flex items-center px-4 sm:px-8 md:px-16 relative">
           {/* Left side nav */}
           <AnimatePresence>
-            {showNav && (
+            {showNav &&
               <motion.nav
                 className="hidden lg:flex flex-col gap-8 mr-auto"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.4 }}
-              >
+                transition={{ duration: 0.4 }}>
+                
                 {[
-                  { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
-                  { jp: "ポートフォリオ", en: "PORTFOLIO" },
-                  { jp: "コンタクト", en: "CONTACT", action: handleContactClick },
-                ].map((item, i) => (
-                  <motion.a
-                    key={item.en}
-                    href={item.action ? undefined : `#${item.en.toLowerCase()}`}
-                    onClick={() => {
-                      if (!muted) {
-                        const bell = new Audio("/audio/bell-sounds.mp3");
-                        bell.play().catch(() => {});
-                      }
-                      item.action?.();
-                    }}
-                    className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                  >
+                { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
+                { jp: "ポートフォリオ", en: "PORTFOLIO" },
+                { jp: "コンタクト", en: "CONTACT", action: handleContactClick }].
+                map((item, i) =>
+                <motion.a
+                  key={item.en}
+                  href={item.action ? undefined : `#${item.en.toLowerCase()}`}
+                  onClick={() => {
+                    if (!muted) {
+                      const bell = new Audio("/audio/bell-sounds.mp3");
+                      bell.play().catch(() => {});
+                    }
+                    item.action?.();
+                  }}
+                  className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}>
+                  
                     <span className="font-jp text-xs tracking-widest">{item.jp}</span>
                     <span className="text-[10px] tracking-[0.3em] font-display">{item.en}</span>
                   </motion.a>
-                ))}
+                )}
               </motion.nav>
-            )}
+              }
           </AnimatePresence>
 
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -193,7 +193,7 @@ const Index = () => {
 
         {/* About text - between logo and bottom illustration */}
         <AnimatePresence mode="wait">
-          {activeSection === "about" && (
+          {activeSection === "about" &&
             <motion.div
               key="about"
               className="flex justify-center px-4 sm:px-8 md:px-16"
@@ -201,15 +201,15 @@ const Index = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.4 }}
-            >
+              transition={{ duration: 0.4 }}>
+              
               <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
                 Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work.
                 This space is dedicated to sharing visual storytelling and artistic expression across various styles and mediums.
               </p>
             </motion.div>
-          )}
-          {activeSection === "contact" && (
+            }
+          {activeSection === "contact" &&
             <motion.div
               key="contact"
               className="flex justify-center px-4 sm:px-8 md:px-16"
@@ -217,16 +217,16 @@ const Index = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.4 }}
-            >
+              transition={{ duration: 0.4 }}>
+              
               <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
                 <p className="font-display tracking-widest text-foreground/90 mb-2">Cooperation & Commissions</p>
                 <p>For collaboration projects or custom commissions, please contact me via email. I'd be happy to discuss any ideas or concepts you have in mind.</p>
                 <p className="mt-2 text-foreground/90">spaceheidys@gmail.com</p>
               </div>
             </motion.div>
-          )}
-          {activeSection === "shop" && (
+            }
+          {activeSection === "shop" &&
             <motion.div
               key="shop"
               className="flex justify-center px-4 sm:px-8 md:px-16"
@@ -234,14 +234,14 @@ const Index = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.4 }}
-            >
+              transition={{ duration: 0.4 }}>
+              
               <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-                <p className="font-display tracking-widest text-foreground/90 mb-2">Shop</p>
+                <p className="font-display tracking-widest text-foreground/90 mb-2">✦ Shop✦</p>
                 <p>This section is currently under construction. Stay tuned!</p>
               </div>
             </motion.div>
-          )}
+            }
         </AnimatePresence>
 
         {/* Bottom section */}
@@ -264,8 +264,8 @@ const Index = () => {
       </div>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
-    </>
-  );
+    </>);
+
 };
 
 export default Index;
