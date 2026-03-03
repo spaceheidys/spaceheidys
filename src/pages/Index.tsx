@@ -19,7 +19,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
-  const [activeSection, setActiveSection] = useState<"about" | "contact" | null>(null);
+  const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
   const [bgImage, setBgImage] = useState(mainBiko01);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
@@ -109,8 +109,8 @@ const Index = () => {
             {["Secret Door", "Shop"].map((item, i) => (
               <motion.a
                 key={item}
-                href={item === "Secret Door" ? undefined : `#${item.toLowerCase()}`}
-                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : undefined}
+                href={item === "Secret Door" || item === "Shop" ? undefined : `#${item.toLowerCase()}`}
+                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : item === "Shop" ? () => setActiveSection("shop") : undefined}
                 className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -223,6 +223,22 @@ const Index = () => {
                 <p className="font-display tracking-widest text-foreground/90 mb-2">Cooperation & Commissions</p>
                 <p>For collaboration projects or custom commissions, please contact me via email. I'd be happy to discuss any ideas or concepts you have in mind.</p>
                 <p className="mt-2 text-foreground/90">spaceheidys@gmail.com</p>
+              </div>
+            </motion.div>
+          )}
+          {activeSection === "shop" && (
+            <motion.div
+              key="shop"
+              className="flex justify-center px-4 sm:px-8 md:px-16"
+              style={{ marginBottom: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
+                <p className="font-display tracking-widest text-foreground/90 mb-2">Shop</p>
+                <p>This section is currently under construction. Stay tuned!</p>
               </div>
             </motion.div>
           )}
