@@ -151,6 +151,25 @@ const Index = () => {
           </div>
         </div>
 
+        {/* About text - between logo and bottom illustration */}
+        <AnimatePresence>
+          {showAboutText && (
+            <motion.div
+              className="flex justify-center px-4 sm:px-8 md:px-16"
+              style={{ marginBottom: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4 }}
+            >
+              <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
+                Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work.
+                This space is dedicated to sharing visual storytelling and artistic expression across various styles and mediums.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Bottom section */}
         <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between px-4 sm:px-8 md:px-16 pb-0 gap-4 sm:gap-0">
           <div className="flex items-end">
@@ -160,25 +179,6 @@ const Index = () => {
             <SocialLinks />
           </div>
         </div>
-
-        {/* About text */}
-        <AnimatePresence>
-          {showAboutText && (
-            <motion.div
-              className="px-4 sm:px-8 md:px-16"
-              style={{ marginBottom: 30 }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.4 }}
-            >
-              <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl">
-                Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work.
-                This space is dedicated to sharing visual storytelling and artistic expression across various styles and mediums.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Footer */}
         <div className="px-4 sm:px-8 md:px-16 pb-3">
