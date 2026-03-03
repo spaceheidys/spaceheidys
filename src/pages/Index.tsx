@@ -272,7 +272,7 @@ const Index = () => {
           <div
             key={i}
             className="bg-gray-300"
-            style={{ width: 620, height: 320 }}
+            style={{ width: 320, height: 620 }}
           />
         ))}
       </div>
