@@ -187,9 +187,27 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
           />
         </div>
         {/* Countdown */}
-        <span className="text-white/40 text-xs tracking-[0.3em] font-display">
-          {secondsLeft}
-        </span>
+        <motion.span
+          className="text-xs tracking-[0.5em] font-display font-bold"
+          style={{
+            color: secondsLeft <= 10 ? "rgba(255,60,60,0.9)" : "rgba(255,255,255,0.5)",
+            textShadow: secondsLeft <= 10
+              ? "0 0 8px rgba(255,60,60,0.6), 0 0 20px rgba(255,60,60,0.3)"
+              : "0 0 6px rgba(255,255,255,0.15), 0 0 15px rgba(0,255,255,0.1)",
+          }}
+          animate={{
+            opacity: [0.4, 1, 0.4],
+            scale: [1, 1.05, 1],
+            x: secondsLeft <= 10 ? [0, -1, 2, -2, 1, 0] : 0,
+          }}
+          transition={{
+            opacity: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+            scale: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+            x: secondsLeft <= 10 ? { duration: 0.3, repeat: Infinity, repeatDelay: 1 } : {},
+          }}
+        >
+          {String(secondsLeft).padStart(2, "0")}
+        </motion.span>
       </motion.div>
     </motion.div>
   );
