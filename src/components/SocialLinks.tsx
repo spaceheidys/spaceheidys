@@ -6,7 +6,7 @@ import iconTwitter from "@/assets/icon_twitter.svg";
 const socials = [
   { icon: iconBe, href: "https://www.behance.net/Biko_Ku", label: "Behance" },
   { icon: iconLN, href: "https://www.linkedin.com/in/viktor-kudriavcev-94757990/", label: "LinkedIn" },
-  { icon: iconTwitter, href: "https://x.com/spaceheidys", label: "X (Twitter)" },
+  // { icon: iconTwitter, href: "https://x.com/spaceheidys", label: "X (Twitter)" },
 ];
 
 const SocialLinks = () => {
