@@ -274,7 +274,7 @@ const Index = () => {
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         aria-label="Scroll to top"
       >
-        <ArrowUp size={32} />
+        <ArrowUp size={600} strokeWidth={0.5} />
       </div>
       <div className="flex gap-1">
         {["Portfolio_1", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => (
