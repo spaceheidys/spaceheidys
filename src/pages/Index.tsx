@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, ArrowUp } from "lucide-react";
 import heroBg from "@/assets/hero-bg.png";
 import mainBiko01 from "@/assets/main_biko_01.png";
 import mainBiko02 from "@/assets/main_biko_02.png";
@@ -267,7 +267,15 @@ const Index = () => {
     {/* Black banner below main screen */}
     <div className="w-full h-16 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="w-full bg-white flex items-center justify-end" style={{ height: 1080 }}>
+    <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-end" style={{ height: 1080 }}>
+      {/* Scroll to top arrow */}
+      <div
+        className="absolute left-6 top-1/2 -translate-y-1/2 cursor-pointer text-black/40 hover:text-black transition-colors duration-300"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Scroll to top"
+      >
+        <ArrowUp size={32} />
+      </div>
       <div className="flex gap-1">
         {["Portfolio_1", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => (
           <div
