@@ -95,7 +95,7 @@ const Index = () => {
             ビコ・ク
           </span>
           <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-            {["Portfolio", "Contacts"].map((item, i) => (
+            {["Secret Door", "Shop"].map((item, i) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase()}`}
