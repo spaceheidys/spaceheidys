@@ -22,6 +22,7 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
   const [bgImage, setBgImage] = useState(mainBiko01);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const { muted, toggleMute } = useSoundContext();
   const bgOptions = [mainBiko01, mainBiko02, mainBiko03];
@@ -158,7 +159,7 @@ const Index = () => {
                 
                 {[
                 { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
-                { jp: "ポートフォリオ", en: "PORTFOLIO" },
+                { jp: "ポートフォリオ", en: "PORTFOLIO", action: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }) },
                 { jp: "コンタクト", en: "CONTACT", action: handleContactClick }].
                 map((item, i) =>
                 <motion.a
@@ -266,7 +267,7 @@ const Index = () => {
     {/* Black banner below main screen */}
     <div className="w-full h-16 bg-black" />
     {/* White section with image placeholders */}
-    <div className="w-full bg-white flex items-center justify-end" style={{ height: 1080 }}>
+    <div ref={portfolioRef} className="w-full bg-white flex items-center justify-end" style={{ height: 1080 }}>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((i) => (
           <div
