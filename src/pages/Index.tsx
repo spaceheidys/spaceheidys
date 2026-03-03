@@ -269,12 +269,14 @@ const Index = () => {
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="w-full bg-white flex items-center justify-end" style={{ height: 1080 }}>
       <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((i) => (
+        {["Portfolio_1", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => (
           <div
-            key={i}
-            className="bg-gray-300"
-            style={{ width: 320, height: 620 }}
-          />
+            key={name}
+            className="bg-gray-300 flex items-center justify-center text-gray-500 text-xs"
+            style={{ width: 269, height: 521 }}
+          >
+            {name}
+          </div>
         ))}
       </div>
     </div>
