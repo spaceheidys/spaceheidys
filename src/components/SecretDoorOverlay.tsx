@@ -151,6 +151,21 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
       onClick={handleClose}
     >
       <div className="absolute inset-0 bg-black/90" />
+      {/* Timed corner squares */}
+      {/* Square 1: appears immediately (top-left) */}
+      <motion.div className="absolute top-4 left-4 w-3 h-3 bg-white/80" initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} />
+      {/* Square 2: appears at 15s elapsed (top-left, offset) */}
+      {secondsLeft <= 45 && (
+        <motion.div className="absolute top-4 left-10 w-3 h-3 bg-white/80" initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} />
+      )}
+      {/* Square 3: appears at 30s elapsed (top-right) */}
+      {secondsLeft <= 30 && (
+        <motion.div className="absolute top-4 right-4 w-3 h-3 bg-white/80" initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} />
+      )}
+      {/* Square 4: appears at 45s elapsed (bottom-right) */}
+      {secondsLeft <= 15 && (
+        <motion.div className="absolute bottom-4 right-4 w-3 h-3 bg-white/80" initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} />
+      )}
       <motion.div
         className="relative flex flex-col items-center gap-6"
         initial={{ scale: 0.9, opacity: 0 }}
