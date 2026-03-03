@@ -11,9 +11,24 @@ import LoadingScreen from "@/components/LoadingScreen";
 
 const Index = () => {
   const [showNav, setShowNav] = useState(true);
-  const [showAbout, setShowAbout] = useState(false);
+  const [showAboutText, setShowAboutText] = useState(false);
   const [loading, setLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleAboutClick = () => {
+    // Clear any existing timer
+    if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
+    // Play bell sound
+    const bell = new Audio("/audio/bell-sounds.mp3");
+    bell.play().catch(() => {});
+    // Show text
+    setShowAboutText(true);
+    // Hide after 1 minute
+    aboutTimerRef.current = setTimeout(() => {
+      setShowAboutText(false);
+    }, 60000);
+  };
 
   useEffect(() => {
     const audio = new Audio("/audio/main_buddhist.mp3");
@@ -104,7 +119,7 @@ const Index = () => {
                 transition={{ duration: 0.4 }}
               >
                 {[
-                  { jp: "アバウト", en: "ABOUT", action: () => setShowAbout(true) },
+                  { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
                   { jp: "ポートフォリオ", en: "PORTFOLIO" },
                   { jp: "コンタクト", en: "CONTACT" },
                 ].map((item, i) => (
@@ -146,6 +161,25 @@ const Index = () => {
           </div>
         </div>
 
+        {/* About text */}
+        <AnimatePresence>
+          {showAboutText && (
+            <motion.div
+              className="px-4 sm:px-8 md:px-16"
+              style={{ marginBottom: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4 }}
+            >
+              <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl">
+                Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work.
+                This space is dedicated to sharing visual storytelling and artistic expression across various styles and mediums.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Footer */}
         <div className="px-4 sm:px-8 md:px-16 pb-3">
           <div className="border-t-[3px] border-white" />
@@ -154,8 +188,6 @@ const Index = () => {
           </div>
         </div>
       </div>
-
-      <AboutModal open={showAbout} onClose={() => setShowAbout(false)} />
     </div>
     </>
   );
