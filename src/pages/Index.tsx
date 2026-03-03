@@ -263,6 +263,8 @@ const Index = () => {
         </div>
       </div>
     </div>
+    {/* Black banner below main screen */}
+    <div className="w-full h-20 bg-black" />
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
     </>);
 
