@@ -3,13 +3,13 @@ import { motion } from "framer-motion";
 
 interface PortfolioCardProps {
   name: string;
-  isFlippable: boolean;
+  flipAxis?: "x" | "y";
 }
 
-const PortfolioCard = ({ name, isFlippable }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
   const [flipped, setFlipped] = useState(false);
 
-  if (!isFlippable) {
+  if (!flipAxis) {
     return (
       <div
         className="bg-gray-300 flex items-center justify-center text-gray-500 text-xs"
@@ -20,6 +20,12 @@ const PortfolioCard = ({ name, isFlippable }: PortfolioCardProps) => {
     );
   }
 
+  const animateProps = flipAxis === "x"
+    ? { rotateX: flipped ? 180 : 0 }
+    : { rotateY: flipped ? 180 : 0 };
+
+  const backTransform = flipAxis === "x" ? "rotateX(180deg)" : "rotateY(180deg)";
+
   return (
     <div
       className="cursor-pointer"
@@ -29,7 +35,7 @@ const PortfolioCard = ({ name, isFlippable }: PortfolioCardProps) => {
       <motion.div
         className="relative w-full h-full"
         style={{ transformStyle: "preserve-3d" }}
-        animate={{ rotateX: flipped ? 180 : 0 }}
+        animate={animateProps}
         transition={{ duration: 0.6, ease: "easeInOut" }}
       >
         {/* Front */}
@@ -42,7 +48,7 @@ const PortfolioCard = ({ name, isFlippable }: PortfolioCardProps) => {
         {/* Back */}
         <div
           className="absolute inset-0 bg-gray-700 flex items-center justify-center text-white text-xs"
-          style={{ backfaceVisibility: "hidden", transform: "rotateX(180deg)" }}
+          style={{ backfaceVisibility: "hidden", transform: backTransform }}
         >
           {name} — Front
         </div>
