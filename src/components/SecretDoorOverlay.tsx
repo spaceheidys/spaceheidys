@@ -11,6 +11,8 @@ interface SecretDoorOverlayProps {
 const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
   const [code, setCode] = useState("");
   const [progress, setProgress] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [denied, setDenied] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const cyberpunkAudioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -31,6 +33,8 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
     if (isOpen) {
       setCode("");
       setProgress(0);
+      setSecondsLeft(60);
+      setDenied(false);
       setTimeout(() => inputRef.current?.focus(), 100);
 
       // Fade out main music
@@ -67,18 +71,18 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
       cyberpunkAudio.play().catch(() => {});
       cyberpunkAudioRef.current = cyberpunkAudio;
 
-      // Start 1-minute progress bar (60 seconds = 60000ms, update every 600ms = 1% per tick)
+      // Start 1-minute progress bar with countdown
       const totalDuration = 60000;
-      const tickInterval = totalDuration / 100;
-      let currentProgress = 0;
+      const tickInterval = 1000; // Update every second
+      let currentSeconds = 60;
 
       progressIntervalRef.current = setInterval(() => {
-        currentProgress += 1;
-        setProgress(currentProgress);
+        currentSeconds -= 1;
+        setSecondsLeft(currentSeconds);
+        setProgress(((60 - currentSeconds) / 60) * 100);
 
-        if (currentProgress >= 100) {
+        if (currentSeconds <= 0) {
           if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-          // Stop cyberpunk audio, close and go back to main
           cyberpunkAudio.pause();
           cyberpunkAudio.currentTime = 0;
           onClose();
@@ -100,16 +104,24 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setCode(value);
-    if (value === SECRET_CODE) {
-      // Stop progress and audio, navigate to secret
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-      if (cyberpunkAudioRef.current) {
-        cyberpunkAudioRef.current.pause();
+    setDenied(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      if (code === SECRET_CODE) {
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+        if (cyberpunkAudioRef.current) {
+          cyberpunkAudioRef.current.pause();
+        }
+        setTimeout(() => {
+          onClose();
+          window.location.href = "/secret";
+        }, 300);
+      } else if (code.length > 0) {
+        setDenied(true);
+        setCode("");
       }
-      setTimeout(() => {
-        onClose();
-        window.location.href = "/secret";
-      }, 300);
     }
   };
 
@@ -151,10 +163,21 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
           type="text"
           value={code}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           className="bg-black border-2 border-white text-white text-center text-sm tracking-[0.3em] font-display outline-none placeholder:text-white/30"
           style={{ width: "240px", height: "56px" }}
           placeholder="ENTER CODE"
         />
+        {/* Denied message */}
+        {denied && (
+          <motion.p
+            className="text-red-500 text-xs tracking-[0.2em] font-display"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            ACCESS IS DENIED
+          </motion.p>
+        )}
         {/* Progress bar */}
         <div className="w-[240px] h-[2px] bg-white/10 rounded-full overflow-hidden">
           <motion.div
@@ -163,6 +186,10 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
             transition={{ duration: 0.3 }}
           />
         </div>
+        {/* Countdown */}
+        <span className="text-white/40 text-xs tracking-[0.3em] font-display">
+          {secondsLeft}
+        </span>
       </motion.div>
     </motion.div>
   );
