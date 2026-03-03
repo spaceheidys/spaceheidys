@@ -279,9 +279,9 @@ const Index = () => {
       </div>
       <div className="flex gap-1">
         {["Portfolio_1", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => {
-          const isFlippable = name === "Portfolio_1";
+          const flipAxis = name === "Portfolio_1" ? "x" as const : name === "Portfolio_2" ? "y" as const : undefined;
           return (
-            <PortfolioCard key={name} name={name} isFlippable={isFlippable} />
+            <PortfolioCard key={name} name={name} flipAxis={flipAxis} />
           );
         })}
       </div>
