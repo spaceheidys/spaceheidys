@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-const SECRET_CODE = "1234";
+const SECRET_CODE = "Letmein";
 
 interface SecretDoorOverlayProps {
   isOpen: boolean;
