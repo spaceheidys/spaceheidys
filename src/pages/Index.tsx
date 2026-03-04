@@ -7,6 +7,7 @@ import mainBiko02 from "@/assets/main_biko_02.png";
 import mainBiko03 from "@/assets/main_biko_03.png";
 import teddyImg from "@/assets/Teddy.png";
 import taroCorelImg from "@/assets/TARO_Corel.png";
+import taro01Img from "@/assets/TARO_01.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
 import { useSoundContext } from "@/contexts/SoundContext";
 
@@ -278,16 +279,16 @@ const Index = () => {
       >
         <ArrowUp size={32} />
       </div>
-      <div className="flex gap-1">
-        {["Portfolio_1", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => {
-          const flipAxis = name === "Portfolio_1" ? "x" as const : name === "Portfolio_5" ? "y-right" as const : "y-center" as const;
+      <div className="flex gap-1 items-end">
+        <PortfolioCard
+          name="TARO_01"
+          flipAxis="y-center"
+          frontImage={taro01Img}
+        />
+        {["Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => {
+          const flipAxis = name === "Portfolio_5" ? "y-right" as const : "y-center" as const;
           return (
-            <PortfolioCard
-              key={name}
-              name={name}
-              flipAxis={flipAxis}
-              {...(name === "Portfolio_1" ? { frontImage: taroCorelImg, width: 205, height: 364 } : {})}
-            />
+            <PortfolioCard key={name} name={name} flipAxis={flipAxis} />
           );
         })}
       </div>

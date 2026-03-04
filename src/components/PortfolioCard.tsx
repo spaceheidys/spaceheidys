@@ -9,14 +9,14 @@ interface PortfolioCardProps {
   height?: number;
 }
 
-const PortfolioCard = ({ name, flipAxis, frontImage, width = 205, height = 364 }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, width, height }: PortfolioCardProps) => {
   const [flipped, setFlipped] = useState(false);
 
   if (!flipAxis) {
     return (
       <div
         className="bg-muted flex items-center justify-center text-muted-foreground text-xs"
-        style={{ width, height }}>
+        style={{ width: width ?? 205, height: height ?? 364 }}>
         
         {name}
       </div>);
@@ -31,10 +31,13 @@ const PortfolioCard = ({ name, flipAxis, frontImage, width = 205, height = 364 }
   const backTransform = isY ? "rotateY(180deg)" : "rotateX(180deg)";
   const origin = flipAxis === "y-right" ? "right center" : "center center";
 
+  const w = width ?? 205;
+  const h = height ?? 364;
+
   return (
     <div
       className="cursor-pointer"
-      style={{ width, height, perspective: 1000 }}
+      style={{ width: w, height: h, perspective: 1000 }}
       onClick={() => setFlipped((prev) => !prev)}>
       
       <motion.div
@@ -57,7 +60,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, width = 205, height = 364 }
           className="absolute inset-0 bg-accent flex items-center justify-center text-accent-foreground text-xs"
           style={{ backfaceVisibility: "hidden", transform: backTransform }}>
           
-          {name} — Front
+          {name} — Back
         </div>
       </motion.div>
     </div>);
