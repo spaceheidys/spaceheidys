@@ -10,9 +10,10 @@ interface PortfolioCardProps {
   backImage?: string;
   width?: number;
   height?: number;
+  onFlip?: (flipped: boolean) => void;
 }
 
-const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, onFlip }: PortfolioCardProps) => {
   const [flipped, setFlipped] = useState(true);
   const { muted } = useSoundContext();
 
@@ -20,7 +21,11 @@ const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height }:
     if (!muted) {
       new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
     }
-    setFlipped((prev) => !prev);
+    setFlipped((prev) => {
+      const next = !prev;
+      onFlip?.(next);
+      return next;
+    });
   };
 
   if (!flipAxis) {

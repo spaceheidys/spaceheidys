@@ -9,6 +9,7 @@ import teddyImg from "@/assets/Teddy.png";
 import taroCorelImg from "@/assets/TARO_Corel.png";
 import taro01Img from "@/assets/TARO_01.png";
 import taroEyeImg from "@/assets/Taro_backside_eye.png";
+import wallpaper3rdCard from "@/assets/wallpaper_3rd_card.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
 import { useSoundContext } from "@/contexts/SoundContext";
 
@@ -28,6 +29,7 @@ const Index = () => {
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
+  const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
   const { muted, toggleMute } = useSoundContext();
   const bgOptions = [mainBiko01, mainBiko02, mainBiko03];
 
@@ -271,7 +273,15 @@ const Index = () => {
     {/* Black banner below main screen */}
     <div className="w-full h-16 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-center" style={{ height: 1080 }}>
+    <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
+      {/* Wallpaper background for 3rd card */}
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
+        style={{
+          backgroundImage: `url(${wallpaper3rdCard})`,
+          opacity: thirdCardFlipped ? 0 : 1,
+        }}
+      />
       {/* Scroll to top arrow */}
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-black/40 hover:text-black transition-colors duration-300"
@@ -280,7 +290,7 @@ const Index = () => {
       >
         <ArrowUp size={32} />
       </div>
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-6 relative z-10">
         {/* Wisdom text above cards 2-4 */}
         <p className="text-black/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
           "The cards know what the mind has forgotten"
@@ -289,7 +299,7 @@ const Index = () => {
           {[
             { name: "TARO_01" },
             { name: "Portfolio_2" },
-            { name: "Portfolio_3", backImage: taroEyeImg },
+            { name: "Portfolio_3", backImage: taroEyeImg, onFlip: (f: boolean) => setThirdCardFlipped(f) },
             { name: "Portfolio_4" },
             { name: "Portfolio_5" },
           ].map((card) => (
@@ -301,6 +311,7 @@ const Index = () => {
               backImage={card.backImage}
               width={250}
               height={374}
+              onFlip={card.onFlip}
             />
           ))}
         </div>
