@@ -284,6 +284,8 @@ const Index = () => {
           name="TARO_01"
           flipAxis="y-center"
           frontImage={taro01Img}
+          width={312}
+          height={468}
         />
         {["Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => {
           const flipAxis = name === "Portfolio_5" ? "y-right" as const : "y-center" as const;
