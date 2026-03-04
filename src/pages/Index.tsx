@@ -270,7 +270,7 @@ const Index = () => {
     {/* Black banner below main screen */}
     <div className="w-full h-16 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-end" style={{ height: 1080 }}>
+    <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-center" style={{ height: 1080 }}>
       {/* Scroll to top arrow */}
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-black/40 hover:text-black transition-colors duration-300"
