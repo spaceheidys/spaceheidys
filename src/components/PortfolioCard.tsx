@@ -12,7 +12,7 @@ interface PortfolioCardProps {
 }
 
 const PortfolioCard = ({ name, flipAxis, frontImage, width, height }: PortfolioCardProps) => {
-  const [flipped, setFlipped] = useState(false);
+  const [flipped, setFlipped] = useState(true);
   const { muted } = useSoundContext();
 
   const handleFlip = () => {
