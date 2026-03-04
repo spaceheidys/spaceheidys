@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useSoundContext } from "@/contexts/SoundContext";
+import taroBackside from "@/assets/Taro_backside.png";
 
 interface PortfolioCardProps {
   name: string;
@@ -66,10 +67,10 @@ const PortfolioCard = ({ name, flipAxis, frontImage, width, height }: PortfolioC
         </div>
         {/* Back */}
         <div
-          className="absolute inset-0 bg-accent flex items-center justify-center text-accent-foreground text-xs"
+          className="absolute inset-0 flex items-center justify-center"
           style={{ backfaceVisibility: "hidden", transform: backTransform }}>
           
-          {name} — Back
+          <img src={taroBackside} alt={`${name} back`} className="w-full h-full object-cover" />
         </div>
       </motion.div>
     </div>);
