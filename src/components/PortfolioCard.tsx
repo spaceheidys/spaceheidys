@@ -36,7 +36,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, width, height }: PortfolioC
 
   return (
     <div
-      className="cursor-pointer"
+      className="cursor-pointer overflow-hidden rounded-[16px]"
       style={{ width: w, height: h, perspective: 1000 }}
       onClick={() => setFlipped((prev) => !prev)}>
       
