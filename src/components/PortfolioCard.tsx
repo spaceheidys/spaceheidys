@@ -13,17 +13,17 @@ const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
     return (
       <div
         className="bg-gray-300 flex items-center justify-center text-gray-500 text-xs"
-        style={{ width: 256, height: 455 }}
-      >
+        style={{ width: 269, height: 521 }}>
+        
         {name}
-      </div>
-    );
+      </div>);
+
   }
 
   const isY = flipAxis === "y-right" || flipAxis === "y-center";
-  const animateProps = isY
-    ? { rotateY: flipped ? -180 : 0 }
-    : { rotateX: flipped ? 180 : 0 };
+  const animateProps = isY ?
+  { rotateY: flipped ? -180 : 0 } :
+  { rotateX: flipped ? 180 : 0 };
 
   const backTransform = isY ? "rotateY(180deg)" : "rotateX(180deg)";
   const origin = flipAxis === "y-right" ? "right center" : "center center";
@@ -31,32 +31,32 @@ const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
   return (
     <div
       className="cursor-pointer"
-      style={{ width: 256, height: 455, perspective: 1000 }}
-      onClick={() => setFlipped((prev) => !prev)}
-    >
+      style={{ width: 269, height: 521, perspective: 1000 }}
+      onClick={() => setFlipped((prev) => !prev)}>
+      
       <motion.div
         className="relative w-full h-full"
         style={{ transformStyle: "preserve-3d", transformOrigin: origin }}
         animate={animateProps}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
-      >
+        transition={{ duration: 0.6, ease: "easeInOut" }}>
+        
         {/* Front */}
         <div
-          className="absolute inset-0 bg-gray-300 flex items-center justify-center text-gray-500 text-xs"
-          style={{ backfaceVisibility: "hidden" }}
-        >
+          className="absolute inset-0 items-center justify-center text-xs text-primary-foreground bg-slate-400 flex flex-row"
+          style={{ backfaceVisibility: "hidden" }}>
+          
           {name}
         </div>
         {/* Back */}
         <div
           className="absolute inset-0 bg-gray-700 flex items-center justify-center text-white text-xs"
-          style={{ backfaceVisibility: "hidden", transform: backTransform }}
-        >
+          style={{ backfaceVisibility: "hidden", transform: backTransform }}>
+          
           {name} — Front
         </div>
       </motion.div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default PortfolioCard;
