@@ -7,11 +7,12 @@ interface PortfolioCardProps {
   name: string;
   flipAxis?: "x" | "y-right" | "y-center";
   frontImage?: string;
+  backImage?: string;
   width?: number;
   height?: number;
 }
 
-const PortfolioCard = ({ name, flipAxis, frontImage, width, height }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height }: PortfolioCardProps) => {
   const [flipped, setFlipped] = useState(true);
   const { muted } = useSoundContext();
 
@@ -70,7 +71,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, width, height }: PortfolioC
           className="absolute inset-0 flex items-center justify-center"
           style={{ backfaceVisibility: "hidden", transform: backTransform }}>
           
-          <img src={taroBackside} alt={`${name} back`} className="w-full h-full object-cover" />
+          <img src={backImage || taroBackside} alt={`${name} back`} className="w-full h-full object-cover" />
         </div>
       </motion.div>
     </div>);
