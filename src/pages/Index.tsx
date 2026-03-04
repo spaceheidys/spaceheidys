@@ -290,7 +290,14 @@ const Index = () => {
         {["Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => {
           const flipAxis = name === "Portfolio_5" ? "y-right" as const : "y-center" as const;
           return (
-            <PortfolioCard key={name} name={name} flipAxis={flipAxis} />
+            <PortfolioCard
+              key={name}
+              name={name}
+              flipAxis={flipAxis}
+              frontImage={taro01Img}
+              width={250}
+              height={374}
+            />
           );
         })}
       </div>
