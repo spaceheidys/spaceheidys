@@ -13,7 +13,7 @@ const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
     return (
       <div
         className="bg-gray-300 flex items-center justify-center text-gray-500 text-xs"
-        style={{ width: 320, height: 569 }}
+        style={{ width: 256, height: 455 }}
       >
         {name}
       </div>
@@ -31,7 +31,7 @@ const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
   return (
     <div
       className="cursor-pointer"
-      style={{ width: 320, height: 569, perspective: 1000 }}
+      style={{ width: 256, height: 455, perspective: 1000 }}
       onClick={() => setFlipped((prev) => !prev)}
     >
       <motion.div
