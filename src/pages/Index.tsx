@@ -280,26 +280,16 @@ const Index = () => {
         <ArrowUp size={32} />
       </div>
       <div className="flex gap-1 items-end">
-        <PortfolioCard
-          name="TARO_01"
-          flipAxis="y-center"
-          frontImage={taro01Img}
-          width={250}
-          height={374}
-        />
-        {["Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => {
-          const flipAxis = name === "Portfolio_5" ? "y-right" as const : "y-center" as const;
-          return (
-            <PortfolioCard
-              key={name}
-              name={name}
-              flipAxis={flipAxis}
-              frontImage={taro01Img}
-              width={250}
-              height={374}
-            />
-          );
-        })}
+        {["TARO_01", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => (
+          <PortfolioCard
+            key={name}
+            name={name}
+            flipAxis="y-center"
+            frontImage={taro01Img}
+            width={250}
+            height={374}
+          />
+        ))}
       </div>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
