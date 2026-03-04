@@ -4,16 +4,19 @@ import { motion } from "framer-motion";
 interface PortfolioCardProps {
   name: string;
   flipAxis?: "x" | "y-right" | "y-center";
+  frontImage?: string;
+  width?: number;
+  height?: number;
 }
 
-const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, width = 205, height = 364 }: PortfolioCardProps) => {
   const [flipped, setFlipped] = useState(false);
 
   if (!flipAxis) {
     return (
       <div
-        className="bg-gray-300 flex items-center justify-center text-gray-500 text-xs"
-        style={{ width: 205, height: 364 }}>
+        className="bg-muted flex items-center justify-center text-muted-foreground text-xs"
+        style={{ width, height }}>
         
         {name}
       </div>);
@@ -31,7 +34,7 @@ const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
   return (
     <div
       className="cursor-pointer"
-      style={{ width: 205, height: 364, perspective: 1000 }}
+      style={{ width, height, perspective: 1000 }}
       onClick={() => setFlipped((prev) => !prev)}>
       
       <motion.div
@@ -42,14 +45,16 @@ const PortfolioCard = ({ name, flipAxis }: PortfolioCardProps) => {
         
         {/* Front */}
         <div
-          className="absolute inset-0 items-center justify-center text-xs text-primary-foreground bg-slate-400 flex flex-row"
+          className="absolute inset-0 flex items-center justify-center text-xs bg-muted text-muted-foreground"
           style={{ backfaceVisibility: "hidden" }}>
           
-          {name}
+          {frontImage ? (
+            <img src={frontImage} alt={name} className="w-full h-full object-cover" />
+          ) : name}
         </div>
         {/* Back */}
         <div
-          className="absolute inset-0 bg-gray-700 flex items-center justify-center text-white text-xs"
+          className="absolute inset-0 bg-accent flex items-center justify-center text-accent-foreground text-xs"
           style={{ backfaceVisibility: "hidden", transform: backTransform }}>
           
           {name} — Front
