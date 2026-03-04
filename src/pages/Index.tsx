@@ -280,17 +280,30 @@ const Index = () => {
       >
         <ArrowUp size={32} />
       </div>
-      <div className="flex gap-1 items-end">
-        {["TARO_01", "Portfolio_2", "Portfolio_3", "Portfolio_4", "Portfolio_5"].map((name) => (
-          <PortfolioCard
-            key={name}
-            name={name}
-            flipAxis="y-center"
-            frontImage={taro01Img}
-            width={250}
-            height={374}
-          />
-        ))}
+      <div className="flex flex-col items-center gap-6">
+        {/* Wisdom text above cards 2-4 */}
+        <p className="text-black/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
+          "The cards know what the mind has forgotten"
+        </p>
+        <div className="flex gap-1 items-end">
+          {[
+            { name: "TARO_01" },
+            { name: "Portfolio_2" },
+            { name: "Portfolio_3", backImage: taroEyeImg },
+            { name: "Portfolio_4" },
+            { name: "Portfolio_5" },
+          ].map((card) => (
+            <PortfolioCard
+              key={card.name}
+              name={card.name}
+              flipAxis="y-center"
+              frontImage={taro01Img}
+              backImage={card.backImage}
+              width={250}
+              height={374}
+            />
+          ))}
+        </div>
       </div>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
