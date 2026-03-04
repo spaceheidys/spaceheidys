@@ -271,7 +271,7 @@ const Index = () => {
     <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-end" style={{ height: 1080 }}>
       {/* Scroll to top arrow */}
       <div
-        className="absolute left-6 top-1/2 -translate-y-1/2 cursor-pointer text-black/40 hover:text-black transition-colors duration-300"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-black/40 hover:text-black transition-colors duration-300"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         aria-label="Scroll to top"
       >
