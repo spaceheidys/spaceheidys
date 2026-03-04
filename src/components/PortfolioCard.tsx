@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useSoundContext } from "@/contexts/SoundContext";
 
 interface PortfolioCardProps {
   name: string;
@@ -11,6 +12,14 @@ interface PortfolioCardProps {
 
 const PortfolioCard = ({ name, flipAxis, frontImage, width, height }: PortfolioCardProps) => {
   const [flipped, setFlipped] = useState(false);
+  const { muted } = useSoundContext();
+
+  const handleFlip = () => {
+    if (!muted) {
+      new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
+    }
+    setFlipped((prev) => !prev);
+  };
 
   if (!flipAxis) {
     return (
@@ -38,7 +47,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, width, height }: PortfolioC
     <div
       className="cursor-pointer overflow-hidden rounded-[16px]"
       style={{ width: w, height: h, perspective: 1000 }}
-      onClick={() => setFlipped((prev) => !prev)}>
+      onClick={handleFlip}>
       
       <motion.div
         className="relative w-full h-full"
