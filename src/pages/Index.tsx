@@ -132,7 +132,7 @@ const Index = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}>
                 
-              {bgOptions.map((bg, i) =>
+              {bgOptions.length > 1 && bgOptions.map((bg, i) =>
                 <div
                   key={i}
                   className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
