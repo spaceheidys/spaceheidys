@@ -30,7 +30,7 @@ const Index = () => {
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
   const { muted, toggleMute } = useSoundContext();
-  const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
+  const bgOptions = [mainBiko01];
 
   const handleAboutClick = () => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
