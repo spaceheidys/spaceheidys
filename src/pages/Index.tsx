@@ -265,8 +265,8 @@ const Index = () => {
         </div>
 
         {/* Copyright */}
-        <div className="flex justify-center pb-2">
-          <div className="text-[10px] sm:text-xs tracking-widest text-foreground/40 font-display">
+        <div className="flex justify-center" style={{ paddingBottom: 100 }}>
+          <div className="text-[10px] sm:text-xs tracking-widest text-foreground/40 font-display text-center">
             © 2026 Spaceheidys. All rights reserved.
           </div>
         </div>
