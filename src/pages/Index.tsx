@@ -271,7 +271,7 @@ const Index = () => {
       </div>
     </div>
     {/* Black banner below main screen */}
-    <div className="w-full h-16 bg-black" />
+    <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
       {/* Wallpaper background for 3rd card */}
