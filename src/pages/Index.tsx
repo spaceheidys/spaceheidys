@@ -85,7 +85,7 @@ const Index = () => {
       <AnimatePresence>
         {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       </AnimatePresence>
-      <div className="relative min-h-screen bg-background overflow-hidden">
+      <div className="relative bg-background overflow-hidden" style={{ height: 1080 }}>
       {/* === MAIN section === */}
       {/* Hero background illustration */}
       <div className="absolute inset-0 w-full h-screen">
