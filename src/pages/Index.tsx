@@ -10,6 +10,7 @@ import taroCorelImg from "@/assets/TARO_Corel.png";
 import taro01Img from "@/assets/TARO_01.png";
 import taroEyeImg from "@/assets/Taro_backside_eye.png";
 import wallpaper3rdCard from "@/assets/wallpaper_3rd_card.png";
+import portfolioMainBg from "@/assets/portfolio_main.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
 import { useSoundContext } from "@/contexts/SoundContext";
 
@@ -85,6 +86,7 @@ const Index = () => {
         {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       </AnimatePresence>
       <div className="relative min-h-screen bg-background overflow-hidden">
+      {/* === MAIN section === */}
       {/* Hero background illustration */}
       <div className="absolute inset-0 w-full h-screen">
         <img
@@ -270,10 +272,15 @@ const Index = () => {
         </div>
       </div>
     </div>
-    {/* Black banner below main screen */}
+    {/* === 2nd_dimension === */}
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
+    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
+      {/* Portfolio background */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-60"
+        style={{ backgroundImage: `url(${portfolioMainBg})` }}
+      />
       {/* Wallpaper background for 3rd card */}
       <div
         className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
@@ -284,7 +291,7 @@ const Index = () => {
       />
       {/* Scroll to top arrow */}
       <div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-black/40 hover:text-black transition-colors duration-300"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         aria-label="Scroll to top"
       >
@@ -292,7 +299,7 @@ const Index = () => {
       </div>
       <div className="flex flex-col items-center gap-6 relative z-10">
         {/* Wisdom text above cards 2-4 */}
-        <p className="text-black/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
+        <p className="text-white/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
           "The cards know what the mind has forgotten"
         </p>
         <div className="flex gap-1 items-end">
