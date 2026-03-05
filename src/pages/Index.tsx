@@ -275,7 +275,12 @@ const Index = () => {
     {/* === 2nd_dimension === */}
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-white flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
+    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
+      {/* Portfolio background */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-60"
+        style={{ backgroundImage: `url(${portfolioMainBg})` }}
+      />
       {/* Wallpaper background for 3rd card */}
       <div
         className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
