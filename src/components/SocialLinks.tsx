@@ -27,7 +27,7 @@ const SocialLinks = () => {
           aria-label={s.label}
           onClick={(e) => { e.preventDefault(); window.open(s.href, '_blank'); }}
         >
-          <img src={s.icon} alt={s.label} style={{ height: 38 }} className="w-auto opacity-60 hover:opacity-100 transition-opacity" />
+          <img src={s.icon} alt={s.label} style={{ height: 15 }} className="w-auto opacity-60 hover:opacity-100 transition-opacity" />
         </a>
       ))}
     </motion.div>
