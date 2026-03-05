@@ -254,7 +254,7 @@ const Index = () => {
         </AnimatePresence>
 
         {/* Bottom section */}
-        <div className="mt-auto flex justify-center" style={{ paddingBottom: 60 }}>
+        <div className="mt-auto flex items-center justify-center" style={{ paddingBottom: 60 }}>
           <SocialLinks />
         </div>
 
