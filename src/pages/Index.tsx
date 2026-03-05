@@ -264,17 +264,15 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="flex justify-center" style={{ paddingBottom: 100 }}>
-          <div className="text-[10px] sm:text-xs tracking-widest text-foreground/40 font-display text-center">
-            © 2026 Spaceheidys. All rights reserved.
-          </div>
-        </div>
 
       </div>
     </div>
     {/* === 2nd_dimension === */}
-    <div className="w-full h-8 bg-black" />
+    <div className="w-full h-8 bg-black flex items-center justify-center">
+      <div className="text-[10px] sm:text-xs tracking-widest text-white/40 font-display">
+        © 2026 Spaceheidys. All rights reserved.
+      </div>
+    </div>
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
       {/* Portfolio background */}
