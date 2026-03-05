@@ -3,7 +3,11 @@ import iconBe from "@/assets/social_network/icon_Be.svg";
 import iconLN from "@/assets/social_network/icon_LN.svg";
 import iconTwitter from "@/assets/social_network/icon_twitter.svg";
 
-const socials: { icon: string; href: string; label: string }[] = [];
+const socials = [
+  { icon: iconBe, href: "https://www.behance.net/Biko_Ku", label: "Behance" },
+  { icon: iconLN, href: "https://www.linkedin.com/in/viktor-kudriavcev-94757990/", label: "LinkedIn" },
+  // { icon: iconTwitter, href: "https://x.com/spaceheidys", label: "X (Twitter)" },
+];
 
 const SocialLinks = () => {
   return (
