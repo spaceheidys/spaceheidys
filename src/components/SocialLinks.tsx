@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import iconBe from "@/assets/icon_Be.svg";
-import iconLN from "@/assets/icon_LN.svg";
-import iconTwitter from "@/assets/icon_twitter.svg";
+import iconBe from "@/assets/social_network/icon_Be.svg";
+import iconLN from "@/assets/social_network/icon_LN.svg";
+import iconTwitter from "@/assets/social_network/icon_twitter.svg";
 
 const socials = [
   { icon: iconBe, href: "https://www.behance.net/Biko_Ku", label: "Behance" },
