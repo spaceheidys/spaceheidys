@@ -2,9 +2,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX, ArrowUp } from "lucide-react";
 import heroBg from "@/assets/hero-bg.png";
-import mainBiko01 from "@/assets/main_biko_01.png";
-import mainBiko02 from "@/assets/main_biko_02.png";
-import mainBiko03 from "@/assets/main_biko_03.png";
+import lostInTime01 from "@/assets/lost_in_time_01.png";
+import lostInTime02 from "@/assets/lost_in_time_02.png";
+import lostInTime03 from "@/assets/lost_in_time_03.png";
 import teddyImg from "@/assets/Teddy.png";
 import taroCorelImg from "@/assets/TARO_Corel.png";
 import taro01Img from "@/assets/TARO_01.png";
@@ -26,13 +26,13 @@ const Index = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
-  const [bgImage, setBgImage] = useState(mainBiko01);
+  const [bgImage, setBgImage] = useState(lostInTime01);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
   const { muted, toggleMute } = useSoundContext();
-  const bgOptions = [mainBiko01, mainBiko02, mainBiko03];
+  const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
 
   const handleAboutClick = () => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
