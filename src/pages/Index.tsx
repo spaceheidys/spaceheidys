@@ -291,7 +291,7 @@ const Index = () => {
       />
       {/* Scroll to top arrow */}
       <div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-black/40 hover:text-black transition-colors duration-300"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         aria-label="Scroll to top"
       >
