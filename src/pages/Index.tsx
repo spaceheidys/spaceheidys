@@ -256,7 +256,8 @@ const Index = () => {
         {/* Bottom section */}
         <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between px-4 sm:px-8 md:px-16 pb-0 gap-4 sm:gap-0">
           <div className="flex items-end">
-            <MascotSection />
+            {/* Teddy_bubble - hidden for now */}
+            {/* <MascotSection /> */}
           </div>
         <div className="pb-4 sm:pb-8">
             <SocialLinks />
