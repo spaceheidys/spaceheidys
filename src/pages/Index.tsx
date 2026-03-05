@@ -128,6 +128,28 @@ const Index = () => {
                 {item}
               </motion.a>
               )}
+            <motion.div
+                className="flex items-center gap-2"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}>
+                
+              {bgOptions.map((bg, i) =>
+                <div
+                  key={i}
+                  className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
+                  style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
+                  onClick={() => setBgImage(bg)} />
+
+                )}
+              <div
+                  className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
+                  onClick={toggleMute}
+                  aria-label={muted ? "Unmute sound" : "Mute sound"}>
+                  
+                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </div>
+            </motion.div>
           </nav>
         </motion.header>
 
