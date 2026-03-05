@@ -299,7 +299,7 @@ const Index = () => {
       </div>
       <div className="flex flex-col items-center gap-6 relative z-10">
         {/* Wisdom text above cards 2-4 */}
-        <p className="text-black/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
+        <p className="text-white/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
           "The cards know what the mind has forgotten"
         </p>
         <div className="flex gap-1 items-end">
