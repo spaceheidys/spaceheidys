@@ -318,7 +318,7 @@ const Index = () => {
       </div>
     </div>
     {/* Footer */}
-    <div className="w-full flex items-center justify-center" style={{ height: 30, backgroundColor: 'red' }}>
+    <div className="w-full flex items-center justify-center" style={{ height: 64, backgroundColor: 'red' }}>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
     </>);
