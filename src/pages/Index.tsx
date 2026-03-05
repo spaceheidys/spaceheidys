@@ -258,19 +258,22 @@ const Index = () => {
           <div className="flex items-end">
             <MascotSection />
           </div>
-          <div className="pb-4 sm:pb-8">
+        <div className="pb-4 sm:pb-8">
             <SocialLinks />
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="flex justify-center pb-2">
+          <div className="text-[10px] sm:text-xs tracking-widest text-foreground/40 font-display">
+            © 2026 Spaceheidys. All rights reserved.
           </div>
         </div>
 
       </div>
     </div>
     {/* === 2nd_dimension === */}
-    <div className="w-full h-8 bg-black flex items-center justify-center">
-      <div className="text-[10px] sm:text-xs tracking-widest text-white/40 font-display">
-        © 2026 Spaceheidys. All rights reserved.
-      </div>
-    </div>
+    <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
       {/* Portfolio background */}
