@@ -305,10 +305,10 @@ const Index = () => {
         <div className="flex gap-1 items-end">
           {[
             { name: "TARO_01" },
-            { name: "Portfolio_2" },
-            { name: "Portfolio_3", backImage: taroEyeImg, onFlip: (f: boolean) => setThirdCardFlipped(f) },
-            { name: "Portfolio_4" },
-            { name: "Portfolio_5" },
+            { name: "TARO_02" },
+            { name: "TARO_03", backImage: taroEyeImg, onFlip: (f: boolean) => setThirdCardFlipped(f) },
+            { name: "TARO_04" },
+            { name: "TARO_05" },
           ].map((card) => (
             <PortfolioCard
               key={card.name}
