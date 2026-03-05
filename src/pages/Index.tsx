@@ -92,7 +92,7 @@ const Index = () => {
         <img
             src={bgImage}
             alt="BIKO KU manga illustration"
-            className="w-full h-full object-cover object-top opacity-60" />
+            className="w-full h-full object-cover object-center opacity-60" />
           
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
