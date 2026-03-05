@@ -85,7 +85,7 @@ const Index = () => {
       <AnimatePresence>
         {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       </AnimatePresence>
-      <div className="relative bg-background overflow-hidden" style={{ height: 1080 }}>
+      <div className="relative bg-background overflow-hidden rounded-none" style={{ height: 1080 }}>
       {/* === MAIN section === */}
       {/* Hero background illustration */}
       <div className="absolute inset-0 w-full h-screen">
@@ -271,23 +271,23 @@ const Index = () => {
     <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
       {/* Portfolio background */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-60"
-        style={{ backgroundImage: `url(${portfolioMainBg})` }}
-      />
+          className="absolute inset-0 bg-cover bg-center opacity-60"
+          style={{ backgroundImage: `url(${portfolioMainBg})` }} />
+        
       {/* Wallpaper background for 3rd card */}
       <div
-        className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
-        style={{
-          backgroundImage: `url(${wallpaper3rdCard})`,
-          opacity: thirdCardFlipped ? 0 : 1,
-        }}
-      />
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
+          style={{
+            backgroundImage: `url(${wallpaper3rdCard})`,
+            opacity: thirdCardFlipped ? 0 : 1
+          }} />
+        
       {/* Scroll to top arrow */}
       <div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        aria-label="Scroll to top"
-      >
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Scroll to top">
+          
         <ArrowUp size={32} />
       </div>
       <div className="flex flex-col items-center gap-6 relative z-10">
@@ -301,8 +301,8 @@ const Index = () => {
             { name: "Card_02" },
             { name: "Card_03", backImage: taroEyeImg, onFlip: (f: boolean) => setThirdCardFlipped(f) },
             { name: "Card_04" },
-            { name: "Card_05" },
-          ].map((card) => (
+            { name: "Card_05" }].
+            map((card) =>
             <PortfolioCard
               key={card.name}
               name={card.name}
@@ -311,9 +311,9 @@ const Index = () => {
               backImage={card.backImage}
               width={250}
               height={374}
-              onFlip={card.onFlip}
-            />
-          ))}
+              onFlip={card.onFlip} />
+
+            )}
         </div>
       </div>
     </div>
