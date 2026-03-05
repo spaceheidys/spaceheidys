@@ -10,6 +10,7 @@ import taroCorelImg from "@/assets/TARO_Corel.png";
 import taro01Img from "@/assets/TARO_01.png";
 import taroEyeImg from "@/assets/Taro_backside_eye.png";
 import wallpaper3rdCard from "@/assets/wallpaper_3rd_card.png";
+import portfolioMainBg from "@/assets/portfolio_main.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
 import { useSoundContext } from "@/contexts/SoundContext";
 
