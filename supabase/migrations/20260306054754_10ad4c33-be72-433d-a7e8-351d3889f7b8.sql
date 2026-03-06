@@ -1,0 +1,1 @@
+ALTER TABLE public.portfolio_items ADD COLUMN group_id uuid DEFAULT NULL;
