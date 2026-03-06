@@ -283,37 +283,21 @@ const Admin = () => {
             No images in this section yet
           </p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            <AnimatePresence>
-              {items.map((item) => (
-                <motion.div
-                  key={item.id}
-                  className="relative group aspect-square bg-secondary border border-border overflow-hidden"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                >
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {items.map((item) => (
+                  <SortableImageCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    image_url={item.image_url}
+                    onDelete={() => handleDelete(item)}
                   />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button
-                      onClick={() => handleDelete(item)}
-                      className="text-red-400 hover:text-red-300 transition-colors"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                  <span className="absolute bottom-1 left-1 text-[8px] text-white/50 font-display tracking-wider truncate max-w-[90%]">
-                    {item.title}
-                  </span>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 
