@@ -41,6 +41,10 @@ const Admin = () => {
   const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
   useEffect(() => {
     if (!loading && !user) {
       navigate("/admin/login");
