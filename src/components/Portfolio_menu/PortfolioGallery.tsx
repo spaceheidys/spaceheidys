@@ -4,7 +4,8 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE_MOBILE = 6;
+const ITEMS_PER_PAGE_DESKTOP = 9;
 
 interface PortfolioItem {
   id: string;
