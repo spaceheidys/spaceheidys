@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 
-const PolygonBackground = () => {
+interface PolygonBackgroundProps {
+  triggerKey?: number;
+}
+
+const PolygonBackground = ({ triggerKey = 0 }: PolygonBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
