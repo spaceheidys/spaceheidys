@@ -226,8 +226,6 @@ const SecretDoorOverlay = forwardRef<HTMLDivElement, SecretDoorOverlayProps>(({ 
       </motion.div>
     </motion.div>
   );
-};
-
 });
 
 SecretDoorOverlay.displayName = "SecretDoorOverlay";

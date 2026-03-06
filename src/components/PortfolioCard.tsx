@@ -81,7 +81,7 @@ const PortfolioCard = forwardRef<HTMLDivElement, PortfolioCardProps>(({ name, fl
       </motion.div>
     </div>);
 
-};
+});
 
 PortfolioCard.displayName = "PortfolioCard";
 
