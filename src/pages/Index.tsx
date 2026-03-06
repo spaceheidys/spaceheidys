@@ -292,6 +292,7 @@ const Index = () => {
                 backImage={taroEyeImg}
                 onFlip={(f: boolean) => { setThirdCardFlipped(f); setFlipCount(c => c + 1); }} />
           </div>
+          <PortfolioMenu visible={!thirdCardFlipped} />
         </div>
       </div>
 
