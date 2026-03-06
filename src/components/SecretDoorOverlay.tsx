@@ -226,8 +226,6 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
       </motion.div>
     </motion.div>
   );
-});
-
-SecretDoorOverlay.displayName = "SecretDoorOverlay";
+};
 
 export default SecretDoorOverlay;

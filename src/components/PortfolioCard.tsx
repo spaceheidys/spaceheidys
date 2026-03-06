@@ -81,8 +81,6 @@ const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, o
       </motion.div>
     </div>);
 
-});
-
-PortfolioCard.displayName = "PortfolioCard";
+};
 
 export default PortfolioCard;
