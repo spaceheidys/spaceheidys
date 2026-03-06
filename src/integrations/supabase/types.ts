@@ -107,6 +107,27 @@ export type Database = {
         }
         Relationships: []
       }
+      section_settings: {
+        Row: {
+          id: string
+          is_visible: boolean
+          section: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          is_visible?: boolean
+          section: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          is_visible?: boolean
+          section?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
