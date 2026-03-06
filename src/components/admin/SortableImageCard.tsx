@@ -96,13 +96,17 @@ const SortableImageCard = ({
   }, []);
 
   const scale = image_zoom;
+  const groupColor = group_id ? getGroupColor(group_id) : null;
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{
+        ...style,
+        ...(groupColor ? { borderColor: groupColor, borderWidth: "2px" } : {}),
+      }}
       className={`relative group aspect-square bg-secondary border overflow-hidden ${
-        isDragging ? "border-foreground/50 shadow-lg" : "border-border"
+        isDragging ? "border-foreground/50 shadow-lg" : groupColor ? "" : "border-border"
       }`}
     >
       <div ref={containerRef} className="w-full h-full overflow-hidden">
