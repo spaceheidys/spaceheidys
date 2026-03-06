@@ -19,6 +19,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          image_offset_x: number
+          image_offset_y: number
           image_url: string
           section: string
           sort_order: number
@@ -29,6 +31,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          image_offset_x?: number
+          image_offset_y?: number
           image_url: string
           section: string
           sort_order?: number
@@ -39,6 +43,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          image_offset_x?: number
+          image_offset_y?: number
           image_url?: string
           section?: string
           sort_order?: number

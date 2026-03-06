@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -165,6 +165,19 @@ const Admin = () => {
     }
   };
 
+  const positionTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handlePositionChange = (id: string, x: number, y: number) => {
+    // Optimistic local update
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, image_offset_x: x, image_offset_y: y } as any : i)));
+
+    // Debounced DB persist
+    if (positionTimers.current[id]) clearTimeout(positionTimers.current[id]);
+    positionTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ image_offset_x: x, image_offset_y: y } as any).eq("id", id);
+    }, 400);
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -292,7 +305,10 @@ const Admin = () => {
                     id={item.id}
                     title={item.title}
                     image_url={item.image_url}
+                    image_offset_x={(item as any).image_offset_x ?? 50}
+                    image_offset_y={(item as any).image_offset_y ?? 50}
                     onDelete={() => handleDelete(item)}
+                    onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
                   />
                 ))}
               </div>
