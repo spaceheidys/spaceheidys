@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE_MOBILE = 6;
+const ITEMS_PER_PAGE_DESKTOP = 9;
 
 interface PortfolioItem {
   id: string;
@@ -36,6 +38,8 @@ interface PortfolioGalleryProps {
 }
 
 const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: PortfolioGalleryProps) => {
+  const isMobile = useIsMobile();
+  const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
 
@@ -73,7 +77,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
       ? defaultGallerySubItems[gallerySub]
       : defaultSectionItems[sectionKey] || defaultSectionItems.gallery);
 
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(items.length / itemsPerPage);
   const [page, setPage] = useState(0);
   const hasPagination = totalPages > 1;
 
@@ -85,7 +89,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     onPageInfo?.(page + 1, totalPages);
   }, [page, totalPages, onPageInfo]);
 
-  const pageItems = items.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+  const pageItems = items.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
@@ -103,7 +107,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
       <AnimatePresence mode="wait">
         <motion.div
           key={`${sectionKey}-${gallerySub}-${page}`}
-          className="w-full h-full grid grid-cols-2 gap-2 p-2"
+          className="w-full h-full grid grid-cols-2 sm:grid-cols-3 gap-2 p-2"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -112,7 +116,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           {pageItems.map((item, i) => (
             <motion.div
               key={item.id}
-              className="bg-white/5 border border-white/10 rounded-md flex items-center justify-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-colors duration-300 overflow-hidden"
+              className="aspect-square bg-white/5 border border-white/10 rounded-md flex items-center justify-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-colors duration-300 overflow-hidden"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 + i * 0.04 }}
