@@ -77,7 +77,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
       ? defaultGallerySubItems[gallerySub]
       : defaultSectionItems[sectionKey] || defaultSectionItems.gallery);
 
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(items.length / itemsPerPage);
   const [page, setPage] = useState(0);
   const hasPagination = totalPages > 1;
 
