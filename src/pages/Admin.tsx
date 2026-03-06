@@ -40,6 +40,7 @@ const Admin = () => {
   const [activeSub, setActiveSub] = useState<string>("VECTOR");
   const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [confirmSave, setConfirmSave] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
