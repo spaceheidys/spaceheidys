@@ -199,6 +199,11 @@ const Admin = () => {
     }, 400);
   };
 
+  const handleTextAlignChange = (id: string, align: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, text_align: align } as any : i)));
+    supabase.from("portfolio_items").update({ text_align: align } as any).eq("id", id);
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -360,10 +365,12 @@ const Admin = () => {
                     image_offset_x={(item as any).image_offset_x ?? 50}
                     image_offset_y={(item as any).image_offset_y ?? 50}
                     image_zoom={(item as any).image_zoom ?? 1}
+                    text_align={(item as any).text_align ?? 'left'}
                     onDelete={() => handleDelete(item)}
                     onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
                     onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
                     onTitleChange={(title) => handleTitleChange(item.id, title)}
+                    onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
                   />
                 ))}
               </div>

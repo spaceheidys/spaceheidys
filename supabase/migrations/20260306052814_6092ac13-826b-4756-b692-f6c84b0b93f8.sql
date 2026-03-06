@@ -1,0 +1,1 @@
+ALTER TABLE public.portfolio_items ADD COLUMN text_align text NOT NULL DEFAULT 'left';
