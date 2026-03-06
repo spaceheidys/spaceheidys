@@ -191,8 +191,15 @@ const AdminMain = () => {
 
       {/* Content */}
       <div className="px-4 sm:px-8 py-6">
+        {/* Buttons section — at top */}
+        <ButtonsSection
+          buttons={navButtons}
+          onUpdate={updateButton}
+          onSwapOrder={swapOrder}
+        />
+
         {/* Active backgrounds */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 mt-6">
           <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
             Active backgrounds — {activeSection} section
             {swapTarget && (
