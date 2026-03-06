@@ -228,4 +228,8 @@ const SecretDoorOverlay = forwardRef<HTMLDivElement, SecretDoorOverlayProps>(({ 
   );
 };
 
+});
+
+SecretDoorOverlay.displayName = "SecretDoorOverlay";
+
 export default SecretDoorOverlay;

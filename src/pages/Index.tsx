@@ -1,12 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX, ArrowUp } from "lucide-react";
-import heroBg from "@/assets/hero-bg.png";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
-import teddyImg from "@/assets/Teddy.png";
-import taroCorelImg from "@/assets/TARO_Corel.png";
 import taro01Img from "@/assets/TARO_01.png";
 import taroEyeImg from "@/assets/Taro_backside_eye.png";
 import wallpaper3rdCard from "@/assets/wallpaper_3rd_card.png";

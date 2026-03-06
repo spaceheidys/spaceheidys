@@ -83,4 +83,6 @@ const PortfolioCard = forwardRef<HTMLDivElement, PortfolioCardProps>(({ name, fl
 
 };
 
+PortfolioCard.displayName = "PortfolioCard";
+
 export default PortfolioCard;
