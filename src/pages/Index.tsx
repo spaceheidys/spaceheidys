@@ -38,6 +38,7 @@ const Index = () => {
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
   const [flipCount, setFlipCount] = useState(0);
   const { muted, toggleMute } = useSoundContext();
+  const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
   const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
 
   const handleAboutClick = () => {
