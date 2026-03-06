@@ -280,8 +280,8 @@ const Index = () => {
       <PolygonBackground triggerKey={flipCount} />
       
 
-      {/* Cards content — centered vertically */}
-      <div className="flex-1 flex items-center justify-center py-8 sm:py-12 px-3 sm:px-4 relative z-10">
+      {/* Cards content — pushed toward top */}
+      <div className="flex items-center justify-center pt-8 sm:pt-12 px-3 sm:px-4 relative z-10">
         <div className="items-center justify-center flex flex-col">
           {/* Wisdom text above cards */}
           <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0 my-[20px]">
@@ -304,6 +304,9 @@ const Index = () => {
           </div>
         </div>
       </div>
+
+      {/* Spacer to push arrow down */}
+      <div className="flex-1" />
 
       {/* Scroll to top arrow */}
       <div
