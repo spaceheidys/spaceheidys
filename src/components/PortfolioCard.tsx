@@ -52,7 +52,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, o
 
   return (
     <div
-      className="cursor-pointer overflow-hidden rounded-[12px] sm:rounded-[16px] w-[100px] h-[150px] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]"
+      className="cursor-pointer overflow-hidden rounded-[12px] sm:rounded-[16px] w-[80vw] h-[120vw] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]"
       style={{ ...(w && h ? { width: w, height: h } : {}), perspective: 1000 }}
       onClick={handleFlip}>
       
