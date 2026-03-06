@@ -312,7 +312,7 @@ const Admin = () => {
 
       <div className="px-4 sm:px-8 py-6 max-w-5xl mx-auto">
         {/* Section tabs */}
-        <div className="flex gap-2 mb-4 flex-wrap">
+        <div className="flex gap-2 mb-4 flex-wrap items-center">
           {SECTIONS.map((s) => (
             <button
               key={s}
@@ -326,6 +326,20 @@ const Admin = () => {
               {s}
             </button>
           ))}
+
+          <div className="ml-auto">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1.5 text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
+                  <StickyNote size={12} />
+                  NOTES
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-auto p-4 border-border bg-background">
+                {user && <NotesPanel userId={user.id} />}
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         {/* Gallery sub-tabs */}
