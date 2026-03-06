@@ -84,6 +84,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (user && isAdmin) fetchItems();
+    setCmsPage(0);
   }, [activeSection, activeSub, user, isAdmin]);
 
   const uploadFiles = async (files: File[], grouped: boolean) => {
