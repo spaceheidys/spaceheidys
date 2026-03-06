@@ -178,8 +178,31 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             transition={{ duration: 0.25 }}
             onClick={() => setSelectedItem(null)}
           >
+            {/* Prev arrow */}
+            {selectedIndex > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
+                className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
+              </button>
+            )}
+
+            {/* Next arrow */}
+            {selectedIndex < navigableItems.length - 1 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
+                className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                aria-label="Next image"
+              >
+                <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
+              </button>
+            )}
+
             <motion.div
-              className="relative max-w-[90vw] max-h-[85vh]"
+              key={selectedItem.id}
+              className="relative max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
@@ -196,7 +219,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               <img
                 src={selectedItem.image_url}
                 alt={selectedItem.label}
-                className="max-w-[90vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
+                className="max-w-[80vw] sm:max-w-[75vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
                 onClick={() => setSelectedItem(null)}
               />
             </motion.div>
