@@ -345,7 +345,8 @@ const Index = () => {
                 visible={!thirdCardFlipped}
                 activeKey={activePortfolioKey}
                 onSelect={(key) => setActivePortfolioKey(key)}
-                onBack={() => setActivePortfolioKey(null)}
+                onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); }}
+                onGallerySubSelect={(label) => setActiveGallerySub(label)}
               />
             </div>
           </div>
