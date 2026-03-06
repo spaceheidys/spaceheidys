@@ -20,6 +20,7 @@ const PolygonBackground = () => {
       vy: number;
       baseX: number;
       baseY: number;
+      distFromCenter: number;
     }
 
     const points: Point[] = [];
