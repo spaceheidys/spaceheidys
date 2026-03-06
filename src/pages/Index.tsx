@@ -200,7 +200,7 @@ const Index = () => {
                 {[
                 { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
                 { jp: "ポートフォリオ", en: "PORTFOLIO", action: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }) },
-                { jp: "ギャラリー", en: "GALLERY", action: () => navigate("/gallery") },
+                ...(sectionVisibility.gallery ? [{ jp: "ギャラリー", en: "GALLERY", action: () => navigate("/gallery") }] : []),
                 { jp: "コンタクト", en: "CONTACT", action: handleContactClick }].
                 map((item, i) =>
                 <motion.a
