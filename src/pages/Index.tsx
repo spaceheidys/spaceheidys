@@ -316,7 +316,7 @@ const Index = () => {
           </AnimatePresence>
           <div className="relative">
             {/* Fixed-height card wrapper */}
-            <div className="flex items-center justify-center w-[80vw] h-[120vw] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]">
+            <div className={`flex items-center justify-center w-[80vw] h-[120vw] ${activePortfolioKey ? 'sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px]' : 'sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]'} transition-all duration-500`}>
               <AnimatePresence mode="wait">
                 {activePortfolioKey ? (
                   <PortfolioGallery key={activePortfolioKey} sectionKey={activePortfolioKey} />
