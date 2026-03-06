@@ -19,6 +19,7 @@ import SecretDoorOverlay from "@/components/SecretDoorOverlay";
 import PortfolioCard from "@/components/PortfolioCard";
 import PolygonBackground from "@/components/PolygonBackground";
 import MobileNav from "@/components/MobileNav";
+import PortfolioMenu from "@/components/Portfolio_menu/PortfolioMenu";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
