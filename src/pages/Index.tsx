@@ -320,7 +320,8 @@ const Index = () => {
               <PortfolioMenu
                 visible={!thirdCardFlipped}
                 activeKey={activePortfolioKey}
-                onSelect={(key) => setActivePortfolioKey(prev => prev === key ? null : key)}
+                onSelect={(key) => setActivePortfolioKey(key)}
+                onBack={() => setActivePortfolioKey(null)}
               />
             </div>
           </div>
