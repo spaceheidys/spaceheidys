@@ -329,6 +329,13 @@ const AdminMain = () => {
                 </div>
               )}
             </div>
+
+            {/* Buttons section */}
+            <ButtonsSection
+              buttons={navButtons}
+              onUpdate={updateButton}
+              onSwapOrder={swapOrder}
+            />
           </>
         )}
       </div>
