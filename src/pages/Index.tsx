@@ -287,9 +287,31 @@ const Index = () => {
       <div className="flex sm:flex-1 items-center justify-center pt-8 sm:pt-12 px-3 sm:px-4 relative z-10">
         <div className="items-center justify-center flex flex-col">
           {/* Wisdom text above cards */}
-          <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0 my-[20px]">
-            "The cards know what the mind has forgotten"
-          </p>
+          <AnimatePresence mode="wait">
+            {activePortfolioKey === "gallery" ? (
+              <motion.p
+                key="gallery-title"
+                className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-[20px] font-display"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.3 }}
+              >
+                Gallery
+              </motion.p>
+            ) : (
+              <motion.p
+                key="wisdom"
+                className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0 my-[20px]"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.3 }}
+              >
+                "The cards know what the mind has forgotten"
+              </motion.p>
+            )}
+          </AnimatePresence>
           <div className="relative">
             {/* Fixed-height card wrapper */}
             <div className="flex items-center justify-center w-[80vw] h-[120vw] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]">

@@ -21,7 +21,51 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack }: PortfolioMenuPr
 
   return (
     <AnimatePresence mode="wait">
-      {activeKey ? (
+      {activeKey === "gallery" ? (
+        <motion.div
+          key="gallery-sub"
+          className="flex flex-col items-center gap-3 mt-6"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3 }}
+        >
+          {[
+            { en: "VECTOR ARTS", jp: "ベクターアート" },
+            { en: "DIGITAL ARTS", jp: "デジタルアート" },
+            { en: "AI POWERED", jp: "エーアイ" },
+          ].map((item, i) => (
+            <motion.button
+              key={item.en}
+              className="group flex flex-col items-center gap-0.5 cursor-pointer"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.08 }}
+            >
+              <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase text-white/50 group-hover:text-white transition-colors duration-300 font-display">
+                {item.en}
+              </span>
+              <span className="text-[9px] sm:text-[10px] tracking-widest text-white/30 group-hover:text-white/60 transition-colors duration-300 font-jp">
+                {item.jp}
+              </span>
+            </motion.button>
+          ))}
+          <motion.button
+            className="group flex flex-col items-center gap-0.5 cursor-pointer mt-2"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + 3 * 0.08 }}
+            onClick={onBack}
+          >
+            <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase text-white/50 group-hover:text-white transition-colors duration-300 font-display">
+              BACK
+            </span>
+            <span className="text-[9px] sm:text-[10px] tracking-widest text-white/30 group-hover:text-white/60 transition-colors duration-300 font-jp">
+              戻る
+            </span>
+          </motion.button>
+        </motion.div>
+      ) : activeKey ? (
         <motion.div
           key="back"
           className="flex items-center justify-center mt-6"
