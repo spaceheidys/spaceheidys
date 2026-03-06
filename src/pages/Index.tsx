@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX, ArrowUp } from "lucide-react";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
@@ -24,6 +25,7 @@ import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
@@ -82,6 +84,18 @@ const Index = () => {
     };
   }, []);
 
+  // Ctrl+Shift+A shortcut to navigate to admin
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "A") {
+        e.preventDefault();
+        navigate("/admin");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate]);
+
   // Mute/unmute the background audio when muted state changes
   useEffect(() => {
     if (audioRef.current) {
@@ -125,11 +139,10 @@ const Index = () => {
             ビコ・ク
           </span>
           <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-            {["Secret Door", "Shop", "CMS"].map((item, i) =>
+            {["Secret Door", "Shop"].map((item, i) =>
               <motion.a
                 key={item}
-                href={item === "CMS" ? "/admin" : undefined}
-                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : item === "Shop" ? () => setActiveSection("shop") : undefined}
+                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => setActiveSection("shop")}
                 className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
