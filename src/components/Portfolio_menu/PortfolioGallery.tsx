@@ -38,6 +38,8 @@ interface PortfolioGalleryProps {
 }
 
 const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: PortfolioGalleryProps) => {
+  const isMobile = useIsMobile();
+  const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
 
