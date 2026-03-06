@@ -20,6 +20,8 @@ import PortfolioCard from "@/components/PortfolioCard";
 import PolygonBackground from "@/components/PolygonBackground";
 import MobileNav from "@/components/MobileNav";
 import PortfolioMenu from "@/components/Portfolio_menu/PortfolioMenu";
+import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu";
+import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
