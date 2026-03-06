@@ -2,9 +2,22 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Trash2, Upload, LogOut, Loader2 } from "lucide-react";
+import { Upload, LogOut, Loader2 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  rectSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import SortableImageCard from "@/components/admin/SortableImageCard";
 
 const SECTIONS = ["gallery", "projects", "skills", "archive"] as const;
 const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
@@ -27,6 +40,10 @@ const Admin = () => {
   const [activeSub, setActiveSub] = useState<string>("VECTOR");
   const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
 
   useEffect(() => {
     if (!loading && !user) {
@@ -127,7 +144,6 @@ const Admin = () => {
   };
 
   const handleDelete = async (item: PortfolioItem) => {
-    // Extract path from URL
     const url = new URL(item.image_url);
     const pathParts = url.pathname.split("/storage/v1/object/public/portfolio-images/");
     const filePath = pathParts[1];
@@ -145,6 +161,29 @@ const Admin = () => {
       toast.error("Delete failed");
     } else {
       toast.success("Deleted");
+      fetchItems();
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = items.findIndex((i) => i.id === active.id);
+    const newIndex = items.findIndex((i) => i.id === over.id);
+    const reordered = arrayMove(items, oldIndex, newIndex);
+
+    // Optimistic update
+    setItems(reordered);
+
+    // Persist new sort orders
+    const updates = reordered.map((item, idx) =>
+      supabase.from("portfolio_items").update({ sort_order: idx }).eq("id", item.id)
+    );
+    const results = await Promise.all(updates);
+    const hasError = results.some((r) => r.error);
+    if (hasError) {
+      toast.error("Failed to save order");
       fetchItems();
     }
   };
@@ -244,37 +283,21 @@ const Admin = () => {
             No images in this section yet
           </p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            <AnimatePresence>
-              {items.map((item) => (
-                <motion.div
-                  key={item.id}
-                  className="relative group aspect-square bg-secondary border border-border overflow-hidden"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                >
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {items.map((item) => (
+                  <SortableImageCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    image_url={item.image_url}
+                    onDelete={() => handleDelete(item)}
                   />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button
-                      onClick={() => handleDelete(item)}
-                      className="text-red-400 hover:text-red-300 transition-colors"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                  <span className="absolute bottom-1 left-1 text-[8px] text-white/50 font-display tracking-wider truncate max-w-[90%]">
-                    {item.title}
-                  </span>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 
