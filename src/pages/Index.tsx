@@ -125,11 +125,10 @@ const Index = () => {
             ビコ・ク
           </span>
           <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-            {["Secret Door", "Shop", "CMS"].map((item, i) =>
+            {["Secret Door", "Shop"].map((item, i) =>
               <motion.a
                 key={item}
-                href={item === "CMS" ? "/admin" : undefined}
-                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : item === "Shop" ? () => setActiveSection("shop") : undefined}
+                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => setActiveSection("shop")}
                 className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
