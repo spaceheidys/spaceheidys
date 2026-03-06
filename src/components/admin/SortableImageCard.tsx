@@ -11,10 +11,12 @@ interface SortableImageCardProps {
   image_offset_x: number;
   image_offset_y: number;
   image_zoom: number;
+  text_align: string;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
   onZoomChange: (zoom: number) => void;
   onTitleChange: (title: string) => void;
+  onTextAlignChange: (align: string) => void;
 }
 
 const SortableImageCard = ({
