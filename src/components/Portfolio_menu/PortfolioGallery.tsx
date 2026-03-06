@@ -89,7 +89,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     onPageInfo?.(page + 1, totalPages);
   }, [page, totalPages, onPageInfo]);
 
-  const pageItems = items.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+  const pageItems = items.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
