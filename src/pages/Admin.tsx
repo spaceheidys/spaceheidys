@@ -178,6 +178,16 @@ const Admin = () => {
     }, 400);
   };
 
+  const zoomTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleZoomChange = (id: string, zoom: number) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, image_zoom: zoom } as any : i)));
+    if (zoomTimers.current[id]) clearTimeout(zoomTimers.current[id]);
+    zoomTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ image_zoom: zoom } as any).eq("id", id);
+    }, 400);
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
