@@ -1,14 +1,18 @@
 import { motion } from "framer-motion";
 
 const menuItems = [
-  { label: "ギャラリー", en: "GALLERY" },
-  { label: "プロジェクト", en: "PROJECTS" },
-  { label: "スキル", en: "SKILLS" },
-  { label: "アーカイブ", en: "ARCHIVE" },
-];
+  { label: "ギャラリー", en: "GALLERY", key: "gallery" },
+  { label: "プロジェクト", en: "PROJECTS", key: "projects" },
+  { label: "スキル", en: "SKILLS", key: "skills" },
+  { label: "アーカイブ", en: "ARCHIVE", key: "archive" },
+] as const;
+
+export type PortfolioMenuKey = (typeof menuItems)[number]["key"];
 
 interface PortfolioMenuProps {
   visible: boolean;
+  activeKey?: PortfolioMenuKey | null;
+  onSelect?: (key: PortfolioMenuKey) => void;
 }
 
 const PortfolioMenu = ({ visible }: PortfolioMenuProps) => {
