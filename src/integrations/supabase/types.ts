@@ -22,6 +22,7 @@ export type Database = {
           image_offset_x: number
           image_offset_y: number
           image_url: string
+          image_zoom: number
           section: string
           sort_order: number
           subsection: string | null
@@ -34,6 +35,7 @@ export type Database = {
           image_offset_x?: number
           image_offset_y?: number
           image_url: string
+          image_zoom?: number
           section: string
           sort_order?: number
           subsection?: string | null
@@ -46,6 +48,7 @@ export type Database = {
           image_offset_x?: number
           image_offset_y?: number
           image_url?: string
+          image_zoom?: number
           section?: string
           sort_order?: number
           subsection?: string | null

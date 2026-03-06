@@ -1,0 +1,1 @@
+ALTER TABLE public.portfolio_items ADD COLUMN image_zoom real NOT NULL DEFAULT 1;
