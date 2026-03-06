@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 
-const navItems = ["About", "Portfolio", "Contacts"];
+const navItems = ["About", "Portfolio", "Gallery", "Contacts"];
 
 const ScrollIndicator = ({ activeSection = "Main" }: { activeSection?: string }) => {
-  const sections = ["About", "Portfolio", "Contacts"];
+  const sections = ["About", "Portfolio", "Gallery", "Contacts"];
   return (
     <div className="flex flex-col gap-3">
       {sections.map((item, i) => (

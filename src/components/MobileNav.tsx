@@ -63,12 +63,13 @@ const MobileNav = ({
             </button>
 
             {[
-              { label: "アバウト / ABOUT", action: onAbout },
-              { label: "ポートフォリオ / PORTFOLIO", action: onPortfolio },
-              { label: "コンタクト / CONTACT", action: onContact },
-              { label: "Secret Door", action: onSecretDoor },
-              { label: "Shop", action: onShop },
-            ].map((item) => (
+               { label: "アバウト / ABOUT", action: onAbout },
+               { label: "ポートフォリオ / PORTFOLIO", action: onPortfolio },
+               { label: "ギャラリー / GALLERY", action: onPortfolio },
+               { label: "コンタクト / CONTACT", action: onContact },
+               { label: "Secret Door", action: onSecretDoor },
+               { label: "Shop", action: onShop },
+             ].map((item) => (
               <button
                 key={item.label}
                 onClick={() => handleClick(item.action)}
