@@ -267,7 +267,16 @@ const Admin = () => {
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
-        <h1 className="font-display text-sm tracking-[0.3em] uppercase">Portfolio CMS</h1>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate("/admin/main")}
+            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Main Page CMS
+          </button>
+          <span className="text-muted-foreground/40">|</span>
+          <h1 className="font-display text-sm tracking-[0.3em] uppercase">Portfolio CMS</h1>
+        </div>
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/")}
