@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, forwardRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const SECRET_CODE = "Letmein";
@@ -8,7 +8,7 @@ interface SecretDoorOverlayProps {
   onClose: () => void;
 }
 
-const SecretDoorOverlay = forwardRef<HTMLDivElement, SecretDoorOverlayProps>(({ isOpen, onClose }, ref) => {
+const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
   const [code, setCode] = useState("");
   const [progress, setProgress] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(60);
