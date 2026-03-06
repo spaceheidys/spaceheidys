@@ -137,7 +137,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 + i * 0.04 }}
-              onClick={() => item.image_url && setSelectedItem(item)}
+              onClick={() => openLightbox(item)}
             >
               {item.image_url ? (
                 <img
