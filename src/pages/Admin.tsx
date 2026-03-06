@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -41,6 +41,8 @@ const Admin = () => {
   const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [confirmSave, setConfirmSave] = useState(false);
+  const [cmsPage, setCmsPage] = useState(0);
+  const CMS_ITEMS_PER_PAGE = 12;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -82,6 +84,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (user && isAdmin) fetchItems();
+    setCmsPage(0);
   }, [activeSection, activeSub, user, isAdmin]);
 
   const uploadFiles = async (files: File[], grouped: boolean) => {
@@ -390,29 +393,56 @@ const Admin = () => {
             No images in this section yet
           </p>
         ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {items.map((item) => (
-                  <SortableImageCard
-                    key={item.id}
-                    id={item.id}
-                    title={item.title}
-                    image_url={item.image_url}
-                    image_offset_x={(item as any).image_offset_x ?? 50}
-                    image_offset_y={(item as any).image_offset_y ?? 50}
-                    image_zoom={(item as any).image_zoom ?? 1}
-                    text_align={(item as any).text_align ?? 'left'}
-                    onDelete={() => handleDelete(item)}
-                    onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
-                    onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
-                    onTitleChange={(title) => handleTitleChange(item.id, title)}
-                    onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
-                  />
-                ))}
+          <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {items
+                    .slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE)
+                    .map((item) => (
+                    <SortableImageCard
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
+                      image_url={item.image_url}
+                      image_offset_x={(item as any).image_offset_x ?? 50}
+                      image_offset_y={(item as any).image_offset_y ?? 50}
+                      image_zoom={(item as any).image_zoom ?? 1}
+                      text_align={(item as any).text_align ?? 'left'}
+                      onDelete={() => handleDelete(item)}
+                      onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
+                      onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
+                      onTitleChange={(title) => handleTitleChange(item.id, title)}
+                      onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+
+            {/* CMS Pagination */}
+            {items.length > CMS_ITEMS_PER_PAGE && (
+              <div className="flex items-center justify-center gap-4 mt-6">
+                <button
+                  onClick={() => setCmsPage((p) => Math.max(0, p - 1))}
+                  disabled={cmsPage === 0}
+                  className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <span className="text-[10px] font-display tracking-widest text-muted-foreground">
+                  {cmsPage + 1} / {Math.ceil(items.length / CMS_ITEMS_PER_PAGE)}
+                </span>
+                <button
+                  onClick={() => setCmsPage((p) => Math.min(Math.ceil(items.length / CMS_ITEMS_PER_PAGE) - 1, p + 1))}
+                  disabled={cmsPage >= Math.ceil(items.length / CMS_ITEMS_PER_PAGE) - 1}
+                  className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
-            </SortableContext>
-          </DndContext>
+            )}
+          </>
         )}
       </div>
 
