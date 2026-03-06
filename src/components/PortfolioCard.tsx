@@ -10,11 +10,13 @@ interface PortfolioCardProps {
   backImage?: string;
   width?: number;
   height?: number;
+  flipped?: boolean;
   onFlip?: (flipped: boolean) => void;
 }
 
-const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, onFlip }: PortfolioCardProps) => {
-  const [flipped, setFlipped] = useState(true);
+const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, flipped: controlledFlipped, onFlip }: PortfolioCardProps) => {
+  const [internalFlipped, setInternalFlipped] = useState(true);
+  const flipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped;
   const { muted } = useSoundContext();
 
   const handleFlip = () => {
