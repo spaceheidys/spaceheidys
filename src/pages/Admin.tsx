@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import NotesPanel from "@/components/admin/NotesPanel";
 import {
   DndContext,
   closestCenter,
