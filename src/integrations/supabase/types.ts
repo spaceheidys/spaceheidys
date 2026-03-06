@@ -26,6 +26,7 @@ export type Database = {
           section: string
           sort_order: number
           subsection: string | null
+          text_align: string
           title: string
         }
         Insert: {
@@ -39,6 +40,7 @@ export type Database = {
           section: string
           sort_order?: number
           subsection?: string | null
+          text_align?: string
           title?: string
         }
         Update: {
@@ -52,6 +54,7 @@ export type Database = {
           section?: string
           sort_order?: number
           subsection?: string | null
+          text_align?: string
           title?: string
         }
         Relationships: []
