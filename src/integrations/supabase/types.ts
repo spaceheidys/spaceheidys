@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_done: boolean
+          sort_order: number
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_done?: boolean
+          sort_order?: number
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_done?: boolean
+          sort_order?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       portfolio_items: {
         Row: {
           created_at: string
