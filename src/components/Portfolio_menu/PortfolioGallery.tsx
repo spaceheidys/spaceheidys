@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
@@ -25,9 +25,10 @@ const gallerySubItems: Record<string, { id: number; label: string }[]> = {
 interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
   gallerySub?: string | null;
+  onPageInfo?: (current: number, total: number) => void;
 }
 
-const PortfolioGallery = ({ sectionKey = "gallery", gallerySub }: PortfolioGalleryProps) => {
+const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: PortfolioGalleryProps) => {
   const items =
     sectionKey === "gallery" && gallerySub && gallerySubItems[gallerySub]
       ? gallerySubItems[gallerySub]
@@ -36,18 +37,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub }: PortfolioGalle
   const [page, setPage] = useState(0);
   const hasPagination = totalPages > 1;
 
+  useEffect(() => {
+    onPageInfo?.(page + 1, totalPages);
+  }, [page, totalPages, onPageInfo]);
+
   const pageItems = items.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
-      {/* Page indicator */}
-      {hasPagination && (
-        <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
-          <span className="text-white/40 text-[10px] sm:text-xs tracking-widest font-display">
-            {page + 1}/{totalPages}
-          </span>
-        </div>
-      )}
       {/* Left arrow */}
       {hasPagination && (
         <button

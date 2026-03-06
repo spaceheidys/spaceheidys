@@ -40,6 +40,7 @@ const Index = () => {
   const { muted, toggleMute } = useSoundContext();
   const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
+  const [pageInfo, setPageInfo] = useState<{ current: number; total: number } | null>(null);
   const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
 
   const handleAboutClick = () => {
@@ -300,6 +301,9 @@ const Index = () => {
               >
                 {{ gallery: "Gallery", projects: "Projects", skills: "AI", archive: "Archive" }[activePortfolioKey]}
                 {activePortfolioKey === "gallery" && activeGallerySub ? ` | ${activeGallerySub}` : ''}
+                {pageInfo && pageInfo.total > 1 && (
+                  <span className="text-white/30 ml-2 text-[10px] sm:text-xs">{pageInfo.current}/{pageInfo.total}</span>
+                )}
               </motion.p>
             ) : (
               <motion.p
@@ -319,7 +323,7 @@ const Index = () => {
             <div className={`flex items-center justify-center w-[80vw] h-[120vw] ${activePortfolioKey ? 'sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px]' : 'sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]'} transition-all duration-500`}>
               <AnimatePresence mode="wait">
                 {activePortfolioKey ? (
-                  <PortfolioGallery key={`${activePortfolioKey}-${activeGallerySub}`} sectionKey={activePortfolioKey} gallerySub={activeGallerySub} />
+                  <PortfolioGallery key={`${activePortfolioKey}-${activeGallerySub}`} sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={(c, t) => setPageInfo({ current: c, total: t })} />
                 ) : (
                   <motion.div
                     key="card"
@@ -346,7 +350,7 @@ const Index = () => {
                 visible={!thirdCardFlipped}
                 activeKey={activePortfolioKey}
                 onSelect={(key) => setActivePortfolioKey(key)}
-                onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); }}
+                onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); setPageInfo(null); }}
                 onGallerySubSelect={(label) => setActiveGallerySub(label)}
               />
             </div>
@@ -372,7 +376,7 @@ const Index = () => {
             visible={!thirdCardFlipped}
             activeKey={activePortfolioKey}
             onSelect={(key) => setActivePortfolioKey(key)}
-            onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); }}
+            onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); setPageInfo(null); }}
             onGallerySubSelect={(label) => setActiveGallerySub(label)}
           />
         </div>
