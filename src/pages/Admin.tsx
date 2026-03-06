@@ -342,24 +342,43 @@ const Admin = () => {
         )}
 
         {/* Upload area */}
-        <label className="flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 mb-6 cursor-pointer">
-          {uploading ? (
-            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-          ) : (
-            <Upload className="w-4 h-4 text-muted-foreground" />
-          )}
-          <span className="text-xs font-display tracking-widest text-muted-foreground">
-            {uploading ? "UPLOADING..." : "UPLOAD IMAGES"}
-          </span>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleUpload}
-            className="hidden"
-            disabled={uploading}
-          />
-        </label>
+        <div className="flex gap-3 mb-6">
+          <label className="flex-1 flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 cursor-pointer">
+            {uploading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            ) : (
+              <Upload className="w-4 h-4 text-muted-foreground" />
+            )}
+            <span className="text-xs font-display tracking-widest text-muted-foreground">
+              {uploading ? "UPLOADING..." : "UPLOAD IMAGE"}
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleSingleUpload}
+              className="hidden"
+              disabled={uploading}
+            />
+          </label>
+          <label className="flex-1 flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 cursor-pointer">
+            {uploading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            ) : (
+              <Images className="w-4 h-4 text-muted-foreground" />
+            )}
+            <span className="text-xs font-display tracking-widest text-muted-foreground">
+              {uploading ? "UPLOADING..." : "UPLOAD GROUP"}
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleGroupUpload}
+              className="hidden"
+              disabled={uploading}
+            />
+          </label>
+        </div>
 
         {/* Items grid */}
         {fetching ? (
