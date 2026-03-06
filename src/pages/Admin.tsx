@@ -165,6 +165,19 @@ const Admin = () => {
     }
   };
 
+  const positionTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handlePositionChange = (id: string, x: number, y: number) => {
+    // Optimistic local update
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, image_offset_x: x, image_offset_y: y } as any : i)));
+
+    // Debounced DB persist
+    if (positionTimers.current[id]) clearTimeout(positionTimers.current[id]);
+    positionTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ image_offset_x: x, image_offset_y: y } as any).eq("id", id);
+    }, 400);
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
