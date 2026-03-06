@@ -144,7 +144,6 @@ const Admin = () => {
   };
 
   const handleDelete = async (item: PortfolioItem) => {
-    // Extract path from URL
     const url = new URL(item.image_url);
     const pathParts = url.pathname.split("/storage/v1/object/public/portfolio-images/");
     const filePath = pathParts[1];
@@ -162,6 +161,29 @@ const Admin = () => {
       toast.error("Delete failed");
     } else {
       toast.success("Deleted");
+      fetchItems();
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = items.findIndex((i) => i.id === active.id);
+    const newIndex = items.findIndex((i) => i.id === over.id);
+    const reordered = arrayMove(items, oldIndex, newIndex);
+
+    // Optimistic update
+    setItems(reordered);
+
+    // Persist new sort orders
+    const updates = reordered.map((item, idx) =>
+      supabase.from("portfolio_items").update({ sort_order: idx }).eq("id", item.id)
+    );
+    const results = await Promise.all(updates);
+    const hasError = results.some((r) => r.error);
+    if (hasError) {
+      toast.error("Failed to save order");
       fetchItems();
     }
   };
