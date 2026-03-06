@@ -76,6 +76,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          is_active: boolean
           section: string
           sort_order: number
         }
@@ -83,6 +84,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          is_active?: boolean
           section: string
           sort_order?: number
         }
@@ -90,6 +92,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          is_active?: boolean
           section?: string
           sort_order?: number
         }

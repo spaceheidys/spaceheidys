@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp } from "lucide-react";
+import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff } from "lucide-react";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
@@ -15,6 +15,7 @@ interface BackgroundItem {
   section: string;
   image_url: string;
   sort_order: number;
+  is_active: boolean;
 }
 
 const SECTIONS = ["main", "portfolio"] as const;
@@ -190,8 +191,15 @@ const AdminMain = () => {
 
       {/* Content */}
       <div className="px-4 sm:px-8 py-6">
+        {/* Buttons section — at top */}
+        <ButtonsSection
+          buttons={navButtons}
+          onUpdate={updateButton}
+          onSwapOrder={swapOrder}
+        />
+
         {/* Active backgrounds */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 mt-6">
           <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
             Active backgrounds — {activeSection} section
             {swapTarget && (
@@ -231,7 +239,7 @@ const AdminMain = () => {
                     swapTarget === item.id
                       ? "border-primary ring-2 ring-primary/30"
                       : "border-border"
-                  }`}
+                  } ${!item.isDefault && backgrounds.find(b => b.id === item.id)?.is_active === false ? "opacity-40" : ""}`}
                 >
                   <img src={item.src} alt="Background" className="w-full h-full object-cover" />
                   {item.isDefault && (
@@ -252,6 +260,29 @@ const AdminMain = () => {
                         }`}
                       >
                         <ArrowUpDown size={14} />
+                      </button>
+                      {/* Visibility toggle — bottom left */}
+                      <button
+                        onClick={async () => {
+                          const bg = backgrounds.find(b => b.id === item.id);
+                          if (!bg) return;
+                          const { error } = await supabase
+                            .from("page_backgrounds")
+                            .update({ is_active: !bg.is_active })
+                            .eq("id", item.id);
+                          if (!error) {
+                            setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b));
+                            toast.success(bg.is_active ? "Hidden" : "Visible");
+                          }
+                        }}
+                        title={backgrounds.find(b => b.id === item.id)?.is_active ? "Hide from site" : "Show on site"}
+                        className={`absolute bottom-2 left-2 p-1 transition-opacity ${
+                          backgrounds.find(b => b.id === item.id)?.is_active === false
+                            ? "bg-background/80 text-muted-foreground/40 opacity-100"
+                            : "bg-background/80 text-foreground opacity-0 group-hover:opacity-100"
+                        }`}
+                      >
+                        {backgrounds.find(b => b.id === item.id)?.is_active === false ? <EyeOff size={14} /> : <Eye size={14} />}
                       </button>
                       {/* Delete button — top right */}
                       <button
@@ -329,13 +360,6 @@ const AdminMain = () => {
                 </div>
               )}
             </div>
-
-            {/* Buttons section */}
-            <ButtonsSection
-              buttons={navButtons}
-              onUpdate={updateButton}
-              onSwapOrder={swapOrder}
-            />
           </>
         )}
       </div>
