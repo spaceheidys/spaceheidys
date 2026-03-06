@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, ArrowUp, ArrowDown, Pencil, Check, X } from "lucide-react";
+import { Eye, EyeOff, ArrowUp, ArrowDown, Pencil, Check, X, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { NavButton } from "@/hooks/useNavButtons";
 
@@ -7,9 +7,11 @@ interface ButtonsSectionProps {
   buttons: NavButton[];
   onUpdate: (id: string, updates: Partial<Pick<NavButton, "label" | "label_jp" | "is_visible">>) => Promise<void>;
   onSwapOrder: (idA: string, idB: string) => Promise<void>;
+  onAdd: (label: string, labelJp: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
-const ButtonsSection = ({ buttons, onUpdate, onSwapOrder }: ButtonsSectionProps) => {
+const ButtonsSection = ({ buttons, onUpdate, onSwapOrder, onAdd, onDelete }: ButtonsSectionProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editLabelJp, setEditLabelJp] = useState("");
@@ -102,9 +104,76 @@ const ButtonsSection = ({ buttons, onUpdate, onSwapOrder }: ButtonsSectionProps)
             >
               {btn.is_visible ? <Eye size={14} /> : <EyeOff size={14} />}
             </button>
+
+            {/* Delete */}
+            <button
+              onClick={() => { onDelete(btn.id); toast.success("Button deleted"); }}
+              className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+              title="Delete button"
+            >
+              <Trash2 size={14} />
+            </button>
           </div>
         ))}
+
+        {/* Add new button */}
+        <AddNewButtonRow onAdd={onAdd} />
       </div>
+    </div>
+  );
+};
+
+const AddNewButtonRow = ({ onAdd }: { onAdd: (label: string, labelJp: string) => Promise<void> }) => {
+  const [adding, setAdding] = useState(false);
+  const [newLabel, setNewLabel] = useState("");
+  const [newLabelJp, setNewLabelJp] = useState("");
+
+  const handleAdd = async () => {
+    if (!newLabel.trim()) {
+      toast.error("Label is required");
+      return;
+    }
+    await onAdd(newLabel.trim(), newLabelJp.trim());
+    setNewLabel("");
+    setNewLabelJp("");
+    setAdding(false);
+    toast.success("Button added");
+  };
+
+  if (!adding) {
+    return (
+      <button
+        onClick={() => setAdding(true)}
+        className="flex items-center gap-2 px-3 py-2.5 border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors text-xs font-display tracking-[0.2em] uppercase"
+      >
+        <Plus size={12} /> Add New Button
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 border border-border px-3 py-2.5">
+      <input
+        value={newLabelJp}
+        onChange={(e) => setNewLabelJp(e.target.value)}
+        className="bg-transparent border-b border-muted-foreground/40 text-xs font-jp w-20 outline-none focus:border-foreground"
+        placeholder="JP label"
+        autoFocus
+      />
+      <span className="text-muted-foreground/40">/</span>
+      <input
+        value={newLabel}
+        onChange={(e) => setNewLabel(e.target.value)}
+        className="bg-transparent border-b border-muted-foreground/40 text-xs font-display tracking-[0.2em] uppercase flex-1 outline-none focus:border-foreground"
+        placeholder="EN label"
+        onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+      />
+      <button onClick={handleAdd} className="text-foreground hover:text-primary">
+        <Check size={14} />
+      </button>
+      <button onClick={() => { setAdding(false); setNewLabel(""); setNewLabelJp(""); }} className="text-muted-foreground hover:text-destructive">
+        <X size={14} />
+      </button>
     </div>
   );
 };
