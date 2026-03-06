@@ -175,6 +175,7 @@ const Index = () => {
               onShop={() => setActiveSection("shop")}
               onAbout={handleAboutClick}
               onPortfolio={() => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+              onGallery={() => navigate("/gallery")}
               onContact={handleContactClick}
               bgOptions={bgOptions}
               bgImage={bgImage}
