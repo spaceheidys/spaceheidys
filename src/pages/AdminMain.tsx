@@ -239,7 +239,7 @@ const AdminMain = () => {
                     swapTarget === item.id
                       ? "border-primary ring-2 ring-primary/30"
                       : "border-border"
-                  }`}
+                  } ${!item.isDefault && backgrounds.find(b => b.id === item.id)?.is_active === false ? "opacity-40" : ""}`}
                 >
                   <img src={item.src} alt="Background" className="w-full h-full object-cover" />
                   {item.isDefault && (
