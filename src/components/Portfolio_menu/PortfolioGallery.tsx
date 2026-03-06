@@ -5,45 +5,33 @@ import type { PortfolioMenuKey } from "./PortfolioMenu";
 
 const ITEMS_PER_PAGE = 6;
 
+const makeItems = (count: number) =>
+  Array.from({ length: count }, (_, i) => ({ id: i + 1, label: String(i + 1).padStart(2, "0") }));
+
 const sectionItems: Record<PortfolioMenuKey, { id: number; label: string }[]> = {
-  gallery: [
-    { id: 1, label: "01" },
-    { id: 2, label: "02" },
-    { id: 3, label: "03" },
-    { id: 4, label: "04" },
-    { id: 5, label: "05" },
-    { id: 6, label: "06" },
-  ],
-  projects: [
-    { id: 1, label: "01" },
-    { id: 2, label: "02" },
-    { id: 3, label: "03" },
-    { id: 4, label: "04" },
-  ],
-  skills: [
-    { id: 1, label: "01" },
-    { id: 2, label: "02" },
-    { id: 3, label: "03" },
-    { id: 4, label: "04" },
-  ],
-  archive: [
-    { id: 1, label: "01" },
-    { id: 2, label: "02" },
-    { id: 3, label: "03" },
-    { id: 4, label: "04" },
-    { id: 5, label: "05" },
-    { id: 6, label: "06" },
-    { id: 7, label: "07" },
-    { id: 8, label: "08" },
-  ],
+  gallery: makeItems(6),
+  projects: makeItems(4),
+  skills: makeItems(4),
+  archive: makeItems(8),
+};
+
+const gallerySubItems: Record<string, { id: number; label: string }[]> = {
+  VECTOR: makeItems(16),
+  DIGITAL: makeItems(6),
+  AI: makeItems(6),
+  SKETCHES: makeItems(6),
 };
 
 interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
+  gallerySub?: string | null;
 }
 
-const PortfolioGallery = ({ sectionKey = "gallery" }: PortfolioGalleryProps) => {
-  const items = sectionItems[sectionKey] || sectionItems.gallery;
+const PortfolioGallery = ({ sectionKey = "gallery", gallerySub }: PortfolioGalleryProps) => {
+  const items =
+    sectionKey === "gallery" && gallerySub && gallerySubItems[gallerySub]
+      ? gallerySubItems[gallerySub]
+      : sectionItems[sectionKey] || sectionItems.gallery;
   const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
   const [page, setPage] = useState(0);
   const hasPagination = totalPages > 1;
