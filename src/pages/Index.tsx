@@ -293,16 +293,35 @@ const Index = () => {
           <div className="relative">
             {/* Fixed-height card wrapper */}
             <div className="flex items-center justify-center w-[80vw] h-[120vw] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]">
-              <PortfolioCard
-                name="Card_03"
-                flipAxis="y-center"
-                frontImage={taro01Img}
-                backImage={taroEyeImg}
-                onFlip={(f: boolean) => { setThirdCardFlipped(f); setFlipCount(c => c + 1); }} />
+              <AnimatePresence mode="wait">
+                {activePortfolioKey === "gallery" ? (
+                  <PortfolioGallery key="gallery" />
+                ) : (
+                  <motion.div
+                    key="card"
+                    className="w-full h-full"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <PortfolioCard
+                      name="Card_03"
+                      flipAxis="y-center"
+                      frontImage={taro01Img}
+                      backImage={taroEyeImg}
+                      onFlip={(f: boolean) => { setThirdCardFlipped(f); setFlipCount(c => c + 1); }} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             {/* Menu positioned below card without affecting layout */}
             <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max">
-              <PortfolioMenu visible={!thirdCardFlipped} />
+              <PortfolioMenu
+                visible={!thirdCardFlipped}
+                activeKey={activePortfolioKey}
+                onSelect={(key) => setActivePortfolioKey(prev => prev === key ? null : key)}
+              />
             </div>
           </div>
         </div>
