@@ -20,6 +20,7 @@ import AboutModal from "@/components/AboutModal";
 import LoadingScreen from "@/components/LoadingScreen";
 import SecretDoorOverlay from "@/components/SecretDoorOverlay";
 import PortfolioCard from "@/components/PortfolioCard";
+import MobileNav from "@/components/MobileNav";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
@@ -85,7 +86,7 @@ const Index = () => {
       <AnimatePresence>
         {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       </AnimatePresence>
-      <div className="relative bg-background overflow-hidden rounded-none" style={{ height: 1080 }}>
+      <div className="relative bg-background overflow-hidden rounded-none min-h-screen">
       {/* === MAIN section === */}
       {/* Hero background illustration */}
       <div className="absolute inset-0 w-full h-screen">
@@ -124,7 +125,6 @@ const Index = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.1 }}>
-                
                 {item}
               </motion.a>
               )}
@@ -133,24 +133,31 @@ const Index = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}>
-                
               {bgOptions.map((bg, i) =>
                 <div
                   key={i}
                   className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
                   style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
                   onClick={() => setBgImage(bg)} />
-
                 )}
               <div
                   className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
                   onClick={toggleMute}
                   aria-label={muted ? "Unmute sound" : "Mute sound"}>
-                  
                 {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
               </div>
             </motion.div>
           </nav>
+          <MobileNav
+            onSecretDoor={() => setSecretDoorOpen(true)}
+            onShop={() => setActiveSection("shop")}
+            onAbout={handleAboutClick}
+            onPortfolio={() => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+            onContact={handleContactClick}
+            bgOptions={bgOptions}
+            bgImage={bgImage}
+            onBgChange={setBgImage}
+          />
         </motion.header>
 
         {/* Main content */}
@@ -264,7 +271,7 @@ const Index = () => {
     {/* === 2nd_dimension === */}
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden" style={{ height: 1080 }}>
+    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden min-h-screen py-12 px-4">
       {/* Portfolio background */}
       <div
           className="absolute inset-0 bg-cover bg-center opacity-60"
@@ -291,7 +298,7 @@ const Index = () => {
         <p className="text-white/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
           "The cards know what the mind has forgotten"
         </p>
-        <div className="flex gap-1 items-end">
+        <div className="flex flex-wrap gap-2 sm:gap-1 items-end justify-center">
           {[
             { name: "Card_01" },
             { name: "Card_02" },
@@ -305,10 +312,7 @@ const Index = () => {
               flipAxis="y-center"
               frontImage={taro01Img}
               backImage={card.backImage}
-              width={250}
-              height={374}
               onFlip={card.onFlip} />
-
             )}
         </div>
       </div>
