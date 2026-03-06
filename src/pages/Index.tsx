@@ -20,6 +20,7 @@ import AboutModal from "@/components/AboutModal";
 import LoadingScreen from "@/components/LoadingScreen";
 import SecretDoorOverlay from "@/components/SecretDoorOverlay";
 import PortfolioCard from "@/components/PortfolioCard";
+import MobileNav from "@/components/MobileNav";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
