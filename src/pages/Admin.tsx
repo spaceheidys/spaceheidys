@@ -84,15 +84,12 @@ const Admin = () => {
     if (user && isAdmin) fetchItems();
   }, [activeSection, activeSub, user, isAdmin]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
+  const uploadFiles = async (files: File[], grouped: boolean) => {
     setUploading(true);
     const uploadedItems: PortfolioItem[] = [];
+    const groupId = grouped ? crypto.randomUUID() : null;
 
-    for (const file of Array.from(files)) {
-      // Validate file type
+    for (const file of files) {
       if (!file.type.startsWith("image/")) {
         toast.error(`${file.name} is not an image`);
         continue;
@@ -118,16 +115,19 @@ const Admin = () => {
         .from("portfolio-images")
         .getPublicUrl(fileName);
 
+      const insertData: any = {
+        section: activeSection,
+        subsection: activeSection === "gallery" ? activeSub : null,
+        title: file.name.replace(/\.[^.]+$/, ""),
+        image_url: urlData.publicUrl,
+        sort_order: items.length + uploadedItems.length,
+        created_by: user?.id,
+      };
+      if (groupId) insertData.group_id = groupId;
+
       const { data, error } = await supabase
         .from("portfolio_items")
-        .insert({
-          section: activeSection,
-          subsection: activeSection === "gallery" ? activeSub : null,
-          title: file.name.replace(/\.[^.]+$/, ""),
-          image_url: urlData.publicUrl,
-          sort_order: items.length + uploadedItems.length,
-          created_by: user?.id,
-        })
+        .insert(insertData)
         .select()
         .single();
 
@@ -137,10 +137,28 @@ const Admin = () => {
     }
 
     if (uploadedItems.length > 0) {
-      toast.success(`Uploaded ${uploadedItems.length} image(s)`);
+      toast.success(`Uploaded ${uploadedItems.length} image(s)${grouped ? " as group" : ""}`);
       fetchItems();
     }
     setUploading(false);
+  };
+
+  const handleSingleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    await uploadFiles([files[0]], false);
+    e.target.value = "";
+  };
+
+  const handleGroupUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    if (files.length < 2) {
+      toast.error("Select at least 2 images for a group");
+      e.target.value = "";
+      return;
+    }
+    await uploadFiles(Array.from(files), true);
     e.target.value = "";
   };
 
