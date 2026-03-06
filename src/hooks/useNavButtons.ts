@@ -46,5 +46,22 @@ export function useNavButtons() {
     await fetchButtons();
   };
 
-  return { buttons, loading, updateButton, swapOrder, refetch: fetchButtons };
+  const addButton = async (label: string, labelJp: string) => {
+    const key = label.toLowerCase().replace(/\s+/g, "_");
+    const maxOrder = buttons.reduce((m, b) => Math.max(m, b.sort_order), -1);
+    await supabase.from("nav_buttons").insert({
+      key,
+      label,
+      label_jp: labelJp,
+      sort_order: maxOrder + 1,
+    });
+    await fetchButtons();
+  };
+
+  const deleteButton = async (id: string) => {
+    await supabase.from("nav_buttons").delete().eq("id", id);
+    await fetchButtons();
+  };
+
+  return { buttons, loading, updateButton, swapOrder, addButton, deleteButton, refetch: fetchButtons };
 }
