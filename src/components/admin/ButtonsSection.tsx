@@ -104,6 +104,15 @@ const ButtonsSection = ({ buttons, onUpdate, onSwapOrder, onAdd, onDelete }: But
             >
               {btn.is_visible ? <Eye size={14} /> : <EyeOff size={14} />}
             </button>
+
+            {/* Delete */}
+            <button
+              onClick={() => { onDelete(btn.id); toast.success("Button deleted"); }}
+              className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+              title="Delete button"
+            >
+              <Trash2 size={14} />
+            </button>
           </div>
         ))}
 
