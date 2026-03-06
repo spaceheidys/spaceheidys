@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      nav_buttons: {
+        Row: {
+          id: string
+          is_visible: boolean
+          key: string
+          label: string
+          label_jp: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          is_visible?: boolean
+          key: string
+          label: string
+          label_jp?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          is_visible?: boolean
+          key?: string
+          label?: string
+          label_jp?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       page_backgrounds: {
         Row: {
           created_at: string
