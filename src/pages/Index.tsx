@@ -269,7 +269,7 @@ const Index = () => {
     {/* === 2nd_dimension === */}
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden min-h-screen py-12 px-4">
+    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden min-h-[100dvh] py-8 sm:py-12 px-3 sm:px-4">
       {/* Portfolio background */}
       <div
           className="absolute inset-0 bg-cover bg-center opacity-60"
@@ -285,18 +285,18 @@ const Index = () => {
         
       {/* Scroll to top arrow */}
       <div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
+          className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top">
           
-        <ArrowUp size={32} />
+        <ArrowUp className="w-6 h-6 sm:w-8 sm:h-8" />
       </div>
-      <div className="flex flex-col items-center gap-6 relative z-10">
-        {/* Wisdom text above cards 2-4 */}
-        <p className="text-white/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
+      <div className="flex flex-col items-center gap-4 sm:gap-6 relative z-10">
+        {/* Wisdom text above cards */}
+        <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-2">
           "The cards know what the mind has forgotten"
         </p>
-        <div className="flex flex-wrap gap-2 sm:gap-1 items-end justify-center">
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-end justify-center">
           {[
             { name: "Card_01" },
             { name: "Card_02" },
