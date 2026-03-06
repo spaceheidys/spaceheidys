@@ -20,6 +20,7 @@ const MobileNav = ({
   onShop,
   onAbout,
   onPortfolio,
+  onGallery,
   onContact,
   bgOptions,
   bgImage,
