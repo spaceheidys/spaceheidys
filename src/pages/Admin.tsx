@@ -30,6 +30,7 @@ interface PortfolioItem {
   image_url: string;
   sort_order: number;
   created_at: string;
+  group_id?: string | null;
 }
 
 const Admin = () => {
