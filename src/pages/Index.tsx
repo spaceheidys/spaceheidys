@@ -17,6 +17,7 @@ import AboutModal from "@/components/AboutModal";
 import LoadingScreen from "@/components/LoadingScreen";
 import SecretDoorOverlay from "@/components/SecretDoorOverlay";
 import PortfolioCard from "@/components/PortfolioCard";
+import PolygonBackground from "@/components/PolygonBackground";
 import MobileNav from "@/components/MobileNav";
 
 const Index = () => {
@@ -270,11 +271,9 @@ const Index = () => {
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100dvh]">
-      {/* Portfolio background */}
-      <div
-          className="absolute inset-0 bg-cover bg-center opacity-60"
-          style={{ backgroundImage: `url(${portfolioMainBg})` }} />
-        
+      {/* Animated polygon background */}
+      <PolygonBackground />
+      
       {/* Wallpaper background for 3rd card */}
       <div
           className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
