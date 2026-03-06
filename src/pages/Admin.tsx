@@ -30,6 +30,7 @@ interface PortfolioItem {
   image_url: string;
   sort_order: number;
   created_at: string;
+  group_id?: string | null;
 }
 
 const Admin = () => {
@@ -409,6 +410,7 @@ const Admin = () => {
                       image_offset_y={(item as any).image_offset_y ?? 50}
                       image_zoom={(item as any).image_zoom ?? 1}
                       text_align={(item as any).text_align ?? 'left'}
+                      group_id={item.group_id}
                       onDelete={() => handleDelete(item)}
                       onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
                       onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
