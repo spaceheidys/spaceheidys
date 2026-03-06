@@ -2,31 +2,26 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Volume2, VolumeX } from "lucide-react";
 import { useSoundContext } from "@/contexts/SoundContext";
+import type { NavButton } from "@/hooks/useNavButtons";
 
 interface MobileNavProps {
-  onGallery: () => void;
   onSecretDoor: () => void;
   onShop: () => void;
-  onAbout: () => void;
-  onPortfolio: () => void;
-  onContact: () => void;
+  navButtons: NavButton[];
+  actionMap: Record<string, () => void>;
   bgOptions: string[];
   bgImage: string;
   onBgChange: (bg: string) => void;
-  galleryVisible?: boolean;
 }
 
 const MobileNav = ({
   onSecretDoor,
   onShop,
-  onAbout,
-  onPortfolio,
-  onGallery,
-  onContact,
+  navButtons,
+  actionMap,
   bgOptions,
   bgImage,
   onBgChange,
-  galleryVisible = true,
 }: MobileNavProps) => {
   const [open, setOpen] = useState(false);
   const { muted, toggleMute } = useSoundContext();
@@ -38,6 +33,8 @@ const MobileNav = ({
     action();
     setOpen(false);
   };
+
+  const visibleButtons = navButtons.filter(b => b.is_visible);
 
   return (
     <div className="md:hidden">
@@ -66,22 +63,27 @@ const MobileNav = ({
               <X size={24} />
             </button>
 
-            {[
-               { label: "アバウト / ABOUT", action: onAbout },
-               { label: "ポートフォリオ / PORTFOLIO", action: onPortfolio },
-               ...(galleryVisible ? [{ label: "ギャラリー / GALLERY", action: onGallery }] : []),
-               { label: "コンタクト / CONTACT", action: onContact },
-               { label: "Secret Door", action: onSecretDoor },
-               { label: "Shop", action: onShop },
-             ].map((item) => (
+            {visibleButtons.map((btn) => (
               <button
-                key={item.label}
-                onClick={() => handleClick(item.action)}
+                key={btn.id}
+                onClick={() => handleClick(actionMap[btn.key] || (() => {}))}
                 className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
               >
-                {item.label}
+                {btn.label_jp} / {btn.label}
               </button>
             ))}
+            <button
+              onClick={() => handleClick(onSecretDoor)}
+              className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
+            >
+              Secret Door
+            </button>
+            <button
+              onClick={() => handleClick(onShop)}
+              className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
+            >
+              Shop
+            </button>
 
             {/* BG switcher + mute */}
             <div className="flex items-center gap-3 mt-4">

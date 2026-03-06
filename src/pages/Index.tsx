@@ -201,14 +201,16 @@ const Index = () => {
           <MobileNav
               onSecretDoor={() => setSecretDoorOpen(true)}
               onShop={() => setActiveSection("shop")}
-              onAbout={handleAboutClick}
-              onPortfolio={() => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
-              onGallery={() => navigate("/gallery")}
-              onContact={handleContactClick}
+              navButtons={navButtons}
+              actionMap={{
+                about: handleAboutClick,
+                portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+                gallery: () => navigate("/gallery"),
+                contacts: handleContactClick,
+              }}
               bgOptions={bgOptions}
               bgImage={bgImage}
-              onBgChange={setBgImage}
-              galleryVisible={sectionVisibility.gallery} />
+              onBgChange={setBgImage} />
             
         </motion.header>
 
