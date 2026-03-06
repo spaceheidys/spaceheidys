@@ -143,7 +143,7 @@ const PolygonBackground = ({ triggerKey = 0 }: PolygonBackgroundProps) => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [triggerKey]);
 
   return (
     <canvas
