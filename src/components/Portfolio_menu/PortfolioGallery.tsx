@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 
@@ -37,6 +37,7 @@ interface PortfolioGalleryProps {
 
 const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: PortfolioGalleryProps) => {
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -60,7 +61,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           }))
         );
       } else {
-        setDbItems(null); // fall back to placeholders
+        setDbItems(null);
       }
     };
     fetchItems();
@@ -115,6 +116,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 + i * 0.04 }}
+              onClick={() => item.image_url && setSelectedItem(item)}
             >
               {item.image_url ? (
                 <img
@@ -143,6 +145,43 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           <ChevronRight className="w-6 h-6 sm:w-[40px] sm:h-[40px]" />
         </button>
       )}
+
+      {/* Lightbox overlay */}
+      <AnimatePresence>
+        {selectedItem && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => setSelectedItem(null)}
+          >
+            <motion.div
+              className="relative max-w-[90vw] max-h-[85vh]"
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedItem(null)}
+                className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                aria-label="Close preview"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <img
+                src={selectedItem.image_url}
+                alt={selectedItem.label}
+                className="max-w-[90vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
+                onClick={() => setSelectedItem(null)}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
