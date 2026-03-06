@@ -269,7 +269,7 @@ const Index = () => {
     {/* === 2nd_dimension === */}
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden min-h-[100dvh] py-8 sm:py-12 px-3 sm:px-4">
+    <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100dvh]">
       {/* Portfolio background */}
       <div
           className="absolute inset-0 bg-cover bg-center opacity-60"
@@ -282,42 +282,46 @@ const Index = () => {
             backgroundImage: `url(${wallpaper3rdCard})`,
             opacity: thirdCardFlipped ? 0 : 1
           }} />
-        
-      {/* Scroll to top arrow */}
-      <div
-          className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Scroll to top">
-          
-        <ArrowUp className="w-6 h-6 sm:w-8 sm:h-8" />
-      </div>
-      <div className="flex flex-col items-center gap-4 sm:gap-6 relative z-10">
-        {/* Wisdom text above cards */}
-        <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-2">
-          "The cards know what the mind has forgotten"
-        </p>
-        <div className="flex flex-wrap gap-2 sm:gap-3 items-end justify-center">
-          {[
-            { name: "Card_01" },
-            { name: "Card_02" },
-            { name: "Card_03", backImage: taroEyeImg, onFlip: (f: boolean) => setThirdCardFlipped(f) },
-            { name: "Card_04" },
-            { name: "Card_05" }].
-            map((card) =>
-            <PortfolioCard
-              key={card.name}
-              name={card.name}
-              flipAxis="y-center"
-              frontImage={taro01Img}
-              backImage={card.backImage}
-              onFlip={card.onFlip} />
-            )}
+
+      {/* Cards content — centered vertically */}
+      <div className="flex-1 flex items-center justify-center py-8 sm:py-12 px-3 sm:px-4 relative z-10">
+        <div className="flex flex-col items-center gap-4 sm:gap-6">
+          {/* Wisdom text above cards */}
+          <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-2">
+            "The cards know what the mind has forgotten"
+          </p>
+          <div className="flex flex-wrap gap-2 sm:gap-3 items-end justify-center">
+            {[
+              { name: "Card_01" },
+              { name: "Card_02" },
+              { name: "Card_03", backImage: taroEyeImg, onFlip: (f: boolean) => setThirdCardFlipped(f) },
+              { name: "Card_04" },
+              { name: "Card_05" }].
+              map((card) =>
+              <PortfolioCard
+                key={card.name}
+                name={card.name}
+                flipAxis="y-center"
+                frontImage={taro01Img}
+                backImage={card.backImage}
+                onFlip={card.onFlip} />
+              )}
+          </div>
         </div>
       </div>
-    </div>
-    {/* Footer */}
-    <div className="w-full flex items-center justify-center bg-black h-12 sm:h-16">
-      <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2026 Spaceheidys. All rights reserved.</span>
+
+      {/* Scroll to top arrow */}
+      <div
+          className="flex justify-center pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Scroll to top">
+        <ArrowUp className="w-6 h-6 sm:w-8 sm:h-8" />
+      </div>
+
+      {/* Footer */}
+      <div className="w-full flex items-center justify-center h-12 sm:h-16 relative z-10">
+        <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2026 Spaceheidys. All rights reserved.</span>
+      </div>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
     </>);
