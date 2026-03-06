@@ -310,6 +310,7 @@ const Index = () => {
                       flipAxis="y-center"
                       frontImage={taro01Img}
                       backImage={taroEyeImg}
+                      flipped={thirdCardFlipped}
                       onFlip={(f: boolean) => { setThirdCardFlipped(f); setFlipCount(c => c + 1); }} />
                   </motion.div>
                 )}
