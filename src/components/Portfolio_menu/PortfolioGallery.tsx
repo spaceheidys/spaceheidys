@@ -222,6 +222,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                 alt={selectedItem.label}
                 className="max-w-[80vw] sm:max-w-[75vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
                 onClick={() => setSelectedItem(null)}
+                onContextMenu={(e) => e.preventDefault()}
               />
             </motion.div>
           </motion.div>
