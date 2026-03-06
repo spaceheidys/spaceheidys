@@ -11,7 +11,7 @@ interface ButtonsSectionProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-const ButtonsSection = ({ buttons, onUpdate, onSwapOrder }: ButtonsSectionProps) => {
+const ButtonsSection = ({ buttons, onUpdate, onSwapOrder, onAdd, onDelete }: ButtonsSectionProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editLabelJp, setEditLabelJp] = useState("");
