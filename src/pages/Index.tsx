@@ -30,6 +30,7 @@ const Index = () => {
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
+  const [flipCount, setFlipCount] = useState(0);
   const { muted, toggleMute } = useSoundContext();
   const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
 
