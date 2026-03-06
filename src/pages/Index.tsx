@@ -175,6 +175,7 @@ const Index = () => {
               onShop={() => setActiveSection("shop")}
               onAbout={handleAboutClick}
               onPortfolio={() => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+              onGallery={() => navigate("/gallery")}
               onContact={handleContactClick}
               bgOptions={bgOptions}
               bgImage={bgImage}
@@ -197,6 +198,7 @@ const Index = () => {
                 {[
                 { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
                 { jp: "ポートフォリオ", en: "PORTFOLIO", action: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }) },
+                { jp: "ギャラリー", en: "GALLERY", action: () => navigate("/gallery") },
                 { jp: "コンタクト", en: "CONTACT", action: handleContactClick }].
                 map((item, i) =>
                 <motion.a

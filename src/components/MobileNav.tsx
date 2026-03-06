@@ -4,6 +4,7 @@ import { Menu, X, Volume2, VolumeX } from "lucide-react";
 import { useSoundContext } from "@/contexts/SoundContext";
 
 interface MobileNavProps {
+  onGallery: () => void;
   onSecretDoor: () => void;
   onShop: () => void;
   onAbout: () => void;
@@ -19,6 +20,7 @@ const MobileNav = ({
   onShop,
   onAbout,
   onPortfolio,
+  onGallery,
   onContact,
   bgOptions,
   bgImage,
@@ -65,7 +67,7 @@ const MobileNav = ({
             {[
                { label: "アバウト / ABOUT", action: onAbout },
                { label: "ポートフォリオ / PORTFOLIO", action: onPortfolio },
-               { label: "ギャラリー / GALLERY", action: onPortfolio },
+               { label: "ギャラリー / GALLERY", action: onGallery },
                { label: "コンタクト / CONTACT", action: onContact },
                { label: "Secret Door", action: onSecretDoor },
                { label: "Shop", action: onShop },
