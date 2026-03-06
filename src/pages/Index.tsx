@@ -357,13 +357,26 @@ const Index = () => {
       {/* Spacer — only on mobile to push arrow down */}
       <div className="flex-1 sm:flex-none" />
 
-      {/* Scroll to top arrow */}
+      {/* Scroll to top arrow — hidden when a portfolio section is active on desktop */}
       <div
-          className="pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 items-center justify-center flex flex-row"
+          className={`pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 items-center justify-center flex flex-row ${activePortfolioKey ? 'sm:hidden' : ''}`}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top">
         <ArrowUp className="w-6 h-6 sm:w-[40px] sm:h-[40px]" />
       </div>
+
+      {/* Menu at bottom position when section is active (desktop only) */}
+      {activePortfolioKey && (
+        <div className="hidden sm:flex relative z-10 items-center justify-center pb-4">
+          <PortfolioMenu
+            visible={!thirdCardFlipped}
+            activeKey={activePortfolioKey}
+            onSelect={(key) => setActivePortfolioKey(key)}
+            onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); }}
+            onGallerySubSelect={(label) => setActiveGallerySub(label)}
+          />
+        </div>
+      )}
 
       {/* Footer */}
       <div className="w-full h-12 sm:h-16 relative z-10 items-center justify-center flex flex-row">
