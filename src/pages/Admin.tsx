@@ -363,6 +363,7 @@ const Admin = () => {
                     onDelete={() => handleDelete(item)}
                     onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
                     onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
+                    onTitleChange={(title) => handleTitleChange(item.id, title)}
                   />
                 ))}
               </div>
