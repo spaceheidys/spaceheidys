@@ -31,7 +31,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub }: PortfolioGalle
 
   return (
     <motion.div
-      className="w-full h-full grid grid-cols-2 gap-2 p-2"
+      className={`w-full h-full grid ${items.length > 8 ? 'grid-cols-4' : 'grid-cols-2'} gap-2 p-2`}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
