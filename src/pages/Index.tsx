@@ -253,10 +253,10 @@ const Index = () => {
               
               <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
                 <p className="font-display tracking-widest text-foreground/90 mb-2">✦ Shop✦</p>
-                <p>This section is currently under construction. Stay tuned!</p>
+                <p>This section is currently under construction.
+Stay tuned</p>
               </div>
-            </motion.div>
-            }
+            </motion.div>}
         </AnimatePresence>
 
         {/* Bottom section */}
