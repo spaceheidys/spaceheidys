@@ -316,7 +316,7 @@ const Index = () => {
           </AnimatePresence>
           <div className="relative">
             {/* Fixed-height card wrapper */}
-            <div className="flex items-center justify-center w-[80vw] h-[120vw] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]">
+            <div className={`flex items-center justify-center w-[80vw] h-[120vw] ${activePortfolioKey ? 'sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px]' : 'sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]'} transition-all duration-500`}>
               <AnimatePresence mode="wait">
                 {activePortfolioKey ? (
                   <PortfolioGallery key={activePortfolioKey} sectionKey={activePortfolioKey} />
@@ -341,7 +341,7 @@ const Index = () => {
               </AnimatePresence>
             </div>
             {/* Menu positioned below card without affecting layout */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max">
+            <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max ${activePortfolioKey ? 'sm:hidden' : ''}`}>
               <PortfolioMenu
                 visible={!thirdCardFlipped}
                 activeKey={activePortfolioKey}
@@ -357,13 +357,26 @@ const Index = () => {
       {/* Spacer — only on mobile to push arrow down */}
       <div className="flex-1 sm:flex-none" />
 
-      {/* Scroll to top arrow */}
+      {/* Scroll to top arrow — hidden when a portfolio section is active on desktop */}
       <div
-          className="pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 items-center justify-center flex flex-row"
+          className={`pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 items-center justify-center flex flex-row ${activePortfolioKey ? 'sm:hidden' : ''}`}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top">
         <ArrowUp className="w-6 h-6 sm:w-[40px] sm:h-[40px]" />
       </div>
+
+      {/* Menu at bottom position when section is active (desktop only) */}
+      {activePortfolioKey && (
+        <div className="hidden sm:flex relative z-10 items-center justify-center pb-4">
+          <PortfolioMenu
+            visible={!thirdCardFlipped}
+            activeKey={activePortfolioKey}
+            onSelect={(key) => setActivePortfolioKey(key)}
+            onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); }}
+            onGallerySubSelect={(label) => setActiveGallerySub(label)}
+          />
+        </div>
+      )}
 
       {/* Footer */}
       <div className="w-full h-12 sm:h-16 relative z-10 items-center justify-center flex flex-row">
