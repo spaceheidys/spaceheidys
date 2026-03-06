@@ -30,6 +30,7 @@ const Index = () => {
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
+  const [flipCount, setFlipCount] = useState(0);
   const { muted, toggleMute } = useSoundContext();
   const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
 
@@ -272,7 +273,7 @@ const Index = () => {
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100dvh]">
       {/* Animated polygon background */}
-      <PolygonBackground />
+      <PolygonBackground triggerKey={flipCount} />
       
 
       {/* Cards content — centered vertically */}
@@ -288,7 +289,7 @@ const Index = () => {
                 flipAxis="y-center"
                 frontImage={taro01Img}
                 backImage={taroEyeImg}
-                onFlip={(f: boolean) => setThirdCardFlipped(f)} />
+                onFlip={(f: boolean) => { setThirdCardFlipped(f); setFlipCount(c => c + 1); }} />
           </div>
         </div>
       </div>

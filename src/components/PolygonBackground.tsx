@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 
-const PolygonBackground = () => {
+interface PolygonBackgroundProps {
+  triggerKey?: number;
+}
+
+const PolygonBackground = ({ triggerKey = 0 }: PolygonBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -139,7 +143,7 @@ const PolygonBackground = () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [triggerKey]);
 
   return (
     <canvas
