@@ -289,16 +289,17 @@ const Index = () => {
         <div className="items-center justify-center flex flex-col">
           {/* Wisdom text above cards */}
           <AnimatePresence mode="wait">
-            {activePortfolioKey === "gallery" ? (
+            {activePortfolioKey ? (
               <motion.p
-                key="gallery-title"
+                key={`section-${activePortfolioKey}`}
                 className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-[20px] font-display"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
                 transition={{ duration: 0.3 }}
               >
-                Gallery{activeGallerySub ? ` | ${activeGallerySub}` : ''}
+                {{ gallery: "Gallery", projects: "Projects", skills: "AI", archive: "Archive" }[activePortfolioKey]}
+                {activePortfolioKey === "gallery" && activeGallerySub ? ` | ${activeGallerySub}` : ''}
               </motion.p>
             ) : (
               <motion.p
