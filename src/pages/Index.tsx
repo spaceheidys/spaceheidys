@@ -147,15 +147,15 @@ const Index = () => {
             </motion.div>
           </nav>
           <MobileNav
-            onSecretDoor={() => setSecretDoorOpen(true)}
-            onShop={() => setActiveSection("shop")}
-            onAbout={handleAboutClick}
-            onPortfolio={() => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
-            onContact={handleContactClick}
-            bgOptions={bgOptions}
-            bgImage={bgImage}
-            onBgChange={setBgImage}
-          />
+              onSecretDoor={() => setSecretDoorOpen(true)}
+              onShop={() => setActiveSection("shop")}
+              onAbout={handleAboutClick}
+              onPortfolio={() => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+              onContact={handleContactClick}
+              bgOptions={bgOptions}
+              bgImage={bgImage}
+              onBgChange={setBgImage} />
+            
         </motion.header>
 
         {/* Main content */}
@@ -287,7 +287,7 @@ const Index = () => {
       <div className="flex-1 flex items-center justify-center py-8 sm:py-12 px-3 sm:px-4 relative z-10">
         <div className="flex flex-col items-center gap-4 sm:gap-6">
           {/* Wisdom text above cards */}
-          <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-2">
+          <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0">
             "The cards know what the mind has forgotten"
           </p>
           <div className="flex flex-wrap gap-2 sm:gap-3 items-end justify-center">
