@@ -273,7 +273,7 @@ const Index = () => {
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100dvh]">
       {/* Animated polygon background */}
-      <PolygonBackground />
+      <PolygonBackground triggerKey={flipCount} />
       
 
       {/* Cards content — centered vertically */}
