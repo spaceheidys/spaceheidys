@@ -84,6 +84,18 @@ const Index = () => {
     };
   }, []);
 
+  // Ctrl+Shift+A shortcut to navigate to admin
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "A") {
+        e.preventDefault();
+        navigate("/admin");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate]);
+
   // Mute/unmute the background audio when muted state changes
   useEffect(() => {
     if (audioRef.current) {
