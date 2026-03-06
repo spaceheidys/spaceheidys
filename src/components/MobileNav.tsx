@@ -68,6 +68,7 @@ const MobileNav = ({
               { label: "コンタクト / CONTACT", action: onContact },
               { label: "Secret Door", action: onSecretDoor },
               { label: "Shop", action: onShop },
+              { label: "CMS", action: () => { window.location.href = "/admin"; } },
             ].map((item) => (
               <button
                 key={item.label}
