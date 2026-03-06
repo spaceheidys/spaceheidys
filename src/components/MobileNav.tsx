@@ -4,6 +4,7 @@ import { Menu, X, Volume2, VolumeX } from "lucide-react";
 import { useSoundContext } from "@/contexts/SoundContext";
 
 interface MobileNavProps {
+  onGallery: () => void;
   onSecretDoor: () => void;
   onShop: () => void;
   onAbout: () => void;
