@@ -36,7 +36,7 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelec
             { en: "DIGITAL", jp: "デジタル" },
             { en: "AI", jp: "エーアイ" },
             { en: "SKETCHES", jp: "スケッチ" },
-            { en: "BACK", jp: "戻る", isBack: true },
+            { en: "RETURN", jp: "戻る", isBack: true },
           ].map((item, i) => (
             <motion.button
               key={item.en}
@@ -69,7 +69,7 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelec
             onClick={onBack}
           >
             <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase text-white/50 group-hover:text-white transition-colors duration-300 font-display">
-              BACK
+              RETURN
             </span>
             <span className="text-[9px] sm:text-[10px] tracking-widest text-white/30 group-hover:text-white/60 transition-colors duration-300 font-jp">
               戻る
