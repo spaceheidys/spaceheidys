@@ -145,6 +145,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                   alt={item.label}
                   className="w-full h-full object-cover"
                   loading="lazy"
+                  onContextMenu={(e) => e.preventDefault()}
                 />
               ) : (
                 <span className="text-white/40 text-[9px] sm:text-[10px] tracking-widest font-display uppercase">
@@ -221,6 +222,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                 alt={selectedItem.label}
                 className="max-w-[80vw] sm:max-w-[75vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
                 onClick={() => setSelectedItem(null)}
+                onContextMenu={(e) => e.preventDefault()}
               />
             </motion.div>
           </motion.div>
