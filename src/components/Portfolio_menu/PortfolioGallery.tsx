@@ -1,21 +1,28 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 
 const ITEMS_PER_PAGE = 6;
 
-const makeItems = (count: number) =>
-  Array.from({ length: count }, (_, i) => ({ id: i + 1, label: String(i + 1).padStart(2, "0") }));
+interface PortfolioItem {
+  id: string;
+  label: string;
+  image_url?: string;
+}
 
-const sectionItems: Record<PortfolioMenuKey, { id: number; label: string }[]> = {
+const makeItems = (count: number): PortfolioItem[] =>
+  Array.from({ length: count }, (_, i) => ({ id: String(i + 1), label: String(i + 1).padStart(2, "0") }));
+
+const defaultSectionItems: Record<PortfolioMenuKey, PortfolioItem[]> = {
   gallery: makeItems(6),
   projects: makeItems(16),
   skills: makeItems(16),
   archive: makeItems(8),
 };
 
-const gallerySubItems: Record<string, { id: number; label: string }[]> = {
+const defaultGallerySubItems: Record<string, PortfolioItem[]> = {
   VECTOR: makeItems(16),
   DIGITAL: makeItems(16),
   AI: makeItems(16),
@@ -29,13 +36,49 @@ interface PortfolioGalleryProps {
 }
 
 const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: PortfolioGalleryProps) => {
+  const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      let query = supabase
+        .from("portfolio_items")
+        .select("id, title, image_url, sort_order")
+        .eq("section", sectionKey)
+        .order("sort_order", { ascending: true });
+
+      if (sectionKey === "gallery" && gallerySub) {
+        query = query.eq("subsection", gallerySub);
+      }
+
+      const { data } = await query;
+      if (data && data.length > 0) {
+        setDbItems(
+          data.map((d: any) => ({
+            id: d.id,
+            label: d.title || "",
+            image_url: d.image_url,
+          }))
+        );
+      } else {
+        setDbItems(null); // fall back to placeholders
+      }
+    };
+    fetchItems();
+  }, [sectionKey, gallerySub]);
+
   const items =
-    sectionKey === "gallery" && gallerySub && gallerySubItems[gallerySub]
-      ? gallerySubItems[gallerySub]
-      : sectionItems[sectionKey] || sectionItems.gallery;
+    dbItems ??
+    (sectionKey === "gallery" && gallerySub && defaultGallerySubItems[gallerySub]
+      ? defaultGallerySubItems[gallerySub]
+      : defaultSectionItems[sectionKey] || defaultSectionItems.gallery);
+
   const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
   const [page, setPage] = useState(0);
   const hasPagination = totalPages > 1;
+
+  useEffect(() => {
+    setPage(0);
+  }, [sectionKey, gallerySub]);
 
   useEffect(() => {
     onPageInfo?.(page + 1, totalPages);
@@ -45,7 +88,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
-      {/* Left arrow */}
       {hasPagination && (
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -57,10 +99,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
         </button>
       )}
 
-      {/* Grid */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={page}
+          key={`${sectionKey}-${gallerySub}-${page}`}
           className="w-full h-full grid grid-cols-2 gap-2 p-2"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -70,20 +111,28 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           {pageItems.map((item, i) => (
             <motion.div
               key={item.id}
-              className="bg-white/5 border border-white/10 rounded-md flex items-center justify-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-colors duration-300"
+              className="bg-white/5 border border-white/10 rounded-md flex items-center justify-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-colors duration-300 overflow-hidden"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 + i * 0.04 }}
             >
-              <span className="text-white/40 text-[9px] sm:text-[10px] tracking-widest font-display uppercase">
-                {item.label}
-              </span>
+              {item.image_url ? (
+                <img
+                  src={item.image_url}
+                  alt={item.label}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="text-white/40 text-[9px] sm:text-[10px] tracking-widest font-display uppercase">
+                  {item.label}
+                </span>
+              )}
             </motion.div>
           ))}
         </motion.div>
       </AnimatePresence>
 
-      {/* Right arrow */}
       {hasPagination && (
         <button
           onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
