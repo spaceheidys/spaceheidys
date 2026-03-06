@@ -170,32 +170,52 @@ const SortableImageCard = ({
       </div>
 
       {/* Title area below image */}
-      <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1.5 py-1">
-        {isEditingTitle ? (
-          <input
-            autoFocus
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            onBlur={() => {
-              setIsEditingTitle(false);
-              if (editTitle.trim() && editTitle !== title) onTitleChange(editTitle.trim());
-              else setEditTitle(title);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") { e.currentTarget.blur(); }
-              if (e.key === "Escape") { setEditTitle(title); setIsEditingTitle(false); }
-            }}
-            className="w-full bg-transparent text-[9px] text-foreground/80 font-display tracking-wider outline-none border-b border-foreground/30"
-          />
-        ) : (
-          <span
-            onClick={(e) => { e.stopPropagation(); setIsEditingTitle(true); setEditTitle(title); }}
-            className="block text-[9px] text-foreground/50 font-display tracking-wider truncate cursor-text hover:text-foreground/80 transition-colors"
-            title="Click to rename"
-          >
-            {title}
-          </span>
-        )}
+      <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1.5 py-1 flex items-center gap-1">
+        <div className="flex-1 min-w-0">
+          {isEditingTitle ? (
+            <input
+              autoFocus
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onBlur={() => {
+                setIsEditingTitle(false);
+                if (editTitle.trim() && editTitle !== title) onTitleChange(editTitle.trim());
+                else setEditTitle(title);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { e.currentTarget.blur(); }
+                if (e.key === "Escape") { setEditTitle(title); setIsEditingTitle(false); }
+              }}
+              className="w-full bg-transparent text-[9px] text-foreground/80 font-display tracking-wider outline-none border-b border-foreground/30"
+            />
+          ) : (
+            <span
+              onClick={(e) => { e.stopPropagation(); setIsEditingTitle(true); setEditTitle(title); }}
+              className="block text-[9px] text-foreground/50 font-display tracking-wider truncate cursor-text hover:text-foreground/80 transition-colors"
+              title="Click to rename"
+            >
+              {title}
+            </span>
+          )}
+        </div>
+        {/* Text align toggle */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const cycle = { left: "center", center: "right", right: "left" } as Record<string, string>;
+            onTextAlignChange(cycle[text_align] || "center");
+          }}
+          className="shrink-0 p-0.5 rounded hover:bg-foreground/10 transition-colors"
+          title={`Align: ${text_align}`}
+        >
+          {text_align === "center" ? (
+            <AlignCenter size={10} className="text-foreground/50" />
+          ) : text_align === "right" ? (
+            <AlignRight size={10} className="text-foreground/50" />
+          ) : (
+            <AlignLeft size={10} className="text-foreground/50" />
+          )}
+        </button>
       </div>
     </div>
   );
