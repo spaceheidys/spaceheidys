@@ -25,9 +25,10 @@ const gallerySubItems: Record<string, { id: number; label: string }[]> = {
 interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
   gallerySub?: string | null;
+  onPageInfo?: (current: number, total: number) => void;
 }
 
-const PortfolioGallery = ({ sectionKey = "gallery", gallerySub }: PortfolioGalleryProps) => {
+const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: PortfolioGalleryProps) => {
   const items =
     sectionKey === "gallery" && gallerySub && gallerySubItems[gallerySub]
       ? gallerySubItems[gallerySub]
