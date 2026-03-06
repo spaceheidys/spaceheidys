@@ -107,7 +107,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
       <AnimatePresence mode="wait">
         <motion.div
           key={`${sectionKey}-${gallerySub}-${page}`}
-          className="w-full h-full grid grid-cols-2 gap-2 p-2"
+          className="w-full h-full grid grid-cols-2 sm:grid-cols-3 gap-2 p-2"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
