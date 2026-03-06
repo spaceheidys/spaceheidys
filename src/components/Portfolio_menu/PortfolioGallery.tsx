@@ -42,6 +42,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
   const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   useEffect(() => {
     const fetchItems = async () => {
