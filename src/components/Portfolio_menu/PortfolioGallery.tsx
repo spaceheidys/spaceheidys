@@ -72,14 +72,13 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     fetchItems();
   }, [sectionKey, gallerySub]);
 
-  // Only items with images for lightbox navigation
-  const navigableItems = useMemo(() => items.filter((i) => !!i.image_url), [items]);
-
   const items =
     dbItems ??
     (sectionKey === "gallery" && gallerySub && defaultGallerySubItems[gallerySub]
       ? defaultGallerySubItems[gallerySub]
       : defaultSectionItems[sectionKey] || defaultSectionItems.gallery);
+
+  const navigableItems = useMemo(() => items.filter((i) => !!i.image_url), [items]);
 
   const openLightbox = (item: PortfolioItem) => {
     if (!item.image_url) return;
