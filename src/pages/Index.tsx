@@ -316,8 +316,8 @@ const Index = () => {
       </div>
     </div>
     {/* Footer */}
-    <div className="w-full flex items-center justify-center bg-black" style={{ height: 64 }}>
-      <span className="text-[10px] tracking-widest text-white/40 font-display">© 2026 Spaceheidys. All rights reserved.</span>
+    <div className="w-full flex items-center justify-center bg-black h-12 sm:h-16">
+      <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2026 Spaceheidys. All rights reserved.</span>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
     </>);
