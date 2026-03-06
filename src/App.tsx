@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import SecretPage from "./pages/SecretPage";
 import Admin from "./pages/Admin";
+import AdminMain from "./pages/AdminMain";
 import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/secret" element={<SecretPage />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/main" element={<AdminMain />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

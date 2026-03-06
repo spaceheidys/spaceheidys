@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX, ArrowUp } from "lucide-react";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
@@ -31,10 +32,12 @@ const Index = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
+  const defaultBgOptions = [lostInTime01, lostInTime02, lostInTime03];
+  const [bgOptions, setBgOptions] = useState<string[]>(defaultBgOptions);
   const [bgImage, setBgImage] = useState(() => {
-    const options = [lostInTime01, lostInTime02, lostInTime03];
-    return options[Math.floor(Math.random() * options.length)];
+    return defaultBgOptions[Math.floor(Math.random() * defaultBgOptions.length)];
   });
+  const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
@@ -44,8 +47,29 @@ const Index = () => {
   const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
-  const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
   const { visibility: sectionVisibility } = useSectionSettings();
+
+  // Fetch dynamic backgrounds
+  useEffect(() => {
+    const fetchBgs = async () => {
+      const { data } = await supabase
+        .from("page_backgrounds")
+        .select("*")
+        .order("sort_order");
+      if (data && data.length > 0) {
+        const mainBgs = data.filter((b: any) => b.section === "main").map((b: any) => b.image_url);
+        const portfolioBgs = data.filter((b: any) => b.section === "portfolio").map((b: any) => b.image_url);
+        if (mainBgs.length > 0) {
+          setBgOptions(mainBgs);
+          setBgImage(mainBgs[Math.floor(Math.random() * mainBgs.length)]);
+        }
+        if (portfolioBgs.length > 0) {
+          setPortfolioBg(portfolioBgs[0]);
+        }
+      }
+    };
+    fetchBgs();
+  }, []);
 
   const handleAboutClick = () => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
@@ -299,6 +323,13 @@ const Index = () => {
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100dvh]">
+      {/* Portfolio background image */}
+      {portfolioBg && (
+        <div className="absolute inset-0">
+          <img src={portfolioBg} alt="" className="w-full h-full object-cover opacity-40" />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+      )}
       {/* Animated polygon background */}
       <PolygonBackground triggerKey={flipCount} />
       
