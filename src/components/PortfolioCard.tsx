@@ -23,11 +23,9 @@ const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, f
     if (!muted) {
       new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
     }
-    setFlipped((prev) => {
-      const next = !prev;
-      onFlip?.(next);
-      return next;
-    });
+    const next = !flipped;
+    setInternalFlipped(next);
+    onFlip?.(next);
   };
 
   if (!flipAxis) {
