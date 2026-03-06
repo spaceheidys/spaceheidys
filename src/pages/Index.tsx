@@ -224,11 +224,17 @@ const Index = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.4 }}>
                 
-                {[
-                { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
-                { jp: "ポートフォリオ", en: "PORTFOLIO", action: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }) },
-                ...(sectionVisibility.gallery ? [{ jp: "ギャラリー", en: "GALLERY", action: () => navigate("/gallery") }] : []),
-                { jp: "コンタクト", en: "CONTACT", action: handleContactClick }].
+                {(() => {
+                  const actionMap: Record<string, () => void> = {
+                    about: handleAboutClick,
+                    portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+                    gallery: () => navigate("/gallery"),
+                    contacts: handleContactClick,
+                  };
+                  return navButtons
+                    .filter(b => b.is_visible)
+                    .map(b => ({ jp: b.label_jp, en: b.label, action: actionMap[b.key] }));
+                })().
                 map((item, i) =>
                 <motion.a
                   key={item.en}
