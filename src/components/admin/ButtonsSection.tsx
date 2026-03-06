@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, ArrowUp, ArrowDown, Pencil, Check, X } from "lucide-react";
+import { Eye, EyeOff, ArrowUp, ArrowDown, Pencil, Check, X, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { NavButton } from "@/hooks/useNavButtons";
 
@@ -7,6 +7,8 @@ interface ButtonsSectionProps {
   buttons: NavButton[];
   onUpdate: (id: string, updates: Partial<Pick<NavButton, "label" | "label_jp" | "is_visible">>) => Promise<void>;
   onSwapOrder: (idA: string, idB: string) => Promise<void>;
+  onAdd: (label: string, labelJp: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
 const ButtonsSection = ({ buttons, onUpdate, onSwapOrder }: ButtonsSectionProps) => {
