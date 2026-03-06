@@ -189,6 +189,16 @@ const Admin = () => {
     }, 400);
   };
 
+  const titleTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleTitleChange = (id: string, title: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, title } : i)));
+    if (titleTimers.current[id]) clearTimeout(titleTimers.current[id]);
+    titleTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ title }).eq("id", id);
+    }, 400);
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
