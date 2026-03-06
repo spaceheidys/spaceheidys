@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const navItems = ["About", "Portfolio", "Contacts"];
+const navItems = ["About", "Portfolio", "Gallery", "Contacts"];
 
 const ScrollIndicator = ({ activeSection = "Main" }: { activeSection?: string }) => {
   const sections = ["About", "Portfolio", "Contacts"];
