@@ -181,7 +181,8 @@ const Index = () => {
               onContact={handleContactClick}
               bgOptions={bgOptions}
               bgImage={bgImage}
-              onBgChange={setBgImage} />
+              onBgChange={setBgImage}
+              galleryVisible={sectionVisibility.gallery} />
             
         </motion.header>
 
