@@ -27,6 +27,7 @@ const SortableImageCard = ({
   onDelete,
   onPositionChange,
   onZoomChange,
+  onTitleChange,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
