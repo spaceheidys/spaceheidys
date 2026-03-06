@@ -14,9 +14,10 @@ interface PortfolioMenuProps {
   activeKey?: PortfolioMenuKey | null;
   onSelect?: (key: PortfolioMenuKey) => void;
   onBack?: () => void;
+  onGallerySubSelect?: (label: string) => void;
 }
 
-const PortfolioMenu = ({ visible, activeKey, onSelect, onBack }: PortfolioMenuProps) => {
+const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect }: PortfolioMenuProps) => {
   if (!visible) return null;
 
   return (
