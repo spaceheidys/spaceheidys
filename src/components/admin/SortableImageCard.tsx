@@ -44,6 +44,7 @@ const SortableImageCard = ({
   image_offset_y,
   image_zoom,
   text_align,
+  group_id,
   onDelete,
   onPositionChange,
   onZoomChange,
