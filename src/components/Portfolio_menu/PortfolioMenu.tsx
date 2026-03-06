@@ -31,9 +31,10 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack }: PortfolioMenuPr
           transition={{ duration: 0.3 }}
         >
           {[
-            { en: "VECTOR ARTS", jp: "ベクターアート" },
-            { en: "DIGITAL ARTS", jp: "デジタルアート" },
-            { en: "AI POWERED", jp: "エーアイ" },
+            { en: "VECTOR", jp: "ベクター" },
+            { en: "DIGITAL", jp: "デジタル" },
+            { en: "AI", jp: "エーアイ" },
+            { en: "SKETCHES", jp: "スケッチ" },
             { en: "BACK", jp: "戻る", isBack: true },
           ].map((item, i) => (
             <motion.button
