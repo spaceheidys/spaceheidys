@@ -1,0 +1,1 @@
+ALTER TABLE public.page_backgrounds ADD COLUMN is_active boolean NOT NULL DEFAULT true;
