@@ -83,14 +83,15 @@ const Index = () => {
       <AnimatePresence>
         {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       </AnimatePresence>
-      <div className="relative bg-background overflow-hidden rounded-none min-h-screen">
+      <div className="relative bg-background overflow-hidden rounded-none min-h-[100dvh]">
       {/* === MAIN section === */}
       {/* Hero background illustration */}
-      <div className="absolute inset-0 w-full h-screen">
+      <div className="absolute inset-0 w-full h-[100dvh]">
         <img
             src={bgImage}
             alt="BIKO KU manga illustration"
-            className="w-full h-full object-cover object-center opacity-60" />
+            className="w-full h-full object-cover object-center opacity-60"
+            loading="eager" />
           
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
@@ -98,7 +99,7 @@ const Index = () => {
       </div>
 
       {/* Content layer */}
-      <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="relative z-10 min-h-[100dvh] flex flex-col">
         {/* Top nav bar */}
         <motion.header
             className="flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
@@ -258,7 +259,7 @@ const Index = () => {
         </AnimatePresence>
 
         {/* Bottom section */}
-        <div className="mt-auto flex items-center justify-center my-0 py-[20px]" style={{ paddingBottom: 60 }}>
+        <div className="mt-auto flex items-center justify-center py-4 sm:py-5 pb-10 sm:pb-12 md:pb-16">
           <SocialLinks />
         </div>
 
@@ -268,7 +269,7 @@ const Index = () => {
     {/* === 2nd_dimension === */}
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden min-h-screen py-12 px-4">
+    <div ref={portfolioRef} className="relative w-full bg-black flex items-center justify-center overflow-hidden min-h-[100dvh] py-8 sm:py-12 px-3 sm:px-4">
       {/* Portfolio background */}
       <div
           className="absolute inset-0 bg-cover bg-center opacity-60"
@@ -284,18 +285,18 @@ const Index = () => {
         
       {/* Scroll to top arrow */}
       <div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
+          className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top">
           
-        <ArrowUp size={32} />
+        <ArrowUp className="w-6 h-6 sm:w-8 sm:h-8" />
       </div>
-      <div className="flex flex-col items-center gap-6 relative z-10">
-        {/* Wisdom text above cards 2-4 */}
-        <p className="text-white/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
+      <div className="flex flex-col items-center gap-4 sm:gap-6 relative z-10">
+        {/* Wisdom text above cards */}
+        <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-2">
           "The cards know what the mind has forgotten"
         </p>
-        <div className="flex flex-wrap gap-2 sm:gap-1 items-end justify-center">
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-end justify-center">
           {[
             { name: "Card_01" },
             { name: "Card_02" },
@@ -315,8 +316,8 @@ const Index = () => {
       </div>
     </div>
     {/* Footer */}
-    <div className="w-full flex items-center justify-center bg-black" style={{ height: 64 }}>
-      <span className="text-[10px] tracking-widest text-white/40 font-display">© 2026 Spaceheidys. All rights reserved.</span>
+    <div className="w-full flex items-center justify-center bg-black h-12 sm:h-16">
+      <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2026 Spaceheidys. All rights reserved.</span>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
     </>);
