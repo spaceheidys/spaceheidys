@@ -298,7 +298,7 @@ const Index = () => {
                 exit={{ opacity: 0, y: -5 }}
                 transition={{ duration: 0.3 }}
               >
-                Gallery
+                Gallery{activeGallerySub ? ` | ${activeGallerySub}` : ''}
               </motion.p>
             ) : (
               <motion.p
