@@ -40,7 +40,7 @@ const Index = () => {
   const { muted, toggleMute } = useSoundContext();
   const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
-  const [pageInfo, setPageInfo] = useState<{ current: number; total: number } | null>(null);
+  const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
   const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
 
   const handleAboutClick = () => {
@@ -290,69 +290,69 @@ const Index = () => {
         <div className="items-center justify-center flex flex-col">
           {/* Wisdom text above cards */}
           <AnimatePresence mode="wait">
-            {activePortfolioKey ? (
+            {activePortfolioKey ?
               <motion.p
                 key={`section-${activePortfolioKey}`}
                 className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-[20px] font-display"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.3 }}
-              >
+                transition={{ duration: 0.3 }}>
+                
                 {{ gallery: "Gallery", projects: "Projects", skills: "AI", archive: "Archive" }[activePortfolioKey]}
                 {activePortfolioKey === "gallery" && activeGallerySub ? ` | ${activeGallerySub}` : ''}
-                {pageInfo && pageInfo.total > 1 && (
-                  <span className="text-white/30 ml-2 text-[10px] sm:text-xs">{pageInfo.current}/{pageInfo.total}</span>
-                )}
-              </motion.p>
-            ) : (
+                {pageInfo && pageInfo.total > 1 &&
+                <span className="text-white/30 ml-2 text-[10px] sm:text-xs">{pageInfo.current}/{pageInfo.total}</span>
+                }
+              </motion.p> :
+
               <motion.p
                 key="wisdom"
                 className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0 my-[20px]"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.3 }}
-              >
+                transition={{ duration: 0.3 }}>
+                
                 "The cards know what the mind has forgotten"
               </motion.p>
-            )}
+              }
           </AnimatePresence>
           <div className="relative">
             {/* Fixed-height card wrapper */}
             <div className={`flex items-center justify-center w-[80vw] h-[120vw] ${activePortfolioKey ? 'sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px]' : 'sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]'} transition-all duration-500`}>
               <AnimatePresence mode="wait">
-                {activePortfolioKey ? (
-                  <PortfolioGallery key={`${activePortfolioKey}-${activeGallerySub}`} sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={(c, t) => setPageInfo({ current: c, total: t })} />
-                ) : (
+                {activePortfolioKey ?
+                  <PortfolioGallery key={`${activePortfolioKey}-${activeGallerySub}`} sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={(c, t) => setPageInfo({ current: c, total: t })} /> :
+
                   <motion.div
                     key="card"
                     className="w-full h-full"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
+                    transition={{ duration: 0.3 }}>
+                    
                     <PortfolioCard
                       name="Card_03"
                       flipAxis="y-center"
                       frontImage={taro01Img}
                       backImage={taroEyeImg}
                       flipped={thirdCardFlipped}
-                      onFlip={(f: boolean) => { setThirdCardFlipped(f); setFlipCount(c => c + 1); }} />
+                      onFlip={(f: boolean) => {setThirdCardFlipped(f);setFlipCount((c) => c + 1);}} />
                   </motion.div>
-                )}
+                  }
               </AnimatePresence>
             </div>
             {/* Menu positioned below card without affecting layout */}
             <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max ${activePortfolioKey ? 'sm:hidden' : ''}`}>
               <PortfolioMenu
-                visible={!thirdCardFlipped}
-                activeKey={activePortfolioKey}
-                onSelect={(key) => setActivePortfolioKey(key)}
-                onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); setPageInfo(null); }}
-                onGallerySubSelect={(label) => setActiveGallerySub(label)}
-              />
+                  visible={!thirdCardFlipped}
+                  activeKey={activePortfolioKey}
+                  onSelect={(key) => setActivePortfolioKey(key)}
+                  onBack={() => {setActivePortfolioKey(null);setActiveGallerySub(null);setPageInfo(null);}}
+                  onGallerySubSelect={(label) => setActiveGallerySub(label)} />
+                
             </div>
           </div>
         </div>
@@ -370,21 +370,21 @@ const Index = () => {
       </div>
 
       {/* Menu at bottom position when section is active (desktop only) */}
-      {activePortfolioKey && (
+      {activePortfolioKey &&
         <div className="hidden sm:flex relative z-10 items-center justify-center pb-4">
           <PortfolioMenu
             visible={!thirdCardFlipped}
             activeKey={activePortfolioKey}
             onSelect={(key) => setActivePortfolioKey(key)}
-            onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); setPageInfo(null); }}
-            onGallerySubSelect={(label) => setActiveGallerySub(label)}
-          />
+            onBack={() => {setActivePortfolioKey(null);setActiveGallerySub(null);setPageInfo(null);}}
+            onGallerySubSelect={(label) => setActiveGallerySub(label)} />
+          
         </div>
-      )}
+        }
 
       {/* Footer */}
       <div className="w-full h-12 sm:h-16 relative z-10 items-center justify-center flex flex-row">
-        <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2026 Spaceheidys. All rights reserved.</span>
+        <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2018 - 2026 Spaceheidys. All rights reserved.</span>
       </div>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
