@@ -14,9 +14,10 @@ interface PortfolioMenuProps {
   activeKey?: PortfolioMenuKey | null;
   onSelect?: (key: PortfolioMenuKey) => void;
   onBack?: () => void;
+  onGallerySubSelect?: (label: string) => void;
 }
 
-const PortfolioMenu = ({ visible, activeKey, onSelect, onBack }: PortfolioMenuProps) => {
+const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect }: PortfolioMenuProps) => {
   if (!visible) return null;
 
   return (
@@ -43,7 +44,7 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack }: PortfolioMenuPr
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.08 }}
-              onClick={'isBack' in item && item.isBack ? onBack : undefined}
+              onClick={'isBack' in item && item.isBack ? onBack : () => onGallerySubSelect?.(item.en)}
             >
               <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase text-white/50 group-hover:text-white transition-colors duration-300 font-display">
                 {item.en}

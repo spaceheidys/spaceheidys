@@ -39,6 +39,7 @@ const Index = () => {
   const [flipCount, setFlipCount] = useState(0);
   const { muted, toggleMute } = useSoundContext();
   const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
+  const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
   const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
 
   const handleAboutClick = () => {
@@ -297,7 +298,7 @@ const Index = () => {
                 exit={{ opacity: 0, y: -5 }}
                 transition={{ duration: 0.3 }}
               >
-                Gallery
+                Gallery{activeGallerySub ? ` | ${activeGallerySub}` : ''}
               </motion.p>
             ) : (
               <motion.p
@@ -344,7 +345,8 @@ const Index = () => {
                 visible={!thirdCardFlipped}
                 activeKey={activePortfolioKey}
                 onSelect={(key) => setActivePortfolioKey(key)}
-                onBack={() => setActivePortfolioKey(null)}
+                onBack={() => { setActivePortfolioKey(null); setActiveGallerySub(null); }}
+                onGallerySubSelect={(label) => setActiveGallerySub(label)}
               />
             </div>
           </div>
