@@ -17,9 +17,9 @@ const sectionItems: Record<PortfolioMenuKey, { id: number; label: string }[]> = 
 
 const gallerySubItems: Record<string, { id: number; label: string }[]> = {
   VECTOR: makeItems(16),
-  DIGITAL: makeItems(6),
-  AI: makeItems(6),
-  SKETCHES: makeItems(6),
+  DIGITAL: makeItems(16),
+  AI: makeItems(16),
+  SKETCHES: makeItems(16),
 };
 
 interface PortfolioGalleryProps {
