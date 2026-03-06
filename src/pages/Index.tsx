@@ -26,7 +26,10 @@ const Index = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
-  const [bgImage, setBgImage] = useState(lostInTime01);
+  const [bgImage, setBgImage] = useState(() => {
+    const options = [lostInTime01, lostInTime02, lostInTime03];
+    return options[Math.floor(Math.random() * options.length)];
+  });
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
