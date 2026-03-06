@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          group_id: string | null
           id: string
           image_offset_x: number
           image_offset_y: number
@@ -32,6 +33,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          group_id?: string | null
           id?: string
           image_offset_x?: number
           image_offset_y?: number
@@ -46,6 +48,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          group_id?: string | null
           id?: string
           image_offset_x?: number
           image_offset_y?: number
