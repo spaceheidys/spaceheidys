@@ -292,7 +292,10 @@ const Admin = () => {
                     id={item.id}
                     title={item.title}
                     image_url={item.image_url}
+                    image_offset_x={(item as any).image_offset_x ?? 50}
+                    image_offset_y={(item as any).image_offset_y ?? 50}
                     onDelete={() => handleDelete(item)}
+                    onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
                   />
                 ))}
               </div>
