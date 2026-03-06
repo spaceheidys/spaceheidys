@@ -83,14 +83,15 @@ const Index = () => {
       <AnimatePresence>
         {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       </AnimatePresence>
-      <div className="relative bg-background overflow-hidden rounded-none min-h-screen">
+      <div className="relative bg-background overflow-hidden rounded-none min-h-[100dvh]">
       {/* === MAIN section === */}
       {/* Hero background illustration */}
-      <div className="absolute inset-0 w-full h-screen">
+      <div className="absolute inset-0 w-full h-[100dvh]">
         <img
             src={bgImage}
             alt="BIKO KU manga illustration"
-            className="w-full h-full object-cover object-center opacity-60" />
+            className="w-full h-full object-cover object-center opacity-60"
+            loading="eager" />
           
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
