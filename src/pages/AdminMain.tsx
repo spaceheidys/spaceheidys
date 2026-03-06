@@ -15,6 +15,7 @@ interface BackgroundItem {
   section: string;
   image_url: string;
   sort_order: number;
+  is_active: boolean;
 }
 
 const SECTIONS = ["main", "portfolio"] as const;
