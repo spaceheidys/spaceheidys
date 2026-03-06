@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import SecretPage from "./pages/SecretPage";
 import Admin from "./pages/Admin";
+import AdminMain from "./pages/AdminMain";
 import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
