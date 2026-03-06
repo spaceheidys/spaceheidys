@@ -49,6 +49,7 @@ const Index = () => {
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
   const { visibility: sectionVisibility } = useSectionSettings();
+  const { buttons: navButtons } = useNavButtons();
 
   // Fetch dynamic backgrounds
   useEffect(() => {
