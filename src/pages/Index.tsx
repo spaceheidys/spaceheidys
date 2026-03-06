@@ -45,6 +45,7 @@ const Index = () => {
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
   const bgOptions = [lostInTime01, lostInTime02, lostInTime03];
+  const { visibility: sectionVisibility } = useSectionSettings();
 
   const handleAboutClick = () => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
