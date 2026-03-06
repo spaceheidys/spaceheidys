@@ -42,6 +42,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
   const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -76,6 +77,22 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     (sectionKey === "gallery" && gallerySub && defaultGallerySubItems[gallerySub]
       ? defaultGallerySubItems[gallerySub]
       : defaultSectionItems[sectionKey] || defaultSectionItems.gallery);
+
+  const navigableItems = useMemo(() => items.filter((i) => !!i.image_url), [items]);
+
+  const openLightbox = (item: PortfolioItem) => {
+    if (!item.image_url) return;
+    const idx = navigableItems.findIndex((n) => n.id === item.id);
+    setSelectedItem(item);
+    setSelectedIndex(idx);
+  };
+
+  const goLightbox = (dir: -1 | 1) => {
+    const newIdx = selectedIndex + dir;
+    if (newIdx < 0 || newIdx >= navigableItems.length) return;
+    setSelectedItem(navigableItems[newIdx]);
+    setSelectedIndex(newIdx);
+  };
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const [page, setPage] = useState(0);
@@ -120,7 +137,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 + i * 0.04 }}
-              onClick={() => item.image_url && setSelectedItem(item)}
+              onClick={() => openLightbox(item)}
             >
               {item.image_url ? (
                 <img
@@ -161,8 +178,31 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             transition={{ duration: 0.25 }}
             onClick={() => setSelectedItem(null)}
           >
+            {/* Prev arrow */}
+            {selectedIndex > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
+                className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
+              </button>
+            )}
+
+            {/* Next arrow */}
+            {selectedIndex < navigableItems.length - 1 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
+                className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                aria-label="Next image"
+              >
+                <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
+              </button>
+            )}
+
             <motion.div
-              className="relative max-w-[90vw] max-h-[85vh]"
+              key={selectedItem.id}
+              className="relative max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
@@ -179,7 +219,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               <img
                 src={selectedItem.image_url}
                 alt={selectedItem.label}
-                className="max-w-[90vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
+                className="max-w-[80vw] sm:max-w-[75vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
                 onClick={() => setSelectedItem(null)}
               />
             </motion.div>
