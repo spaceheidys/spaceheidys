@@ -1,43 +1,33 @@
 import { motion } from "framer-motion";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 
+const vectorItems = Array.from({ length: 16 }, (_, i) => ({ id: i + 1, label: String(i + 1).padStart(2, "0") }));
+
+const defaultItems = (count: number) => Array.from({ length: count }, (_, i) => ({ id: i + 1, label: String(i + 1).padStart(2, "0") }));
+
 const sectionItems: Record<PortfolioMenuKey, { id: number; label: string }[]> = {
-  gallery: [
-    { id: 1, label: "01" },
-    { id: 2, label: "02" },
-    { id: 3, label: "03" },
-    { id: 4, label: "04" },
-    { id: 5, label: "05" },
-    { id: 6, label: "06" },
-  ],
-  projects: [
-    { id: 1, label: "01" },
-    { id: 2, label: "02" },
-    { id: 3, label: "03" },
-    { id: 4, label: "04" },
-  ],
-  skills: [
-    { id: 1, label: "01" },
-    { id: 2, label: "02" },
-    { id: 3, label: "03" },
-    { id: 4, label: "04" },
-  ],
-  archive: [
-    { id: 1, label: "01" },
-    { id: 2, label: "02" },
-    { id: 3, label: "03" },
-    { id: 4, label: "04" },
-    { id: 5, label: "05" },
-    { id: 6, label: "06" },
-  ],
+  gallery: defaultItems(6),
+  projects: defaultItems(4),
+  skills: defaultItems(4),
+  archive: defaultItems(6),
+};
+
+const gallerySubItems: Record<string, { id: number; label: string }[]> = {
+  VECTOR: vectorItems,
+  DIGITAL: defaultItems(6),
+  AI: defaultItems(6),
+  SKETCHES: defaultItems(6),
 };
 
 interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
+  gallerySub?: string | null;
 }
 
-const PortfolioGallery = ({ sectionKey = "gallery" }: PortfolioGalleryProps) => {
-  const items = sectionItems[sectionKey] || sectionItems.gallery;
+const PortfolioGallery = ({ sectionKey = "gallery", gallerySub }: PortfolioGalleryProps) => {
+  const items = sectionKey === "gallery" && gallerySub && gallerySubItems[gallerySub]
+    ? gallerySubItems[gallerySub]
+    : sectionItems[sectionKey] || sectionItems.gallery;
 
   return (
     <motion.div
