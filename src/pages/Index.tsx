@@ -25,6 +25,7 @@ import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
