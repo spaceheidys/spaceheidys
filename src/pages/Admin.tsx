@@ -38,6 +38,7 @@ interface PortfolioItem {
 
 const Admin = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
+  const { visibility, toggle: toggleSection } = useSectionSettings();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [activeSection, setActiveSection] = useState<string>("gallery");
