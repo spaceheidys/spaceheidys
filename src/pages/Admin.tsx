@@ -228,6 +228,37 @@ const Admin = () => {
       <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
         <h1 className="font-display text-sm tracking-[0.3em] uppercase">Portfolio CMS</h1>
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate("/")}
+            className="text-muted-foreground text-[10px] tracking-widest hover:text-foreground transition-colors font-display uppercase"
+          >
+            ← SITE
+          </button>
+
+          {confirmSave ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setConfirmSave(false); window.location.reload(); }}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+              >
+                <Check size={10} /> YES
+              </button>
+              <button
+                onClick={() => setConfirmSave(false)}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={10} /> NO
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmSave(true)}
+              className="px-2 py-1 text-[10px] font-display tracking-[0.2em] uppercase border border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors"
+            >
+              SAVE
+            </button>
+          )}
+
           <span className="text-muted-foreground text-xs font-display tracking-wider hidden sm:block">
             {user.email}
           </span>
