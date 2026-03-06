@@ -13,6 +13,7 @@ interface MobileNavProps {
   bgOptions: string[];
   bgImage: string;
   onBgChange: (bg: string) => void;
+  galleryVisible?: boolean;
 }
 
 const MobileNav = ({
