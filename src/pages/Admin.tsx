@@ -199,6 +199,11 @@ const Admin = () => {
     }, 400);
   };
 
+  const handleTextAlignChange = (id: string, align: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, text_align: align } as any : i)));
+    supabase.from("portfolio_items").update({ text_align: align } as any).eq("id", id);
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
