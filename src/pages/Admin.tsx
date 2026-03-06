@@ -2,9 +2,22 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Trash2, Upload, LogOut, Loader2 } from "lucide-react";
+import { Upload, LogOut, Loader2 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  rectSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import SortableImageCard from "@/components/admin/SortableImageCard";
 
 const SECTIONS = ["gallery", "projects", "skills", "archive"] as const;
 const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
