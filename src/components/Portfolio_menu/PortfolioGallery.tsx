@@ -39,7 +39,15 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub }: PortfolioGalle
   const pageItems = items.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
+    <div className="relative w-full h-full flex flex-col items-center justify-center">
+      {/* Page indicator */}
+      {hasPagination && (
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
+          <span className="text-white/40 text-[10px] sm:text-xs tracking-widest font-display">
+            {page + 1}/{totalPages}
+          </span>
+        </div>
+      )}
       {/* Left arrow */}
       {hasPagination && (
         <button
