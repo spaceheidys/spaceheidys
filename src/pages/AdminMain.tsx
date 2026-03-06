@@ -30,7 +30,7 @@ const AdminMain = () => {
   const [swapTarget, setSwapTarget] = useState<string | null>(null); // id of active image being swapped
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
-  const { buttons: navButtons, updateButton, swapOrder } = useNavButtons();
+  const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
