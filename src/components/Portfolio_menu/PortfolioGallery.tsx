@@ -75,7 +75,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
   // Only items with images for lightbox navigation
   const navigableItems = useMemo(() => items.filter((i) => !!i.image_url), [items]);
 
-  const items_list =
+  const items =
     dbItems ??
     (sectionKey === "gallery" && gallerySub && defaultGallerySubItems[gallerySub]
       ? defaultGallerySubItems[gallerySub]
