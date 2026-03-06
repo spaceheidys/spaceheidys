@@ -2,6 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Trash2, GripVertical, Move, ZoomIn, ZoomOut } from "lucide-react";
 import { useRef, useState, useCallback } from "react";
+import { Check, X } from "lucide-react";
 
 interface SortableImageCardProps {
   id: string;
@@ -28,6 +29,7 @@ const SortableImageCard = ({
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -134,12 +136,29 @@ const SortableImageCard = ({
 
       {/* Delete overlay */}
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-        <button
-          onClick={onDelete}
-          className="text-destructive hover:text-destructive/80 transition-colors pointer-events-auto"
-        >
-          <Trash2 size={20} />
-        </button>
+        {confirmDelete ? (
+          <div className="flex items-center gap-3 pointer-events-auto">
+            <button
+              onClick={() => { onDelete(); setConfirmDelete(false); }}
+              className="p-1.5 rounded bg-destructive/80 hover:bg-destructive transition-colors"
+            >
+              <Check size={14} className="text-destructive-foreground" />
+            </button>
+            <button
+              onClick={() => setConfirmDelete(false)}
+              className="p-1.5 rounded bg-muted/80 hover:bg-muted transition-colors"
+            >
+              <X size={14} className="text-foreground" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirmDelete(true)}
+            className="text-destructive hover:text-destructive/80 transition-colors pointer-events-auto"
+          >
+            <Trash2 size={20} />
+          </button>
+        )}
       </div>
 
       <span className="absolute bottom-1 left-1 text-[8px] text-foreground/40 font-display tracking-wider truncate max-w-[90%]">
