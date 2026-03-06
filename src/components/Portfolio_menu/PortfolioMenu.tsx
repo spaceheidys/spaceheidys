@@ -1,17 +1,21 @@
 import { motion } from "framer-motion";
 
 const menuItems = [
-  { label: "ギャラリー", en: "GALLERY" },
-  { label: "プロジェクト", en: "PROJECTS" },
-  { label: "スキル", en: "SKILLS" },
-  { label: "アーカイブ", en: "ARCHIVE" },
-];
+  { label: "ギャラリー", en: "GALLERY", key: "gallery" },
+  { label: "プロジェクト", en: "PROJECTS", key: "projects" },
+  { label: "スキル", en: "SKILLS", key: "skills" },
+  { label: "アーカイブ", en: "ARCHIVE", key: "archive" },
+] as const;
+
+export type PortfolioMenuKey = (typeof menuItems)[number]["key"];
 
 interface PortfolioMenuProps {
   visible: boolean;
+  activeKey?: PortfolioMenuKey | null;
+  onSelect?: (key: PortfolioMenuKey) => void;
 }
 
-const PortfolioMenu = ({ visible }: PortfolioMenuProps) => {
+const PortfolioMenu = ({ visible, activeKey, onSelect }: PortfolioMenuProps) => {
   if (!visible) return null;
 
   return (
@@ -29,11 +33,12 @@ const PortfolioMenu = ({ visible }: PortfolioMenuProps) => {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 + i * 0.08 }}
+          onClick={() => onSelect?.(item.key)}
         >
-          <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase text-white/50 group-hover:text-white transition-colors duration-300 font-display">
+          <span className={`text-[10px] sm:text-xs tracking-[0.2em] uppercase transition-colors duration-300 font-display ${activeKey === item.key ? "text-white" : "text-white/50 group-hover:text-white"}`}>
             {item.en}
           </span>
-          <span className="text-[9px] sm:text-[10px] tracking-widest text-white/30 group-hover:text-white/60 transition-colors duration-300 font-jp">
+          <span className={`text-[9px] sm:text-[10px] tracking-widest transition-colors duration-300 font-jp ${activeKey === item.key ? "text-white/80" : "text-white/30 group-hover:text-white/60"}`}>
             {item.label}
           </span>
         </motion.button>
