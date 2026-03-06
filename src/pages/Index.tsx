@@ -99,7 +99,7 @@ const Index = () => {
       </div>
 
       {/* Content layer */}
-      <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="relative z-10 min-h-[100dvh] flex flex-col">
         {/* Top nav bar */}
         <motion.header
             className="flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
