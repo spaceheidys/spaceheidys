@@ -285,9 +285,9 @@ const Index = () => {
 
       {/* Cards content — centered vertically */}
       <div className="flex-1 flex items-center justify-center py-8 sm:py-12 px-3 sm:px-4 relative z-10">
-        <div className="flex flex-col items-center gap-4 sm:gap-6">
+        <div className="gap-4 sm:gap-[24px] items-center justify-center flex flex-col">
           {/* Wisdom text above cards */}
-          <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0">
+          <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0 my-[20px]">
             "The cards know what the mind has forgotten"
           </p>
           <div className="flex flex-wrap gap-2 sm:gap-3 items-end justify-center">
@@ -312,14 +312,14 @@ const Index = () => {
 
       {/* Scroll to top arrow */}
       <div
-          className="flex justify-center pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
+          className="pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 items-center justify-center flex flex-row"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top">
-        <ArrowUp className="w-6 h-6 sm:w-8 sm:h-8" />
+        <ArrowUp className="w-6 h-6 sm:w-[40px] sm:h-[40px]" />
       </div>
 
       {/* Footer */}
-      <div className="w-full flex items-center justify-center h-12 sm:h-16 relative z-10">
+      <div className="w-full h-12 sm:h-16 relative z-10 items-center justify-center flex flex-row">
         <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2026 Spaceheidys. All rights reserved.</span>
       </div>
     </div>
