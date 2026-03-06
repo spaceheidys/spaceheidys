@@ -189,6 +189,16 @@ const Admin = () => {
     }, 400);
   };
 
+  const titleTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleTitleChange = (id: string, title: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, title } : i)));
+    if (titleTimers.current[id]) clearTimeout(titleTimers.current[id]);
+    titleTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ title }).eq("id", id);
+    }, 400);
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -353,6 +363,7 @@ const Admin = () => {
                     onDelete={() => handleDelete(item)}
                     onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
                     onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
+                    onTitleChange={(title) => handleTitleChange(item.id, title)}
                   />
                 ))}
               </div>

@@ -14,6 +14,7 @@ interface SortableImageCardProps {
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
   onZoomChange: (zoom: number) => void;
+  onTitleChange: (title: string) => void;
 }
 
 const SortableImageCard = ({
@@ -26,10 +27,13 @@ const SortableImageCard = ({
   onDelete,
   onPositionChange,
   onZoomChange,
+  onTitleChange,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editTitle, setEditTitle] = useState(title);
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -161,9 +165,34 @@ const SortableImageCard = ({
         )}
       </div>
 
-      <span className="absolute bottom-1 left-1 text-[8px] text-foreground/40 font-display tracking-wider truncate max-w-[90%]">
-        {title}
-      </span>
+      {/* Title area below image */}
+      <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1.5 py-1">
+        {isEditingTitle ? (
+          <input
+            autoFocus
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            onBlur={() => {
+              setIsEditingTitle(false);
+              if (editTitle.trim() && editTitle !== title) onTitleChange(editTitle.trim());
+              else setEditTitle(title);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { e.currentTarget.blur(); }
+              if (e.key === "Escape") { setEditTitle(title); setIsEditingTitle(false); }
+            }}
+            className="w-full bg-transparent text-[9px] text-foreground/80 font-display tracking-wider outline-none border-b border-foreground/30"
+          />
+        ) : (
+          <span
+            onClick={(e) => { e.stopPropagation(); setIsEditingTitle(true); setEditTitle(title); }}
+            className="block text-[9px] text-foreground/50 font-display tracking-wider truncate cursor-text hover:text-foreground/80 transition-colors"
+            title="Click to rename"
+          >
+            {title}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
