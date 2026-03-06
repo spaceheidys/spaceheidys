@@ -282,20 +282,26 @@ const Index = () => {
 
       {/* Cards content — centered vertically */}
       <div className="flex-1 flex items-center justify-center py-8 sm:py-12 px-3 sm:px-4 relative z-10">
-        <div className="gap-4 sm:gap-[24px] items-center justify-center flex flex-col">
+        <div className="items-center justify-center flex flex-col">
           {/* Wisdom text above cards */}
           <p className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0 my-[20px]">
             "The cards know what the mind has forgotten"
           </p>
-          <div className="flex flex-wrap gap-2 sm:gap-3 items-end justify-center">
+          <div className="relative">
+            {/* Fixed-height card wrapper */}
+            <div className="flex items-center justify-center w-[80vw] h-[120vw] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px]">
               <PortfolioCard
                 name="Card_03"
                 flipAxis="y-center"
                 frontImage={taro01Img}
                 backImage={taroEyeImg}
                 onFlip={(f: boolean) => { setThirdCardFlipped(f); setFlipCount(c => c + 1); }} />
+            </div>
+            {/* Menu positioned below card without affecting layout */}
+            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max">
+              <PortfolioMenu visible={!thirdCardFlipped} />
+            </div>
           </div>
-          <PortfolioMenu visible={!thirdCardFlipped} />
         </div>
       </div>
 
