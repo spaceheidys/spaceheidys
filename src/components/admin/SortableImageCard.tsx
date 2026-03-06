@@ -12,12 +12,29 @@ interface SortableImageCardProps {
   image_offset_y: number;
   image_zoom: number;
   text_align: string;
+  group_id?: string | null;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
   onZoomChange: (zoom: number) => void;
   onTitleChange: (title: string) => void;
   onTextAlignChange: (align: string) => void;
 }
+
+const GROUP_COLORS = [
+  "hsl(340, 80%, 55%)", "hsl(200, 80%, 55%)", "hsl(120, 60%, 45%)",
+  "hsl(40, 90%, 55%)", "hsl(280, 70%, 55%)", "hsl(20, 85%, 55%)",
+  "hsl(170, 70%, 45%)", "hsl(310, 70%, 55%)",
+];
+
+const groupColorMap = new Map<string, string>();
+let colorIdx = 0;
+const getGroupColor = (groupId: string): string => {
+  if (!groupColorMap.has(groupId)) {
+    groupColorMap.set(groupId, GROUP_COLORS[colorIdx % GROUP_COLORS.length]);
+    colorIdx++;
+  }
+  return groupColorMap.get(groupId)!;
+};
 
 const SortableImageCard = ({
   id,
