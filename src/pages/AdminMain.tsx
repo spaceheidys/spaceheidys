@@ -196,6 +196,8 @@ const AdminMain = () => {
           buttons={navButtons}
           onUpdate={updateButton}
           onSwapOrder={swapOrder}
+          onAdd={addButton}
+          onDelete={deleteButton}
         />
 
         {/* Active backgrounds */}
