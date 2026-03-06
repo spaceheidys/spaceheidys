@@ -323,6 +323,13 @@ const Index = () => {
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
     <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100dvh]">
+      {/* Portfolio background image */}
+      {portfolioBg && (
+        <div className="absolute inset-0">
+          <img src={portfolioBg} alt="" className="w-full h-full object-cover opacity-40" />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+      )}
       {/* Animated polygon background */}
       <PolygonBackground triggerKey={flipCount} />
       
