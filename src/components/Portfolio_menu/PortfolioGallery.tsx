@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 
 const galleryItems = [
-  { id: 1, label: "Work 01" },
-  { id: 2, label: "Work 02" },
-  { id: 3, label: "Work 03" },
-  { id: 4, label: "Work 04" },
-  { id: 5, label: "Work 05" },
-  { id: 6, label: "Work 06" },
+  { id: 1, label: "01" },
+  { id: 2, label: "02" },
+  { id: 3, label: "03" },
+  { id: 4, label: "04" },
+  { id: 5, label: "05" },
+  { id: 6, label: "06" },
 ];
 
 const PortfolioGallery = () => {
