@@ -14,6 +14,7 @@ interface SortableImageCardProps {
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
   onZoomChange: (zoom: number) => void;
+  onTitleChange: (title: string) => void;
 }
 
 const SortableImageCard = ({
