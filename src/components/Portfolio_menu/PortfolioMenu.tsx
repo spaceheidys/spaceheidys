@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const menuItems = [
   { label: "ギャラリー", en: "GALLERY", key: "gallery" },
   { label: "プロジェクト", en: "PROJECTS", key: "projects" },
-  { label: "スキル", en: "SKILLS", key: "skills" },
+  { label: "エーアイ", en: "AI", key: "skills" },
   { label: "アーカイブ", en: "ARCHIVE", key: "archive" },
 ] as const;
 
