@@ -341,7 +341,7 @@ const Index = () => {
               </AnimatePresence>
             </div>
             {/* Menu positioned below card without affecting layout */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max">
+            <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max ${activePortfolioKey ? 'sm:hidden' : ''}`}>
               <PortfolioMenu
                 visible={!thirdCardFlipped}
                 activeKey={activePortfolioKey}
