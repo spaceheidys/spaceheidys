@@ -1,4 +1,4 @@
-import { useState, forwardRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useSoundContext } from "@/contexts/SoundContext";
 import taroBackside from "@/assets/Taro_backside.png";
@@ -13,7 +13,7 @@ interface PortfolioCardProps {
   onFlip?: (flipped: boolean) => void;
 }
 
-const PortfolioCard = forwardRef<HTMLDivElement, PortfolioCardProps>(({ name, flipAxis, frontImage, backImage, width, height, onFlip }, ref) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, onFlip }: PortfolioCardProps) => {
   const [flipped, setFlipped] = useState(true);
   const { muted } = useSoundContext();
 
@@ -81,8 +81,6 @@ const PortfolioCard = forwardRef<HTMLDivElement, PortfolioCardProps>(({ name, fl
       </motion.div>
     </div>);
 
-});
-
-PortfolioCard.displayName = "PortfolioCard";
+};
 
 export default PortfolioCard;
