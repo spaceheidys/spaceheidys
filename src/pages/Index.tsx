@@ -291,21 +291,12 @@ const Index = () => {
             "The cards know what the mind has forgotten"
           </p>
           <div className="flex flex-wrap gap-2 sm:gap-3 items-end justify-center">
-            {[
-              { name: "Card_01" },
-              { name: "Card_02" },
-              { name: "Card_03", backImage: taroEyeImg, onFlip: (f: boolean) => setThirdCardFlipped(f) },
-              { name: "Card_04" },
-              { name: "Card_05" }].
-              map((card) =>
               <PortfolioCard
-                key={card.name}
-                name={card.name}
+                name="Card_03"
                 flipAxis="y-center"
                 frontImage={taro01Img}
-                backImage={card.backImage}
-                onFlip={card.onFlip} />
-              )}
+                backImage={taroEyeImg}
+                onFlip={(f: boolean) => setThirdCardFlipped(f)} />
           </div>
         </div>
       </div>
