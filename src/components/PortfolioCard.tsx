@@ -47,13 +47,13 @@ const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, o
   const backTransform = isY ? "rotateY(180deg)" : "rotateX(180deg)";
   const origin = flipAxis === "y-right" ? "right center" : "center center";
 
-  const w = width ?? 205;
-  const h = height ?? 364;
+  const w = width;
+  const h = height;
 
   return (
     <div
-      className="cursor-pointer overflow-hidden rounded-[16px]"
-      style={{ width: w, height: h, perspective: 1000 }}
+      className="cursor-pointer overflow-hidden rounded-[16px] w-[140px] h-[210px] sm:w-[160px] sm:h-[240px] md:w-[200px] md:h-[300px] lg:w-[250px] lg:h-[374px]"
+      style={{ ...(w && h ? { width: w, height: h } : {}), perspective: 1000 }}
       onClick={handleFlip}>
       
       <motion.div

@@ -298,7 +298,7 @@ const Index = () => {
         <p className="text-white/60 text-sm tracking-[0.2em] uppercase text-center font-light italic">
           "The cards know what the mind has forgotten"
         </p>
-        <div className="flex gap-1 items-end">
+        <div className="flex flex-wrap gap-2 sm:gap-1 items-end justify-center">
           {[
             { name: "Card_01" },
             { name: "Card_02" },
@@ -312,10 +312,7 @@ const Index = () => {
               flipAxis="y-center"
               frontImage={taro01Img}
               backImage={card.backImage}
-              width={250}
-              height={374}
               onFlip={card.onFlip} />
-
             )}
         </div>
       </div>
