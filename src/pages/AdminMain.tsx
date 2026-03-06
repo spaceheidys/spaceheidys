@@ -7,6 +7,8 @@ import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp } from "lucide-re
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
+import { useNavButtons } from "@/hooks/useNavButtons";
+import ButtonsSection from "@/components/admin/ButtonsSection";
 
 interface BackgroundItem {
   id: string;
@@ -27,6 +29,7 @@ const AdminMain = () => {
   const [swapTarget, setSwapTarget] = useState<string | null>(null); // id of active image being swapped
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
+  const { buttons: navButtons, updateButton, swapOrder } = useNavButtons();
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
@@ -326,6 +329,13 @@ const AdminMain = () => {
                 </div>
               )}
             </div>
+
+            {/* Buttons section */}
+            <ButtonsSection
+              buttons={navButtons}
+              onUpdate={updateButton}
+              onSwapOrder={swapOrder}
+            />
           </>
         )}
       </div>

@@ -25,6 +25,7 @@ import PortfolioMenu from "@/components/Portfolio_menu/PortfolioMenu";
 import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu";
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
+import { useNavButtons } from "@/hooks/useNavButtons";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ const Index = () => {
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
   const { visibility: sectionVisibility } = useSectionSettings();
+  const { buttons: navButtons } = useNavButtons();
 
   // Fetch dynamic backgrounds
   useEffect(() => {
@@ -199,14 +201,16 @@ const Index = () => {
           <MobileNav
               onSecretDoor={() => setSecretDoorOpen(true)}
               onShop={() => setActiveSection("shop")}
-              onAbout={handleAboutClick}
-              onPortfolio={() => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
-              onGallery={() => navigate("/gallery")}
-              onContact={handleContactClick}
+              navButtons={navButtons}
+              actionMap={{
+                about: handleAboutClick,
+                portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+                gallery: () => navigate("/gallery"),
+                contacts: handleContactClick,
+              }}
               bgOptions={bgOptions}
               bgImage={bgImage}
-              onBgChange={setBgImage}
-              galleryVisible={sectionVisibility.gallery} />
+              onBgChange={setBgImage} />
             
         </motion.header>
 
@@ -222,11 +226,17 @@ const Index = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.4 }}>
                 
-                {[
-                { jp: "アバウト", en: "ABOUT", action: handleAboutClick },
-                { jp: "ポートフォリオ", en: "PORTFOLIO", action: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }) },
-                ...(sectionVisibility.gallery ? [{ jp: "ギャラリー", en: "GALLERY", action: () => navigate("/gallery") }] : []),
-                { jp: "コンタクト", en: "CONTACT", action: handleContactClick }].
+                {(() => {
+                  const actionMap: Record<string, () => void> = {
+                    about: handleAboutClick,
+                    portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+                    gallery: () => navigate("/gallery"),
+                    contacts: handleContactClick,
+                  };
+                  return navButtons
+                    .filter(b => b.is_visible)
+                    .map(b => ({ jp: b.label_jp, en: b.label, action: actionMap[b.key] }));
+                })().
                 map((item, i) =>
                 <motion.a
                   key={item.en}
