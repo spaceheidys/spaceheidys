@@ -274,13 +274,6 @@ const Index = () => {
       {/* Animated polygon background */}
       <PolygonBackground />
       
-      {/* Wallpaper background for 3rd card */}
-      <div
-          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
-          style={{
-            backgroundImage: `url(${wallpaper3rdCard})`,
-            opacity: thirdCardFlipped ? 0 : 1
-          }} />
 
       {/* Cards content — centered vertically */}
       <div className="flex-1 flex items-center justify-center py-8 sm:py-12 px-3 sm:px-4 relative z-10">
