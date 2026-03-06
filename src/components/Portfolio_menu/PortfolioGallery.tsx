@@ -12,6 +12,15 @@ interface PortfolioItem {
   id: string;
   label: string;
   image_url?: string;
+  group_id?: string | null;
+}
+
+/** A display entry: either a single image or a group (first image as thumbnail, all URLs stored) */
+interface GalleryEntry {
+  id: string;
+  label: string;
+  image_url?: string;
+  groupImages?: string[]; // populated for groups
 }
 
 const makeItems = (count: number): PortfolioItem[] =>
@@ -41,14 +50,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
   const isMobile = useIsMobile();
   const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
-  const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   useEffect(() => {
     const fetchItems = async () => {
       let query = supabase
         .from("portfolio_items")
-        .select("id, title, image_url, sort_order")
+        .select("id, title, image_url, sort_order, group_id")
         .eq("section", sectionKey)
         .order("sort_order", { ascending: true });
 
@@ -63,6 +72,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             id: d.id,
             label: d.title || "",
             image_url: d.image_url,
+            group_id: d.group_id || null,
           }))
         );
       } else {
@@ -72,29 +82,56 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     fetchItems();
   }, [sectionKey, gallerySub]);
 
-  const items =
+  const rawItems =
     dbItems ??
     (sectionKey === "gallery" && gallerySub && defaultGallerySubItems[gallerySub]
       ? defaultGallerySubItems[gallerySub]
       : defaultSectionItems[sectionKey] || defaultSectionItems.gallery);
 
-  const navigableItems = useMemo(() => items.filter((i) => !!i.image_url), [items]);
+  // Collapse groups into single entries
+  const entries: GalleryEntry[] = useMemo(() => {
+    const result: GalleryEntry[] = [];
+    const seenGroups = new Set<string>();
 
-  const openLightbox = (item: PortfolioItem) => {
-    if (!item.image_url) return;
-    const idx = navigableItems.findIndex((n) => n.id === item.id);
-    setSelectedItem(item);
+    for (const item of rawItems) {
+      if (item.group_id) {
+        if (seenGroups.has(item.group_id)) continue;
+        seenGroups.add(item.group_id);
+        const groupItems = rawItems.filter((i) => i.group_id === item.group_id);
+        result.push({
+          id: item.id,
+          label: item.label,
+          image_url: item.image_url,
+          groupImages: groupItems.map((g) => g.image_url!).filter(Boolean),
+        });
+      } else {
+        result.push({
+          id: item.id,
+          label: item.label,
+          image_url: item.image_url,
+        });
+      }
+    }
+    return result;
+  }, [rawItems]);
+
+  const navigableEntries = useMemo(() => entries.filter((i) => !!i.image_url), [entries]);
+
+  const openLightbox = (entry: GalleryEntry) => {
+    if (!entry.image_url) return;
+    const idx = navigableEntries.findIndex((n) => n.id === entry.id);
+    setSelectedEntry(entry);
     setSelectedIndex(idx);
   };
 
   const goLightbox = (dir: -1 | 1) => {
     const newIdx = selectedIndex + dir;
-    if (newIdx < 0 || newIdx >= navigableItems.length) return;
-    setSelectedItem(navigableItems[newIdx]);
+    if (newIdx < 0 || newIdx >= navigableEntries.length) return;
+    setSelectedEntry(navigableEntries[newIdx]);
     setSelectedIndex(newIdx);
   };
 
-  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const totalPages = Math.ceil(entries.length / itemsPerPage);
   const [page, setPage] = useState(0);
   const hasPagination = totalPages > 1;
 
@@ -106,7 +143,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     onPageInfo?.(page + 1, totalPages);
   }, [page, totalPages, onPageInfo]);
 
-  const pageItems = items.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+  const pageItems = entries.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+
+  const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
@@ -170,17 +209,17 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
       {/* Lightbox overlay */}
       <AnimatePresence>
-        {selectedItem && (
+        {selectedEntry && (
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            onClick={() => setSelectedItem(null)}
+            onClick={() => setSelectedEntry(null)}
           >
-            {/* Prev arrow */}
-            {selectedIndex > 0 && (
+            {/* Navigation arrows – only for non-group entries */}
+            {!isGroup && selectedIndex > 0 && (
               <button
                 onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
                 className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
@@ -189,9 +228,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                 <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
               </button>
             )}
-
-            {/* Next arrow */}
-            {selectedIndex < navigableItems.length - 1 && (
+            {!isGroup && selectedIndex < navigableEntries.length - 1 && (
               <button
                 onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
                 className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
@@ -202,8 +239,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             )}
 
             <motion.div
-              key={selectedItem.id}
-              className="relative max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"
+              key={selectedEntry.id}
+              className={`relative ${isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"}`}
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
@@ -211,19 +248,35 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               onClick={(e) => e.stopPropagation()}
             >
               <button
-                onClick={() => setSelectedItem(null)}
-                className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                onClick={() => setSelectedEntry(null)}
+                className="absolute top-1 right-1 z-10 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200 sticky"
+                style={{ position: "sticky", top: 4, float: "right" }}
                 aria-label="Close preview"
               >
                 <X className="w-4 h-4" />
               </button>
-              <img
-                src={selectedItem.image_url}
-                alt={selectedItem.label}
-                className="max-w-[80vw] sm:max-w-[75vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
-                onClick={() => setSelectedItem(null)}
-                onContextMenu={(e) => e.preventDefault()}
-              />
+
+              {isGroup ? (
+                <div className="flex flex-col gap-3">
+                  {selectedEntry.groupImages!.map((url, idx) => (
+                    <img
+                      key={idx}
+                      src={url}
+                      alt={`${selectedEntry.label} ${idx + 1}`}
+                      className="w-full object-contain rounded-md"
+                      onContextMenu={(e) => e.preventDefault()}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <img
+                  src={selectedEntry.image_url}
+                  alt={selectedEntry.label}
+                  className="max-w-[80vw] sm:max-w-[75vw] max-h-[85vh] object-contain rounded-md cursor-pointer"
+                  onClick={() => setSelectedEntry(null)}
+                  onContextMenu={(e) => e.preventDefault()}
+                />
+              )}
             </motion.div>
           </motion.div>
         )}
