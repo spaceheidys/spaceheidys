@@ -23,6 +23,7 @@ import MobileNav from "@/components/MobileNav";
 import PortfolioMenu from "@/components/Portfolio_menu/PortfolioMenu";
 import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu";
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
+import { useSectionSettings } from "@/hooks/useSectionSettings";
 
 const Index = () => {
   const navigate = useNavigate();
