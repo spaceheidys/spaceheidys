@@ -301,6 +301,9 @@ const Index = () => {
               >
                 {{ gallery: "Gallery", projects: "Projects", skills: "AI", archive: "Archive" }[activePortfolioKey]}
                 {activePortfolioKey === "gallery" && activeGallerySub ? ` | ${activeGallerySub}` : ''}
+                {pageInfo && pageInfo.total > 1 && (
+                  <span className="text-white/30 ml-2 text-[10px] sm:text-xs">{pageInfo.current}/{pageInfo.total}</span>
+                )}
               </motion.p>
             ) : (
               <motion.p
