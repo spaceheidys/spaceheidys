@@ -72,11 +72,28 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     fetchItems();
   }, [sectionKey, gallerySub]);
 
-  const items =
+  // Only items with images for lightbox navigation
+  const navigableItems = useMemo(() => items.filter((i) => !!i.image_url), [items]);
+
+  const items_list =
     dbItems ??
     (sectionKey === "gallery" && gallerySub && defaultGallerySubItems[gallerySub]
       ? defaultGallerySubItems[gallerySub]
       : defaultSectionItems[sectionKey] || defaultSectionItems.gallery);
+
+  const openLightbox = (item: PortfolioItem) => {
+    if (!item.image_url) return;
+    const idx = navigableItems.findIndex((n) => n.id === item.id);
+    setSelectedItem(item);
+    setSelectedIndex(idx);
+  };
+
+  const goLightbox = (dir: -1 | 1) => {
+    const newIdx = selectedIndex + dir;
+    if (newIdx < 0 || newIdx >= navigableItems.length) return;
+    setSelectedItem(navigableItems[newIdx]);
+    setSelectedIndex(newIdx);
+  };
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const [page, setPage] = useState(0);
