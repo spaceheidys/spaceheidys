@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Trash2, GripVertical, Move } from "lucide-react";
+import { Trash2, GripVertical, Move, ZoomIn, ZoomOut } from "lucide-react";
 import { useRef, useState, useCallback } from "react";
 
 interface SortableImageCardProps {
@@ -9,8 +9,10 @@ interface SortableImageCardProps {
   image_url: string;
   image_offset_x: number;
   image_offset_y: number;
+  image_zoom: number;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
+  onZoomChange: (zoom: number) => void;
 }
 
 const SortableImageCard = ({
@@ -19,8 +21,10 @@ const SortableImageCard = ({
   image_url,
   image_offset_x,
   image_offset_y,
+  image_zoom,
   onDelete,
   onPositionChange,
+  onZoomChange,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
@@ -63,6 +67,8 @@ const SortableImageCard = ({
     panStart.current = null;
   }, []);
 
+  const scale = image_zoom;
+
   return (
     <div
       ref={setNodeRef}
@@ -71,12 +77,15 @@ const SortableImageCard = ({
         isDragging ? "border-foreground/50 shadow-lg" : "border-border"
       }`}
     >
-      <div ref={containerRef} className="w-full h-full">
+      <div ref={containerRef} className="w-full h-full overflow-hidden">
         <img
           src={image_url}
           alt={title}
-          className="w-full h-full object-cover pointer-events-none"
-          style={{ objectPosition: `${image_offset_x}% ${image_offset_y}%` }}
+          className="w-full h-full object-cover pointer-events-none origin-center"
+          style={{
+            objectPosition: `${image_offset_x}% ${image_offset_y}%`,
+            transform: `scale(${scale})`,
+          }}
           loading="lazy"
         />
       </div>
@@ -88,6 +97,24 @@ const SortableImageCard = ({
         className="absolute top-1 left-1 z-10 p-1 bg-black/50 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
       >
         <GripVertical size={14} className="text-foreground/70" />
+      </div>
+
+      {/* Zoom slider – top center */}
+      <div
+        className="absolute top-1 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 bg-black/50 rounded px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ZoomOut size={10} className="text-foreground/60 shrink-0" />
+        <input
+          type="range"
+          min="1"
+          max="3"
+          step="0.05"
+          value={image_zoom}
+          onChange={(e) => onZoomChange(parseFloat(e.target.value))}
+          className="w-14 h-1 appearance-none bg-foreground/20 rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground/70"
+        />
+        <ZoomIn size={10} className="text-foreground/60 shrink-0" />
       </div>
 
       {/* Pan handle – top right */}
