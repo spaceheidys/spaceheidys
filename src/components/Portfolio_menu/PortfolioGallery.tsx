@@ -145,6 +145,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                   alt={item.label}
                   className="w-full h-full object-cover"
                   loading="lazy"
+                  onContextMenu={(e) => e.preventDefault()}
                 />
               ) : (
                 <span className="text-white/40 text-[9px] sm:text-[10px] tracking-widest font-display uppercase">
