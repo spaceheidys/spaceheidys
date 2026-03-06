@@ -10,8 +10,8 @@ const makeItems = (count: number) =>
 
 const sectionItems: Record<PortfolioMenuKey, { id: number; label: string }[]> = {
   gallery: makeItems(6),
-  projects: makeItems(4),
-  skills: makeItems(4),
+  projects: makeItems(16),
+  skills: makeItems(16),
   archive: makeItems(8),
 };
 
