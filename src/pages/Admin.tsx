@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, LogOut, Loader2 } from "lucide-react";
+import { Upload, LogOut, Loader2, Check, X } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -40,6 +40,7 @@ const Admin = () => {
   const [activeSub, setActiveSub] = useState<string>("VECTOR");
   const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [confirmSave, setConfirmSave] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -329,14 +330,39 @@ const Admin = () => {
         )}
       </div>
 
-      {/* Back button */}
-      <div className="px-4 sm:px-8 pb-8">
+      {/* Back button & Save */}
+      <div className="px-4 sm:px-8 pb-8 flex flex-col gap-4">
         <button
           onClick={() => navigate("/")}
-          className="text-muted-foreground text-xs tracking-widest hover:text-foreground transition-colors font-display"
+          className="text-muted-foreground text-xs tracking-widest hover:text-foreground transition-colors font-display w-fit"
         >
           ← BACK TO SITE
         </button>
+
+        {confirmSave ? (
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-display tracking-wider text-foreground/70">REFRESH SITE?</span>
+            <button
+              onClick={() => { setConfirmSave(false); window.location.reload(); }}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+            >
+              <Check size={12} /> YES
+            </button>
+            <button
+              onClick={() => setConfirmSave(false)}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X size={12} /> NO
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirmSave(true)}
+            className="w-fit px-4 py-2 text-xs font-display tracking-[0.2em] uppercase border border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors"
+          >
+            SAVE CHANGES
+          </button>
+        )}
       </div>
     </div>
   );
