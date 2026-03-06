@@ -36,7 +36,7 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelec
             { en: "DIGITAL", jp: "デジタル" },
             { en: "AI", jp: "エーアイ" },
             { en: "SKETCHES", jp: "スケッチ" },
-            { en: "BACK", jp: "戻る", isBack: true },
+            { en: "RETURN", jp: "戻る", isBack: true },
           ].map((item, i) => (
             <motion.button
               key={item.en}
