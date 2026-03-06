@@ -59,8 +59,8 @@ const Index = () => {
         .select("*")
         .order("sort_order");
       if (data && data.length > 0) {
-        const mainBgs = data.filter((b: any) => b.section === "main").map((b: any) => b.image_url);
-        const portfolioBgs = data.filter((b: any) => b.section === "portfolio").map((b: any) => b.image_url);
+        const mainBgs = data.filter((b: any) => b.section === "main" && b.is_active !== false).map((b: any) => b.image_url);
+        const portfolioBgs = data.filter((b: any) => b.section === "portfolio" && b.is_active !== false).map((b: any) => b.image_url);
         if (mainBgs.length > 0) {
           setBgOptions(mainBgs);
           setBgImage(mainBgs[Math.floor(Math.random() * mainBgs.length)]);
