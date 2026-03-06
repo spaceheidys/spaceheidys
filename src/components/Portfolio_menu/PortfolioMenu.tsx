@@ -1,13 +1,14 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useSectionSettings } from "@/hooks/useSectionSettings";
 
-const menuItems = [
+const allMenuItems = [
   { label: "ギャラリー", en: "GALLERY", key: "gallery" },
   { label: "プロジェクト", en: "PROJECTS", key: "projects" },
   { label: "エーアイ", en: "AI", key: "skills" },
   { label: "アーカイブ", en: "ARCHIVE", key: "archive" },
 ] as const;
 
-export type PortfolioMenuKey = (typeof menuItems)[number]["key"];
+export type PortfolioMenuKey = (typeof allMenuItems)[number]["key"];
 
 interface PortfolioMenuProps {
   visible: boolean;
@@ -18,7 +19,11 @@ interface PortfolioMenuProps {
 }
 
 const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect }: PortfolioMenuProps) => {
+  const { visibility } = useSectionSettings();
+
   if (!visible) return null;
+
+  const menuItems = allMenuItems.filter((item) => visibility[item.key]);
 
   return (
     <AnimatePresence mode="wait">

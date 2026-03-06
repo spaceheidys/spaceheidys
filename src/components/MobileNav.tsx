@@ -13,6 +13,7 @@ interface MobileNavProps {
   bgOptions: string[];
   bgImage: string;
   onBgChange: (bg: string) => void;
+  galleryVisible?: boolean;
 }
 
 const MobileNav = ({
@@ -25,6 +26,7 @@ const MobileNav = ({
   bgOptions,
   bgImage,
   onBgChange,
+  galleryVisible = true,
 }: MobileNavProps) => {
   const [open, setOpen] = useState(false);
   const { muted, toggleMute } = useSoundContext();
@@ -67,7 +69,7 @@ const MobileNav = ({
             {[
                { label: "アバウト / ABOUT", action: onAbout },
                { label: "ポートフォリオ / PORTFOLIO", action: onPortfolio },
-               { label: "ギャラリー / GALLERY", action: onGallery },
+               ...(galleryVisible ? [{ label: "ギャラリー / GALLERY", action: onGallery }] : []),
                { label: "コンタクト / CONTACT", action: onContact },
                { label: "Secret Door", action: onSecretDoor },
                { label: "Shop", action: onShop },
