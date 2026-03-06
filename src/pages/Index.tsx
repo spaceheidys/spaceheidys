@@ -376,7 +376,7 @@ const Index = () => {
 
       {/* Scroll to top arrow — hidden when a portfolio section is active on desktop */}
       <div
-          className={`pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 items-center justify-center flex flex-row ${activePortfolioKey ? 'sm:hidden' : ''}`}
+          className={`pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 items-center justify-center flex flex-row ${activePortfolioKey ? 'hidden' : ''}`}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top">
         <ArrowUp className="w-6 h-6 sm:w-[40px] sm:h-[40px]" />
