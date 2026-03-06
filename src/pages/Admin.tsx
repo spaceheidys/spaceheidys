@@ -316,17 +316,27 @@ const Admin = () => {
         {/* Section tabs */}
         <div className="flex gap-2 mb-4 flex-wrap items-center">
           {SECTIONS.map((s) => (
-            <button
-              key={s}
-              onClick={() => { setActiveSection(s); setActiveSub("VECTOR"); }}
-              className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border transition-colors ${
-                activeSection === s
-                  ? "border-foreground text-foreground"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {s}
-            </button>
+            <div key={s} className="flex items-center gap-0">
+              <button
+                onClick={() => { setActiveSection(s); setActiveSub("VECTOR"); }}
+                className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border-y border-l transition-colors ${
+                  activeSection === s
+                    ? "border-foreground text-foreground"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {s}
+              </button>
+              <button
+                onClick={() => toggleSection(s as any)}
+                className={`px-1.5 py-1.5 border transition-colors ${
+                  activeSection === s ? "border-foreground" : "border-border"
+                } ${visibility[s as keyof typeof visibility] ? "text-foreground/60 hover:text-foreground" : "text-muted-foreground/30 hover:text-muted-foreground"}`}
+                title={visibility[s as keyof typeof visibility] ? `Hide ${s} on site` : `Show ${s} on site`}
+              >
+                {visibility[s as keyof typeof visibility] ? <Eye size={11} /> : <EyeOff size={11} />}
+              </button>
+            </div>
           ))}
 
           <div className="ml-auto">
