@@ -167,18 +167,21 @@ export type Database = {
       section_content: {
         Row: {
           content: string
+          display_duration: number | null
           id: string
           key: string
           updated_at: string
         }
         Insert: {
           content?: string
+          display_duration?: number | null
           id?: string
           key: string
           updated_at?: string
         }
         Update: {
           content?: string
+          display_duration?: number | null
           id?: string
           key?: string
           updated_at?: string
