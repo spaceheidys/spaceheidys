@@ -51,7 +51,7 @@ const Index = () => {
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
   const { visibility: sectionVisibility } = useSectionSettings();
   const { buttons: navButtons } = useNavButtons();
-  const { get: getContent } = useSectionContent();
+  const { get: getContent, getDuration } = useSectionContent();
 
   // Fetch dynamic backgrounds
   useEffect(() => {
