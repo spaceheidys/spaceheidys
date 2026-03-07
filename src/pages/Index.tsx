@@ -234,6 +234,8 @@ const Index = () => {
                     portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
                     gallery: () => navigate("/gallery"),
                     contacts: handleContactClick,
+                    secret_door: () => setSecretDoorOpen(true),
+                    shop: () => setActiveSection("shop"),
                   };
                   return navButtons
                     .filter(b => b.is_visible)
