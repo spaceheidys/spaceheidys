@@ -207,6 +207,8 @@ const Index = () => {
                 portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
                 gallery: () => navigate("/gallery"),
                 contacts: handleContactClick,
+                secret_door: () => setSecretDoorOpen(true),
+                shop: () => setActiveSection("shop"),
               }}
               bgOptions={bgOptions}
               bgImage={bgImage}
