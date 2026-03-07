@@ -209,36 +209,6 @@ export type Database = {
         }
         Relationships: []
       }
-      social_links: {
-        Row: {
-          icon_url: string
-          id: string
-          is_visible: boolean
-          label: string
-          sort_order: number
-          updated_at: string
-          url: string
-        }
-        Insert: {
-          icon_url?: string
-          id?: string
-          is_visible?: boolean
-          label: string
-          sort_order?: number
-          updated_at?: string
-          url?: string
-        }
-        Update: {
-          icon_url?: string
-          id?: string
-          is_visible?: boolean
-          label?: string
-          sort_order?: number
-          updated_at?: string
-          url?: string
-        }
-        Relationships: []
-      }
       user_roles: {
         Row: {
           id: string

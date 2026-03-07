@@ -11,8 +11,6 @@ import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import ButtonsSection from "@/components/admin/ButtonsSection";
 import ContentSection from "@/components/admin/ContentSection";
-import SocialSection from "@/components/admin/SocialSection";
-import { useSocialLinks } from "@/hooks/useSocialLinks";
 
 interface BackgroundItem {
   id: string;
@@ -36,7 +34,6 @@ const AdminMain = () => {
   const libraryFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
   const { get: getContent, getDuration, update: updateContent, updateDuration } = useSectionContent();
-  const { links: socialLinks, updateLink, addLink: addSocialLink, deleteLink: deleteSocialLink, swapOrder: swapSocialOrder } = useSocialLinks();
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
@@ -208,15 +205,6 @@ const AdminMain = () => {
 
         {/* Section content editing */}
         <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
-
-        {/* Social links management */}
-        <SocialSection
-          links={socialLinks}
-          onUpdate={updateLink}
-          onSwapOrder={swapSocialOrder}
-          onAdd={addSocialLink}
-          onDelete={deleteSocialLink}
-        />
 
         {/* Active backgrounds */}
         <div className="flex items-center justify-between mb-4 mt-6">
