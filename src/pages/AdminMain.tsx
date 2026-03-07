@@ -9,10 +9,8 @@ import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
 import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
-import { useSocialLinks } from "@/hooks/useSocialLinks";
 import ButtonsSection from "@/components/admin/ButtonsSection";
 import ContentSection from "@/components/admin/ContentSection";
-import SocialSection from "@/components/admin/SocialSection";
 
 interface BackgroundItem {
   id: string;
@@ -36,7 +34,6 @@ const AdminMain = () => {
   const libraryFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
   const { get: getContent, getDuration, update: updateContent, updateDuration } = useSectionContent();
-  const { links: socialLinks, updateLink, addLink: addSocialLink, deleteLink: deleteSocialLink, swapOrder: swapSocialOrder } = useSocialLinks();
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
@@ -197,27 +194,14 @@ const AdminMain = () => {
 
       {/* Content */}
       <div className="px-4 sm:px-8 py-6">
-        {/* Buttons + Social side by side */}
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1">
-            <ButtonsSection
-              buttons={navButtons}
-              onUpdate={updateButton}
-              onSwapOrder={swapOrder}
-              onAdd={addButton}
-              onDelete={deleteButton}
-            />
-          </div>
-          <div className="flex-1">
-            <SocialSection
-              links={socialLinks}
-              onUpdate={updateLink}
-              onSwapOrder={swapSocialOrder}
-              onAdd={addSocialLink}
-              onDelete={deleteSocialLink}
-            />
-          </div>
-        </div>
+        {/* Buttons section — at top */}
+        <ButtonsSection
+          buttons={navButtons}
+          onUpdate={updateButton}
+          onSwapOrder={swapOrder}
+          onAdd={addButton}
+          onDelete={deleteButton}
+        />
 
         {/* Section content editing */}
         <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
