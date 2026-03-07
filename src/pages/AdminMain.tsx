@@ -33,7 +33,7 @@ const AdminMain = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
-  const { get: getContent, update: updateContent } = useSectionContent();
+  const { get: getContent, getDuration, update: updateContent, updateDuration } = useSectionContent();
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
