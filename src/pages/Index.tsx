@@ -75,18 +75,30 @@ const Index = () => {
     fetchBgs();
   }, []);
 
-  const handleAboutClick = () => {
+  const handleSectionClick = (section: "about" | "contact" | "shop") => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
-    setActiveSection("about");
-    aboutTimerRef.current = setTimeout(() => {
-      setActiveSection((prev) => prev === "about" ? null : prev);
-    }, 30000);
+    setActiveSection(section);
+    // Use the max duration among the section's content keys, or the single key's duration
+    const sectionKeys: Record<string, string[]> = {
+      about: ["about"],
+      contact: ["contact_title", "contact_body", "contact_email"],
+      shop: [],
+    };
+    const keys = sectionKeys[section] || [];
+    const durations = keys.map((k) => getDuration(k));
+    // If any key is null (always), the whole section stays. Otherwise use the max.
+    const hasAlways = durations.some((d) => d === null);
+    if (!hasAlways && durations.length > 0) {
+      const maxDuration = Math.max(...durations.filter((d): d is number => d !== null));
+      aboutTimerRef.current = setTimeout(() => {
+        setActiveSection((prev) => prev === section ? null : prev);
+      }, maxDuration * 1000);
+    }
   };
 
-  const handleContactClick = () => {
-    if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
-    setActiveSection("contact");
-  };
+  const handleAboutClick = () => handleSectionClick("about");
+
+  const handleContactClick = () => handleSectionClick("contact");
 
   useEffect(() => {
     const audio = new Audio("/audio/main_buddhist.mp3");
