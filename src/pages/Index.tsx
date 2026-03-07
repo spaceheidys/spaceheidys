@@ -282,9 +282,11 @@ const Index = () => {
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.4 }}>
               
-              <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-                {getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
-              </p>
+              {sectionVisibility.about !== false && (
+                <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
+                  {getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
+                </p>
+              )}
             </motion.div>
             }
           {activeSection === "contact" &&
