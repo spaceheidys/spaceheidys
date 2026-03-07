@@ -283,8 +283,7 @@ const Index = () => {
               transition={{ duration: 0.4 }}>
               
               <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-                Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work.
-                This space is dedicated to sharing visual storytelling and artistic expression across various styles and mediums.
+                {getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
               </p>
             </motion.div>
             }
