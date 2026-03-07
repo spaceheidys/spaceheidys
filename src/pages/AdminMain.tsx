@@ -209,6 +209,15 @@ const AdminMain = () => {
         {/* Section content editing */}
         <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
 
+        {/* Social links management */}
+        <SocialSection
+          links={socialLinks}
+          onUpdate={updateLink}
+          onSwapOrder={swapSocialOrder}
+          onAdd={addSocialLink}
+          onDelete={deleteSocialLink}
+        />
+
         {/* Active backgrounds */}
         <div className="flex items-center justify-between mb-4 mt-6">
           <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
