@@ -197,14 +197,27 @@ const AdminMain = () => {
 
       {/* Content */}
       <div className="px-4 sm:px-8 py-6">
-        {/* Buttons section — at top */}
-        <ButtonsSection
-          buttons={navButtons}
-          onUpdate={updateButton}
-          onSwapOrder={swapOrder}
-          onAdd={addButton}
-          onDelete={deleteButton}
-        />
+        {/* Buttons + Social side by side */}
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex-1">
+            <ButtonsSection
+              buttons={navButtons}
+              onUpdate={updateButton}
+              onSwapOrder={swapOrder}
+              onAdd={addButton}
+              onDelete={deleteButton}
+            />
+          </div>
+          <div className="flex-1">
+            <SocialSection
+              links={socialLinks}
+              onUpdate={updateLink}
+              onSwapOrder={swapSocialOrder}
+              onAdd={addSocialLink}
+              onDelete={deleteSocialLink}
+            />
+          </div>
+        </div>
 
         {/* Section content editing */}
         <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
