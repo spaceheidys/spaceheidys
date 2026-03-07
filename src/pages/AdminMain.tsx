@@ -203,6 +203,9 @@ const AdminMain = () => {
           onDelete={deleteButton}
         />
 
+        {/* Section content editing */}
+        <ContentSection get={getContent} update={updateContent} />
+
         {/* Active backgrounds */}
         <div className="flex items-center justify-between mb-4 mt-6">
           <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">

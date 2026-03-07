@@ -298,9 +298,9 @@ const Index = () => {
               transition={{ duration: 0.4 }}>
               
               <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-                <p className="font-display tracking-widest text-foreground/90 mb-2">Cooperation & Commissions</p>
-                <p>For collaboration projects or custom commissions, please contact me via email. I'd be happy to discuss any ideas or concepts you have in mind.</p>
-                <p className="mt-2 text-foreground/90">spaceheidys@gmail.com</p>
+                <p className="font-display tracking-widest text-foreground/90 mb-2">{getContent("contact_title") || "Cooperation & Commissions"}</p>
+                <p>{getContent("contact_body") || "For collaboration projects or custom commissions, please contact me via email."}</p>
+                <p className="mt-2 text-foreground/90">{getContent("contact_email") || "spaceheidys@gmail.com"}</p>
               </div>
             </motion.div>
             }
