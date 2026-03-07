@@ -8,7 +8,9 @@ import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
 import { useNavButtons } from "@/hooks/useNavButtons";
+import { useSectionContent } from "@/hooks/useSectionContent";
 import ButtonsSection from "@/components/admin/ButtonsSection";
+import ContentSection from "@/components/admin/ContentSection";
 
 interface BackgroundItem {
   id: string;
