@@ -8,7 +8,9 @@ import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
 import { useNavButtons } from "@/hooks/useNavButtons";
+import { useSectionContent } from "@/hooks/useSectionContent";
 import ButtonsSection from "@/components/admin/ButtonsSection";
+import ContentSection from "@/components/admin/ContentSection";
 
 interface BackgroundItem {
   id: string;
@@ -31,6 +33,7 @@ const AdminMain = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
+  const { get: getContent, update: updateContent } = useSectionContent();
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
@@ -199,6 +202,9 @@ const AdminMain = () => {
           onAdd={addButton}
           onDelete={deleteButton}
         />
+
+        {/* Section content editing */}
+        <ContentSection get={getContent} update={updateContent} />
 
         {/* Active backgrounds */}
         <div className="flex items-center justify-between mb-4 mt-6">

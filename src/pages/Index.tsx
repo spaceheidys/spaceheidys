@@ -26,6 +26,7 @@ import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useNavButtons } from "@/hooks/useNavButtons";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ const Index = () => {
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
   const { visibility: sectionVisibility } = useSectionSettings();
   const { buttons: navButtons } = useNavButtons();
+  const { get: getContent } = useSectionContent();
 
   // Fetch dynamic backgrounds
   useEffect(() => {
@@ -281,8 +283,7 @@ const Index = () => {
               transition={{ duration: 0.4 }}>
               
               <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-                Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work.
-                This space is dedicated to sharing visual storytelling and artistic expression across various styles and mediums.
+                {getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
               </p>
             </motion.div>
             }
@@ -297,9 +298,9 @@ const Index = () => {
               transition={{ duration: 0.4 }}>
               
               <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-                <p className="font-display tracking-widest text-foreground/90 mb-2">Cooperation & Commissions</p>
-                <p>For collaboration projects or custom commissions, please contact me via email. I'd be happy to discuss any ideas or concepts you have in mind.</p>
-                <p className="mt-2 text-foreground/90">spaceheidys@gmail.com</p>
+                <p className="font-display tracking-widest text-foreground/90 mb-2">{getContent("contact_title") || "Cooperation & Commissions"}</p>
+                <p>{getContent("contact_body") || "For collaboration projects or custom commissions, please contact me via email."}</p>
+                <p className="mt-2 text-foreground/90">{getContent("contact_email") || "spaceheidys@gmail.com"}</p>
               </div>
             </motion.div>
             }
