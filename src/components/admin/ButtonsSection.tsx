@@ -117,13 +117,30 @@ const ButtonsSection = ({ buttons, onUpdate, onSwapOrder, onAdd, onDelete }: But
             </button>
 
             {/* Delete */}
-            <button
-              onClick={() => { onDelete(btn.id); toast.success("Button deleted"); }}
-              className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-              title="Delete button"
-            >
-              <Trash2 size={14} />
-            </button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Delete button"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete "{btn.label}"?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently remove this button from the navigation.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => { onDelete(btn.id); toast.success("Button deleted"); }}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         ))}
 
