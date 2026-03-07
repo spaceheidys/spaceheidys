@@ -2,6 +2,17 @@ import { useState } from "react";
 import { Eye, EyeOff, ArrowUp, ArrowDown, Pencil, Check, X, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { NavButton } from "@/hooks/useNavButtons";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface ButtonsSectionProps {
   buttons: NavButton[];
