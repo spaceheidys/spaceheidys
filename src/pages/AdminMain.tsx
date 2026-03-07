@@ -33,7 +33,7 @@ const AdminMain = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
-  const { get: getContent, update: updateContent } = useSectionContent();
+  const { get: getContent, getDuration, update: updateContent, updateDuration } = useSectionContent();
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
@@ -204,7 +204,7 @@ const AdminMain = () => {
         />
 
         {/* Section content editing */}
-        <ContentSection get={getContent} update={updateContent} />
+        <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
 
         {/* Active backgrounds */}
         <div className="flex items-center justify-between mb-4 mt-6">

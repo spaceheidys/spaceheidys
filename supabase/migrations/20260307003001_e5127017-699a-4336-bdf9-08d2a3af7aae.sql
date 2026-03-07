@@ -1,0 +1,1 @@
+ALTER TABLE section_content ADD COLUMN display_duration integer DEFAULT NULL;
