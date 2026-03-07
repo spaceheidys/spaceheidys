@@ -26,6 +26,7 @@ import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useNavButtons } from "@/hooks/useNavButtons";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const Index = () => {
   const navigate = useNavigate();
