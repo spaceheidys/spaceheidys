@@ -300,9 +300,15 @@ const Index = () => {
               transition={{ duration: 0.4 }}>
               
               <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-                <p className="font-display tracking-widest text-foreground/90 mb-2">{getContent("contact_title") || "Cooperation & Commissions"}</p>
-                <p>{getContent("contact_body") || "For collaboration projects or custom commissions, please contact me via email."}</p>
-                <p className="mt-2 text-foreground/90">{getContent("contact_email") || "spaceheidys@gmail.com"}</p>
+                {(sectionVisibility as any).contact_title !== false && (
+                  <p className="font-display tracking-widest text-foreground/90 mb-2">{getContent("contact_title") || "Cooperation & Commissions"}</p>
+                )}
+                {(sectionVisibility as any).contact_body !== false && (
+                  <p>{getContent("contact_body") || "For collaboration projects or custom commissions, please contact me via email."}</p>
+                )}
+                {(sectionVisibility as any).contact_email !== false && (
+                  <p className="mt-2 text-foreground/90">{getContent("contact_email") || "spaceheidys@gmail.com"}</p>
+                )}
               </div>
             </motion.div>
             }
