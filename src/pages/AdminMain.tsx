@@ -204,7 +204,7 @@ const AdminMain = () => {
         />
 
         {/* Section content editing */}
-        <ContentSection get={getContent} update={updateContent} />
+        <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
 
         {/* Active backgrounds */}
         <div className="flex items-center justify-between mb-4 mt-6">
