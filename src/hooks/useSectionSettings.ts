@@ -6,9 +6,13 @@ export interface SectionVisibility {
   projects: boolean;
   skills: boolean;
   archive: boolean;
+  about: boolean;
+  contact_title: boolean;
+  contact_body: boolean;
+  contact_email: boolean;
 }
 
-const DEFAULT: SectionVisibility = { gallery: true, projects: true, skills: true, archive: true };
+const DEFAULT: SectionVisibility = { gallery: true, projects: true, skills: true, archive: true, about: true, contact_title: true, contact_body: true, contact_email: true };
 
 export function useSectionSettings() {
   const [visibility, setVisibility] = useState<SectionVisibility>(DEFAULT);
