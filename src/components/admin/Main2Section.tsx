@@ -12,14 +12,19 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [wisdomText, setWisdomText] = useState("");
   const [frontImage, setFrontImage] = useState("");
   const [backImage, setBackImage] = useState("");
+  const [bgType, setBgType] = useState("polygon");
+  const [bgVideo, setBgVideo] = useState("");
   const [uploading, setUploading] = useState<string | null>(null);
   const frontRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setWisdomText(get("cards_wisdom"));
     setFrontImage(get("card_front_image"));
     setBackImage(get("card_back_image"));
+    setBgType(get("card_bg_type") || "polygon");
+    setBgVideo(get("card_bg_video"));
   }, [get]);
 
   const handleSave = async () => {
@@ -41,16 +46,41 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     const url = urlData.publicUrl;
     await update(key, url);
     if (key === "card_front_image") setFrontImage(url);
-    else setBackImage(url);
+    else if (key === "card_back_image") setBackImage(url);
     toast.success("Image updated");
+    setUploading(null);
+  };
+
+  const handleVideoUpload = async (file: File) => {
+    setUploading("card_bg_video");
+    const ext = file.name.split(".").pop();
+    const path = `cards/bg_video_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) {
+      toast.error("Upload failed");
+      setUploading(null);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    await update("card_bg_video", url);
+    setBgVideo(url);
+    toast.success("Video uploaded");
     setUploading(null);
   };
 
   const handleClear = async (key: string) => {
     await update(key, "");
     if (key === "card_front_image") setFrontImage("");
-    else setBackImage("");
+    else if (key === "card_back_image") setBackImage("");
+    else if (key === "card_bg_video") setBgVideo("");
     toast.success("Reset to default");
+  };
+
+  const handleBgTypeChange = async (type: string) => {
+    setBgType(type);
+    await update("card_bg_type", type);
+    toast.success(type === "polygon" ? "Polygon background active" : "Video background active");
   };
 
   return (
@@ -81,9 +111,90 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
         </div>
       </div>
 
+      {/* Background type toggle */}
+      <div className="space-y-3">
+        <label className="text-xs text-muted-foreground font-display tracking-widest uppercase">
+          Section Background
+        </label>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleBgTypeChange("polygon")}
+            className={`px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase transition-colors border ${
+              bgType === "polygon"
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Polygon
+          </button>
+          <button
+            onClick={() => handleBgTypeChange("video")}
+            className={`px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase transition-colors border ${
+              bgType === "video"
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Video
+          </button>
+        </div>
+
+        {bgType === "video" && (
+          <div className="space-y-2">
+            {bgVideo ? (
+              <div className="relative group border border-border aspect-video overflow-hidden">
+                <video src={bgVideo} className="w-full h-full object-cover" muted autoPlay loop playsInline />
+                <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                  <label className="p-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
+                    {uploading === "card_bg_video" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                    <input
+                      ref={videoRef}
+                      type="file"
+                      accept="video/mp4,video/webm"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleVideoUpload(f);
+                        if (videoRef.current) videoRef.current.value = "";
+                      }}
+                      disabled={!!uploading}
+                    />
+                  </label>
+                  <button
+                    onClick={() => handleClear("card_bg_video")}
+                    className="p-2 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <label className="flex items-center justify-center gap-2 border border-dashed border-border aspect-video cursor-pointer text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
+                {uploading === "card_bg_video" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                <span className="text-xs font-display tracking-[0.2em] uppercase">Upload MP4 / WebM</span>
+                <input
+                  ref={videoRef}
+                  type="file"
+                  accept="video/mp4,video/webm"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleVideoUpload(f);
+                    if (videoRef.current) videoRef.current.value = "";
+                  }}
+                  disabled={!!uploading}
+                />
+              </label>
+            )}
+            <p className="text-[10px] text-muted-foreground/50 font-display tracking-wider">
+              MP4 (H.264) or WebM recommended. Keep under 10 MB for fast loading.
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Card images */}
       <div className="grid grid-cols-2 gap-6">
-        {/* Front */}
         <CardImageUpload
           label="Card front"
           imageUrl={frontImage}
@@ -92,7 +203,6 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           onUpload={(f) => handleImageUpload(f, "card_front_image")}
           onClear={() => handleClear("card_front_image")}
         />
-        {/* Back */}
         <CardImageUpload
           label="Card back"
           imageUrl={backImage}
