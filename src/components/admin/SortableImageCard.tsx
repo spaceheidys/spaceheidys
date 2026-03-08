@@ -84,8 +84,14 @@ const SortableImageCard = ({
   const [confirmUrlChange, setConfirmUrlChange] = useState(false);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [editDesc, setEditDesc] = useState(description || "");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setModalData({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  }, [title, description, tags, project_date, project_url]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
