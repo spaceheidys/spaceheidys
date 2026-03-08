@@ -311,6 +311,38 @@ const SortableImageCard = ({
           )}
         </div>
       )}
+      {/* Description input – only for projects section */}
+      {showProjectUrl && (
+        <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-1.5 py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ position: 'absolute', bottom: -20, transform: 'translateY(0)' }}
+        >
+          {isEditingDesc ? (
+            <textarea
+              autoFocus
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              onBlur={() => {
+                setIsEditingDesc(false);
+                if (editDesc !== (description || "")) onDescriptionChange?.(editDesc.trim());
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") { setEditDesc(description || ""); setIsEditingDesc(false); }
+              }}
+              placeholder="Project description…"
+              rows={2}
+              className="w-full bg-transparent text-[8px] text-foreground/70 font-display tracking-wider outline-none border-b border-foreground/20 placeholder:text-foreground/20 resize-none"
+            />
+          ) : (
+            <span
+              onClick={(e) => { e.stopPropagation(); setIsEditingDesc(true); setEditDesc(description || ""); }}
+              className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
+              title="Click to set description"
+            >
+              {description || "Add description…"}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
