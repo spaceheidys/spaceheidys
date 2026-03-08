@@ -318,10 +318,11 @@ const SortableImageCard = ({
                 {project_url || "Set URL…"}
               </span>
             )}
-            {/* Change URL button with confirmation */}
+            {/* Change / Delete URL buttons with confirmation */}
             {project_url && !isEditingUrl && (
               confirmUrlChange ? (
                 <div className="flex items-center gap-0.5 shrink-0">
+                  <span className="text-[7px] text-foreground/40 mr-0.5">Edit?</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -342,14 +343,46 @@ const SortableImageCard = ({
                     <X size={8} className="text-foreground" />
                   </button>
                 </div>
+              ) : confirmDeleteUrl ? (
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <span className="text-[7px] text-destructive/70 mr-0.5">Delete?</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConfirmDeleteUrl(false);
+                      onProjectUrlChange?.("");
+                      setEditUrl("");
+                    }}
+                    className="p-0.5 rounded bg-destructive/60 hover:bg-destructive/80 transition-colors"
+                    title="Yes, delete URL"
+                  >
+                    <Check size={8} className="text-destructive-foreground" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setConfirmDeleteUrl(false); }}
+                    className="p-0.5 rounded bg-muted/60 hover:bg-muted/80 transition-colors"
+                    title="Cancel"
+                  >
+                    <X size={8} className="text-foreground" />
+                  </button>
+                </div>
               ) : (
-                <button
-                  onClick={(e) => { e.stopPropagation(); setConfirmUrlChange(true); }}
-                  className="shrink-0 p-0.5 rounded hover:bg-foreground/10 transition-colors"
-                  title="Change URL"
-                >
-                  <RefreshCw size={8} className="text-foreground/40 hover:text-foreground/70" />
-                </button>
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setConfirmUrlChange(true); }}
+                    className="p-0.5 rounded hover:bg-foreground/10 transition-colors"
+                    title="Change URL"
+                  >
+                    <RefreshCw size={8} className="text-foreground/40 hover:text-foreground/70" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setConfirmDeleteUrl(true); }}
+                    className="p-0.5 rounded hover:bg-destructive/20 transition-colors"
+                    title="Delete URL"
+                  >
+                    <Trash2 size={8} className="text-foreground/40 hover:text-destructive/70" />
+                  </button>
+                </div>
               )
             )}
           </div>
