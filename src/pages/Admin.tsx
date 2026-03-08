@@ -235,6 +235,16 @@ const Admin = () => {
     supabase.from("portfolio_items").update({ text_align: align } as any).eq("id", id);
   };
 
+  const descTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleDescriptionChange = (id: string, desc: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, description: desc } as any : i)));
+    if (descTimers.current[id]) clearTimeout(descTimers.current[id]);
+    descTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ description: desc } as any).eq("id", id);
+    }, 400);
+  };
+
   const projectUrlTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const handleProjectUrlChange = (id: string, url: string) => {
