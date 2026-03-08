@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { Heart } from "lucide-react";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 
 const allMenuItems = [
@@ -8,7 +9,7 @@ const allMenuItems = [
   { label: "アーカイブ", en: "ARCHIVE", key: "archive" },
 ] as const;
 
-export type PortfolioMenuKey = (typeof allMenuItems)[number]["key"];
+export type PortfolioMenuKey = (typeof allMenuItems)[number]["key"] | "favorites";
 
 interface PortfolioMenuProps {
   visible: boolean;
@@ -16,6 +17,7 @@ interface PortfolioMenuProps {
   onSelect?: (key: PortfolioMenuKey) => void;
   onBack?: () => void;
   onGallerySubSelect?: (label: string) => void;
+  favoritesCount?: number;
 }
 
 const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect }: PortfolioMenuProps) => {
