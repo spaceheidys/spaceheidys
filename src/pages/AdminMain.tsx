@@ -194,17 +194,23 @@ const AdminMain = () => {
 
       {/* Content */}
       <div className="px-4 sm:px-8 py-6">
-        {/* Buttons section — at top */}
-        <ButtonsSection
-          buttons={navButtons}
-          onUpdate={updateButton}
-          onSwapOrder={swapOrder}
-          onAdd={addButton}
-          onDelete={deleteButton}
-        />
+        {activeSection === "main2" ? (
+          <Main2Section get={getContent} update={updateContent} />
+        ) : (
+          <>
+            {/* Buttons section — at top */}
+            <ButtonsSection
+              buttons={navButtons}
+              onUpdate={updateButton}
+              onSwapOrder={swapOrder}
+              onAdd={addButton}
+              onDelete={deleteButton}
+            />
 
-        {/* Section content editing */}
-        <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
+            {/* Section content editing */}
+            <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
+          </>
+        )}
 
         {/* Active backgrounds */}
         <div className="flex items-center justify-between mb-4 mt-6">
