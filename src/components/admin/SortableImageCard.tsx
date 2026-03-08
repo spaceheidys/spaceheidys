@@ -286,44 +286,38 @@ const SortableImageCard = ({
         </button>
       </div>
 
-      {/* Project URL input – only for projects section */}
+      {/* Project fields overlay – URL, Description, Tags, Date */}
       {showProjectUrl && (
-        <div className="absolute bottom-0 left-0 right-0 translate-y-full bg-black/80 px-1.5 py-1 flex items-center gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
-          style={{ position: 'absolute', bottom: 0, transform: 'translateY(0)' }}
-        >
-          <Link size={9} className="text-foreground/40 shrink-0" />
-          {isEditingUrl ? (
-            <input
-              autoFocus
-              value={editUrl}
-              onChange={(e) => setEditUrl(e.target.value)}
-              onBlur={() => {
-                setIsEditingUrl(false);
-                if (editUrl !== (project_url || "")) onProjectUrlChange?.(editUrl.trim());
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") e.currentTarget.blur();
-                if (e.key === "Escape") { setEditUrl(project_url || ""); setIsEditingUrl(false); }
-              }}
-              placeholder="https://..."
-              className="w-full bg-transparent text-[8px] text-foreground/70 font-display tracking-wider outline-none border-b border-foreground/20 placeholder:text-foreground/20"
-            />
-          ) : (
-            <span
-              onClick={(e) => { e.stopPropagation(); setIsEditingUrl(true); setEditUrl(project_url || ""); }}
-              className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
-              title="Click to set project URL"
-            >
-              {project_url || "Set URL…"}
-            </span>
-          )}
-        </div>
-      )}
-      {/* Description input – only for projects section */}
-      {showProjectUrl && (
-        <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-1.5 py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
-          style={{ position: 'absolute', bottom: -20, transform: 'translateY(0)' }}
-        >
+        <div className="absolute bottom-[24px] left-0 right-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 px-1.5 py-1 space-y-0.5">
+          {/* URL */}
+          <div className="flex items-center gap-1">
+            <Link size={8} className="text-foreground/40 shrink-0" />
+            {isEditingUrl ? (
+              <input
+                autoFocus
+                value={editUrl}
+                onChange={(e) => setEditUrl(e.target.value)}
+                onBlur={() => {
+                  setIsEditingUrl(false);
+                  if (editUrl !== (project_url || "")) onProjectUrlChange?.(editUrl.trim());
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.currentTarget.blur();
+                  if (e.key === "Escape") { setEditUrl(project_url || ""); setIsEditingUrl(false); }
+                }}
+                placeholder="https://..."
+                className="w-full bg-transparent text-[8px] text-foreground/70 font-display tracking-wider outline-none border-b border-foreground/20 placeholder:text-foreground/20"
+              />
+            ) : (
+              <span
+                onClick={(e) => { e.stopPropagation(); setIsEditingUrl(true); setEditUrl(project_url || ""); }}
+                className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
+              >
+                {project_url || "Set URL…"}
+              </span>
+            )}
+          </div>
+          {/* Description */}
           {isEditingDesc ? (
             <textarea
               autoFocus
@@ -336,45 +330,40 @@ const SortableImageCard = ({
               onKeyDown={(e) => {
                 if (e.key === "Escape") { setEditDesc(description || ""); setIsEditingDesc(false); }
               }}
-              placeholder="Project description…"
+              placeholder="Description…"
               rows={2}
-              className="w-full bg-transparent text-[8px] text-foreground/70 font-display tracking-wider outline-none border-b border-foreground/20 placeholder:text-foreground/20 resize-none"
+              className="w-full bg-transparent text-[7px] text-foreground/70 font-display tracking-wider outline-none border-b border-foreground/15 placeholder:text-foreground/20 resize-none"
             />
           ) : (
             <span
               onClick={(e) => { e.stopPropagation(); setIsEditingDesc(true); setEditDesc(description || ""); }}
-              className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
-              title="Click to set description"
+              className="block text-[7px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
             >
               {description || "Add description…"}
             </span>
           )}
-        </div>
-      )}
-      {/* Tags & Date – only for projects */}
-      {showProjectUrl && (
-        <div className="absolute left-0 right-0 bg-black/70 px-1.5 py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1"
-          style={{ position: 'absolute', bottom: -40 }}
-        >
-          <input
-            type="text"
-            value={(tags || []).join(", ")}
-            onChange={(e) => {
-              const newTags = e.target.value.split(",").map(t => t.trim()).filter(Boolean);
-              onTagsChange?.(newTags);
-            }}
-            placeholder="Tags: React, AI…"
-            className="flex-1 bg-transparent text-[8px] text-foreground/60 font-display tracking-wider outline-none border-b border-foreground/15 placeholder:text-foreground/20"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <input
-            type="text"
-            value={project_date || ""}
-            onChange={(e) => onProjectDateChange?.(e.target.value)}
-            placeholder="2025"
-            className="w-12 bg-transparent text-[8px] text-foreground/60 font-display tracking-wider outline-none border-b border-foreground/15 placeholder:text-foreground/20 text-right"
-            onClick={(e) => e.stopPropagation()}
-          />
+          {/* Tags & Date */}
+          <div className="flex gap-1">
+            <input
+              type="text"
+              value={(tags || []).join(", ")}
+              onChange={(e) => {
+                const newTags = e.target.value.split(",").map(t => t.trim()).filter(Boolean);
+                onTagsChange?.(newTags);
+              }}
+              placeholder="Tags…"
+              className="flex-1 bg-transparent text-[7px] text-foreground/50 font-display tracking-wider outline-none border-b border-foreground/10 placeholder:text-foreground/15"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <input
+              type="text"
+              value={project_date || ""}
+              onChange={(e) => onProjectDateChange?.(e.target.value)}
+              placeholder="Year"
+              className="w-10 bg-transparent text-[7px] text-foreground/50 font-display tracking-wider outline-none border-b border-foreground/10 placeholder:text-foreground/15 text-right"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
         </div>
       )}
     </div>
