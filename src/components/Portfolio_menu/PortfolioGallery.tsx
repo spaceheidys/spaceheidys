@@ -106,12 +106,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           label: item.label,
           image_url: item.image_url,
           groupImages: groupItems.map((g) => g.image_url!).filter(Boolean),
+          project_url: item.project_url,
         });
       } else {
         result.push({
           id: item.id,
           label: item.label,
           image_url: item.image_url,
+          project_url: item.project_url,
         });
       }
     }
