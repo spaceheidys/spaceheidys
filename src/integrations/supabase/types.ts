@@ -109,10 +109,12 @@ export type Database = {
           image_offset_y: number
           image_url: string
           image_zoom: number
+          project_date: string
           project_url: string | null
           section: string
           sort_order: number
           subsection: string | null
+          tags: string[]
           text_align: string
           title: string
         }
@@ -126,10 +128,12 @@ export type Database = {
           image_offset_y?: number
           image_url: string
           image_zoom?: number
+          project_date?: string
           project_url?: string | null
           section: string
           sort_order?: number
           subsection?: string | null
+          tags?: string[]
           text_align?: string
           title?: string
         }
@@ -143,10 +147,12 @@ export type Database = {
           image_offset_y?: number
           image_url?: string
           image_zoom?: number
+          project_date?: string
           project_url?: string | null
           section?: string
           sort_order?: number
           subsection?: string | null
+          tags?: string[]
           text_align?: string
           title?: string
         }

@@ -15,6 +15,8 @@ interface PortfolioItem {
   group_id?: string | null;
   project_url?: string | null;
   description?: string;
+  tags?: string[];
+  project_date?: string;
 }
 
 /** A display entry: either a single image or a group (first image as thumbnail, all URLs stored) */
@@ -25,6 +27,8 @@ interface GalleryEntry {
   groupImages?: string[];
   project_url?: string | null;
   description?: string;
+  tags?: string[];
+  project_date?: string;
 }
 
 const makeItems = (count: number): PortfolioItem[] =>
@@ -61,7 +65,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     const fetchItems = async () => {
       let query = supabase
         .from("portfolio_items")
-        .select("id, title, image_url, sort_order, group_id, project_url, description")
+        .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date")
         .eq("section", sectionKey)
         .order("sort_order", { ascending: true });
 
@@ -79,6 +83,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             group_id: d.group_id || null,
             project_url: d.project_url || null,
             description: d.description || "",
+            tags: d.tags || [],
+            project_date: d.project_date || "",
           }))
         );
       } else {
@@ -111,6 +117,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           groupImages: groupItems.map((g) => g.image_url!).filter(Boolean),
           project_url: item.project_url,
           description: item.description,
+          tags: item.tags,
+          project_date: item.project_date,
         });
       } else {
         result.push({
@@ -119,6 +127,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           image_url: item.image_url,
           project_url: item.project_url,
           description: item.description,
+          tags: item.tags,
+          project_date: item.project_date,
         });
       }
     }
@@ -291,13 +301,30 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                   {/* Right: info panel */}
                   <div className="sm:w-[280px] lg:w-[320px] flex flex-col justify-between p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95">
                     <div>
-                      <h3 className="text-lg font-display tracking-[0.15em] uppercase text-white mb-3">
+                      <h3 className="text-lg font-display tracking-[0.15em] uppercase text-white mb-1">
                         {selectedEntry.label}
                       </h3>
+                      {selectedEntry.project_date && (
+                        <p className="text-[10px] text-white/30 font-display tracking-widest uppercase mb-4">
+                          {selectedEntry.project_date}
+                        </p>
+                      )}
                       {selectedEntry.description && (
-                        <p className="text-sm text-white/60 leading-relaxed font-body">
+                        <p className="text-sm text-white/60 leading-relaxed font-body mb-4">
                           {selectedEntry.description}
                         </p>
+                      )}
+                      {selectedEntry.tags && selectedEntry.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {selectedEntry.tags.map((tag, i) => (
+                            <span
+                              key={i}
+                              className="px-2 py-0.5 text-[9px] font-display tracking-widest uppercase border border-white/15 text-white/50 rounded-sm"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
                     <a

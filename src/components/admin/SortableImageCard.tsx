@@ -14,6 +14,8 @@ interface SortableImageCardProps {
   group_id?: string | null;
   project_url?: string | null;
   description?: string;
+  tags?: string[];
+  project_date?: string;
   showProjectUrl?: boolean;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
@@ -22,6 +24,8 @@ interface SortableImageCardProps {
   onTextAlignChange: (align: string) => void;
   onProjectUrlChange?: (url: string) => void;
   onDescriptionChange?: (desc: string) => void;
+  onTagsChange?: (tags: string[]) => void;
+  onProjectDateChange?: (date: string) => void;
 }
 
 const GROUP_COLORS = [
@@ -51,6 +55,8 @@ const SortableImageCard = ({
   group_id,
   project_url,
   description,
+  tags,
+  project_date,
   showProjectUrl,
   onDelete,
   onPositionChange,
@@ -59,6 +65,8 @@ const SortableImageCard = ({
   onTextAlignChange,
   onProjectUrlChange,
   onDescriptionChange,
+  onTagsChange,
+  onProjectDateChange,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
@@ -341,6 +349,32 @@ const SortableImageCard = ({
               {description || "Add description…"}
             </span>
           )}
+        </div>
+      )}
+      {/* Tags & Date – only for projects */}
+      {showProjectUrl && (
+        <div className="absolute left-0 right-0 bg-black/70 px-1.5 py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1"
+          style={{ position: 'absolute', bottom: -40 }}
+        >
+          <input
+            type="text"
+            value={(tags || []).join(", ")}
+            onChange={(e) => {
+              const newTags = e.target.value.split(",").map(t => t.trim()).filter(Boolean);
+              onTagsChange?.(newTags);
+            }}
+            placeholder="Tags: React, AI…"
+            className="flex-1 bg-transparent text-[8px] text-foreground/60 font-display tracking-wider outline-none border-b border-foreground/15 placeholder:text-foreground/20"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <input
+            type="text"
+            value={project_date || ""}
+            onChange={(e) => onProjectDateChange?.(e.target.value)}
+            placeholder="2025"
+            className="w-12 bg-transparent text-[8px] text-foreground/60 font-display tracking-wider outline-none border-b border-foreground/15 placeholder:text-foreground/20 text-right"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </div>

@@ -255,6 +255,26 @@ const Admin = () => {
     }, 400);
   };
 
+  const tagsTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleTagsChange = (id: string, tags: string[]) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, tags } as any : i)));
+    if (tagsTimers.current[id]) clearTimeout(tagsTimers.current[id]);
+    tagsTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ tags } as any).eq("id", id);
+    }, 600);
+  };
+
+  const dateTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleProjectDateChange = (id: string, date: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, project_date: date } as any : i)));
+    if (dateTimers.current[id]) clearTimeout(dateTimers.current[id]);
+    dateTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ project_date: date } as any).eq("id", id);
+    }, 600);
+  };
+
   const handleHtmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -584,6 +604,8 @@ const Admin = () => {
                       group_id={item.group_id}
                       project_url={(item as any).project_url}
                       description={(item as any).description}
+                      tags={(item as any).tags}
+                      project_date={(item as any).project_date}
                       showProjectUrl={activeSection === "projects"}
                       onDelete={() => handleDelete(item)}
                       onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
@@ -592,6 +614,8 @@ const Admin = () => {
                       onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
                       onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
                       onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
+                      onTagsChange={(tags) => handleTagsChange(item.id, tags)}
+                      onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
                     />
                   ))}
                 </div>
