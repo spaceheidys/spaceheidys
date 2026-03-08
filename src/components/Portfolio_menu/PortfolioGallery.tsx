@@ -61,7 +61,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     const fetchItems = async () => {
       let query = supabase
         .from("portfolio_items")
-        .select("id, title, image_url, sort_order, group_id, project_url")
+        .select("id, title, image_url, sort_order, group_id, project_url, description")
         .eq("section", sectionKey)
         .order("sort_order", { ascending: true });
 
