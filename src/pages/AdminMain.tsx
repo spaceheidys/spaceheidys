@@ -11,6 +11,7 @@ import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import ButtonsSection from "@/components/admin/ButtonsSection";
 import ContentSection from "@/components/admin/ContentSection";
+import Main2Section from "@/components/admin/Main2Section";
 
 interface BackgroundItem {
   id: string;
@@ -20,7 +21,7 @@ interface BackgroundItem {
   is_active: boolean;
 }
 
-const SECTIONS = ["main", "portfolio"] as const;
+const SECTIONS = ["main", "main2", "portfolio"] as const;
 
 const AdminMain = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -194,17 +195,23 @@ const AdminMain = () => {
 
       {/* Content */}
       <div className="px-4 sm:px-8 py-6">
-        {/* Buttons section — at top */}
-        <ButtonsSection
-          buttons={navButtons}
-          onUpdate={updateButton}
-          onSwapOrder={swapOrder}
-          onAdd={addButton}
-          onDelete={deleteButton}
-        />
+        {activeSection === "main2" ? (
+          <Main2Section get={getContent} update={updateContent} />
+        ) : (
+          <>
+            {/* Buttons section — at top */}
+            <ButtonsSection
+              buttons={navButtons}
+              onUpdate={updateButton}
+              onSwapOrder={swapOrder}
+              onAdd={addButton}
+              onDelete={deleteButton}
+            />
 
-        {/* Section content editing */}
-        <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
+            {/* Section content editing */}
+            <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
+          </>
+        )}
 
         {/* Active backgrounds */}
         <div className="flex items-center justify-between mb-4 mt-6">
