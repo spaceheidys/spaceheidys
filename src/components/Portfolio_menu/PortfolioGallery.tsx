@@ -15,6 +15,8 @@ interface PortfolioItem {
   group_id?: string | null;
   project_url?: string | null;
   description?: string;
+  tags?: string[];
+  project_date?: string;
 }
 
 /** A display entry: either a single image or a group (first image as thumbnail, all URLs stored) */
@@ -25,6 +27,8 @@ interface GalleryEntry {
   groupImages?: string[];
   project_url?: string | null;
   description?: string;
+  tags?: string[];
+  project_date?: string;
 }
 
 const makeItems = (count: number): PortfolioItem[] =>
