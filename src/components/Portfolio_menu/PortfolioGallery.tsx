@@ -262,7 +262,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                 <X className="w-4 h-4" />
               </button>
 
-              {isGroup ? (
+              {isProject ? (
+                <iframe
+                  src={selectedEntry.project_url!}
+                  title={selectedEntry.label}
+                  className="w-full h-full rounded-md border border-white/10"
+                  sandbox="allow-scripts allow-same-origin allow-popups"
+                />
+              ) : isGroup ? (
                 <div className="flex flex-col gap-3">
                   {selectedEntry.groupImages!.map((url, idx) => (
                     <img
