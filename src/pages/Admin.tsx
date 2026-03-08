@@ -235,6 +235,16 @@ const Admin = () => {
     supabase.from("portfolio_items").update({ text_align: align } as any).eq("id", id);
   };
 
+  const descTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleDescriptionChange = (id: string, desc: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, description: desc } as any : i)));
+    if (descTimers.current[id]) clearTimeout(descTimers.current[id]);
+    descTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ description: desc } as any).eq("id", id);
+    }, 400);
+  };
+
   const projectUrlTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const handleProjectUrlChange = (id: string, url: string) => {
@@ -573,6 +583,7 @@ const Admin = () => {
                       text_align={(item as any).text_align ?? 'left'}
                       group_id={item.group_id}
                       project_url={(item as any).project_url}
+                      description={(item as any).description}
                       showProjectUrl={activeSection === "projects"}
                       onDelete={() => handleDelete(item)}
                       onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
@@ -580,6 +591,7 @@ const Admin = () => {
                       onTitleChange={(title) => handleTitleChange(item.id, title)}
                       onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
                       onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
+                      onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
                     />
                   ))}
                 </div>

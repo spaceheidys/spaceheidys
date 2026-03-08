@@ -13,6 +13,7 @@ interface SortableImageCardProps {
   text_align: string;
   group_id?: string | null;
   project_url?: string | null;
+  description?: string;
   showProjectUrl?: boolean;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
@@ -20,6 +21,7 @@ interface SortableImageCardProps {
   onTitleChange: (title: string) => void;
   onTextAlignChange: (align: string) => void;
   onProjectUrlChange?: (url: string) => void;
+  onDescriptionChange?: (desc: string) => void;
 }
 
 const GROUP_COLORS = [
@@ -48,6 +50,7 @@ const SortableImageCard = ({
   text_align,
   group_id,
   project_url,
+  description,
   showProjectUrl,
   onDelete,
   onPositionChange,
@@ -55,6 +58,7 @@ const SortableImageCard = ({
   onTitleChange,
   onTextAlignChange,
   onProjectUrlChange,
+  onDescriptionChange,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
@@ -63,6 +67,8 @@ const SortableImageCard = ({
   const [editTitle, setEditTitle] = useState(title);
   const [isEditingUrl, setIsEditingUrl] = useState(false);
   const [editUrl, setEditUrl] = useState(project_url || "");
+  const [isEditingDesc, setIsEditingDesc] = useState(false);
+  const [editDesc, setEditDesc] = useState(description || "");
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -301,6 +307,38 @@ const SortableImageCard = ({
               title="Click to set project URL"
             >
               {project_url || "Set URL…"}
+            </span>
+          )}
+        </div>
+      )}
+      {/* Description input – only for projects section */}
+      {showProjectUrl && (
+        <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-1.5 py-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ position: 'absolute', bottom: -20, transform: 'translateY(0)' }}
+        >
+          {isEditingDesc ? (
+            <textarea
+              autoFocus
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              onBlur={() => {
+                setIsEditingDesc(false);
+                if (editDesc !== (description || "")) onDescriptionChange?.(editDesc.trim());
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") { setEditDesc(description || ""); setIsEditingDesc(false); }
+              }}
+              placeholder="Project description…"
+              rows={2}
+              className="w-full bg-transparent text-[8px] text-foreground/70 font-display tracking-wider outline-none border-b border-foreground/20 placeholder:text-foreground/20 resize-none"
+            />
+          ) : (
+            <span
+              onClick={(e) => { e.stopPropagation(); setIsEditingDesc(true); setEditDesc(description || ""); }}
+              className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
+              title="Click to set description"
+            >
+              {description || "Add description…"}
             </span>
           )}
         </div>

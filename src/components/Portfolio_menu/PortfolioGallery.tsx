@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 
@@ -14,6 +14,7 @@ interface PortfolioItem {
   image_url?: string;
   group_id?: string | null;
   project_url?: string | null;
+  description?: string;
 }
 
 /** A display entry: either a single image or a group (first image as thumbnail, all URLs stored) */
@@ -23,6 +24,7 @@ interface GalleryEntry {
   image_url?: string;
   groupImages?: string[];
   project_url?: string | null;
+  description?: string;
 }
 
 const makeItems = (count: number): PortfolioItem[] =>
@@ -59,7 +61,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     const fetchItems = async () => {
       let query = supabase
         .from("portfolio_items")
-        .select("id, title, image_url, sort_order, group_id, project_url")
+        .select("id, title, image_url, sort_order, group_id, project_url, description")
         .eq("section", sectionKey)
         .order("sort_order", { ascending: true });
 
@@ -76,6 +78,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             image_url: d.image_url,
             group_id: d.group_id || null,
             project_url: d.project_url || null,
+            description: d.description || "",
           }))
         );
       } else {
@@ -107,6 +110,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           image_url: item.image_url,
           groupImages: groupItems.map((g) => g.image_url!).filter(Boolean),
           project_url: item.project_url,
+          description: item.description,
         });
       } else {
         result.push({
@@ -114,6 +118,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           label: item.label,
           image_url: item.image_url,
           project_url: item.project_url,
+          description: item.description,
         });
       }
     }
@@ -257,7 +262,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[90vw] h-[85vh] sm:w-[80vw]" : isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"}`}
+              className={`relative ${isProject ? "w-[90vw] h-[80vh] sm:w-[85vw] sm:h-[75vh]" : isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"}`}
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
@@ -266,20 +271,46 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             >
               <button
                 onClick={() => setSelectedEntry(null)}
-                className="absolute top-1 right-1 z-10 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200 sticky"
-                style={{ position: "sticky", top: 4, float: "right" }}
+                className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
                 aria-label="Close preview"
               >
                 <X className="w-4 h-4" />
               </button>
 
               {isProject ? (
-                <iframe
-                  src={selectedEntry.project_url!}
-                  title={selectedEntry.label}
-                  className="w-full h-full rounded-md border border-white/10"
-                  sandbox="allow-scripts allow-same-origin allow-popups"
-                />
+                <div className="w-full h-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
+                  {/* Left: iframe preview */}
+                  <div className="flex-1 min-h-[40vh] sm:min-h-0 relative">
+                    <iframe
+                      src={selectedEntry.project_url!}
+                      title={selectedEntry.label}
+                      className="absolute inset-0 w-full h-full"
+                      sandbox="allow-scripts allow-same-origin allow-popups"
+                    />
+                  </div>
+                  {/* Right: info panel */}
+                  <div className="sm:w-[280px] lg:w-[320px] flex flex-col justify-between p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95">
+                    <div>
+                      <h3 className="text-lg font-display tracking-[0.15em] uppercase text-white mb-3">
+                        {selectedEntry.label}
+                      </h3>
+                      {selectedEntry.description && (
+                        <p className="text-sm text-white/60 leading-relaxed font-body">
+                          {selectedEntry.description}
+                        </p>
+                      )}
+                    </div>
+                    <a
+                      href={selectedEntry.project_url!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-6 flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/80 hover:text-white hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"
+                    >
+                      <ExternalLink size={14} />
+                      Visit Project
+                    </a>
+                  </div>
+                </div>
               ) : isGroup ? (
                 <div className="flex flex-col gap-3">
                   {selectedEntry.groupImages!.map((url, idx) => (
