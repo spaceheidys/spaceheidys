@@ -20,7 +20,7 @@ interface BackgroundItem {
   is_active: boolean;
 }
 
-const SECTIONS = ["main", "portfolio"] as const;
+const SECTIONS = ["main", "main2", "portfolio"] as const;
 
 const AdminMain = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
