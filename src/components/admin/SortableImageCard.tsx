@@ -14,6 +14,8 @@ interface SortableImageCardProps {
   group_id?: string | null;
   project_url?: string | null;
   description?: string;
+  tags?: string[];
+  project_date?: string;
   showProjectUrl?: boolean;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
@@ -22,6 +24,8 @@ interface SortableImageCardProps {
   onTextAlignChange: (align: string) => void;
   onProjectUrlChange?: (url: string) => void;
   onDescriptionChange?: (desc: string) => void;
+  onTagsChange?: (tags: string[]) => void;
+  onProjectDateChange?: (date: string) => void;
 }
 
 const GROUP_COLORS = [
