@@ -455,23 +455,38 @@ const Admin = () => {
             />
           </label>
           {activeSection === "projects" && (
-            <label className="flex-1 flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 cursor-pointer">
-              {uploading ? (
-                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-              ) : (
-                <FileCode className="w-4 h-4 text-muted-foreground" />
-              )}
-              <span className="text-xs font-display tracking-widest text-muted-foreground">
-                {uploading ? "UPLOADING..." : "UPLOAD HTML"}
-              </span>
+            <div className="flex-1 flex items-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-2 px-3">
+              <FileCode className="w-4 h-4 text-muted-foreground shrink-0" />
               <input
-                type="file"
-                accept=".html,.htm"
-                onChange={handleHtmlUpload}
-                className="hidden"
-                disabled={uploading}
+                type="text"
+                placeholder="Paste project URL here and press Enter…"
+                className="flex-1 bg-transparent text-xs font-display tracking-widest text-foreground placeholder:text-muted-foreground/50 outline-none"
+                onKeyDown={async (e) => {
+                  if (e.key === "Enter") {
+                    const url = e.currentTarget.value.trim();
+                    if (!url) return;
+                    // Create a new portfolio item with this URL as project_url
+                    const insertData: any = {
+                      section: "projects",
+                      subsection: null,
+                      title: url.replace(/^https?:\/\//, "").split("/")[0],
+                      image_url: "",
+                      sort_order: items.length,
+                      created_by: user?.id,
+                      project_url: url,
+                    };
+                    const { error } = await supabase.from("portfolio_items").insert(insertData);
+                    if (error) {
+                      toast.error("Failed to add project");
+                    } else {
+                      toast.success("Project added!");
+                      e.currentTarget.value = "";
+                      fetchItems();
+                    }
+                  }
+                }}
               />
-            </label>
+            </div>
           )}
         </div>
 
