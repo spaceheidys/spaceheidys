@@ -14,6 +14,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [backImage, setBackImage] = useState("");
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
+  const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
   const frontRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
@@ -25,6 +26,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setBackImage(get("card_back_image"));
     setBgType(get("card_bg_type") || "polygon");
     setBgVideo(get("card_bg_video"));
+    setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
   }, [get]);
 
   const handleSave = async () => {
@@ -189,6 +191,29 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             <p className="text-[10px] text-muted-foreground/50 font-display tracking-wider">
               MP4 (H.264) or WebM recommended. Keep under 10 MB for fast loading.
             </p>
+            {/* Opacity slider */}
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase shrink-0">
+                Opacity
+              </span>
+              <input
+                type="range"
+                min="5"
+                max="100"
+                step="5"
+                value={bgOpacity}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  setBgOpacity(val);
+                }}
+                onMouseUp={() => update("card_bg_video_opacity", String(bgOpacity))}
+                onTouchEnd={() => update("card_bg_video_opacity", String(bgOpacity))}
+                className="flex-1 h-1 appearance-none bg-border rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground"
+              />
+              <span className="text-[10px] text-muted-foreground font-display w-8 text-right">
+                {bgOpacity}%
+              </span>
+            </div>
           </div>
         )}
       </div>

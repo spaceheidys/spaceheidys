@@ -365,7 +365,8 @@ const Index = () => {
       {getContent("card_bg_type") === "video" && getContent("card_bg_video") ? (
         <video
           src={getContent("card_bg_video")}
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: (parseInt(getContent("card_bg_video_opacity") || "40", 10)) / 100 }}
           autoPlay
           loop
           muted
