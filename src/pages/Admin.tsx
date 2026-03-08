@@ -455,22 +455,66 @@ const Admin = () => {
             />
           </label>
           {activeSection === "projects" && (
-            <div className="flex-1 flex items-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-2 px-3">
-              <FileCode className="w-4 h-4 text-muted-foreground shrink-0" />
-              <input
-                type="text"
-                placeholder="Paste project URL here and press Enter…"
-                className="flex-1 bg-transparent text-xs font-display tracking-widest text-foreground placeholder:text-muted-foreground/50 outline-none"
-                onKeyDown={async (e) => {
-                  if (e.key === "Enter") {
-                    const url = e.currentTarget.value.trim();
-                    if (!url) return;
-                    // Create a new portfolio item with this URL as project_url
+            <div className="flex-1 flex flex-col gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-3 px-3">
+              <div className="flex items-center gap-2">
+                <FileCode className="w-4 h-4 text-muted-foreground shrink-0" />
+                <input
+                  id="project-url-input"
+                  type="text"
+                  placeholder="Paste project URL…"
+                  className="flex-1 bg-transparent text-xs font-display tracking-widest text-foreground placeholder:text-muted-foreground/50 outline-none"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                  <Upload className="w-3 h-3" />
+                  <span className="text-[10px] font-display tracking-widest" id="project-thumb-label">
+                    THUMBNAIL (optional)
+                  </span>
+                  <input
+                    id="project-thumb-input"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      const label = document.getElementById("project-thumb-label");
+                      if (label) label.textContent = file ? file.name : "THUMBNAIL (optional)";
+                    }}
+                  />
+                </label>
+                <button
+                  className="ml-auto text-[10px] font-display tracking-[0.2em] uppercase px-3 py-1 border border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors disabled:opacity-30"
+                  disabled={uploading}
+                  onClick={async () => {
+                    const urlInput = document.getElementById("project-url-input") as HTMLInputElement;
+                    const thumbInput = document.getElementById("project-thumb-input") as HTMLInputElement;
+                    const url = urlInput?.value.trim();
+                    if (!url) { toast.error("Enter a project URL"); return; }
+
+                    setUploading(true);
+                    let imageUrl = "";
+
+                    // Upload thumbnail if provided
+                    const thumbFile = thumbInput?.files?.[0];
+                    if (thumbFile) {
+                      const ext = thumbFile.name.split(".").pop();
+                      const fileName = `projects/thumbs/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+                      const { error: upErr } = await supabase.storage.from("portfolio-images").upload(fileName, thumbFile);
+                      if (upErr) {
+                        toast.error("Thumbnail upload failed");
+                        setUploading(false);
+                        return;
+                      }
+                      const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(fileName);
+                      imageUrl = urlData.publicUrl;
+                    }
+
                     const insertData: any = {
                       section: "projects",
                       subsection: null,
                       title: url.replace(/^https?:\/\//, "").split("/")[0],
-                      image_url: "",
+                      image_url: imageUrl,
                       sort_order: items.length,
                       created_by: user?.id,
                       project_url: url,
@@ -480,12 +524,18 @@ const Admin = () => {
                       toast.error("Failed to add project");
                     } else {
                       toast.success("Project added!");
-                      e.currentTarget.value = "";
+                      urlInput.value = "";
+                      if (thumbInput) thumbInput.value = "";
+                      const label = document.getElementById("project-thumb-label");
+                      if (label) label.textContent = "THUMBNAIL (optional)";
                       fetchItems();
                     }
-                  }
-                }}
-              />
+                    setUploading(false);
+                  }}
+                >
+                  {uploading ? "ADDING..." : "ADD PROJECT"}
+                </button>
+              </div>
             </div>
           )}
         </div>
