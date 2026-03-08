@@ -71,6 +71,7 @@ const SortableImageCard = ({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDeleteUrl, setConfirmDeleteUrl] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [isEditingUrl, setIsEditingUrl] = useState(false);
