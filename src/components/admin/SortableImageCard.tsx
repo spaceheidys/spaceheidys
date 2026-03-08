@@ -117,16 +117,25 @@ const SortableImageCard = ({
       }`}
     >
       <div ref={containerRef} className="w-full h-full overflow-hidden">
-        <img
-          src={image_url}
-          alt={title}
-          className="w-full h-full object-cover pointer-events-none origin-center"
-          style={{
-            objectPosition: `${image_offset_x}% ${image_offset_y}%`,
-            transform: `scale(${scale})`,
-          }}
-          loading="lazy"
-        />
+        {image_url ? (
+          <img
+            src={image_url}
+            alt={title}
+            className="w-full h-full object-cover pointer-events-none origin-center"
+            style={{
+              objectPosition: `${image_offset_x}% ${image_offset_y}%`,
+              transform: `scale(${scale})`,
+            }}
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-muted/20 gap-1">
+            <Link size={20} className="text-muted-foreground/30" />
+            <span className="text-[8px] text-muted-foreground/40 font-display tracking-widest uppercase truncate max-w-full px-2">
+              {project_url ? new URL(project_url).hostname : "No image"}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Drag handle – top left */}

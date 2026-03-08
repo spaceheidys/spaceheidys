@@ -171,12 +171,17 @@ const Admin = () => {
   };
 
   const handleDelete = async (item: PortfolioItem) => {
-    const url = new URL(item.image_url);
-    const pathParts = url.pathname.split("/storage/v1/object/public/portfolio-images/");
-    const filePath = pathParts[1];
-
-    if (filePath) {
-      await supabase.storage.from("portfolio-images").remove([filePath]);
+    if (item.image_url) {
+      try {
+        const url = new URL(item.image_url);
+        const pathParts = url.pathname.split("/storage/v1/object/public/portfolio-images/");
+        const filePath = pathParts[1];
+        if (filePath) {
+          await supabase.storage.from("portfolio-images").remove([filePath]);
+        }
+      } catch {
+        // image_url might not be a valid storage URL, skip cleanup
+      }
     }
 
     const { error } = await supabase
