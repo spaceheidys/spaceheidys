@@ -445,7 +445,8 @@ const Index = () => {
                   activeKey={activePortfolioKey}
                   onSelect={(key) => setActivePortfolioKey(key)}
                   onBack={() => {setActivePortfolioKey(null);setActiveGallerySub(null);setPageInfo(null);}}
-                  onGallerySubSelect={(label) => setActiveGallerySub(label)} />
+                  onGallerySubSelect={(label) => setActiveGallerySub(label)}
+                  favoritesCount={favoritesCount} />
                 
             </div>
           </div>
