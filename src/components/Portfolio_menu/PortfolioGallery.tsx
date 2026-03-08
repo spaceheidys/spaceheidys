@@ -151,6 +151,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
   const pageItems = entries.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
+  const isProject = selectedEntry && selectedEntry.project_url;
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
