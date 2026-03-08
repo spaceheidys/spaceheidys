@@ -55,6 +55,8 @@ const SortableImageCard = ({
   group_id,
   project_url,
   description,
+  tags,
+  project_date,
   showProjectUrl,
   onDelete,
   onPositionChange,
@@ -63,6 +65,8 @@ const SortableImageCard = ({
   onTextAlignChange,
   onProjectUrlChange,
   onDescriptionChange,
+  onTagsChange,
+  onProjectDateChange,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
