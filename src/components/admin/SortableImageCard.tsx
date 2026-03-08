@@ -61,6 +61,8 @@ const SortableImageCard = ({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
+  const [isEditingUrl, setIsEditingUrl] = useState(false);
+  const [editUrl, setEditUrl] = useState(project_url || "");
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
