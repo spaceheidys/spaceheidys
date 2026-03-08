@@ -416,8 +416,8 @@ const Index = () => {
                     <PortfolioCard
                       name="Card_03"
                       flipAxis="y-center"
-                      frontImage={taro01Img}
-                      backImage={taroEyeImg}
+                      frontImage={getContent("card_front_image") || taro01Img}
+                      backImage={getContent("card_back_image") || taroEyeImg}
                       flipped={thirdCardFlipped}
                       onFlip={(f: boolean) => {setThirdCardFlipped(f);setFlipCount((c) => c + 1);}} />
                   </motion.div>
