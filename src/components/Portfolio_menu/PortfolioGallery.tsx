@@ -120,10 +120,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     return result;
   }, [rawItems]);
 
-  const navigableEntries = useMemo(() => entries.filter((i) => !!i.image_url), [entries]);
+  const navigableEntries = useMemo(() => entries.filter((i) => !!i.image_url || !!i.project_url), [entries]);
 
   const openLightbox = (entry: GalleryEntry) => {
-    if (!entry.image_url) return;
+    if (!entry.image_url && !entry.project_url) return;
     const idx = navigableEntries.findIndex((n) => n.id === entry.id);
     setSelectedEntry(entry);
     setSelectedIndex(idx);
