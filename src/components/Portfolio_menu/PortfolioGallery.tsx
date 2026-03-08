@@ -192,6 +192,17 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                   loading="lazy"
                   onContextMenu={(e) => e.preventDefault()}
                 />
+              ) : item.project_url ? (
+                <div className="w-full h-full overflow-hidden relative bg-black">
+                  <iframe
+                    src={item.project_url}
+                    title={item.label}
+                    className="absolute origin-top-left pointer-events-none"
+                    style={{ width: "1200px", height: "900px", transform: "scale(0.14)", transformOrigin: "top left" }}
+                    sandbox="allow-scripts allow-same-origin"
+                    loading="lazy"
+                  />
+                </div>
               ) : (
                 <span className="text-white/40 text-[9px] sm:text-[10px] tracking-widest font-display uppercase">
                   {item.label}
