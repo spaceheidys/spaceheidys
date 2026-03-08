@@ -306,7 +306,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[90vw] h-[80vh] sm:w-[85vw] sm:h-[75vh]" : isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"}`}
+              className={`relative ${isProject ? "w-[95vw] h-[90vh] sm:w-[85vw] sm:h-[80vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh]"}`}
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
