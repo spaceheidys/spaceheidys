@@ -13,11 +13,14 @@ interface SortableImageCardProps {
   image_zoom: number;
   text_align: string;
   group_id?: string | null;
+  project_url?: string | null;
+  showProjectUrl?: boolean;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
   onZoomChange: (zoom: number) => void;
   onTitleChange: (title: string) => void;
   onTextAlignChange: (align: string) => void;
+  onProjectUrlChange?: (url: string) => void;
 }
 
 const GROUP_COLORS = [
