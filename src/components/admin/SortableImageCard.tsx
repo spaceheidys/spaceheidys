@@ -128,11 +128,27 @@ const SortableImageCard = ({
             }}
             loading="lazy"
           />
+        ) : project_url ? (
+          <div className="w-full h-full overflow-hidden relative bg-black">
+            <iframe
+              src={project_url}
+              title={title}
+              className="absolute origin-top-left pointer-events-none"
+              style={{
+                width: "1200px",
+                height: "1600px",
+                transform: "scale(0.15)",
+                transformOrigin: "top left",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+              loading="lazy"
+            />
+          </div>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-muted/20 gap-1">
             <Link size={20} className="text-muted-foreground/30" />
-            <span className="text-[8px] text-muted-foreground/40 font-display tracking-widest uppercase truncate max-w-full px-2">
-              {project_url ? new URL(project_url).hostname : "No image"}
+            <span className="text-[8px] text-muted-foreground/40 font-display tracking-widest uppercase">
+              No image
             </span>
           </div>
         )}
