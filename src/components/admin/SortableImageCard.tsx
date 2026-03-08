@@ -455,6 +455,78 @@ const SortableImageCard = ({
           </div>
         </div>
       )}
+
+      {/* Edit Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>Edit Details</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={modalData.title}
+                onChange={(e) => setModalData({ ...modalData, title: e.target.value })}
+              />
+            </div>
+            {showProjectUrl && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="url">Project URL</Label>
+                  <Input
+                    id="url"
+                    value={modalData.project_url}
+                    onChange={(e) => setModalData({ ...modalData, project_url: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="desc">Description</Label>
+                  <Textarea
+                    id="desc"
+                    value={modalData.description}
+                    onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="tags">Tags (comma separated)</Label>
+                  <Input
+                    id="tags"
+                    value={modalData.tags}
+                    onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
+                    placeholder="tag1, tag2..."
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="date">Date / Year</Label>
+                  <Input
+                    id="date"
+                    value={modalData.project_date}
+                    onChange={(e) => setModalData({ ...modalData, project_date: e.target.value })}
+                    placeholder="e.g. 2024"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+            <Button onClick={() => {
+              onTitleChange(modalData.title.trim());
+              if (showProjectUrl) {
+                if (onProjectUrlChange) onProjectUrlChange(modalData.project_url.trim());
+                if (onDescriptionChange) onDescriptionChange(modalData.description.trim());
+                if (onTagsChange) onTagsChange(modalData.tags.split(",").map(t => t.trim()).filter(Boolean));
+                if (onProjectDateChange) onProjectDateChange(modalData.project_date.trim());
+              }
+              setIsEditModalOpen(false);
+            }}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
