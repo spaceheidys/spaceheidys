@@ -53,6 +53,7 @@ const Index = () => {
   const { visibility: sectionVisibility } = useSectionSettings();
   const { buttons: navButtons } = useNavButtons();
   const { get: getContent, getDuration } = useSectionContent();
+  const { count: favoritesCount } = useFavorites();
 
   // Fetch dynamic backgrounds
   useEffect(() => {
