@@ -694,31 +694,48 @@ const Admin = () => {
                   {items
                     .slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE)
                     .map((item) => (
-                    <SortableImageCard
-                      key={item.id}
-                      id={item.id}
-                      title={item.title}
-                      image_url={item.image_url}
-                      image_offset_x={(item as any).image_offset_x ?? 50}
-                      image_offset_y={(item as any).image_offset_y ?? 50}
-                      image_zoom={(item as any).image_zoom ?? 1}
-                      text_align={(item as any).text_align ?? 'left'}
-                      group_id={item.group_id}
-                      project_url={(item as any).project_url}
-                      description={(item as any).description}
-                      tags={(item as any).tags}
-                      project_date={(item as any).project_date}
-                      showProjectUrl={activeSection === "projects"}
-                      onDelete={() => handleDelete(item)}
-                      onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
-                      onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
-                      onTitleChange={(title) => handleTitleChange(item.id, title)}
-                      onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
-                      onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
-                      onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
-                      onTagsChange={(tags) => handleTagsChange(item.id, tags)}
-                      onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
-                    />
+                    <div key={item.id} className="relative">
+                      {bulkSelectMode && (
+                        <button
+                          onClick={() => {
+                            const next = new Set(selectedIds);
+                            next.has(item.id) ? next.delete(item.id) : next.add(item.id);
+                            setSelectedIds(next);
+                          }}
+                          className="absolute top-1 right-1 z-30 p-0.5 rounded bg-black/60"
+                        >
+                          {selectedIds.has(item.id) ? (
+                            <CheckSquare size={16} className="text-primary" />
+                          ) : (
+                            <Square size={16} className="text-foreground/40" />
+                          )}
+                        </button>
+                      )}
+                      <SortableImageCard
+                        id={item.id}
+                        title={item.title}
+                        image_url={item.image_url}
+                        image_offset_x={(item as any).image_offset_x ?? 50}
+                        image_offset_y={(item as any).image_offset_y ?? 50}
+                        image_zoom={(item as any).image_zoom ?? 1}
+                        text_align={(item as any).text_align ?? 'left'}
+                        group_id={item.group_id}
+                        project_url={(item as any).project_url}
+                        description={(item as any).description}
+                        tags={(item as any).tags}
+                        project_date={(item as any).project_date}
+                        showProjectUrl={activeSection === "projects"}
+                        onDelete={() => handleDelete(item)}
+                        onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
+                        onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
+                        onTitleChange={(title) => handleTitleChange(item.id, title)}
+                        onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
+                        onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
+                        onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
+                        onTagsChange={(tags) => handleTagsChange(item.id, tags)}
+                        onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
+                      />
+                    </div>
                   ))}
                 </div>
               </SortableContext>
