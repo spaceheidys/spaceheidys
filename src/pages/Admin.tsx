@@ -583,6 +583,7 @@ const Admin = () => {
                       text_align={(item as any).text_align ?? 'left'}
                       group_id={item.group_id}
                       project_url={(item as any).project_url}
+                      description={(item as any).description}
                       showProjectUrl={activeSection === "projects"}
                       onDelete={() => handleDelete(item)}
                       onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
