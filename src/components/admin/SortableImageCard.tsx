@@ -246,6 +246,40 @@ const SortableImageCard = ({
           )}
         </button>
       </div>
+
+      {/* Project URL input – only for projects section */}
+      {showProjectUrl && (
+        <div className="absolute bottom-0 left-0 right-0 translate-y-full bg-black/80 px-1.5 py-1 flex items-center gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ position: 'absolute', bottom: 0, transform: 'translateY(0)' }}
+        >
+          <Link size={9} className="text-foreground/40 shrink-0" />
+          {isEditingUrl ? (
+            <input
+              autoFocus
+              value={editUrl}
+              onChange={(e) => setEditUrl(e.target.value)}
+              onBlur={() => {
+                setIsEditingUrl(false);
+                if (editUrl !== (project_url || "")) onProjectUrlChange?.(editUrl.trim());
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.currentTarget.blur();
+                if (e.key === "Escape") { setEditUrl(project_url || ""); setIsEditingUrl(false); }
+              }}
+              placeholder="https://..."
+              className="w-full bg-transparent text-[8px] text-foreground/70 font-display tracking-wider outline-none border-b border-foreground/20 placeholder:text-foreground/20"
+            />
+          ) : (
+            <span
+              onClick={(e) => { e.stopPropagation(); setIsEditingUrl(true); setEditUrl(project_url || ""); }}
+              className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
+              title="Click to set project URL"
+            >
+              {project_url || "Set URL…"}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
