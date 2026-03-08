@@ -13,6 +13,7 @@ interface PortfolioItem {
   label: string;
   image_url?: string;
   group_id?: string | null;
+  project_url?: string | null;
 }
 
 /** A display entry: either a single image or a group (first image as thumbnail, all URLs stored) */
