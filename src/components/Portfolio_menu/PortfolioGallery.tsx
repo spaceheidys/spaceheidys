@@ -35,7 +35,7 @@ interface GalleryEntry {
 const makeItems = (count: number): PortfolioItem[] =>
   Array.from({ length: count }, (_, i) => ({ id: String(i + 1), label: String(i + 1).padStart(2, "0") }));
 
-const defaultSectionItems: Record<PortfolioMenuKey, PortfolioItem[]> = {
+const defaultSectionItems: Partial<Record<PortfolioMenuKey, PortfolioItem[]>> = {
   gallery: makeItems(6),
   projects: makeItems(16),
   skills: makeItems(16),
