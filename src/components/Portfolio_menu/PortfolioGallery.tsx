@@ -120,10 +120,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     return result;
   }, [rawItems]);
 
-  const navigableEntries = useMemo(() => entries.filter((i) => !!i.image_url), [entries]);
+  const navigableEntries = useMemo(() => entries.filter((i) => !!i.image_url || !!i.project_url), [entries]);
 
   const openLightbox = (entry: GalleryEntry) => {
-    if (!entry.image_url) return;
+    if (!entry.image_url && !entry.project_url) return;
     const idx = navigableEntries.findIndex((n) => n.id === entry.id);
     setSelectedEntry(entry);
     setSelectedIndex(idx);
@@ -192,6 +192,17 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                   loading="lazy"
                   onContextMenu={(e) => e.preventDefault()}
                 />
+              ) : item.project_url ? (
+                <div className="w-full h-full overflow-hidden relative bg-black">
+                  <iframe
+                    src={item.project_url}
+                    title={item.label}
+                    className="absolute origin-top-left pointer-events-none"
+                    style={{ width: "1200px", height: "900px", transform: "scale(0.14)", transformOrigin: "top left" }}
+                    sandbox="allow-scripts allow-same-origin"
+                    loading="lazy"
+                  />
+                </div>
               ) : (
                 <span className="text-white/40 text-[9px] sm:text-[10px] tracking-widest font-display uppercase">
                   {item.label}
