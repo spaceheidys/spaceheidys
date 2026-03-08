@@ -535,6 +535,7 @@ const Admin = () => {
                     const thumbInput = document.getElementById("project-thumb-input") as HTMLInputElement;
                     const url = urlInput?.value.trim();
                     const projectName = nameInput?.value.trim();
+                    if (!url && !projectName) { toast.error("Enter a project name or URL"); return; }
 
                     setUploading(true);
                     let imageUrl = "";
@@ -557,17 +558,18 @@ const Admin = () => {
                     const insertData: any = {
                       section: "projects",
                       subsection: null,
-                      title: url.replace(/^https?:\/\//, "").split("/")[0],
+                      title: projectName || url.replace(/^https?:\/\//, "").split("/")[0],
                       image_url: imageUrl,
                       sort_order: items.length,
                       created_by: user?.id,
-                      project_url: url,
+                      project_url: url || null,
                     };
                     const { error } = await supabase.from("portfolio_items").insert(insertData);
                     if (error) {
                       toast.error("Failed to add project");
                     } else {
                       toast.success("Project added!");
+                      if (nameInput) nameInput.value = "";
                       urlInput.value = "";
                       if (thumbInput) thumbInput.value = "";
                       const label = document.getElementById("project-thumb-label");
