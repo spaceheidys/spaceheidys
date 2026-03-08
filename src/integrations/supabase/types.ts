@@ -108,6 +108,7 @@ export type Database = {
           image_offset_y: number
           image_url: string
           image_zoom: number
+          project_url: string | null
           section: string
           sort_order: number
           subsection: string | null
@@ -123,6 +124,7 @@ export type Database = {
           image_offset_y?: number
           image_url: string
           image_zoom?: number
+          project_url?: string | null
           section: string
           sort_order?: number
           subsection?: string | null
@@ -138,6 +140,7 @@ export type Database = {
           image_offset_y?: number
           image_url?: string
           image_zoom?: number
+          project_url?: string | null
           section?: string
           sort_order?: number
           subsection?: string | null
