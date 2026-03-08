@@ -20,12 +20,13 @@ interface PortfolioMenuProps {
   favoritesCount?: number;
 }
 
-const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect }: PortfolioMenuProps) => {
+const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect, favoritesCount = 0 }: PortfolioMenuProps) => {
   const { visibility } = useSectionSettings();
 
   if (!visible) return null;
 
   const menuItems = allMenuItems.filter((item) => visibility[item.key]);
+  const hasFavorites = favoritesCount > 0;
 
   return (
     <AnimatePresence mode="wait">
