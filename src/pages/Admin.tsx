@@ -604,6 +604,8 @@ const Admin = () => {
                       group_id={item.group_id}
                       project_url={(item as any).project_url}
                       description={(item as any).description}
+                      tags={(item as any).tags}
+                      project_date={(item as any).project_date}
                       showProjectUrl={activeSection === "projects"}
                       onDelete={() => handleDelete(item)}
                       onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
@@ -612,6 +614,8 @@ const Admin = () => {
                       onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
                       onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
                       onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
+                      onTagsChange={(tags) => handleTagsChange(item.id, tags)}
+                      onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
                     />
                   ))}
                 </div>
