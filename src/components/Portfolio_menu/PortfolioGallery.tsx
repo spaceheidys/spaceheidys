@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X, ExternalLink, Share2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ExternalLink, Share2, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useFavorites } from "@/hooks/useFavorites";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 
 const ITEMS_PER_PAGE_MOBILE = 6;
