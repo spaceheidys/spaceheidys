@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw, Edit2 } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -458,15 +458,42 @@ const SortableImageCard = ({
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
+        <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
           <DialogHeader>
             <DialogTitle>Edit Details</DialogTitle>
+            <DialogDescription className="sr-only">Edit title, URL, description, tags and date for this item.</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+
+          {/* Image / project preview */}
+          {(image_url || project_url) && (
+            <div className="relative w-full aspect-video rounded-md overflow-hidden border border-border bg-muted/20 mb-1">
+              {image_url ? (
+                <img
+                  src={image_url}
+                  alt={title}
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: `${image_offset_x}% ${image_offset_y}%` }}
+                />
+              ) : project_url ? (
+                <div className="w-full h-full overflow-hidden relative bg-black">
+                  <iframe
+                    src={project_url}
+                    title={title}
+                    className="absolute origin-top-left pointer-events-none"
+                    style={{ width: "1200px", height: "800px", transform: "scale(0.2)", transformOrigin: "top left" }}
+                    sandbox="allow-scripts allow-same-origin"
+                    loading="lazy"
+                  />
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          <div className="grid gap-4 py-2">
             <div className="grid gap-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="edit-title">Title</Label>
               <Input
-                id="title"
+                id="edit-title"
                 value={modalData.title}
                 onChange={(e) => setModalData({ ...modalData, title: e.target.value })}
               />
@@ -474,36 +501,36 @@ const SortableImageCard = ({
             {showProjectUrl && (
               <>
                 <div className="grid gap-2">
-                  <Label htmlFor="url">Project URL</Label>
+                  <Label htmlFor="edit-url">Project URL</Label>
                   <Input
-                    id="url"
+                    id="edit-url"
                     value={modalData.project_url}
                     onChange={(e) => setModalData({ ...modalData, project_url: e.target.value })}
                     placeholder="https://..."
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="desc">Description</Label>
+                  <Label htmlFor="edit-desc">Description</Label>
                   <Textarea
-                    id="desc"
+                    id="edit-desc"
                     value={modalData.description}
                     onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
                     rows={3}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="tags">Tags (comma separated)</Label>
+                  <Label htmlFor="edit-tags">Tags (через запятую / comma separated)</Label>
                   <Input
-                    id="tags"
+                    id="edit-tags"
                     value={modalData.tags}
                     onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
                     placeholder="tag1, tag2..."
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="date">Date / Year</Label>
+                  <Label htmlFor="edit-date">Date / Year</Label>
                   <Input
-                    id="date"
+                    id="edit-date"
                     value={modalData.project_date}
                     onChange={(e) => setModalData({ ...modalData, project_date: e.target.value })}
                     placeholder="e.g. 2024"

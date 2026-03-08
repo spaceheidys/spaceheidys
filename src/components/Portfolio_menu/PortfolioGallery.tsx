@@ -208,10 +208,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           disabled={page === 0}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[calc(100%+8px)] z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -ml-5 sm:-translate-x-[calc(100%+8px)] sm:ml-0"
           aria-label="Previous page"
         >
-          <ChevronLeft className="w-6 h-6 sm:w-[40px] sm:h-[40px]" />
+          <ChevronLeft className="w-5 h-5 sm:w-[40px] sm:h-[40px]" />
         </button>
       )}
 
@@ -266,10 +266,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
         <button
           onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
           disabled={page === totalPages - 1}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[calc(100%+8px)] z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -mr-5 sm:translate-x-[calc(100%+8px)] sm:mr-0"
           aria-label="Next page"
         >
-          <ChevronRight className="w-6 h-6 sm:w-[40px] sm:h-[40px]" />
+          <ChevronRight className="w-5 h-5 sm:w-[40px] sm:h-[40px]" />
         </button>
       )}
 
@@ -306,7 +306,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[90vw] h-[80vh] sm:w-[85vw] sm:h-[75vh]" : isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"}`}
+              className={`relative ${isProject ? "w-[95vw] h-[90vh] sm:w-[85vw] sm:h-[80vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh]"}`}
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
@@ -336,7 +336,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               {isProject ? (
                 <div className="w-full h-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
                   {/* Left: iframe preview */}
-                  <div className="flex-1 min-h-[40vh] sm:min-h-0 relative">
+                  <div className="flex-1 min-h-[35vh] sm:min-h-0 relative">
                     <iframe
                       src={selectedEntry.project_url!}
                       title={selectedEntry.label}
@@ -344,8 +344,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                       sandbox="allow-scripts allow-same-origin allow-popups"
                     />
                   </div>
-                  {/* Right: info panel */}
-                  <div className="sm:w-[280px] lg:w-[320px] flex flex-col justify-between p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95">
+                  {/* Right: info panel — scrollable on mobile */}
+                  <div className="sm:w-[280px] lg:w-[320px] flex flex-col justify-between p-4 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95 overflow-y-auto max-h-[40vh] sm:max-h-none">
                     <div>
                       <h3 className="text-lg font-display tracking-[0.15em] uppercase text-white mb-1">
                         {selectedEntry.label}
