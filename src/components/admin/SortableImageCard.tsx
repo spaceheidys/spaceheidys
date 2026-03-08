@@ -223,6 +223,15 @@ const SortableImageCard = ({
         <Move size={14} className="text-foreground/70" />
       </div>
 
+      {/* Edit Details Button */}
+      <div
+        onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}
+        className="absolute top-8 right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
+        title="Edit Text/Details"
+      >
+        <Edit2 size={14} className="text-foreground/70" />
+      </div>
+
       {/* Delete overlay */}
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
         {confirmDelete ? (
