@@ -511,6 +511,41 @@ const Admin = () => {
                   className="flex-1 bg-transparent text-xs font-display tracking-widest text-foreground placeholder:text-muted-foreground/50 outline-none"
                 />
               </div>
+              {/* Description textarea + .txt upload */}
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-display tracking-widest text-muted-foreground uppercase">Description</span>
+                  <label className="flex items-center gap-1 cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                    <Upload className="w-3 h-3" />
+                    <span className="text-[9px] font-display tracking-widest" id="project-txt-label">LOAD .TXT</span>
+                    <input
+                      id="project-txt-input"
+                      type="file"
+                      accept=".txt,text/plain"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          const text = ev.target?.result as string;
+                          const ta = document.getElementById("project-desc-input") as HTMLTextAreaElement;
+                          if (ta) ta.value = text;
+                          const label = document.getElementById("project-txt-label");
+                          if (label) label.textContent = file.name;
+                        };
+                        reader.readAsText(file);
+                      }}
+                    />
+                  </label>
+                </div>
+                <textarea
+                  id="project-desc-input"
+                  placeholder="Project description…"
+                  rows={3}
+                  className="w-full bg-transparent text-xs font-display tracking-wider text-foreground placeholder:text-muted-foreground/50 outline-none border border-border focus:border-foreground/40 transition-colors resize-y px-2 py-1.5 rounded-sm"
+                />
+              </div>
               <div className="flex items-center gap-2">
                 <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
                   <Upload className="w-3 h-3" />
@@ -536,8 +571,11 @@ const Admin = () => {
                     const nameInput = document.getElementById("project-name-input") as HTMLInputElement;
                     const urlInput = document.getElementById("project-url-input") as HTMLInputElement;
                     const thumbInput = document.getElementById("project-thumb-input") as HTMLInputElement;
+                    const descInput = document.getElementById("project-desc-input") as HTMLTextAreaElement;
+                    const txtInput = document.getElementById("project-txt-input") as HTMLInputElement;
                     const url = urlInput?.value.trim();
                     const projectName = nameInput?.value.trim();
+                    const desc = descInput?.value.trim() || "";
                     if (!url && !projectName) { toast.error("Enter a project name or URL"); return; }
 
                     setUploading(true);
@@ -566,6 +604,7 @@ const Admin = () => {
                       sort_order: items.length,
                       created_by: user?.id,
                       project_url: url || null,
+                      description: desc,
                     };
                     const { error } = await supabase.from("portfolio_items").insert(insertData);
                     if (error) {
@@ -574,9 +613,13 @@ const Admin = () => {
                       toast.success("Project added!");
                       if (nameInput) nameInput.value = "";
                       urlInput.value = "";
+                      if (descInput) descInput.value = "";
                       if (thumbInput) thumbInput.value = "";
+                      if (txtInput) txtInput.value = "";
                       const label = document.getElementById("project-thumb-label");
                       if (label) label.textContent = "THUMBNAIL (optional)";
+                      const txtLabel = document.getElementById("project-txt-label");
+                      if (txtLabel) txtLabel.textContent = "LOAD .TXT";
                       fetchItems();
                     }
                     setUploading(false);
