@@ -118,6 +118,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           label: item.label,
           image_url: item.image_url,
           project_url: item.project_url,
+          description: item.description,
         });
       }
     }
