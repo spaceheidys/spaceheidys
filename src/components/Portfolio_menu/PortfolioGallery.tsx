@@ -21,7 +21,8 @@ interface GalleryEntry {
   id: string;
   label: string;
   image_url?: string;
-  groupImages?: string[]; // populated for groups
+  groupImages?: string[];
+  project_url?: string | null;
 }
 
 const makeItems = (count: number): PortfolioItem[] =>
