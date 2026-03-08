@@ -11,6 +11,7 @@ import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import ButtonsSection from "@/components/admin/ButtonsSection";
 import ContentSection from "@/components/admin/ContentSection";
+import Main2Section from "@/components/admin/Main2Section";
 
 interface BackgroundItem {
   id: string;
