@@ -230,6 +230,41 @@ const Admin = () => {
     supabase.from("portfolio_items").update({ text_align: align } as any).eq("id", id);
   };
 
+  const projectUrlTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleProjectUrlChange = (id: string, url: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, project_url: url } as any : i)));
+    if (projectUrlTimers.current[id]) clearTimeout(projectUrlTimers.current[id]);
+    projectUrlTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ project_url: url || null } as any).eq("id", id);
+    }, 400);
+  };
+
+  const handleHtmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".html") && !file.name.endsWith(".htm")) {
+      toast.error("Only .html files are accepted");
+      e.target.value = "";
+      return;
+    }
+    setUploading(true);
+    const fileName = `projects/html/${Date.now()}-${Math.random().toString(36).slice(2)}.html`;
+    const { error: uploadError } = await supabase.storage
+      .from("portfolio-images")
+      .upload(fileName, file, { contentType: "text/html" });
+    if (uploadError) {
+      toast.error("HTML upload failed");
+    } else {
+      const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(fileName);
+      // Copy URL to clipboard and notify
+      navigator.clipboard.writeText(urlData.publicUrl).catch(() => {});
+      toast.success("HTML uploaded! URL copied to clipboard. Paste it into a card's URL field.");
+    }
+    setUploading(false);
+    e.target.value = "";
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
