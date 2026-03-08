@@ -46,6 +46,9 @@ const Admin = () => {
   const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [confirmSave, setConfirmSave] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkSelectMode, setBulkSelectMode] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [cmsPage, setCmsPage] = useState(0);
   const CMS_ITEMS_PER_PAGE = 12;
 
