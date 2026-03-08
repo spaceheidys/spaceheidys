@@ -61,9 +61,41 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const { favorites, toggle, isFavorite } = useFavorites();
 
   useEffect(() => {
     const fetchItems = async () => {
+      if (sectionKey === "favorites") {
+        // Fetch all favorited items across sections
+        const favIds = Array.from(favorites);
+        if (favIds.length === 0) {
+          setDbItems([]);
+          return;
+        }
+        const { data } = await supabase
+          .from("portfolio_items")
+          .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date, section")
+          .in("id", favIds)
+          .order("sort_order", { ascending: true });
+        if (data && data.length > 0) {
+          setDbItems(
+            data.map((d: any) => ({
+              id: d.id,
+              label: d.title || "",
+              image_url: d.image_url,
+              group_id: d.group_id || null,
+              project_url: d.project_url || null,
+              description: d.description || "",
+              tags: d.tags || [],
+              project_date: d.project_date || "",
+            }))
+          );
+        } else {
+          setDbItems([]);
+        }
+        return;
+      }
+
       let query = supabase
         .from("portfolio_items")
         .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date")
@@ -93,7 +125,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
       }
     };
     fetchItems();
-  }, [sectionKey, gallerySub]);
+  }, [sectionKey, gallerySub, favorites]);
 
   const rawItems =
     dbItems ??
