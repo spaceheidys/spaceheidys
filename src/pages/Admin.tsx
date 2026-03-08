@@ -589,6 +589,94 @@ const Admin = () => {
           )}
         </div>
 
+        {/* Bulk select toolbar */}
+        {items.length > 0 && (
+          <div className="flex items-center gap-2 mb-2">
+            <button
+              onClick={() => {
+                setBulkSelectMode(!bulkSelectMode);
+                setSelectedIds(new Set());
+                setConfirmBulkDelete(false);
+              }}
+              className={`text-[10px] font-display tracking-[0.15em] uppercase px-2 py-1 border transition-colors ${
+                bulkSelectMode
+                  ? "border-primary text-primary"
+                  : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+              }`}
+            >
+              {bulkSelectMode ? "CANCEL SELECT" : "SELECT"}
+            </button>
+            {bulkSelectMode && (
+              <>
+                <button
+                  onClick={() => {
+                    const pageIds = items.slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE).map(i => i.id);
+                    const allSelected = pageIds.every(id => selectedIds.has(id));
+                    const next = new Set(selectedIds);
+                    pageIds.forEach(id => allSelected ? next.delete(id) : next.add(id));
+                    setSelectedIds(next);
+                  }}
+                  className="text-[10px] font-display tracking-[0.15em] uppercase px-2 py-1 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                >
+                  {items.slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE).every(i => selectedIds.has(i.id)) ? "DESELECT ALL" : "SELECT ALL"}
+                </button>
+                {selectedIds.size > 0 && (
+                  confirmBulkDelete ? (
+                    <div className="flex items-center gap-1 ml-auto">
+                      <span className="text-[10px] text-destructive font-display tracking-widest">
+                        Delete {selectedIds.size}?
+                      </span>
+                      <button
+                        onClick={async () => {
+                          const ids = Array.from(selectedIds);
+                          // Delete associated storage files
+                          const toDelete = items.filter(i => ids.includes(i.id) && i.image_url);
+                          const storagePaths = toDelete
+                            .map(i => {
+                              const match = i.image_url.match(/portfolio-images\/(.+)$/);
+                              return match ? match[1] : null;
+                            })
+                            .filter(Boolean) as string[];
+                          if (storagePaths.length > 0) {
+                            await supabase.storage.from("portfolio-images").remove(storagePaths);
+                          }
+                          const { error } = await supabase.from("portfolio_items").delete().in("id", ids);
+                          if (error) {
+                            toast.error("Failed to delete items");
+                          } else {
+                            toast.success(`Deleted ${ids.length} items`);
+                            setSelectedIds(new Set());
+                            setBulkSelectMode(false);
+                            setConfirmBulkDelete(false);
+                            fetchItems();
+                          }
+                        }}
+                        className="p-1 rounded bg-destructive/80 hover:bg-destructive transition-colors"
+                      >
+                        <Check size={12} className="text-destructive-foreground" />
+                      </button>
+                      <button
+                        onClick={() => setConfirmBulkDelete(false)}
+                        className="p-1 rounded bg-muted/80 hover:bg-muted transition-colors"
+                      >
+                        <X size={12} className="text-foreground" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmBulkDelete(true)}
+                      className="ml-auto flex items-center gap-1 text-[10px] font-display tracking-[0.15em] uppercase px-2 py-1 border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <Trash2 size={10} />
+                      DELETE ({selectedIds.size})
+                    </button>
+                  )
+                )}
+              </>
+            )}
+          </div>
+        )}
+
         {/* Items grid */}
         {fetching ? (
           <div className="flex justify-center py-12">
