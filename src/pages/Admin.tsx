@@ -591,6 +591,7 @@ const Admin = () => {
                       onTitleChange={(title) => handleTitleChange(item.id, title)}
                       onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
                       onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
+                      onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
                     />
                   ))}
                 </div>
