@@ -1,7 +1,12 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw } from "lucide-react";
-import { useRef, useState, useCallback } from "react";
+import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw, Edit2 } from "lucide-react";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface SortableImageCardProps {
   id: string;
@@ -79,8 +84,14 @@ const SortableImageCard = ({
   const [confirmUrlChange, setConfirmUrlChange] = useState(false);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [editDesc, setEditDesc] = useState(description || "");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setModalData({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  }, [title, description, tags, project_date, project_url]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -210,6 +221,15 @@ const SortableImageCard = ({
         }`}
       >
         <Move size={14} className="text-foreground/70" />
+      </div>
+
+      {/* Edit Details Button */}
+      <div
+        onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}
+        className="absolute top-8 right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
+        title="Edit Text/Details"
+      >
+        <Edit2 size={14} className="text-foreground/70" />
       </div>
 
       {/* Delete overlay */}
@@ -435,6 +455,78 @@ const SortableImageCard = ({
           </div>
         </div>
       )}
+
+      {/* Edit Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>Edit Details</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={modalData.title}
+                onChange={(e) => setModalData({ ...modalData, title: e.target.value })}
+              />
+            </div>
+            {showProjectUrl && (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="url">Project URL</Label>
+                  <Input
+                    id="url"
+                    value={modalData.project_url}
+                    onChange={(e) => setModalData({ ...modalData, project_url: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="desc">Description</Label>
+                  <Textarea
+                    id="desc"
+                    value={modalData.description}
+                    onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="tags">Tags (comma separated)</Label>
+                  <Input
+                    id="tags"
+                    value={modalData.tags}
+                    onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
+                    placeholder="tag1, tag2..."
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="date">Date / Year</Label>
+                  <Input
+                    id="date"
+                    value={modalData.project_date}
+                    onChange={(e) => setModalData({ ...modalData, project_date: e.target.value })}
+                    placeholder="e.g. 2024"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+            <Button onClick={() => {
+              onTitleChange(modalData.title.trim());
+              if (showProjectUrl) {
+                if (onProjectUrlChange) onProjectUrlChange(modalData.project_url.trim());
+                if (onDescriptionChange) onDescriptionChange(modalData.description.trim());
+                if (onTagsChange) onTagsChange(modalData.tags.split(",").map(t => t.trim()).filter(Boolean));
+                if (onProjectDateChange) onProjectDateChange(modalData.project_date.trim());
+              }
+              setIsEditModalOpen(false);
+            }}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
