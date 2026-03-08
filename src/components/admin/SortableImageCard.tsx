@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X } from "lucide-react";
+import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw } from "lucide-react";
 import { useRef, useState, useCallback } from "react";
 
 interface SortableImageCardProps {
@@ -75,6 +75,7 @@ const SortableImageCard = ({
   const [editTitle, setEditTitle] = useState(title);
   const [isEditingUrl, setIsEditingUrl] = useState(false);
   const [editUrl, setEditUrl] = useState(project_url || "");
+  const [confirmUrlChange, setConfirmUrlChange] = useState(false);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [editDesc, setEditDesc] = useState(description || "");
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
@@ -289,7 +290,7 @@ const SortableImageCard = ({
       {/* Project fields overlay – URL, Description, Tags, Date */}
       {showProjectUrl && (
         <div className="absolute bottom-[24px] left-0 right-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 px-1.5 py-1 space-y-0.5">
-          {/* URL */}
+          {/* URL + Change URL button */}
           <div className="flex items-center gap-1">
             <Link size={8} className="text-foreground/40 shrink-0" />
             {isEditingUrl ? (
@@ -311,10 +312,44 @@ const SortableImageCard = ({
             ) : (
               <span
                 onClick={(e) => { e.stopPropagation(); setIsEditingUrl(true); setEditUrl(project_url || ""); }}
-                className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
+                className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors flex-1 min-w-0"
               >
                 {project_url || "Set URL…"}
               </span>
+            )}
+            {/* Change URL button with confirmation */}
+            {project_url && !isEditingUrl && (
+              confirmUrlChange ? (
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConfirmUrlChange(false);
+                      setIsEditingUrl(true);
+                      setEditUrl(project_url || "");
+                    }}
+                    className="p-0.5 rounded bg-primary/60 hover:bg-primary/80 transition-colors"
+                    title="Yes, change URL"
+                  >
+                    <Check size={8} className="text-primary-foreground" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setConfirmUrlChange(false); }}
+                    className="p-0.5 rounded bg-muted/60 hover:bg-muted/80 transition-colors"
+                    title="Cancel"
+                  >
+                    <X size={8} className="text-foreground" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setConfirmUrlChange(true); }}
+                  className="shrink-0 p-0.5 rounded hover:bg-foreground/10 transition-colors"
+                  title="Change URL"
+                >
+                  <RefreshCw size={8} className="text-foreground/40 hover:text-foreground/70" />
+                </button>
+              )
             )}
           </div>
           {/* Description */}
