@@ -15,6 +15,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
   const [bgOpacity, setBgOpacity] = useState(40);
+  const [uploading, setUploading] = useState<string | null>(null);
   const frontRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
