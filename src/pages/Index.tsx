@@ -27,6 +27,7 @@ import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const Index = () => {
   const navigate = useNavigate();
