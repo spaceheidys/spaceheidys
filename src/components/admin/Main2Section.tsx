@@ -26,6 +26,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setBackImage(get("card_back_image"));
     setBgType(get("card_bg_type") || "polygon");
     setBgVideo(get("card_bg_video"));
+    setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
   }, [get]);
 
   const handleSave = async () => {
