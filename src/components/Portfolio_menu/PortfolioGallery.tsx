@@ -312,13 +312,25 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               transition={{ duration: 0.3, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button
-                onClick={() => setSelectedEntry(null)}
-                className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
-                aria-label="Close preview"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggle(selectedEntry.id);
+                  }}
+                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                  aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                >
+                  <Heart className={`w-4 h-4 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                </button>
+                <button
+                  onClick={() => setSelectedEntry(null)}
+                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                  aria-label="Close preview"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
               {isProject ? (
                 <div className="w-full h-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
