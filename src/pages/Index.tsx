@@ -27,6 +27,7 @@ import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ const Index = () => {
   const { visibility: sectionVisibility } = useSectionSettings();
   const { buttons: navButtons } = useNavButtons();
   const { get: getContent, getDuration } = useSectionContent();
+  const { count: favoritesCount } = useFavorites();
 
   // Fetch dynamic backgrounds
   useEffect(() => {
@@ -443,7 +445,8 @@ const Index = () => {
                   activeKey={activePortfolioKey}
                   onSelect={(key) => setActivePortfolioKey(key)}
                   onBack={() => {setActivePortfolioKey(null);setActiveGallerySub(null);setPageInfo(null);}}
-                  onGallerySubSelect={(label) => setActiveGallerySub(label)} />
+                  onGallerySubSelect={(label) => setActiveGallerySub(label)}
+                  favoritesCount={favoritesCount} />
                 
             </div>
           </div>
@@ -469,7 +472,8 @@ const Index = () => {
             activeKey={activePortfolioKey}
             onSelect={(key) => setActivePortfolioKey(key)}
             onBack={() => {setActivePortfolioKey(null);setActiveGallerySub(null);setPageInfo(null);}}
-            onGallerySubSelect={(label) => setActiveGallerySub(label)} />
+            onGallerySubSelect={(label) => setActiveGallerySub(label)}
+            favoritesCount={favoritesCount} />
           
         </div>
         }
