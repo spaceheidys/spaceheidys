@@ -492,6 +492,14 @@ const Admin = () => {
           {activeSection === "projects" && (
             <div className="flex-1 flex flex-col gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-3 px-3">
               <div className="flex items-center gap-2">
+                <input
+                  id="project-name-input"
+                  type="text"
+                  placeholder="Project name…"
+                  className="flex-1 bg-transparent text-xs font-display tracking-widest text-foreground placeholder:text-muted-foreground/50 outline-none border-b border-border focus:border-foreground/40 transition-colors"
+                />
+              </div>
+              <div className="flex items-center gap-2">
                 <FileCode className="w-4 h-4 text-muted-foreground shrink-0" />
                 <input
                   id="project-url-input"
