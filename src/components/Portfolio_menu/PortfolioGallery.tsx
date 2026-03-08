@@ -301,13 +301,30 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                   {/* Right: info panel */}
                   <div className="sm:w-[280px] lg:w-[320px] flex flex-col justify-between p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95">
                     <div>
-                      <h3 className="text-lg font-display tracking-[0.15em] uppercase text-white mb-3">
+                      <h3 className="text-lg font-display tracking-[0.15em] uppercase text-white mb-1">
                         {selectedEntry.label}
                       </h3>
+                      {selectedEntry.project_date && (
+                        <p className="text-[10px] text-white/30 font-display tracking-widest uppercase mb-4">
+                          {selectedEntry.project_date}
+                        </p>
+                      )}
                       {selectedEntry.description && (
-                        <p className="text-sm text-white/60 leading-relaxed font-body">
+                        <p className="text-sm text-white/60 leading-relaxed font-body mb-4">
                           {selectedEntry.description}
                         </p>
+                      )}
+                      {selectedEntry.tags && selectedEntry.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {selectedEntry.tags.map((tag, i) => (
+                            <span
+                              key={i}
+                              className="px-2 py-0.5 text-[9px] font-display tracking-widest uppercase border border-white/15 text-white/50 rounded-sm"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
                     <a
