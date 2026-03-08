@@ -83,6 +83,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             group_id: d.group_id || null,
             project_url: d.project_url || null,
             description: d.description || "",
+            tags: d.tags || [],
+            project_date: d.project_date || "",
           }))
         );
       } else {
