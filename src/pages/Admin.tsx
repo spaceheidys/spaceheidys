@@ -492,6 +492,14 @@ const Admin = () => {
           {activeSection === "projects" && (
             <div className="flex-1 flex flex-col gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-3 px-3">
               <div className="flex items-center gap-2">
+                <input
+                  id="project-name-input"
+                  type="text"
+                  placeholder="Project name…"
+                  className="flex-1 bg-transparent text-xs font-display tracking-widest text-foreground placeholder:text-muted-foreground/50 outline-none border-b border-border focus:border-foreground/40 transition-colors"
+                />
+              </div>
+              <div className="flex items-center gap-2">
                 <FileCode className="w-4 h-4 text-muted-foreground shrink-0" />
                 <input
                   id="project-url-input"
@@ -522,10 +530,12 @@ const Admin = () => {
                   className="ml-auto text-[10px] font-display tracking-[0.2em] uppercase px-3 py-1 border border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors disabled:opacity-30"
                   disabled={uploading}
                   onClick={async () => {
+                    const nameInput = document.getElementById("project-name-input") as HTMLInputElement;
                     const urlInput = document.getElementById("project-url-input") as HTMLInputElement;
                     const thumbInput = document.getElementById("project-thumb-input") as HTMLInputElement;
                     const url = urlInput?.value.trim();
-                    if (!url) { toast.error("Enter a project URL"); return; }
+                    const projectName = nameInput?.value.trim();
+                    if (!url && !projectName) { toast.error("Enter a project name or URL"); return; }
 
                     setUploading(true);
                     let imageUrl = "";
@@ -548,17 +558,18 @@ const Admin = () => {
                     const insertData: any = {
                       section: "projects",
                       subsection: null,
-                      title: url.replace(/^https?:\/\//, "").split("/")[0],
+                      title: projectName || url.replace(/^https?:\/\//, "").split("/")[0],
                       image_url: imageUrl,
                       sort_order: items.length,
                       created_by: user?.id,
-                      project_url: url,
+                      project_url: url || null,
                     };
                     const { error } = await supabase.from("portfolio_items").insert(insertData);
                     if (error) {
                       toast.error("Failed to add project");
                     } else {
                       toast.success("Project added!");
+                      if (nameInput) nameInput.value = "";
                       urlInput.value = "";
                       if (thumbInput) thumbInput.value = "";
                       const label = document.getElementById("project-thumb-label");
