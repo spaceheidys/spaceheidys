@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote, Eye, EyeOff } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote, Eye, EyeOff, FileCode } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NotesPanel from "@/components/admin/NotesPanel";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
@@ -230,6 +230,41 @@ const Admin = () => {
     supabase.from("portfolio_items").update({ text_align: align } as any).eq("id", id);
   };
 
+  const projectUrlTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const handleProjectUrlChange = (id: string, url: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, project_url: url } as any : i)));
+    if (projectUrlTimers.current[id]) clearTimeout(projectUrlTimers.current[id]);
+    projectUrlTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ project_url: url || null } as any).eq("id", id);
+    }, 400);
+  };
+
+  const handleHtmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".html") && !file.name.endsWith(".htm")) {
+      toast.error("Only .html files are accepted");
+      e.target.value = "";
+      return;
+    }
+    setUploading(true);
+    const fileName = `projects/html/${Date.now()}-${Math.random().toString(36).slice(2)}.html`;
+    const { error: uploadError } = await supabase.storage
+      .from("portfolio-images")
+      .upload(fileName, file, { contentType: "text/html" });
+    if (uploadError) {
+      toast.error("HTML upload failed");
+    } else {
+      const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(fileName);
+      // Copy URL to clipboard and notify
+      navigator.clipboard.writeText(urlData.publicUrl).catch(() => {});
+      toast.success("HTML uploaded! URL copied to clipboard. Paste it into a card's URL field.");
+    }
+    setUploading(false);
+    e.target.value = "";
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -419,6 +454,25 @@ const Admin = () => {
               disabled={uploading}
             />
           </label>
+          {activeSection === "projects" && (
+            <label className="flex-1 flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 cursor-pointer">
+              {uploading ? (
+                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              ) : (
+                <FileCode className="w-4 h-4 text-muted-foreground" />
+              )}
+              <span className="text-xs font-display tracking-widest text-muted-foreground">
+                {uploading ? "UPLOADING..." : "UPLOAD HTML"}
+              </span>
+              <input
+                type="file"
+                accept=".html,.htm"
+                onChange={handleHtmlUpload}
+                className="hidden"
+                disabled={uploading}
+              />
+            </label>
+          )}
         </div>
 
         {/* Items grid */}
@@ -448,11 +502,14 @@ const Admin = () => {
                       image_zoom={(item as any).image_zoom ?? 1}
                       text_align={(item as any).text_align ?? 'left'}
                       group_id={item.group_id}
+                      project_url={(item as any).project_url}
+                      showProjectUrl={activeSection === "projects"}
                       onDelete={() => handleDelete(item)}
                       onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
                       onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
                       onTitleChange={(title) => handleTitleChange(item.id, title)}
                       onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
+                      onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
                     />
                   ))}
                 </div>

@@ -1,8 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X } from "lucide-react";
 import { useRef, useState, useCallback } from "react";
-import { Check, X } from "lucide-react";
 
 interface SortableImageCardProps {
   id: string;
@@ -13,11 +12,14 @@ interface SortableImageCardProps {
   image_zoom: number;
   text_align: string;
   group_id?: string | null;
+  project_url?: string | null;
+  showProjectUrl?: boolean;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
   onZoomChange: (zoom: number) => void;
   onTitleChange: (title: string) => void;
   onTextAlignChange: (align: string) => void;
+  onProjectUrlChange?: (url: string) => void;
 }
 
 const GROUP_COLORS = [
@@ -45,17 +47,22 @@ const SortableImageCard = ({
   image_zoom,
   text_align,
   group_id,
+  project_url,
+  showProjectUrl,
   onDelete,
   onPositionChange,
   onZoomChange,
   onTitleChange,
   onTextAlignChange,
+  onProjectUrlChange,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
+  const [isEditingUrl, setIsEditingUrl] = useState(false);
+  const [editUrl, setEditUrl] = useState(project_url || "");
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -239,6 +246,40 @@ const SortableImageCard = ({
           )}
         </button>
       </div>
+
+      {/* Project URL input – only for projects section */}
+      {showProjectUrl && (
+        <div className="absolute bottom-0 left-0 right-0 translate-y-full bg-black/80 px-1.5 py-1 flex items-center gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ position: 'absolute', bottom: 0, transform: 'translateY(0)' }}
+        >
+          <Link size={9} className="text-foreground/40 shrink-0" />
+          {isEditingUrl ? (
+            <input
+              autoFocus
+              value={editUrl}
+              onChange={(e) => setEditUrl(e.target.value)}
+              onBlur={() => {
+                setIsEditingUrl(false);
+                if (editUrl !== (project_url || "")) onProjectUrlChange?.(editUrl.trim());
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.currentTarget.blur();
+                if (e.key === "Escape") { setEditUrl(project_url || ""); setIsEditingUrl(false); }
+              }}
+              placeholder="https://..."
+              className="w-full bg-transparent text-[8px] text-foreground/70 font-display tracking-wider outline-none border-b border-foreground/20 placeholder:text-foreground/20"
+            />
+          ) : (
+            <span
+              onClick={(e) => { e.stopPropagation(); setIsEditingUrl(true); setEditUrl(project_url || ""); }}
+              className="block text-[8px] text-foreground/40 font-display tracking-wider truncate cursor-text hover:text-foreground/70 transition-colors"
+              title="Click to set project URL"
+            >
+              {project_url || "Set URL…"}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 };

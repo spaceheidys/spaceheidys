@@ -13,6 +13,7 @@ interface PortfolioItem {
   label: string;
   image_url?: string;
   group_id?: string | null;
+  project_url?: string | null;
 }
 
 /** A display entry: either a single image or a group (first image as thumbnail, all URLs stored) */
@@ -20,7 +21,8 @@ interface GalleryEntry {
   id: string;
   label: string;
   image_url?: string;
-  groupImages?: string[]; // populated for groups
+  groupImages?: string[];
+  project_url?: string | null;
 }
 
 const makeItems = (count: number): PortfolioItem[] =>
@@ -57,7 +59,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     const fetchItems = async () => {
       let query = supabase
         .from("portfolio_items")
-        .select("id, title, image_url, sort_order, group_id")
+        .select("id, title, image_url, sort_order, group_id, project_url")
         .eq("section", sectionKey)
         .order("sort_order", { ascending: true });
 
@@ -73,6 +75,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             label: d.title || "",
             image_url: d.image_url,
             group_id: d.group_id || null,
+            project_url: d.project_url || null,
           }))
         );
       } else {
@@ -103,12 +106,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
           label: item.label,
           image_url: item.image_url,
           groupImages: groupItems.map((g) => g.image_url!).filter(Boolean),
+          project_url: item.project_url,
         });
       } else {
         result.push({
           id: item.id,
           label: item.label,
           image_url: item.image_url,
+          project_url: item.project_url,
         });
       }
     }
@@ -146,6 +151,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
   const pageItems = entries.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
+  const isProject = selectedEntry && selectedEntry.project_url;
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
@@ -240,7 +246,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"}`}
+              className={`relative ${isProject ? "w-[90vw] h-[85vh] sm:w-[80vw]" : isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[80vw] sm:max-w-[75vw] max-h-[85vh]"}`}
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
@@ -256,7 +262,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                 <X className="w-4 h-4" />
               </button>
 
-              {isGroup ? (
+              {isProject ? (
+                <iframe
+                  src={selectedEntry.project_url!}
+                  title={selectedEntry.label}
+                  className="w-full h-full rounded-md border border-white/10"
+                  sandbox="allow-scripts allow-same-origin allow-popups"
+                />
+              ) : isGroup ? (
                 <div className="flex flex-col gap-3">
                   {selectedEntry.groupImages!.map((url, idx) => (
                     <img
