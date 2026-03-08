@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ExternalLink, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 
