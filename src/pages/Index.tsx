@@ -425,7 +425,7 @@ const Index = () => {
                 exit={{ opacity: 0, y: -5 }}
                 transition={{ duration: 0.3 }}>
                 
-                {{ gallery: "Gallery", projects: "Projects", skills: "AI", archive: "Archive" }[activePortfolioKey]}
+                {{ gallery: "Gallery", projects: "Projects", skills_cms: "Skills", archive: "Archive" }[activePortfolioKey]}
                 {activePortfolioKey === "gallery" && activeGallerySub ? ` | ${activeGallerySub}` : ''}
                 {pageInfo && pageInfo.total > 1 &&
                 <span className="text-white/30 ml-2 text-[10px] sm:text-xs">{pageInfo.current}/{pageInfo.total}</span>

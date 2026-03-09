@@ -41,7 +41,7 @@ const makeItems = (count: number): PortfolioItem[] =>
 const defaultSectionItems: Partial<Record<PortfolioMenuKey, PortfolioItem[]>> = {
   gallery: makeItems(6),
   projects: makeItems(16),
-  skills: makeItems(16),
+  skills_cms: makeItems(16),
   archive: makeItems(8),
 };
 
