@@ -20,6 +20,7 @@ import MobileNav from "@/components/MobileNav";
 import PortfolioMenu from "@/components/Portfolio_menu/PortfolioMenu";
 import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu";
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
+import SkillsDisplay from "@/components/Portfolio_menu/SkillsDisplay";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
