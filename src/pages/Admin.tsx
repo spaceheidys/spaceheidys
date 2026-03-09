@@ -450,6 +450,9 @@ const Admin = () => {
           </div>
         </div>
 
+        {/* SHARE section */}
+        {activeSection === "share" && <ShareSection />}
+
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
           <div className="flex gap-2 mb-6 flex-wrap">
