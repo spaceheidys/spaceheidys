@@ -423,6 +423,18 @@ const Admin = () => {
             </div>
           ))}
 
+          {/* SHARE tab */}
+          <button
+            onClick={() => setActiveSection("share")}
+            className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border transition-colors ${
+              activeSection === "share"
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            SHARE
+          </button>
+
           <div className="ml-auto">
             <Popover>
               <PopoverTrigger asChild>
