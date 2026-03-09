@@ -63,7 +63,7 @@ const SkillsDescriptionBox = ({ getContent, updateContent }: { getContent: (k: s
   return (
     <div className="border-t border-border pt-4 mt-4 max-w-lg">
       <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground mb-2">
-        Skills Description
+        Description
       </p>
       <textarea
         value={draft}
