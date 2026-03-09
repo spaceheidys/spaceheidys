@@ -40,6 +40,58 @@ interface PortfolioItem {
   group_id?: string | null;
 }
 
+const SkillsDescriptionBox = ({ getContent, updateContent }: { getContent: (k: string) => string; updateContent: (k: string, v: string) => Promise<void> }) => {
+  const [draft, setDraft] = useState(getContent("skills_description"));
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    setDraft(getContent("skills_description"));
+    setDirty(false);
+  }, [getContent("skills_description")]);
+
+  const save = async () => {
+    await updateContent("skills_description", draft);
+    setDirty(false);
+    toast.success("Skills description saved");
+  };
+
+  const cancel = () => {
+    setDraft(getContent("skills_description"));
+    setDirty(false);
+  };
+
+  return (
+    <div className="border-t border-border pt-4 mt-4 max-w-lg">
+      <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground mb-2">
+        Skills Description
+      </p>
+      <textarea
+        value={draft}
+        onChange={(e) => { setDraft(e.target.value); setDirty(true); }}
+        placeholder="Add description text below skills..."
+        rows={4}
+        className="w-full p-3 bg-transparent border border-border text-sm font-body text-foreground resize-y outline-none focus:border-foreground transition-colors"
+      />
+      {dirty && (
+        <div className="flex gap-2 mt-2 justify-end">
+          <button
+            onClick={save}
+            className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+          >
+            <Check size={10} /> YES
+          </button>
+          <button
+            onClick={cancel}
+            className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X size={10} /> NO
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Admin = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const { visibility, toggle: toggleSection } = useSectionSettings();
@@ -459,18 +511,7 @@ const Admin = () => {
         {activeSection === "skills" && (
           <>
             <SkillsSection />
-            <div className="border-t border-border pt-4 mt-4 max-w-lg">
-              <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground mb-2">
-                Skills Description
-              </p>
-              <textarea
-                value={getContent("skills_description")}
-                onChange={(e) => updateContent("skills_description", e.target.value)}
-                placeholder="Add description text below skills..."
-                rows={4}
-                className="w-full p-3 bg-transparent border border-border text-sm font-body text-foreground resize-y outline-none focus:border-foreground transition-colors"
-              />
-            </div>
+            <SkillsDescriptionBox getContent={getContent} updateContent={updateContent} />
           </>
         )}
 
