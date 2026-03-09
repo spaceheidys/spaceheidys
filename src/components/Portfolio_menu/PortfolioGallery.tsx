@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X, ExternalLink, Share2, Heart, Copy } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ExternalLink, Share2, Heart, Copy, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { toast } from "sonner";
@@ -313,6 +313,17 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
               transition={{ duration: 0.3, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Back to list — top left */}
+              <button
+                onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
+                className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-200 text-[9px] font-display tracking-[0.2em] uppercase"
+                aria-label="Back to list"
+              >
+                <ArrowLeft className="w-3 h-3" />
+                <span className="hidden sm:inline">Back</span>
+              </button>
+
+              {/* Top-right controls */}
               <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
                 <button
                   onClick={(e) => {
