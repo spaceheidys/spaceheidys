@@ -277,7 +277,7 @@ const SkillsSection = () => {
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={skills.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-1">
+            <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <SortableSkillRow
                   key={skill.id}
