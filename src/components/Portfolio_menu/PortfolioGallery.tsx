@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X, ExternalLink, Share2, Heart, Copy } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ExternalLink, Share2, Heart, Copy, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { toast } from "sonner";
