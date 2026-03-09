@@ -54,6 +54,21 @@ const Index = () => {
   const { buttons: navButtons } = useNavButtons();
   const { get: getContent, getDuration } = useSectionContent();
   const { count: favoritesCount } = useFavorites();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Show scroll-to-top arrow only when in portfolio section
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!portfolioRef.current) return;
+      const rect = portfolioRef.current.getBoundingClientRect();
+      // Show when portfolio section is in view and page is scrolled down
+      const inPortfolio = rect.top < window.innerHeight && rect.bottom > 0;
+      const scrolledDown = window.scrollY > 100;
+      setShowScrollTop(inPortfolio && scrolledDown);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Fetch dynamic backgrounds
   useEffect(() => {
@@ -456,13 +471,21 @@ const Index = () => {
       {/* Spacer — only on mobile to push arrow down */}
       <div className="flex-1 sm:flex-none" />
 
-      {/* Scroll to top arrow — fixed bottom-right, doesn't interfere with menu */}
-      <div
-          className={`fixed bottom-6 right-6 z-30 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 ${activePortfolioKey ? 'hidden' : 'flex'}`}
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Scroll to top">
-        <ArrowUp className="w-8 h-8 sm:w-10 sm:h-10" />
-      </div>
+      {/* Scroll to top arrow — only visible in portfolio section */}
+      <AnimatePresence>
+        {showScrollTop && !activePortfolioKey && (
+          <motion.div
+            className="fixed bottom-6 right-6 z-30 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            aria-label="Scroll to top"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}>
+            <ArrowUp className="w-8 h-8 sm:w-10 sm:h-10" />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Menu at bottom position when section is active (desktop only) */}
       {activePortfolioKey &&
