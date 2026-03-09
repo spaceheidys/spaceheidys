@@ -738,7 +738,7 @@ const Admin = () => {
         )}
 
         {/* Items grid */}
-        {activeSection !== "share" && fetching ? (
+        {activeSection !== "share" && (fetching ? (
           <div className="flex justify-center py-12">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
@@ -824,7 +824,7 @@ const Admin = () => {
               </div>
             )}
           </>
-        )}
+        ))}
       </div>
 
     </div>
