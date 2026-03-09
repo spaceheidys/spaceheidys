@@ -397,7 +397,7 @@ const Index = () => {
       
 
       {/* Cards content — centered */}
-      <div className="flex flex-1 items-center justify-center px-3 sm:px-4 relative z-10">
+      <div className="flex flex-1 items-center justify-center pt-12 sm:pt-16 md:pt-20 px-3 sm:px-4 relative z-10">
         <div className="items-center justify-center flex flex-col w-full">
           {/* Wisdom text above cards */}
           <AnimatePresence mode="wait">
