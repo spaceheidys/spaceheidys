@@ -402,7 +402,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[95vw] h-[90vh] sm:w-[85vw] sm:h-[80vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh]"}`}
+              className={`relative my-auto ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh]"}`}
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.75, opacity: 0, y: 20 }}
