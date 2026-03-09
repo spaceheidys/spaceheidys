@@ -221,6 +221,33 @@ export type Database = {
         }
         Relationships: []
       }
+      skills: {
+        Row: {
+          created_at: string
+          icon_url: string
+          id: string
+          is_visible: boolean
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          icon_url?: string
+          id?: string
+          is_visible?: boolean
+          name?: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          icon_url?: string
+          id?: string
+          is_visible?: boolean
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       social_links: {
         Row: {
           icon_url: string
