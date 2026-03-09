@@ -8,14 +8,10 @@ import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
 import taro01Img from "@/assets/TARO_01.png";
 import taroEyeImg from "@/assets/Taro_backside_eye.png";
-import wallpaper3rdCard from "@/assets/wallpaper_3rd_card.png";
-import portfolioMainBg from "@/assets/portfolio_main.png";
 import BikoKuLogo from "@/components/BikoKuLogo";
 import { useSoundContext } from "@/contexts/SoundContext";
 
-import MascotSection from "@/components/MascotSection";
 import SocialLinks from "@/components/SocialLinks";
-import AboutModal from "@/components/AboutModal";
 import LoadingScreen from "@/components/LoadingScreen";
 import SecretDoorOverlay from "@/components/SecretDoorOverlay";
 import PortfolioCard from "@/components/PortfolioCard";

@@ -99,7 +99,7 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
