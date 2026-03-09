@@ -72,18 +72,6 @@ const MobileNav = ({
                 {btn.label_jp} / {btn.label}
               </button>
             ))}
-            <button
-              onClick={() => handleClick(onSecretDoor)}
-              className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
-            >
-              Secret Door
-            </button>
-            <button
-              onClick={() => handleClick(onShop)}
-              className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
-            >
-              Shop
-            </button>
 
             {/* BG switcher + mute */}
             <div className="flex items-center gap-3 mt-4">
