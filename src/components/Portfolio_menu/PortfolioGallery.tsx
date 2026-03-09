@@ -484,10 +484,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                         Visit Project
                       </a>
                       {/* Dynamic share buttons */}
-                      <div className="flex items-center justify-center gap-2">
-                        <span className="text-[9px] text-white/30 font-display tracking-widest uppercase">Share</span>
-                        <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />
-                      </div>
+                      <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />
                     </div>
                   </div>
                 </div>
