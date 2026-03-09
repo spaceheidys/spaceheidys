@@ -287,12 +287,12 @@ const SortableRow = ({
 // ─── Main ShareSection ─────────────────────────────────────────────────────────
 const ShareSection = () => {
   const [links, setLinks] = useState<SocialLink[]>([]);
+  const [originalLinks, setOriginalLinks] = useState<SocialLink[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
-
-  const labelTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const urlTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const templateTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
