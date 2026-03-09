@@ -484,8 +484,11 @@ const Index = () => {
       </div>
     </div>
     {/* Footer - mobile only (separate from portfolio) */}
-    <div className="w-full h-12 bg-black items-center justify-center flex sm:hidden flex-row">
-      <span className="text-[9px] tracking-widest text-white/40 font-display">© 2018 - 2026 Spaceheidys. All rights reserved.</span>
+    <div className="sm:hidden w-full flex flex-col">
+      <div className="w-full h-px bg-white/10" />
+      <div className="w-full h-12 bg-black items-center justify-center flex flex-row">
+        <span className="text-[9px] tracking-widest text-white/40 font-display">© 2018 - 2026 Spaceheidys. All rights reserved.</span>
+      </div>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
     </>);
