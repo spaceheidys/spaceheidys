@@ -541,12 +541,10 @@ const SortableImageCard = ({
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
             <Button onClick={() => {
               onTitleChange(modalData.title.trim());
-              if (showProjectUrl) {
-                if (onProjectUrlChange) onProjectUrlChange(modalData.project_url.trim());
-                if (onDescriptionChange) onDescriptionChange(modalData.description.trim());
-                if (onTagsChange) onTagsChange(modalData.tags.split(",").map(t => t.trim()).filter(Boolean));
-                if (onProjectDateChange) onProjectDateChange(modalData.project_date.trim());
-              }
+              if (onDescriptionChange) onDescriptionChange(modalData.description.trim());
+              if (onTagsChange) onTagsChange(modalData.tags.split(",").map(t => t.trim()).filter(Boolean));
+              if (onProjectDateChange) onProjectDateChange(modalData.project_date.trim());
+              if (showProjectUrl && onProjectUrlChange) onProjectUrlChange(modalData.project_url.trim());
               setIsEditModalOpen(false);
             }}>Save</Button>
           </DialogFooter>
