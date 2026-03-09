@@ -1,15 +1,35 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import iconBe from "@/assets/icon_Be.svg";
-import iconLN from "@/assets/icon_LN.svg";
-import iconTwitter from "@/assets/icon_twitter.svg";
+import { supabase } from "@/integrations/supabase/client";
 
-const socials = [
-  { icon: iconBe, href: "https://www.behance.net/Biko_Ku", label: "Behance" },
-  { icon: iconLN, href: "https://www.linkedin.com/in/viktor-kudriavcev-94757990/", label: "LinkedIn" },
-  // { icon: iconTwitter, href: "https://x.com/spaceheidys", label: "X (Twitter)" },
-];
+interface SocialLink {
+  id: string;
+  label: string;
+  url: string;
+  icon_url: string;
+  is_visible: boolean;
+  sort_order: number;
+}
 
 const SocialLinks = () => {
+  const [links, setLinks] = useState<SocialLink[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("social_links")
+      .select("id, label, url, icon_url, is_visible, sort_order")
+      .eq("is_visible", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        if (data) setLinks(data as SocialLink[]);
+      });
+  }, []);
+
+  // Only show links that have a profile URL (not share-only buttons)
+  const profileLinks = links.filter((l) => l.url.trim() !== "");
+
+  if (profileLinks.length === 0) return null;
+
   return (
     <motion.div
       className="flex items-center gap-6"
@@ -17,17 +37,36 @@ const SocialLinks = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1.8, duration: 0.6 }}
     >
-      {socials.map((s) => (
+      {profileLinks.map((s) => (
         <a
-          key={s.label}
-          href={s.href}
+          key={s.id}
+          href={s.url}
           target="_blank"
           rel="noopener noreferrer"
           className="text-muted-foreground hover:text-foreground transition-colors duration-300"
           aria-label={s.label}
-          
         >
-          <img src={s.icon} alt={s.label} style={{ height: 29 }} className="w-auto opacity-60 hover:opacity-100 transition-opacity" />
+          {s.icon_url ? (
+            <img
+              src={s.icon_url}
+              alt={s.label}
+              style={{
+                height: 29,
+                filter: s.icon_url.startsWith("data:") ? "invert(1) opacity(0.6)" : undefined,
+              }}
+              className="w-auto hover:opacity-100 transition-opacity"
+              onMouseEnter={(e) => {
+                if (s.icon_url.startsWith("data:")) (e.currentTarget as HTMLImageElement).style.filter = "invert(1) opacity(1)";
+              }}
+              onMouseLeave={(e) => {
+                if (s.icon_url.startsWith("data:")) (e.currentTarget as HTMLImageElement).style.filter = "invert(1) opacity(0.6)";
+              }}
+            />
+          ) : (
+            <span className="text-xs font-display tracking-widest opacity-60 hover:opacity-100 transition-opacity">
+              {s.label}
+            </span>
+          )}
         </a>
       ))}
     </motion.div>
