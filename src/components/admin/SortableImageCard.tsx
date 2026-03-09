@@ -499,45 +499,43 @@ const SortableImageCard = ({
               />
             </div>
             {showProjectUrl && (
-              <>
-                <div className="grid gap-2">
-                  <Label htmlFor="edit-url">Project URL</Label>
-                  <Input
-                    id="edit-url"
-                    value={modalData.project_url}
-                    onChange={(e) => setModalData({ ...modalData, project_url: e.target.value })}
-                    placeholder="https://..."
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="edit-desc">Description</Label>
-                  <Textarea
-                    id="edit-desc"
-                    value={modalData.description}
-                    onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
-                    rows={3}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="edit-tags">Tags (через запятую / comma separated)</Label>
-                  <Input
-                    id="edit-tags"
-                    value={modalData.tags}
-                    onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
-                    placeholder="tag1, tag2..."
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="edit-date">Date / Year</Label>
-                  <Input
-                    id="edit-date"
-                    value={modalData.project_date}
-                    onChange={(e) => setModalData({ ...modalData, project_date: e.target.value })}
-                    placeholder="e.g. 2024"
-                  />
-                </div>
-              </>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-url">Project URL</Label>
+                <Input
+                  id="edit-url"
+                  value={modalData.project_url}
+                  onChange={(e) => setModalData({ ...modalData, project_url: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
             )}
+            <div className="grid gap-2">
+              <Label htmlFor="edit-desc">Description</Label>
+              <Textarea
+                id="edit-desc"
+                value={modalData.description}
+                onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
+                rows={4}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-tags">Tags (comma separated)</Label>
+              <Input
+                id="edit-tags"
+                value={modalData.tags}
+                onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
+                placeholder="tag1, tag2..."
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-date">Date / Year</Label>
+              <Input
+                id="edit-date"
+                value={modalData.project_date}
+                onChange={(e) => setModalData({ ...modalData, project_date: e.target.value })}
+                placeholder="e.g. 2024"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
