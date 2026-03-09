@@ -756,20 +756,23 @@ const Admin = () => {
                     .map((item) => (
                     <div key={item.id} className="relative">
                       {bulkSelectMode && (
-                        <button
+                        <div
                           onClick={() => {
                             const next = new Set(selectedIds);
                             next.has(item.id) ? next.delete(item.id) : next.add(item.id);
                             setSelectedIds(next);
                           }}
-                          className="absolute top-1 right-1 z-30 p-0.5 rounded bg-black/60"
+                          className="absolute inset-0 z-30 cursor-pointer flex items-center justify-center"
                         >
-                          {selectedIds.has(item.id) ? (
-                            <CheckSquare size={16} className="text-primary" />
-                          ) : (
-                            <Square size={16} className="text-foreground/40" />
-                          )}
-                        </button>
+                          <div className={`absolute inset-0 transition-colors ${selectedIds.has(item.id) ? 'bg-primary/20' : 'bg-black/30 hover:bg-black/10'}`} />
+                          <div className="absolute top-1 right-1 p-0.5 rounded bg-black/60">
+                            {selectedIds.has(item.id) ? (
+                              <CheckSquare size={16} className="text-primary" />
+                            ) : (
+                              <Square size={16} className="text-foreground/40" />
+                            )}
+                          </div>
+                        </div>
                       )}
                       <SortableImageCard
                         id={item.id}
