@@ -47,6 +47,8 @@ const Index = () => {
   const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
+  const [isClosingSection, setIsClosingSection] = useState(false);
+  const closingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { visibility: sectionVisibility } = useSectionSettings();
   const { buttons: navButtons } = useNavButtons();
   const { get: getContent, getDuration } = useSectionContent();
