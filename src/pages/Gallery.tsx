@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
@@ -21,6 +21,7 @@ interface GalleryEntry {
 }
 
 const TABS = ["ALL", "VECTOR", "DIGITAL", "AI", "SKETCHES"] as const;
+const SWIPE_THRESHOLD = 50;
 
 const Gallery = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const Gallery = () => {
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -95,14 +97,26 @@ const Gallery = () => {
     setSelectedIndex(idx);
   };
 
-  const goLightbox = (dir: -1 | 1) => {
+  const goLightbox = useCallback((dir: -1 | 1) => {
     const newIdx = selectedIndex + dir;
     if (newIdx < 0 || newIdx >= navigableEntries.length) return;
     setSelectedEntry(navigableEntries[newIdx]);
     setSelectedIndex(newIdx);
-  };
+  }, [selectedIndex, navigableEntries]);
 
   const isGroup = selectedEntry?.groupImages && selectedEntry.groupImages.length > 1;
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || isGroup) return;
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    touchStartX.current = null;
+    if (Math.abs(delta) < SWIPE_THRESHOLD) return;
+    goLightbox(delta > 0 ? 1 : -1);
+  }, [goLightbox, isGroup]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -228,6 +242,8 @@ const Gallery = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             onClick={() => setSelectedEntry(null)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
             {!isGroup && selectedIndex > 0 && (
               <button
