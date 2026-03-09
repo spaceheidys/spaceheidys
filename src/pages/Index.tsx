@@ -54,6 +54,21 @@ const Index = () => {
   const { buttons: navButtons } = useNavButtons();
   const { get: getContent, getDuration } = useSectionContent();
   const { count: favoritesCount } = useFavorites();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Show scroll-to-top arrow only when in portfolio section
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!portfolioRef.current) return;
+      const rect = portfolioRef.current.getBoundingClientRect();
+      // Show when portfolio section is in view and page is scrolled down
+      const inPortfolio = rect.top < window.innerHeight && rect.bottom > 0;
+      const scrolledDown = window.scrollY > 100;
+      setShowScrollTop(inPortfolio && scrolledDown);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Fetch dynamic backgrounds
   useEffect(() => {
