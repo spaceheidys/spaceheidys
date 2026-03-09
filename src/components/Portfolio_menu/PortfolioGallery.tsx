@@ -55,7 +55,7 @@ const defaultGallerySubItems: Record<string, PortfolioItem[]> = {
 interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
   gallerySub?: string | null;
-  onPageInfo?: (current: number, total: number) => void;
+  onPageInfo?: (info: { current: number; total: number }) => void;
 }
 
 // ─── Share buttons bar ────────────────────────────────────────────────────────
@@ -283,7 +283,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
   const hasPagination = totalPages > 1;
 
   useEffect(() => { setPage(0); }, [sectionKey, gallerySub]);
-  useEffect(() => { onPageInfo?.(page + 1, totalPages); }, [page, totalPages, onPageInfo]);
+  useEffect(() => { onPageInfo?.({ current: page + 1, total: totalPages }); }, [page, totalPages]);
 
   const pageItems = entries.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
