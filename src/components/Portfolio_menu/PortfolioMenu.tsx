@@ -5,7 +5,7 @@ import { useSectionSettings } from "@/hooks/useSectionSettings";
 const allMenuItems = [
   { label: "ギャラリー", en: "GALLERY", key: "gallery" },
   { label: "プロジェクト", en: "PROJECTS", key: "projects" },
-  { label: "エーアイ", en: "AI", key: "skills" },
+  { label: "スキル", en: "SKILLS", key: "skills" },
   { label: "アーカイブ", en: "ARCHIVE", key: "archive" },
 ] as const;
 

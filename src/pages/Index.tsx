@@ -20,6 +20,7 @@ import MobileNav from "@/components/MobileNav";
 import PortfolioMenu from "@/components/Portfolio_menu/PortfolioMenu";
 import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu";
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
+import SkillsDisplay from "@/components/Portfolio_menu/SkillsDisplay";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
@@ -425,7 +426,7 @@ const Index = () => {
                 exit={{ opacity: 0, y: -5 }}
                 transition={{ duration: 0.3 }}>
                 
-                {{ gallery: "Gallery", projects: "Projects", skills: "AI", archive: "Archive" }[activePortfolioKey]}
+                {{ gallery: "Gallery", projects: "Projects", skills: "Skills", archive: "Archive" }[activePortfolioKey]}
                 {activePortfolioKey === "gallery" && activeGallerySub ? ` | ${activeGallerySub}` : ''}
                 {pageInfo && pageInfo.total > 1 &&
                 <span className="text-white/30 ml-2 text-[10px] sm:text-xs">{pageInfo.current}/{pageInfo.total}</span>
@@ -448,7 +449,9 @@ const Index = () => {
             {/* Fixed-height card wrapper */}
             <div className={`flex items-center justify-center w-[60vw] h-[90vw] max-w-[300px] max-h-[450px] ${activePortfolioKey ? 'sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px] sm:max-w-none sm:max-h-none' : 'sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px] sm:max-w-none sm:max-h-none'} transition-all duration-500`}>
               <AnimatePresence mode="wait">
-                {activePortfolioKey ?
+                {activePortfolioKey === "skills" ?
+                  <SkillsDisplay key="skills" /> :
+                activePortfolioKey ?
                   <PortfolioGallery key={`${activePortfolioKey}-${activeGallerySub}`} sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} /> :
 
                   <motion.div
