@@ -151,6 +151,7 @@ const SortableRow = ({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id });
   const [expanded, setExpanded] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
 
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
