@@ -50,8 +50,17 @@ const SocialLinks = () => {
             <img
               src={s.icon_url}
               alt={s.label}
-              style={{ height: 29 }}
-              className="w-auto opacity-60 hover:opacity-100 transition-opacity"
+              style={{
+                height: 29,
+                filter: s.icon_url.startsWith("data:") ? "invert(1) opacity(0.6)" : undefined,
+              }}
+              className="w-auto hover:opacity-100 transition-opacity"
+              onMouseEnter={(e) => {
+                if (s.icon_url.startsWith("data:")) (e.currentTarget as HTMLImageElement).style.filter = "invert(1) opacity(1)";
+              }}
+              onMouseLeave={(e) => {
+                if (s.icon_url.startsWith("data:")) (e.currentTarget as HTMLImageElement).style.filter = "invert(1) opacity(0.6)";
+              }}
             />
           ) : (
             <span className="text-xs font-display tracking-widest opacity-60 hover:opacity-100 transition-opacity">
