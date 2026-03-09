@@ -25,6 +25,7 @@ import ShareSection from "@/components/admin/ShareSection";
 
 const SECTIONS = ["gallery", "projects", "skills", "archive"] as const;
 const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
+const SPECIAL_TABS = ["share"] as const;
 
 interface PortfolioItem {
   id: string;
