@@ -23,6 +23,7 @@ import {
 import SortableImageCard from "@/components/admin/SortableImageCard";
 import ShareSection from "@/components/admin/ShareSection";
 import SkillsSection from "@/components/admin/SkillsSection";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const SECTIONS = ["gallery", "projects", "skills", "archive"] as const;
 const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
@@ -42,6 +43,7 @@ interface PortfolioItem {
 const Admin = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const { visibility, toggle: toggleSection } = useSectionSettings();
+  const { get: getContent, update: updateContent, loading: contentLoading } = useSectionContent();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [activeSection, setActiveSection] = useState<string>("gallery");
@@ -454,7 +456,23 @@ const Admin = () => {
         {activeSection === "share" && <ShareSection />}
 
         {/* SKILLS section */}
-        {activeSection === "skills" && <SkillsSection />}
+        {activeSection === "skills" && (
+          <>
+            <SkillsSection />
+            <div className="border-t border-border pt-4 mt-4 max-w-lg">
+              <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground mb-2">
+                Skills Description
+              </p>
+              <textarea
+                value={getContent("skills_description")}
+                onChange={(e) => updateContent("skills_description", e.target.value)}
+                placeholder="Add description text below skills..."
+                rows={4}
+                className="w-full p-3 bg-transparent border border-border text-sm font-body text-foreground resize-y outline-none focus:border-foreground transition-colors"
+              />
+            </div>
+          </>
+        )}
 
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
