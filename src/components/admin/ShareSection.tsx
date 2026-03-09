@@ -300,55 +300,45 @@ const ShareSection = () => {
     setLoading(true);
     const { data, error } = await supabase.from("social_links").select("*").order("sort_order", { ascending: true });
     if (error) toast.error("Failed to load social links");
-    else setLinks((data as SocialLink[]) || []);
+    else {
+      const d = (data as SocialLink[]) || [];
+      setLinks(d);
+      setOriginalLinks(JSON.parse(JSON.stringify(d)));
+      setDeletedIds([]);
+    }
     setLoading(false);
   };
 
   useEffect(() => { fetchLinks(); }, []);
 
-  const persist = async (id: string, patch: Partial<SocialLink>) => {
-    await supabase.from("social_links").update(patch as any).eq("id", id);
-    invalidateSocialLinksCache();
+  const hasChanges = JSON.stringify(links) !== JSON.stringify(originalLinks) || deletedIds.length > 0;
+
+  const handleVisibilityToggle = (id: string) => {
+    setLinks((prev) => prev.map((l) => l.id === id ? { ...l, is_visible: !l.is_visible } : l));
   };
 
-  const handleVisibilityToggle = async (id: string) => {
+  const handleDelete = (id: string) => {
     const link = links.find((l) => l.id === id);
-    if (!link) return;
-    const newVal = !link.is_visible;
-    setLinks((prev) => prev.map((l) => l.id === id ? { ...l, is_visible: newVal } : l));
-    await supabase.from("social_links").update({ is_visible: newVal }).eq("id", id);
-    invalidateSocialLinksCache();
-  };
-
-  const handleDelete = async (id: string) => {
+    if (link && originalLinks.find((o) => o.id === id)) {
+      setDeletedIds((prev) => [...prev, id]);
+    }
     setLinks((prev) => prev.filter((l) => l.id !== id));
-    await supabase.from("social_links").delete().eq("id", id);
-    toast.success("Deleted");
-    invalidateSocialLinksCache();
   };
 
   const handleLabelChange = (id: string, val: string) => {
     setLinks((prev) => prev.map((l) => l.id === id ? { ...l, label: val } : l));
-    clearTimeout(labelTimers.current[id]);
-    labelTimers.current[id] = setTimeout(() => persist(id, { label: val }), 500);
   };
 
   const handleUrlChange = (id: string, val: string) => {
     setLinks((prev) => prev.map((l) => l.id === id ? { ...l, url: val } : l));
-    clearTimeout(urlTimers.current[id]);
-    urlTimers.current[id] = setTimeout(() => persist(id, { url: val }), 500);
   };
 
   const handleTemplateChange = (id: string, val: string) => {
     setLinks((prev) => prev.map((l) => l.id === id ? { ...l, share_url_template: val } : l));
-    clearTimeout(templateTimers.current[id]);
-    templateTimers.current[id] = setTimeout(() => persist(id, { share_url_template: val }), 600);
   };
 
-  const handleIconSelect = async (id: string, url: string) => {
+  const handleIconSelect = (id: string, url: string) => {
     setLinks((prev) => prev.map((l) => l.id === id ? { ...l, icon_url: url } : l));
-    await persist(id, { icon_url: url });
-    toast.success("Icon updated");
   };
 
   const handleIconUpload = async (id: string, file: File) => {
@@ -358,31 +348,67 @@ const ShareSection = () => {
     const { error: upErr } = await supabase.storage.from("portfolio-images").upload(fileName, file, { contentType: file.type });
     if (upErr) { toast.error("Icon upload failed"); setUploadingId(null); return; }
     const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(fileName);
-    await persist(id, { icon_url: urlData.publicUrl });
     setLinks((prev) => prev.map((l) => l.id === id ? { ...l, icon_url: urlData.publicUrl } : l));
-    toast.success("Icon updated");
     setUploadingId(null);
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIdx = links.findIndex((l) => l.id === active.id);
     const newIdx = links.findIndex((l) => l.id === over.id);
-    const reordered = arrayMove(links, oldIdx, newIdx);
-    setLinks(reordered);
-    await Promise.all(reordered.map((l, idx) => supabase.from("social_links").update({ sort_order: idx }).eq("id", l.id)));
-    invalidateSocialLinksCache();
+    setLinks(arrayMove(links, oldIdx, newIdx));
   };
 
-  const handleAddNew = async () => {
+  const handleAddNew = () => {
     const maxOrder = links.reduce((m, l) => Math.max(m, l.sort_order), -1);
-    const { data, error } = await supabase
-      .from("social_links")
-      .insert({ label: "New Link", url: "", icon_url: "", is_visible: true, sort_order: maxOrder + 1, share_url_template: "" })
-      .select().single();
-    if (error) toast.error("Failed to add link");
-    else { setLinks((prev) => [...prev, data as SocialLink]); invalidateSocialLinksCache(); }
+    const tempId = `temp-${Date.now()}`;
+    setLinks((prev) => [...prev, {
+      id: tempId,
+      label: "New Link",
+      url: "",
+      icon_url: "",
+      is_visible: true,
+      sort_order: maxOrder + 1,
+      share_url_template: "",
+    }]);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // Delete removed links
+      for (const id of deletedIds) {
+        await supabase.from("social_links").delete().eq("id", id);
+      }
+
+      // Upsert all current links
+      for (let i = 0; i < links.length; i++) {
+        const link = links[i];
+        const payload = {
+          label: link.label,
+          url: link.url,
+          icon_url: link.icon_url,
+          is_visible: link.is_visible,
+          sort_order: i,
+          share_url_template: link.share_url_template,
+        };
+
+        if (link.id.startsWith("temp-")) {
+          await supabase.from("social_links").insert(payload);
+        } else {
+          await supabase.from("social_links").update(payload).eq("id", link.id);
+        }
+      }
+
+      invalidateSocialLinksCache();
+      toast.success("Saved");
+      await fetchLinks();
+    } catch {
+      toast.error("Save failed");
+    }
+    setSaving(false);
+    setShowConfirm(false);
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>;
@@ -418,6 +444,41 @@ const ShareSection = () => {
         <Plus size={11} />
         ADD LINK
       </button>
+
+      {/* Save button with Yes/No confirmation */}
+      {hasChanges && !showConfirm && (
+        <button
+          onClick={() => setShowConfirm(true)}
+          className="mt-6 w-full flex items-center justify-center gap-2 text-[10px] font-display tracking-[0.2em] uppercase px-4 py-2.5 bg-foreground text-background hover:bg-foreground/90 transition-colors"
+        >
+          {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+          SAVE CHANGES
+        </button>
+      )}
+
+      {showConfirm && (
+        <div className="mt-6 border border-border p-4 flex flex-col items-center gap-3">
+          <span className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+            Save all changes?
+          </span>
+          <div className="flex gap-3">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-1.5 text-[10px] font-display tracking-[0.2em] uppercase px-5 py-2 bg-foreground text-background hover:bg-foreground/90 transition-colors disabled:opacity-50"
+            >
+              {saving ? <Loader2 size={10} className="animate-spin" /> : null}
+              YES
+            </button>
+            <button
+              onClick={() => setShowConfirm(false)}
+              className="text-[10px] font-display tracking-[0.2em] uppercase px-5 py-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+            >
+              NO
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
