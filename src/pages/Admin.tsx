@@ -647,7 +647,7 @@ const Admin = () => {
               </div>
             </div>
           )}
-        </div>
+        </div>)}
 
         {/* Bulk select toolbar */}
         {items.length > 0 && (
