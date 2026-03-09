@@ -75,18 +75,27 @@ const Index = () => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         // When portfolio section leaves viewport (user scrolled back to MAIN)
-        if (!entry.isIntersecting && !thirdCardFlipped) {
-          if (!muted) {
-            new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
+        if (!entry.isIntersecting) {
+          // Close any active portfolio section
+          if (activePortfolioKey) {
+            setActivePortfolioKey(null);
+            setActiveGallerySub(null);
+            setPageInfo(null);
           }
-          setThirdCardFlipped(true);
+          // Flip card back if it's currently unflipped
+          if (!thirdCardFlipped) {
+            if (!muted) {
+              new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
+            }
+            setThirdCardFlipped(true);
+          }
         }
       },
       { threshold: 0.1 }
     );
     observer.observe(portfolioRef.current);
     return () => observer.disconnect();
-  }, [thirdCardFlipped, muted]);
+  }, [thirdCardFlipped, muted, activePortfolioKey]);
 
   // Fetch dynamic backgrounds
   useEffect(() => {
