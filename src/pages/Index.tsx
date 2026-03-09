@@ -68,6 +68,22 @@ const Index = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Reset card to backside when scrolling back to MAIN section
+  useEffect(() => {
+    if (!portfolioRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When portfolio section leaves viewport (user scrolled back to MAIN)
+        if (!entry.isIntersecting && !thirdCardFlipped) {
+          setThirdCardFlipped(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(portfolioRef.current);
+    return () => observer.disconnect();
+  }, [thirdCardFlipped]);
+
   // Fetch dynamic backgrounds
   useEffect(() => {
     const fetchBgs = async () => {
