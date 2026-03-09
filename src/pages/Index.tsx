@@ -85,7 +85,7 @@ const Index = () => {
     );
     observer.observe(portfolioRef.current);
     return () => observer.disconnect();
-  }, [thirdCardFlipped]);
+  }, [thirdCardFlipped, muted]);
 
   // Fetch dynamic backgrounds
   useEffect(() => {
