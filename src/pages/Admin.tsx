@@ -456,7 +456,23 @@ const Admin = () => {
         {activeSection === "share" && <ShareSection />}
 
         {/* SKILLS section */}
-        {activeSection === "skills" && <SkillsSection />}
+        {activeSection === "skills" && (
+          <>
+            <SkillsSection />
+            <div className="border-t border-border pt-4 mt-4 max-w-lg">
+              <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground mb-2">
+                Skills Description
+              </p>
+              <textarea
+                value={getContent("skills_description")}
+                onChange={(e) => updateContent("skills_description", e.target.value)}
+                placeholder="Add description text below skills..."
+                rows={4}
+                className="w-full p-3 bg-transparent border border-border text-sm font-body text-foreground resize-y outline-none focus:border-foreground transition-colors"
+              />
+            </div>
+          </>
+        )}
 
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
