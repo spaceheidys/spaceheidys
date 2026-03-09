@@ -21,9 +21,11 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import SortableImageCard from "@/components/admin/SortableImageCard";
+import ShareSection from "@/components/admin/ShareSection";
 
 const SECTIONS = ["gallery", "projects", "skills", "archive"] as const;
 const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
+const SPECIAL_TABS = ["share"] as const;
 
 interface PortfolioItem {
   id: string;
@@ -421,6 +423,18 @@ const Admin = () => {
             </div>
           ))}
 
+          {/* SHARE tab */}
+          <button
+            onClick={() => setActiveSection("share")}
+            className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border transition-colors ${
+              activeSection === "share"
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            SHARE
+          </button>
+
           <div className="ml-auto">
             <Popover>
               <PopoverTrigger asChild>
@@ -435,6 +449,9 @@ const Admin = () => {
             </Popover>
           </div>
         </div>
+
+        {/* SHARE section */}
+        {activeSection === "share" && <ShareSection />}
 
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
@@ -456,7 +473,7 @@ const Admin = () => {
         )}
 
         {/* Upload area */}
-        <div className="flex gap-3 mb-6">
+        {activeSection !== "share" && (<div className="flex gap-3 mb-6">
           <label className="flex-1 flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 cursor-pointer">
             {uploading ? (
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
@@ -630,10 +647,10 @@ const Admin = () => {
               </div>
             </div>
           )}
-        </div>
+        </div>)}
 
         {/* Bulk select toolbar */}
-        {items.length > 0 && (
+        {activeSection !== "share" && items.length > 0 && (
           <div className="flex items-center gap-2 mb-2">
             <button
               onClick={() => {
@@ -721,7 +738,7 @@ const Admin = () => {
         )}
 
         {/* Items grid */}
-        {fetching ? (
+        {activeSection !== "share" && (fetching ? (
           <div className="flex justify-center py-12">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
@@ -807,7 +824,7 @@ const Admin = () => {
               </div>
             )}
           </>
-        )}
+        ))}
       </div>
 
     </div>
