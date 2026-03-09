@@ -61,12 +61,14 @@ const Index = () => {
     const handleScroll = () => {
       if (!portfolioRef.current) return;
       const rect = portfolioRef.current.getBoundingClientRect();
-      // Show when portfolio section is in view and page is scrolled down
-      const inPortfolio = rect.top < window.innerHeight && rect.bottom > 0;
-      const scrolledDown = window.scrollY > 100;
-      setShowScrollTop(inPortfolio && scrolledDown);
+      // Show when portfolio section top is above viewport center (user scrolled into it)
+      const inPortfolio = rect.top < window.innerHeight * 0.5;
+      // Hide when at the very top of the page
+      const notAtTop = window.scrollY > 200;
+      setShowScrollTop(inPortfolio && notAtTop);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Check initial state
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
