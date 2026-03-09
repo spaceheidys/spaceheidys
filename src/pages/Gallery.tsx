@@ -97,14 +97,26 @@ const Gallery = () => {
     setSelectedIndex(idx);
   };
 
-  const goLightbox = (dir: -1 | 1) => {
+  const goLightbox = useCallback((dir: -1 | 1) => {
     const newIdx = selectedIndex + dir;
     if (newIdx < 0 || newIdx >= navigableEntries.length) return;
     setSelectedEntry(navigableEntries[newIdx]);
     setSelectedIndex(newIdx);
-  };
+  }, [selectedIndex, navigableEntries]);
 
   const isGroup = selectedEntry?.groupImages && selectedEntry.groupImages.length > 1;
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || isGroup) return;
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    touchStartX.current = null;
+    if (Math.abs(delta) < SWIPE_THRESHOLD) return;
+    goLightbox(delta > 0 ? 1 : -1);
+  }, [goLightbox, isGroup]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
