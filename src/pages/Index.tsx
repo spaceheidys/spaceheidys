@@ -394,9 +394,9 @@ const Index = () => {
       )}
       
 
-      {/* Cards content — top on mobile, centered on desktop */}
-      <div className="flex sm:flex-1 items-center justify-center pt-8 sm:pt-12 px-3 sm:px-4 relative z-10">
-        <div className="items-center justify-center flex flex-col">
+      {/* Cards content — centered */}
+      <div className="flex flex-1 items-center justify-center px-3 sm:px-4 relative z-10">
+        <div className="items-center justify-center flex flex-col w-full">
           {/* Wisdom text above cards */}
           <AnimatePresence mode="wait">
             {activePortfolioKey ?
