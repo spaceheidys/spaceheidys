@@ -456,12 +456,12 @@ const Index = () => {
       {/* Spacer — only on mobile to push arrow down */}
       <div className="flex-1 sm:flex-none" />
 
-      {/* Scroll to top arrow — hidden when a portfolio section is active on desktop */}
+      {/* Scroll to top arrow — fixed bottom-right, doesn't interfere with menu */}
       <div
-          className={`pb-2 relative z-10 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 items-center justify-center flex flex-row ${activePortfolioKey ? 'hidden' : ''}`}
+          className={`fixed bottom-6 right-6 z-30 cursor-pointer text-white/40 hover:text-white transition-colors duration-300 ${activePortfolioKey ? 'hidden' : 'flex'}`}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top">
-        <ArrowUp className="w-6 h-6 sm:w-[40px] sm:h-[40px]" />
+        <ArrowUp className="w-8 h-8 sm:w-10 sm:h-10" />
       </div>
 
       {/* Menu at bottom position when section is active (desktop only) */}
