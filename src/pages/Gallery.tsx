@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
@@ -21,6 +21,7 @@ interface GalleryEntry {
 }
 
 const TABS = ["ALL", "VECTOR", "DIGITAL", "AI", "SKETCHES"] as const;
+const SWIPE_THRESHOLD = 50;
 
 const Gallery = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const Gallery = () => {
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const fetch = async () => {
