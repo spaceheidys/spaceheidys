@@ -22,6 +22,7 @@ import {
 } from "@dnd-kit/sortable";
 import SortableImageCard from "@/components/admin/SortableImageCard";
 import ShareSection from "@/components/admin/ShareSection";
+import SkillsSection from "@/components/admin/SkillsSection";
 
 const SECTIONS = ["gallery", "projects", "skills", "archive"] as const;
 const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
@@ -450,8 +451,10 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* SHARE section */}
         {activeSection === "share" && <ShareSection />}
+
+        {/* SKILLS section */}
+        {activeSection === "skills" && <SkillsSection />}
 
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
@@ -473,7 +476,7 @@ const Admin = () => {
         )}
 
         {/* Upload area */}
-        {activeSection !== "share" && (<div className="flex gap-3 mb-6">
+        {activeSection !== "share" && activeSection !== "skills" && (<div className="flex gap-3 mb-6">
           <label className="flex-1 flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 cursor-pointer">
             {uploading ? (
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
@@ -650,7 +653,7 @@ const Admin = () => {
         </div>)}
 
         {/* Bulk select toolbar */}
-        {activeSection !== "share" && items.length > 0 && (
+        {activeSection !== "share" && activeSection !== "skills" && items.length > 0 && (
           <div className="flex items-center gap-2 mb-2">
             <button
               onClick={() => {
@@ -738,7 +741,7 @@ const Admin = () => {
         )}
 
         {/* Items grid */}
-        {activeSection !== "share" && (fetching ? (
+        {activeSection !== "share" && activeSection !== "skills" && (fetching ? (
           <div className="flex justify-center py-12">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
