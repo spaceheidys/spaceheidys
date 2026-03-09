@@ -151,6 +151,7 @@ const SortableRow = ({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id });
   const [expanded, setExpanded] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
 
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
@@ -255,9 +256,17 @@ const SortableRow = ({
         </button>
 
         {/* Delete */}
-        <button onClick={() => onDelete(link.id)} className="shrink-0 text-muted-foreground/30 hover:text-destructive transition-colors">
-          <Trash2 size={12} />
-        </button>
+        {confirmDelete ? (
+          <div className="flex items-center gap-1 shrink-0">
+            <button onClick={() => { onDelete(link.id); setConfirmDelete(false); }} className="text-[9px] font-display tracking-widest text-destructive hover:text-destructive/80 transition-colors">YES</button>
+            <span className="text-muted-foreground/20 text-[9px]">/</span>
+            <button onClick={() => setConfirmDelete(false)} className="text-[9px] font-display tracking-widest text-muted-foreground/40 hover:text-foreground transition-colors">NO</button>
+          </div>
+        ) : (
+          <button onClick={() => setConfirmDelete(true)} className="shrink-0 text-muted-foreground/30 hover:text-destructive transition-colors">
+            <Trash2 size={12} />
+          </button>
+        )}
       </div>
 
       {/* Expanded: share template */}
