@@ -389,11 +389,6 @@ const ShareSection = () => {
 
   return (
     <div className="max-w-2xl">
-      <div className="mb-4 space-y-1">
-        <p className="text-[10px] font-display tracking-[0.2em] text-muted-foreground uppercase">
-          Click icon → pick preset or upload · Eye = show/hide on site · ▼ = share template
-        </p>
-      </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={links.map((l) => l.id)} strategy={verticalListSortingStrategy}>
