@@ -78,11 +78,16 @@ const Index = () => {
       ([entry]) => {
         // When portfolio section leaves viewport (user scrolled back to MAIN)
         if (!entry.isIntersecting) {
-          // Close any active portfolio section
-          if (activePortfolioKey) {
-            setActivePortfolioKey(null);
-            setActiveGallerySub(null);
-            setPageInfo(null);
+          // Smoothly close any active portfolio section
+          if (activePortfolioKey && !isClosingSection) {
+            setIsClosingSection(true);
+            // Wait for exit animation (300ms) before clearing state
+            closingTimeoutRef.current = setTimeout(() => {
+              setActivePortfolioKey(null);
+              setActiveGallerySub(null);
+              setPageInfo(null);
+              setIsClosingSection(false);
+            }, 300);
           }
           // Flip card back if it's currently unflipped
           if (!thirdCardFlipped) {
@@ -96,8 +101,13 @@ const Index = () => {
       { threshold: 0.1 }
     );
     observer.observe(portfolioRef.current);
-    return () => observer.disconnect();
-  }, [thirdCardFlipped, muted, activePortfolioKey]);
+    return () => {
+      observer.disconnect();
+      if (closingTimeoutRef.current) {
+        clearTimeout(closingTimeoutRef.current);
+      }
+    };
+  }, [thirdCardFlipped, muted, activePortfolioKey, isClosingSection]);
 
   // Fetch dynamic backgrounds
   useEffect(() => {
