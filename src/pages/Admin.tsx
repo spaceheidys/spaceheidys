@@ -451,8 +451,10 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* SHARE section */}
         {activeSection === "share" && <ShareSection />}
+
+        {/* SKILLS section */}
+        {activeSection === "skills" && <SkillsSection />}
 
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
