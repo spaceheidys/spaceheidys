@@ -653,7 +653,7 @@ const Admin = () => {
         </div>)}
 
         {/* Bulk select toolbar */}
-        {activeSection !== "share" && items.length > 0 && (
+        {activeSection !== "share" && activeSection !== "skills" && items.length > 0 && (
           <div className="flex items-center gap-2 mb-2">
             <button
               onClick={() => {
