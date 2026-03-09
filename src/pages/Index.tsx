@@ -268,7 +268,7 @@ const Index = () => {
           <AnimatePresence>
             {showNav &&
               <motion.nav
-                className="hidden lg:flex flex-col gap-8 mr-auto"
+                className="hidden md:flex flex-col gap-8 mr-auto"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
