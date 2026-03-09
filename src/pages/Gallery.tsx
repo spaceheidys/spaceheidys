@@ -242,6 +242,8 @@ const Gallery = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             onClick={() => setSelectedEntry(null)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
             {!isGroup && selectedIndex > 0 && (
               <button
