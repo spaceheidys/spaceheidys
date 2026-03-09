@@ -75,6 +75,9 @@ const Index = () => {
       ([entry]) => {
         // When portfolio section leaves viewport (user scrolled back to MAIN)
         if (!entry.isIntersecting && !thirdCardFlipped) {
+          if (!muted) {
+            new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
+          }
           setThirdCardFlipped(true);
         }
       },
@@ -82,7 +85,7 @@ const Index = () => {
     );
     observer.observe(portfolioRef.current);
     return () => observer.disconnect();
-  }, [thirdCardFlipped]);
+  }, [thirdCardFlipped, muted]);
 
   // Fetch dynamic backgrounds
   useEffect(() => {
