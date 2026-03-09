@@ -17,6 +17,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { invalidateSocialLinksCache } from "@/hooks/useSocialLinks";
 
 interface SocialLink {
   id: string;
@@ -25,6 +26,7 @@ interface SocialLink {
   icon_url: string;
   is_visible: boolean;
   sort_order: number;
+  share_url_template: string;
 }
 
 interface SortableRowProps {
@@ -33,6 +35,7 @@ interface SortableRowProps {
   onDelete: (id: string) => void;
   onLabelChange: (id: string, val: string) => void;
   onUrlChange: (id: string, val: string) => void;
+  onTemplateChange: (id: string, val: string) => void;
   onIconUpload: (id: string, file: File) => void;
   uploadingId: string | null;
 }
@@ -43,10 +46,12 @@ const SortableRow = ({
   onDelete,
   onLabelChange,
   onUrlChange,
+  onTemplateChange,
   onIconUpload,
   uploadingId,
 }: SortableRowProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id });
+  const [expanded, setExpanded] = useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -55,78 +60,107 @@ const SortableRow = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center gap-3 px-3 py-2.5 border border-border bg-background group"
-    >
-      {/* Drag handle */}
-      <button
-        {...attributes}
-        {...listeners}
-        className="text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none shrink-0"
-      >
-        <GripVertical size={14} />
-      </button>
+    <div ref={setNodeRef} style={style} className="border border-border bg-background">
+      {/* Main row */}
+      <div className="flex items-center gap-3 px-3 py-2.5 group">
+        {/* Drag handle */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none shrink-0"
+        >
+          <GripVertical size={14} />
+        </button>
 
-      {/* Icon preview + upload */}
-      <label className="relative shrink-0 cursor-pointer w-7 h-7 flex items-center justify-center border border-dashed border-border hover:border-foreground/40 transition-colors overflow-hidden rounded-sm">
-        {uploadingId === link.id ? (
-          <Loader2 size={12} className="animate-spin text-muted-foreground" />
-        ) : link.icon_url ? (
-          <img src={link.icon_url} alt={link.label} className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
-        ) : (
-          <Upload size={10} className="text-muted-foreground/40" />
-        )}
+        {/* Icon preview + upload */}
+        <label className="relative shrink-0 cursor-pointer w-7 h-7 flex items-center justify-center border border-dashed border-border hover:border-foreground/40 transition-colors overflow-hidden rounded-sm">
+          {uploadingId === link.id ? (
+            <Loader2 size={12} className="animate-spin text-muted-foreground" />
+          ) : link.icon_url ? (
+            <img src={link.icon_url} alt={link.label} className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+          ) : (
+            <Upload size={10} className="text-muted-foreground/40" />
+          )}
+          <input
+            type="file"
+            accept="image/*,.svg"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) onIconUpload(link.id, f);
+              e.target.value = "";
+            }}
+          />
+        </label>
+
+        {/* Label */}
         <input
-          type="file"
-          accept="image/*,.svg"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) onIconUpload(link.id, f);
-            e.target.value = "";
-          }}
+          type="text"
+          value={link.label}
+          onChange={(e) => onLabelChange(link.id, e.target.value)}
+          placeholder="Label"
+          className="w-24 bg-transparent text-xs font-display tracking-wider text-foreground placeholder:text-muted-foreground/40 outline-none border-b border-transparent focus:border-border transition-colors"
         />
-      </label>
 
-      {/* Label */}
-      <input
-        type="text"
-        value={link.label}
-        onChange={(e) => onLabelChange(link.id, e.target.value)}
-        placeholder="Label"
-        className="w-24 bg-transparent text-xs font-display tracking-wider text-foreground placeholder:text-muted-foreground/40 outline-none border-b border-transparent focus:border-border transition-colors"
-      />
+        {/* Profile URL */}
+        <input
+          type="text"
+          value={link.url}
+          onChange={(e) => onUrlChange(link.id, e.target.value)}
+          placeholder="Profile URL (optional)"
+          className="flex-1 bg-transparent text-xs font-display tracking-wider text-foreground placeholder:text-muted-foreground/40 outline-none border-b border-transparent focus:border-border transition-colors min-w-0"
+        />
 
-      {/* URL */}
-      <input
-        type="text"
-        value={link.url}
-        onChange={(e) => onUrlChange(link.id, e.target.value)}
-        placeholder="https://..."
-        className="flex-1 bg-transparent text-xs font-display tracking-wider text-foreground placeholder:text-muted-foreground/40 outline-none border-b border-transparent focus:border-border transition-colors min-w-0"
-      />
+        {/* Expand for share template */}
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="shrink-0 text-[9px] font-display tracking-widest text-muted-foreground/50 hover:text-muted-foreground transition-colors px-1"
+          title="Share URL template"
+        >
+          {expanded ? "▲" : "▼"}
+        </button>
 
-      {/* Visibility toggle */}
-      <button
-        onClick={() => onVisibilityToggle(link.id)}
-        className="shrink-0 transition-colors"
-        title={link.is_visible ? "Hide" : "Show"}
-      >
-        {link.is_visible
-          ? <Eye size={13} className="text-foreground/50 hover:text-foreground" />
-          : <EyeOff size={13} className="text-muted-foreground/30 hover:text-muted-foreground" />
-        }
-      </button>
+        {/* Visibility toggle */}
+        <button
+          onClick={() => onVisibilityToggle(link.id)}
+          className="shrink-0 transition-colors"
+          title={link.is_visible ? "Hide" : "Show"}
+        >
+          {link.is_visible
+            ? <Eye size={13} className="text-foreground/50 hover:text-foreground" />
+            : <EyeOff size={13} className="text-muted-foreground/30 hover:text-muted-foreground" />
+          }
+        </button>
 
-      {/* Delete */}
-      <button
-        onClick={() => onDelete(link.id)}
-        className="shrink-0 text-muted-foreground/30 hover:text-destructive transition-colors"
-      >
-        <Trash2 size={12} />
-      </button>
+        {/* Delete */}
+        <button
+          onClick={() => onDelete(link.id)}
+          className="shrink-0 text-muted-foreground/30 hover:text-destructive transition-colors"
+        >
+          <Trash2 size={12} />
+        </button>
+      </div>
+
+      {/* Expanded: share URL template */}
+      {expanded && (
+        <div className="px-3 pb-2.5 border-t border-border/50 pt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-display tracking-widest text-muted-foreground uppercase shrink-0">
+              Share URL template
+            </span>
+            <input
+              type="text"
+              value={link.share_url_template}
+              onChange={(e) => onTemplateChange(link.id, e.target.value)}
+              placeholder="https://x.com/intent/tweet?url={url}&text={title}"
+              className="flex-1 bg-transparent text-[10px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none border-b border-transparent focus:border-border transition-colors"
+            />
+          </div>
+          <p className="text-[9px] text-muted-foreground/40 mt-1 font-display">
+            Use <code className="text-muted-foreground/60">{"{url}"}</code> and <code className="text-muted-foreground/60">{"{title}"}</code> as placeholders. Leave empty = profile link only (no share button in portfolio).
+          </p>
+        </div>
+      )}
     </div>
   );
 };
@@ -138,6 +172,7 @@ const ShareSection = () => {
 
   const labelTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const urlTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const templateTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -156,6 +191,11 @@ const ShareSection = () => {
 
   useEffect(() => { fetchLinks(); }, []);
 
+  const persist = async (id: string, patch: Partial<SocialLink>) => {
+    const { error } = await supabase.from("social_links").update(patch as any).eq("id", id);
+    if (!error) invalidateSocialLinksCache();
+  };
+
   const handleVisibilityToggle = async (id: string) => {
     const link = links.find((l) => l.id === id);
     if (!link) return;
@@ -163,29 +203,32 @@ const ShareSection = () => {
     setLinks((prev) => prev.map((l) => l.id === id ? { ...l, is_visible: newVal } : l));
     const { error } = await supabase.from("social_links").update({ is_visible: newVal }).eq("id", id);
     if (error) { toast.error("Failed to update visibility"); fetchLinks(); }
+    else invalidateSocialLinksCache();
   };
 
   const handleDelete = async (id: string) => {
     setLinks((prev) => prev.filter((l) => l.id !== id));
     const { error } = await supabase.from("social_links").delete().eq("id", id);
     if (error) { toast.error("Failed to delete"); fetchLinks(); }
-    else toast.success("Deleted");
+    else { toast.success("Deleted"); invalidateSocialLinksCache(); }
   };
 
   const handleLabelChange = (id: string, val: string) => {
     setLinks((prev) => prev.map((l) => l.id === id ? { ...l, label: val } : l));
-    if (labelTimers.current[id]) clearTimeout(labelTimers.current[id]);
-    labelTimers.current[id] = setTimeout(() => {
-      supabase.from("social_links").update({ label: val }).eq("id", id);
-    }, 500);
+    clearTimeout(labelTimers.current[id]);
+    labelTimers.current[id] = setTimeout(() => persist(id, { label: val }), 500);
   };
 
   const handleUrlChange = (id: string, val: string) => {
     setLinks((prev) => prev.map((l) => l.id === id ? { ...l, url: val } : l));
-    if (urlTimers.current[id]) clearTimeout(urlTimers.current[id]);
-    urlTimers.current[id] = setTimeout(() => {
-      supabase.from("social_links").update({ url: val }).eq("id", id);
-    }, 500);
+    clearTimeout(urlTimers.current[id]);
+    urlTimers.current[id] = setTimeout(() => persist(id, { url: val }), 500);
+  };
+
+  const handleTemplateChange = (id: string, val: string) => {
+    setLinks((prev) => prev.map((l) => l.id === id ? { ...l, share_url_template: val } : l));
+    clearTimeout(templateTimers.current[id]);
+    templateTimers.current[id] = setTimeout(() => persist(id, { share_url_template: val }), 600);
   };
 
   const handleIconUpload = async (id: string, file: File) => {
@@ -195,18 +238,11 @@ const ShareSection = () => {
     const { error: upErr } = await supabase.storage
       .from("portfolio-images")
       .upload(fileName, file, { contentType: file.type });
-    if (upErr) {
-      toast.error("Icon upload failed");
-      setUploadingId(null);
-      return;
-    }
+    if (upErr) { toast.error("Icon upload failed"); setUploadingId(null); return; }
     const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(fileName);
-    const { error } = await supabase.from("social_links").update({ icon_url: urlData.publicUrl }).eq("id", id);
-    if (error) toast.error("Failed to save icon");
-    else {
-      setLinks((prev) => prev.map((l) => l.id === id ? { ...l, icon_url: urlData.publicUrl } : l));
-      toast.success("Icon updated");
-    }
+    await persist(id, { icon_url: urlData.publicUrl });
+    setLinks((prev) => prev.map((l) => l.id === id ? { ...l, icon_url: urlData.publicUrl } : l));
+    toast.success("Icon updated");
     setUploadingId(null);
   };
 
@@ -220,19 +256,19 @@ const ShareSection = () => {
     const updates = reordered.map((l, idx) =>
       supabase.from("social_links").update({ sort_order: idx }).eq("id", l.id)
     );
-    const results = await Promise.all(updates);
-    if (results.some((r) => r.error)) toast.error("Failed to save order");
+    await Promise.all(updates);
+    invalidateSocialLinksCache();
   };
 
   const handleAddNew = async () => {
     const maxOrder = links.reduce((m, l) => Math.max(m, l.sort_order), -1);
     const { data, error } = await supabase
       .from("social_links")
-      .insert({ label: "New Link", url: "", icon_url: "", is_visible: true, sort_order: maxOrder + 1 })
+      .insert({ label: "New Link", url: "", icon_url: "", is_visible: true, sort_order: maxOrder + 1, share_url_template: "" })
       .select()
       .single();
     if (error) toast.error("Failed to add link");
-    else { setLinks((prev) => [...prev, data as SocialLink]); }
+    else { setLinks((prev) => [...prev, data as SocialLink]); invalidateSocialLinksCache(); }
   };
 
   if (loading) {
@@ -245,9 +281,14 @@ const ShareSection = () => {
 
   return (
     <div className="max-w-2xl">
-      <p className="text-[10px] font-display tracking-[0.2em] text-muted-foreground mb-4 uppercase">
-        Drag to reorder · Click eye to show/hide · Click icon area to replace
-      </p>
+      <div className="mb-4 space-y-1">
+        <p className="text-[10px] font-display tracking-[0.2em] text-muted-foreground uppercase">
+          Drag to reorder · Eye = show/hide · Icon area = replace icon
+        </p>
+        <p className="text-[9px] font-display text-muted-foreground/50">
+          ▼ Expand row to set Share URL template — shown as share buttons inside portfolio lightbox &amp; favorites
+        </p>
+      </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={links.map((l) => l.id)} strategy={verticalListSortingStrategy}>
@@ -260,6 +301,7 @@ const ShareSection = () => {
                 onDelete={handleDelete}
                 onLabelChange={handleLabelChange}
                 onUrlChange={handleUrlChange}
+                onTemplateChange={handleTemplateChange}
                 onIconUpload={handleIconUpload}
                 uploadingId={uploadingId}
               />
