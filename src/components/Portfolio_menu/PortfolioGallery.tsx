@@ -274,43 +274,51 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
       )}
 
       {/* Lightbox overlay */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {selectedEntry && (
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
+            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            transition={{ duration: 0.3 }}
             onClick={() => setSelectedEntry(null)}
           >
             {/* Navigation arrows – only for non-group entries */}
             {!isGroup && selectedIndex > 0 && (
-              <button
+              <motion.button
                 onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
                 className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
                 aria-label="Previous image"
               >
                 <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
-              </button>
+              </motion.button>
             )}
             {!isGroup && selectedIndex < navigableEntries.length - 1 && (
-              <button
+              <motion.button
                 onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
                 className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
                 aria-label="Next image"
               >
                 <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
-              </button>
+              </motion.button>
             )}
 
             <motion.div
               key={selectedEntry.id}
               className={`relative ${isProject ? "w-[95vw] h-[90vh] sm:w-[85vw] sm:h-[80vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh]"}`}
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.85, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              initial={{ scale: 0.7, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.75, opacity: 0, y: 20 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Back to list — top left */}
