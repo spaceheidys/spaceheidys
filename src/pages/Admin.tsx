@@ -476,7 +476,7 @@ const Admin = () => {
         )}
 
         {/* Upload area */}
-        {activeSection !== "share" && (<div className="flex gap-3 mb-6">
+        {activeSection !== "share" && activeSection !== "skills" && (<div className="flex gap-3 mb-6">
           <label className="flex-1 flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 cursor-pointer">
             {uploading ? (
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
