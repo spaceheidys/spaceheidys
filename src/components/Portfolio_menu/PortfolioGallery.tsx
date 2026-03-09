@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { toast } from "sonner";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const ITEMS_PER_PAGE_MOBILE = 6;
 const ITEMS_PER_PAGE_DESKTOP = 9;
