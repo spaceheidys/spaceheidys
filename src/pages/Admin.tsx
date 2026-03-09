@@ -479,16 +479,27 @@ const Admin = () => {
           ))}
 
           {/* SHARE tab */}
-          <button
-            onClick={() => setActiveSection("share")}
-            className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border transition-colors ${
-              activeSection === "share"
-                ? "border-foreground text-foreground"
-                : "border-border text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            SHARE
-          </button>
+          <div className="flex items-center gap-0">
+            <button
+              onClick={() => setActiveSection("share")}
+              className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border-y border-l transition-colors ${
+                activeSection === "share"
+                  ? "border-foreground text-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              SHARE
+            </button>
+            <button
+              onClick={() => toggleSection("share" as any)}
+              className={`px-1.5 py-1.5 border transition-colors ${
+                activeSection === "share" ? "border-foreground" : "border-border"
+              } ${visibility["share" as keyof typeof visibility] ? "text-foreground/60 hover:text-foreground" : "text-muted-foreground/30 hover:text-muted-foreground"}`}
+              title={visibility["share" as keyof typeof visibility] ? "Hide share on site" : "Show share on site"}
+            >
+              {visibility["share" as keyof typeof visibility] ? <Eye size={11} /> : <EyeOff size={11} />}
+            </button>
+          </div>
 
           <div className="ml-auto">
             <Popover>
