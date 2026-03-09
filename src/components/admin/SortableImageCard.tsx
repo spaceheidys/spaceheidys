@@ -491,6 +491,15 @@ const SortableImageCard = ({
 
           <div className="grid gap-4 py-2">
             <div className="grid gap-2">
+              <Label htmlFor="edit-desc">About Project</Label>
+              <Textarea
+                id="edit-desc"
+                value={modalData.description}
+                onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
+                rows={4}
+              />
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="edit-title">Title</Label>
               <Input
                 id="edit-title"
@@ -509,15 +518,6 @@ const SortableImageCard = ({
                 />
               </div>
             )}
-            <div className="grid gap-2">
-              <Label htmlFor="edit-desc">Description</Label>
-              <Textarea
-                id="edit-desc"
-                value={modalData.description}
-                onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
-                rows={4}
-              />
-            </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-tags">Tags (comma separated)</Label>
               <Input
