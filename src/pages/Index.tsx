@@ -471,9 +471,13 @@ const Index = () => {
             <div className={`flex items-center justify-center w-[60vw] h-[90vw] max-w-[300px] max-h-[450px] ${activePortfolioKey ? 'sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px] sm:max-w-none sm:max-h-none' : 'sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px] sm:max-w-none sm:max-h-none'} transition-all duration-500`}>
               <AnimatePresence mode="wait">
                 {activePortfolioKey === "skills" ?
-                  <SkillsDisplay key="skills" /> :
+                  <motion.div key="skills" className="w-full h-full" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97, y: 8 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
+                    <SkillsDisplay />
+                  </motion.div> :
                 activePortfolioKey ?
-                  <PortfolioGallery key={`${activePortfolioKey}-${activeGallerySub}`} sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} /> :
+                  <motion.div key={`${activePortfolioKey}-${activeGallerySub}`} className="w-full h-full" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97, y: 8 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
+                    <PortfolioGallery sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} />
+                  </motion.div> :
 
                   <motion.div
                     key="card"
