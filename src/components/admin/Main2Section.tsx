@@ -88,7 +88,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   return (
     <div className="space-y-6">
       <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-        Second Section — Card Area
+        Second Section — Card Area & Footer
       </p>
 
       {/* Wisdom text above cards */}
