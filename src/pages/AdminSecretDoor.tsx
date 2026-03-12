@@ -352,6 +352,31 @@ const AdminSecretDoor = () => {
           </label>
         </section>
 
+        {/* MUSIC ON/OFF */}
+        <section className="border border-border p-4 space-y-3">
+          <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+            Secret Door Music (VOL)
+          </p>
+          <div className="flex items-center gap-3">
+            {settings?.music_enabled ? <Volume2 size={16} className="text-foreground" /> : <VolumeX size={16} className="text-muted-foreground" />}
+            <Switch
+              checked={settings?.music_enabled ?? true}
+              onCheckedChange={async (checked) => {
+                if (!settings) return;
+                const { error } = await supabase
+                  .from("secret_door_settings" as any)
+                  .update({ music_enabled: checked, updated_at: new Date().toISOString() } as any)
+                  .eq("id", settings.id);
+                if (!error) {
+                  setSettings((s) => s ? { ...s, music_enabled: checked } : s);
+                  toast.success(checked ? "Music ON" : "Music OFF");
+                }
+              }}
+            />
+            <span className="text-xs text-muted-foreground">{settings?.music_enabled ? "ON" : "OFF"}</span>
+          </div>
+        </section>
+
         {/* DOWNLOADS GALLERY */}
         <section className="border border-border p-4 space-y-3">
           <div className="flex items-center justify-between">
