@@ -154,7 +154,7 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
       >
         <input
           ref={inputRef}
-          type="text"
+          type="password"
           value={code}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
