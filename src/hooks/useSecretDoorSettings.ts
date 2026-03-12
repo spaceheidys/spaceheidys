@@ -5,12 +5,14 @@ export interface SecretDoorSettings {
   secret_code: string;
   timer_seconds: number;
   background_url: string | null;
+  music_enabled: boolean;
 }
 
 const DEFAULTS: SecretDoorSettings = {
   secret_code: "Letmein",
   timer_seconds: 60,
   background_url: null,
+  music_enabled: true,
 };
 
 export function useSecretDoorSettings() {
