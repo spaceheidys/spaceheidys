@@ -11,6 +11,7 @@ interface SecretDoorSettings {
   secret_code: string;
   timer_seconds: number;
   background_url: string | null;
+  music_enabled: boolean;
 }
 
 interface SecretDoorFile {
