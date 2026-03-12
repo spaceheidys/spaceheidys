@@ -417,8 +417,20 @@ const Index = () => {
           <div className="absolute inset-0 bg-black/60" />
         </div>
       )}
-      {/* Polygon background for portfolio section */}
-      <PolygonBackground triggerKey={flipCount} />
+      {/* Animated polygon background or video */}
+      {getContent("card_bg_type") === "video" && getContent("card_bg_video") ? (
+        <video
+          src={getContent("card_bg_video")}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: (parseInt(getContent("card_bg_video_opacity") || "40", 10)) / 100 }}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+      ) : (
+        <PolygonBackground triggerKey={flipCount} />
+      )}
       
 
       {/* Cards content — centered */}
@@ -536,28 +548,10 @@ const Index = () => {
 
     </div>
     {/* Footer — outside portfolio block */}
-    <div className="relative w-full bg-black flex flex-col overflow-hidden">
-      {/* Footer background: video or polygon */}
-      {getContent("card_bg_type") === "video" && getContent("card_bg_video") ? (
-        <video
-          src={getContent("card_bg_video")}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: (parseInt(getContent("card_bg_video_opacity") || "40", 10)) / 100 }}
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-      ) : getContent("card_bg_type") === "polygon" ? (
-        <div className="absolute inset-0">
-          <PolygonBackground />
-        </div>
-      ) : null}
-      <div className="relative z-10">
-        <div className="w-full h-px bg-white/10" />
-        <div className="w-full h-12 sm:h-16 items-center justify-center flex flex-row">
-          <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2018 - 2026 Spaceheidys. All rights reserved.</span>
-        </div>
+    <div className="w-full bg-black flex flex-col">
+      <div className="w-full h-px bg-white/10" />
+      <div className="w-full h-12 sm:h-16 items-center justify-center flex flex-row">
+        <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">© 2018 - 2026 Spaceheidys. All rights reserved.</span>
       </div>
     </div>
     <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />

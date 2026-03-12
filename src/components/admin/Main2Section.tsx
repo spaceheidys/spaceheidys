@@ -88,7 +88,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   return (
     <div className="space-y-6">
       <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-        Second Section — Card Area & Footer
+        Second Section — Card Area
       </p>
 
       {/* Wisdom text above cards */}
@@ -116,7 +116,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
       {/* Background type toggle */}
       <div className="space-y-3">
         <label className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-          Footer Background
+          Section Background
         </label>
         <div className="flex items-center gap-2">
           <button
