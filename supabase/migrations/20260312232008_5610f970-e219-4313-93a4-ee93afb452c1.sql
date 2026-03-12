@@ -1,0 +1,1 @@
+ALTER TABLE public.secret_door_settings ADD COLUMN music_enabled boolean NOT NULL DEFAULT true;

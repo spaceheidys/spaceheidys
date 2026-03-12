@@ -207,6 +207,7 @@ export type Database = {
         Row: {
           background_url: string | null
           id: string
+          music_enabled: boolean
           secret_code: string
           timer_seconds: number
           updated_at: string
@@ -214,6 +215,7 @@ export type Database = {
         Insert: {
           background_url?: string | null
           id?: string
+          music_enabled?: boolean
           secret_code?: string
           timer_seconds?: number
           updated_at?: string
@@ -221,6 +223,7 @@ export type Database = {
         Update: {
           background_url?: string | null
           id?: string
+          music_enabled?: boolean
           secret_code?: string
           timer_seconds?: number
           updated_at?: string
