@@ -59,10 +59,12 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
         }, 50);
       }
 
-      const cyberpunkAudio = new Audio("/audio/Cyberpunk_secret_door.mp3");
-      cyberpunkAudio.loop = true;
-      cyberpunkAudio.play().catch(() => {});
-      cyberpunkAudioRef.current = cyberpunkAudio;
+      if (settings.music_enabled) {
+        const cyberpunkAudio = new Audio("/audio/Cyberpunk_secret_door.mp3");
+        cyberpunkAudio.loop = true;
+        cyberpunkAudio.play().catch(() => {});
+        cyberpunkAudioRef.current = cyberpunkAudio;
+      }
 
       let currentSeconds = duration;
       progressIntervalRef.current = setInterval(() => {
@@ -71,8 +73,8 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
         setProgress(((duration - currentSeconds) / duration) * 100);
         if (currentSeconds <= 0) {
           if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-          cyberpunkAudio.pause();
-          cyberpunkAudio.currentTime = 0;
+          if (cyberpunkAudioRef.current) { cyberpunkAudioRef.current.pause(); cyberpunkAudioRef.current.currentTime = 0; }
+          onClose();
           onClose();
         }
       }, 1000);
@@ -154,7 +156,7 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
       >
         <input
           ref={inputRef}
-          type="text"
+          type="password"
           value={code}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
