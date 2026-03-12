@@ -176,6 +176,57 @@ export type Database = {
         }
         Relationships: []
       }
+      secret_door_files: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number
+          file_url: string
+          id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          file_url: string
+          id?: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          file_url?: string
+          id?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      secret_door_settings: {
+        Row: {
+          background_url: string | null
+          id: string
+          secret_code: string
+          timer_seconds: number
+          updated_at: string
+        }
+        Insert: {
+          background_url?: string | null
+          id?: string
+          secret_code?: string
+          timer_seconds?: number
+          updated_at?: string
+        }
+        Update: {
+          background_url?: string | null
+          id?: string
+          secret_code?: string
+          timer_seconds?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       section_content: {
         Row: {
           content: string

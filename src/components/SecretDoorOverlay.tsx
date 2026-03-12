@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-
-const SECRET_CODE = "Letmein";
+import { useSecretDoorSettings } from "@/hooks/useSecretDoorSettings";
 
 interface SecretDoorOverlayProps {
   isOpen: boolean;
@@ -9,6 +8,7 @@ interface SecretDoorOverlayProps {
 }
 
 const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
+  const { settings } = useSecretDoorSettings();
   const [code, setCode] = useState("");
   const [progress, setProgress] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(60);
@@ -18,35 +18,29 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mainAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Find and store reference to the main background audio
   const findMainAudio = () => {
     const allAudio = document.querySelectorAll("audio");
     for (const audio of allAudio) {
-      if (audio.src.includes("main_buddhist")) {
-        return audio;
-      }
+      if (audio.src.includes("main_buddhist")) return audio;
     }
     return null;
   };
 
   useEffect(() => {
     if (isOpen) {
+      const duration = settings.timer_seconds;
       setCode("");
       setProgress(0);
-      setSecondsLeft(60);
+      setSecondsLeft(duration);
       setDenied(false);
       setTimeout(() => inputRef.current?.focus(), 100);
 
       // Fade out main music
       const mainAudio = findMainAudio();
       if (!mainAudio) {
-        // Try to find it via the audioRef on window
         const audios = document.getElementsByTagName("audio");
         for (let i = 0; i < audios.length; i++) {
-          if (!audios[i].paused) {
-            mainAudioRef.current = audios[i];
-            break;
-          }
+          if (!audios[i].paused) { mainAudioRef.current = audios[i]; break; }
         }
       } else {
         mainAudioRef.current = mainAudio;
@@ -65,59 +59,42 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
         }, 50);
       }
 
-      // Play cyberpunk track
       const cyberpunkAudio = new Audio("/audio/Cyberpunk_secret_door.mp3");
       cyberpunkAudio.loop = true;
       cyberpunkAudio.play().catch(() => {});
       cyberpunkAudioRef.current = cyberpunkAudio;
 
-      // Start 1-minute progress bar with countdown
-      const totalDuration = 60000;
-      const tickInterval = 1000; // Update every second
-      let currentSeconds = 60;
-
+      let currentSeconds = duration;
       progressIntervalRef.current = setInterval(() => {
         currentSeconds -= 1;
         setSecondsLeft(currentSeconds);
-        setProgress(((60 - currentSeconds) / 60) * 100);
-
+        setProgress(((duration - currentSeconds) / duration) * 100);
         if (currentSeconds <= 0) {
           if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
           cyberpunkAudio.pause();
           cyberpunkAudio.currentTime = 0;
           onClose();
         }
-      }, tickInterval);
+      }, 1000);
     }
 
     return () => {
-      if (cyberpunkAudioRef.current) {
-        cyberpunkAudioRef.current.pause();
-        cyberpunkAudioRef.current.currentTime = 0;
-      }
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
+      if (cyberpunkAudioRef.current) { cyberpunkAudioRef.current.pause(); cyberpunkAudioRef.current.currentTime = 0; }
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, settings.timer_seconds]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setCode(value);
+    setCode(e.target.value);
     setDenied(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      if (code === SECRET_CODE) {
+      if (code === settings.secret_code) {
         if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-        if (cyberpunkAudioRef.current) {
-          cyberpunkAudioRef.current.pause();
-        }
-        setTimeout(() => {
-          onClose();
-          window.location.href = "/secret";
-        }, 300);
+        if (cyberpunkAudioRef.current) cyberpunkAudioRef.current.pause();
+        setTimeout(() => { onClose(); window.location.href = "/secret"; }, 300);
       } else if (code.length > 0) {
         setDenied(true);
         setCode("");
@@ -126,20 +103,15 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
   };
 
   const handleClose = () => {
-    if (cyberpunkAudioRef.current) {
-      cyberpunkAudioRef.current.pause();
-      cyberpunkAudioRef.current.currentTime = 0;
-    }
+    if (cyberpunkAudioRef.current) { cyberpunkAudioRef.current.pause(); cyberpunkAudioRef.current.currentTime = 0; }
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-    // Restore main audio
-    if (mainAudioRef.current) {
-      mainAudioRef.current.volume = 1;
-      mainAudioRef.current.play().catch(() => {});
-    }
+    if (mainAudioRef.current) { mainAudioRef.current.volume = 1; mainAudioRef.current.play().catch(() => {}); }
     onClose();
   };
 
   if (!isOpen) return null;
+
+  const totalDuration = settings.timer_seconds;
 
   return (
     <motion.div
@@ -150,22 +122,29 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
       transition={{ duration: 0.3 }}
       onClick={handleClose}
     >
-      <div className="absolute inset-0 bg-black/90" />
-      {/* Timed corner squares */}
-      {/* Square 1: appears immediately (bottom-left) */}
+      {settings.background_url ? (
+        <>
+          <div className="absolute inset-0">
+            <img src={settings.background_url} alt="" className="w-full h-full object-cover" />
+          </div>
+          <div className="absolute inset-0 bg-black/70" />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-black/90" />
+      )}
+
+      {/* Corner squares */}
       <motion.div className={`absolute bottom-4 left-4 w-2.5 h-2.5 ${secondsLeft <= 10 ? 'bg-red-500' : 'bg-white/80'}`} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1, rotate: secondsLeft <= 10 ? 360 : 0 }} transition={{ opacity: { duration: 0.3 }, scale: { duration: 0.3 }, rotate: secondsLeft <= 10 ? { duration: 1, repeat: Infinity, ease: "linear" } : {} }} />
-      {/* Square 2: appears at 15s elapsed (top-left) */}
-      {secondsLeft <= 45 && (
+      {secondsLeft <= totalDuration - 15 && (
         <motion.div className={`absolute top-4 left-4 w-2.5 h-2.5 ${secondsLeft <= 10 ? 'bg-red-500' : 'bg-white/80'}`} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1, rotate: secondsLeft <= 10 ? 360 : 0 }} transition={{ opacity: { duration: 0.3 }, scale: { duration: 0.3 }, rotate: secondsLeft <= 10 ? { duration: 1, repeat: Infinity, ease: "linear" } : {} }} />
       )}
-      {/* Square 3: appears at 30s elapsed (top-right) */}
-      {secondsLeft <= 30 && (
+      {secondsLeft <= totalDuration - 30 && (
         <motion.div className={`absolute top-4 right-4 w-2.5 h-2.5 ${secondsLeft <= 10 ? 'bg-red-500' : 'bg-white/80'}`} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1, rotate: secondsLeft <= 10 ? 360 : 0 }} transition={{ opacity: { duration: 0.3 }, scale: { duration: 0.3 }, rotate: secondsLeft <= 10 ? { duration: 1, repeat: Infinity, ease: "linear" } : {} }} />
       )}
-      {/* Square 4: appears at 45s elapsed (bottom-right) */}
-      {secondsLeft <= 15 && (
+      {secondsLeft <= totalDuration - 45 && (
         <motion.div className={`absolute bottom-4 right-4 w-2.5 h-2.5 ${secondsLeft <= 10 ? 'bg-red-500' : 'bg-white/80'}`} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1, rotate: secondsLeft <= 10 ? 360 : 0 }} transition={{ opacity: { duration: 0.3 }, scale: { duration: 0.3 }, rotate: secondsLeft <= 10 ? { duration: 1, repeat: Infinity, ease: "linear" } : {} }} />
       )}
+
       <motion.div
         className="relative flex flex-col items-center gap-6"
         initial={{ scale: 0.9, opacity: 0 }}
@@ -183,25 +162,14 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
           style={{ width: "240px", height: "56px" }}
           placeholder="ENTER CODE"
         />
-        {/* Denied message */}
         {denied && (
-          <motion.p
-            className="text-red-500 text-xs tracking-[0.2em] font-display"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+          <motion.p className="text-red-500 text-xs tracking-[0.2em] font-display" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             ACCESS IS DENIED
           </motion.p>
         )}
-        {/* Progress bar */}
         <div className="w-[240px] h-[2px] bg-white/10 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-white/60 rounded-full"
-            style={{ width: `${progress}%` }}
-            transition={{ duration: 0.3 }}
-          />
+          <motion.div className="h-full bg-white/60 rounded-full" style={{ width: `${progress}%` }} transition={{ duration: 0.3 }} />
         </div>
-        {/* Countdown */}
         <motion.span
           className="text-xs tracking-[0.5em] font-display font-bold"
           style={{
