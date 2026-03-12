@@ -417,20 +417,8 @@ const Index = () => {
           <div className="absolute inset-0 bg-black/60" />
         </div>
       )}
-      {/* Animated polygon background or video */}
-      {getContent("card_bg_type") === "video" && getContent("card_bg_video") ? (
-        <video
-          src={getContent("card_bg_video")}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: (parseInt(getContent("card_bg_video_opacity") || "40", 10)) / 100 }}
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-      ) : (
-        <PolygonBackground triggerKey={flipCount} />
-      )}
+      {/* Polygon background for portfolio section */}
+      <PolygonBackground triggerKey={flipCount} />
       
 
       {/* Cards content — centered */}
