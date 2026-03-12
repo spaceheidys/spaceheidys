@@ -406,6 +406,13 @@ const Admin = () => {
           </button>
           <span className="text-muted-foreground/40">|</span>
           <h1 className="font-display text-sm tracking-[0.3em] uppercase">Portfolio CMS</h1>
+          <span className="text-muted-foreground/40">|</span>
+          <button
+            onClick={() => navigate("/admin/secret-door")}
+            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Secret Door
+          </button>
         </div>
         <div className="flex items-center gap-4">
           <button
