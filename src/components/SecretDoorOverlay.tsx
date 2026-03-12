@@ -73,8 +73,8 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
         setProgress(((duration - currentSeconds) / duration) * 100);
         if (currentSeconds <= 0) {
           if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-          cyberpunkAudio.pause();
-          cyberpunkAudio.currentTime = 0;
+          if (cyberpunkAudioRef.current) { cyberpunkAudioRef.current.pause(); cyberpunkAudioRef.current.currentTime = 0; }
+          onClose();
           onClose();
         }
       }, 1000);
