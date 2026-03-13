@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NotesPanel from "@/components/admin/NotesPanel";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
@@ -107,6 +107,7 @@ const Admin = () => {
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [cmsPage, setCmsPage] = useState(0);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const CMS_ITEMS_PER_PAGE = 12;
 
   const sensors = useSensors(
@@ -828,58 +829,153 @@ const Admin = () => {
           </p>
         ) : (
           <>
+            {/* Collapse/Expand all groups toggle */}
+            {(() => {
+              const groupIds = [...new Set(items.filter(i => i.group_id).map(i => i.group_id!))];
+              if (groupIds.length === 0) return null;
+              const allCollapsed = groupIds.every(gid => collapsedGroups.has(gid));
+              return (
+                <div className="flex items-center gap-2 mb-3">
+                  <button
+                    onClick={() => {
+                      if (allCollapsed) {
+                        setCollapsedGroups(new Set());
+                      } else {
+                        setCollapsedGroups(new Set(groupIds));
+                      }
+                    }}
+                    className="flex items-center gap-1 text-[10px] font-display tracking-[0.15em] uppercase px-2 py-1 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                  >
+                    {allCollapsed ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+                    {allCollapsed ? "EXPAND ALL GROUPS" : "COLLAPSE ALL GROUPS"}
+                  </button>
+                </div>
+              );
+            })()}
+
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                  {items
-                    .slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE)
-                    .map((item) => (
-                    <div key={item.id} className="relative">
-                      {bulkSelectMode && (
-                        <div
-                          onClick={() => {
-                            const next = new Set(selectedIds);
-                            next.has(item.id) ? next.delete(item.id) : next.add(item.id);
-                            setSelectedIds(next);
-                          }}
-                          className="absolute inset-0 z-30 cursor-pointer flex items-center justify-center"
-                        >
-                          <div className={`absolute inset-0 transition-colors ${selectedIds.has(item.id) ? 'bg-primary/20' : 'bg-black/30 hover:bg-black/10'}`} />
-                          <div className="absolute top-1 right-1 p-0.5 rounded bg-black/60">
-                            {selectedIds.has(item.id) ? (
-                              <CheckSquare size={16} className="text-primary" />
-                            ) : (
-                              <Square size={16} className="text-foreground/40" />
-                            )}
+                  {(() => {
+                    // Build display list: for collapsed groups, only show first item
+                    const seenGroups = new Set<string>();
+                    const groupCounts = new Map<string, number>();
+                    items.forEach(item => {
+                      if (item.group_id) {
+                        groupCounts.set(item.group_id, (groupCounts.get(item.group_id) || 0) + 1);
+                      }
+                    });
+
+                    const displayItems: { item: PortfolioItem; isGroupHeader: boolean; groupCount: number; isCollapsed: boolean }[] = [];
+                    items.forEach(item => {
+                      if (item.group_id && collapsedGroups.has(item.group_id)) {
+                        if (!seenGroups.has(item.group_id)) {
+                          seenGroups.add(item.group_id);
+                          displayItems.push({
+                            item,
+                            isGroupHeader: true,
+                            groupCount: groupCounts.get(item.group_id) || 1,
+                            isCollapsed: true,
+                          });
+                        }
+                        // Skip other items in collapsed group
+                      } else {
+                        displayItems.push({
+                          item,
+                          isGroupHeader: item.group_id ? !seenGroups.has(item.group_id) : false,
+                          groupCount: item.group_id ? (groupCounts.get(item.group_id) || 1) : 1,
+                          isCollapsed: false,
+                        });
+                        if (item.group_id) seenGroups.add(item.group_id);
+                      }
+                    });
+
+                    return displayItems
+                      .slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE)
+                      .map(({ item, isGroupHeader, groupCount, isCollapsed }) => (
+                      <div key={item.id} className="relative">
+                        {/* Collapsed group overlay */}
+                        {isCollapsed && isGroupHeader && (
+                          <button
+                            onClick={() => {
+                              const next = new Set(collapsedGroups);
+                              next.delete(item.group_id!);
+                              setCollapsedGroups(next);
+                            }}
+                            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] cursor-pointer hover:bg-black/30 transition-colors"
+                          >
+                            <span className="text-[10px] font-display tracking-widest text-white/90 uppercase mb-1">
+                              GROUP · {groupCount} IMG
+                            </span>
+                            <ChevronDown size={16} className="text-white/70" />
+                            <span className="text-[9px] font-display tracking-widest text-white/50 mt-0.5">
+                              EXPAND
+                            </span>
+                          </button>
+                        )}
+                        {/* Group header collapse button (when expanded) */}
+                        {isGroupHeader && !isCollapsed && groupCount > 1 && (
+                          <button
+                            onClick={() => {
+                              const next = new Set(collapsedGroups);
+                              next.add(item.group_id!);
+                              setCollapsedGroups(next);
+                            }}
+                            className="absolute top-1 left-1 z-20 flex items-center gap-0.5 px-1.5 py-0.5 bg-black/60 text-white/80 hover:text-white transition-colors"
+                            title="Collapse group"
+                          >
+                            <ChevronUp size={10} />
+                            <span className="text-[8px] font-display tracking-widest">
+                              {groupCount}
+                            </span>
+                          </button>
+                        )}
+                        {bulkSelectMode && (
+                          <div
+                            onClick={() => {
+                              const next = new Set(selectedIds);
+                              next.has(item.id) ? next.delete(item.id) : next.add(item.id);
+                              setSelectedIds(next);
+                            }}
+                            className="absolute inset-0 z-30 cursor-pointer flex items-center justify-center"
+                          >
+                            <div className={`absolute inset-0 transition-colors ${selectedIds.has(item.id) ? 'bg-primary/20' : 'bg-black/30 hover:bg-black/10'}`} />
+                            <div className="absolute top-1 right-1 p-0.5 rounded bg-black/60">
+                              {selectedIds.has(item.id) ? (
+                                <CheckSquare size={16} className="text-primary" />
+                              ) : (
+                                <Square size={16} className="text-foreground/40" />
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                      <SortableImageCard
-                        id={item.id}
-                        title={item.title}
-                        image_url={item.image_url}
-                        image_offset_x={(item as any).image_offset_x ?? 50}
-                        image_offset_y={(item as any).image_offset_y ?? 50}
-                        image_zoom={(item as any).image_zoom ?? 1}
-                        text_align={(item as any).text_align ?? 'left'}
-                        group_id={item.group_id}
-                        project_url={(item as any).project_url}
-                        description={(item as any).description}
-                        tags={(item as any).tags}
-                        project_date={(item as any).project_date}
-                        showProjectUrl={activeSection === "projects"}
-                        onDelete={() => handleDelete(item)}
-                        onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
-                        onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
-                        onTitleChange={(title) => handleTitleChange(item.id, title)}
-                        onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
-                        onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
-                        onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
-                        onTagsChange={(tags) => handleTagsChange(item.id, tags)}
-                        onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
-                      />
-                    </div>
-                  ))}
+                        )}
+                        <SortableImageCard
+                          id={item.id}
+                          title={item.title}
+                          image_url={item.image_url}
+                          image_offset_x={(item as any).image_offset_x ?? 50}
+                          image_offset_y={(item as any).image_offset_y ?? 50}
+                          image_zoom={(item as any).image_zoom ?? 1}
+                          text_align={(item as any).text_align ?? 'left'}
+                          group_id={item.group_id}
+                          project_url={(item as any).project_url}
+                          description={(item as any).description}
+                          tags={(item as any).tags}
+                          project_date={(item as any).project_date}
+                          showProjectUrl={activeSection === "projects"}
+                          onDelete={() => handleDelete(item)}
+                          onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}
+                          onZoomChange={(zoom) => handleZoomChange(item.id, zoom)}
+                          onTitleChange={(title) => handleTitleChange(item.id, title)}
+                          onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
+                          onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
+                          onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
+                          onTagsChange={(tags) => handleTagsChange(item.id, tags)}
+                          onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
+                        />
+                      </div>
+                    ));
+                  })()}
                 </div>
               </SortableContext>
             </DndContext>
