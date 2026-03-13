@@ -972,6 +972,12 @@ const Admin = () => {
                           onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
                           onTagsChange={(tags) => handleTagsChange(item.id, tags)}
                           onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
+                          onImageReplace={async (newUrl) => {
+                            const { error } = await supabase.from("portfolio_items").update({ image_url: newUrl }).eq("id", item.id);
+                            if (!error) {
+                              setItems(prev => prev.map(i => i.id === item.id ? { ...i, image_url: newUrl } : i));
+                            }
+                          }}
                         />
                       </div>
                     ));

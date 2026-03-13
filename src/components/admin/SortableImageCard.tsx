@@ -1,7 +1,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw, Edit2 } from "lucide-react";
+import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw, Edit2, Upload, Loader2 } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +33,7 @@ interface SortableImageCardProps {
   onDescriptionChange?: (desc: string) => void;
   onTagsChange?: (tags: string[]) => void;
   onProjectDateChange?: (date: string) => void;
+  onImageReplace?: (newUrl: string) => void;
 }
 
 const GROUP_COLORS = [
@@ -72,6 +75,7 @@ const SortableImageCard = ({
   onDescriptionChange,
   onTagsChange,
   onProjectDateChange,
+  onImageReplace,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
@@ -86,6 +90,11 @@ const SortableImageCard = ({
   const [editDesc, setEditDesc] = useState(description || "");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  const [replacingImage, setReplacingImage] = useState(false);
+  const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
+  const [pendingReplacePreview, setPendingReplacePreview] = useState<string | null>(null);
+  const [uploadingReplace, setUploadingReplace] = useState(false);
+  const replaceFileRef = useRef<HTMLInputElement>(null);
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -467,7 +476,13 @@ const SortableImageCard = ({
           {/* Image / project preview */}
           {(image_url || project_url) && (
             <div className="relative w-full aspect-video rounded-md overflow-hidden border border-border bg-muted/20 mb-1">
-              {image_url ? (
+              {pendingReplacePreview ? (
+                <img
+                  src={pendingReplacePreview}
+                  alt="New image"
+                  className="w-full h-full object-cover"
+                />
+              ) : image_url ? (
                 <img
                   src={image_url}
                   alt={title}
@@ -486,6 +501,68 @@ const SortableImageCard = ({
                   />
                 </div>
               ) : null}
+
+              {/* Replace image button */}
+              {image_url && onImageReplace && !pendingReplaceFile && (
+                <label className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-background/80 text-foreground text-[10px] font-display tracking-widest uppercase cursor-pointer hover:bg-background transition-colors">
+                  <Upload size={10} />
+                  Replace
+                  <input
+                    ref={replaceFileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setPendingReplaceFile(file);
+                      setPendingReplacePreview(URL.createObjectURL(file));
+                    }}
+                  />
+                </label>
+              )}
+
+              {/* Yes/No confirmation for replacement */}
+              {pendingReplaceFile && (
+                <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-background/90 px-2 py-1">
+                  <span className="text-[10px] font-display tracking-widest text-foreground">Replace?</span>
+                  <button
+                    disabled={uploadingReplace}
+                    onClick={async () => {
+                      if (!pendingReplaceFile || !onImageReplace) return;
+                      setUploadingReplace(true);
+                      const ext = pendingReplaceFile.name.split(".").pop();
+                      const path = `replaced/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+                      const { error: upErr } = await supabase.storage.from("portfolio-images").upload(path, pendingReplaceFile);
+                      if (upErr) {
+                        toast.error("Upload failed");
+                        setUploadingReplace(false);
+                        return;
+                      }
+                      const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+                      onImageReplace(urlData.publicUrl);
+                      setPendingReplaceFile(null);
+                      setPendingReplacePreview(null);
+                      setUploadingReplace(false);
+                      toast.success("Image replaced");
+                    }}
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+                  >
+                    {uploadingReplace ? <Loader2 size={10} className="animate-spin" /> : <Check size={10} />} YES
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPendingReplaceFile(null);
+                      if (pendingReplacePreview) URL.revokeObjectURL(pendingReplacePreview);
+                      setPendingReplacePreview(null);
+                      if (replaceFileRef.current) replaceFileRef.current.value = "";
+                    }}
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X size={10} /> NO
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
