@@ -476,7 +476,13 @@ const SortableImageCard = ({
           {/* Image / project preview */}
           {(image_url || project_url) && (
             <div className="relative w-full aspect-video rounded-md overflow-hidden border border-border bg-muted/20 mb-1">
-              {image_url ? (
+              {pendingReplacePreview ? (
+                <img
+                  src={pendingReplacePreview}
+                  alt="New image"
+                  className="w-full h-full object-cover"
+                />
+              ) : image_url ? (
                 <img
                   src={image_url}
                   alt={title}
@@ -495,6 +501,68 @@ const SortableImageCard = ({
                   />
                 </div>
               ) : null}
+
+              {/* Replace image button */}
+              {image_url && onImageReplace && !pendingReplaceFile && (
+                <label className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-background/80 text-foreground text-[10px] font-display tracking-widest uppercase cursor-pointer hover:bg-background transition-colors">
+                  <Upload size={10} />
+                  Replace
+                  <input
+                    ref={replaceFileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setPendingReplaceFile(file);
+                      setPendingReplacePreview(URL.createObjectURL(file));
+                    }}
+                  />
+                </label>
+              )}
+
+              {/* Yes/No confirmation for replacement */}
+              {pendingReplaceFile && (
+                <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-background/90 px-2 py-1">
+                  <span className="text-[10px] font-display tracking-widest text-foreground">Replace?</span>
+                  <button
+                    disabled={uploadingReplace}
+                    onClick={async () => {
+                      if (!pendingReplaceFile || !onImageReplace) return;
+                      setUploadingReplace(true);
+                      const ext = pendingReplaceFile.name.split(".").pop();
+                      const path = `replaced/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+                      const { error: upErr } = await supabase.storage.from("portfolio-images").upload(path, pendingReplaceFile);
+                      if (upErr) {
+                        toast.error("Upload failed");
+                        setUploadingReplace(false);
+                        return;
+                      }
+                      const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+                      onImageReplace(urlData.publicUrl);
+                      setPendingReplaceFile(null);
+                      setPendingReplacePreview(null);
+                      setUploadingReplace(false);
+                      toast.success("Image replaced");
+                    }}
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+                  >
+                    {uploadingReplace ? <Loader2 size={10} className="animate-spin" /> : <Check size={10} />} YES
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPendingReplaceFile(null);
+                      if (pendingReplacePreview) URL.revokeObjectURL(pendingReplacePreview);
+                      setPendingReplacePreview(null);
+                      if (replaceFileRef.current) replaceFileRef.current.value = "";
+                    }}
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X size={10} /> NO
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
