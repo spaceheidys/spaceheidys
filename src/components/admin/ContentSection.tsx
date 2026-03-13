@@ -15,6 +15,7 @@ const FIELDS = [
   { key: "contact_title", label: "Contact — Title" },
   { key: "contact_body", label: "Contact — Body" },
   { key: "contact_email", label: "Contact — Email" },
+  { key: "footer", label: "Footer Text" },
 ];
 
 const DURATION_OPTIONS = [
