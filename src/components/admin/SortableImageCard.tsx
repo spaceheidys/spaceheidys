@@ -90,6 +90,11 @@ const SortableImageCard = ({
   const [editDesc, setEditDesc] = useState(description || "");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  const [replacingImage, setReplacingImage] = useState(false);
+  const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
+  const [pendingReplacePreview, setPendingReplacePreview] = useState<string | null>(null);
+  const [uploadingReplace, setUploadingReplace] = useState(false);
+  const replaceFileRef = useRef<HTMLInputElement>(null);
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
