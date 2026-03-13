@@ -33,6 +33,7 @@ interface SortableImageCardProps {
   onDescriptionChange?: (desc: string) => void;
   onTagsChange?: (tags: string[]) => void;
   onProjectDateChange?: (date: string) => void;
+  onImageReplace?: (newUrl: string) => void;
 }
 
 const GROUP_COLORS = [
