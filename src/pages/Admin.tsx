@@ -107,6 +107,7 @@ const Admin = () => {
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [cmsPage, setCmsPage] = useState(0);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const CMS_ITEMS_PER_PAGE = 12;
 
   const sensors = useSensors(
