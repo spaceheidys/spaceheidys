@@ -571,12 +571,12 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
               /* ── SINGLE IMAGE view ── */
               ) : (
-                <div className="flex flex-col items-center gap-2 max-h-[85vh]">
+                <div className="flex flex-col items-center gap-2">
                   <img
                     src={selectedEntry.image_url}
                     alt={selectedEntry.label}
-                    className="max-w-[80vw] sm:max-w-[75vw] object-contain rounded-md cursor-pointer flex-shrink min-h-0"
-                    style={{ maxHeight: "calc(85vh - 3rem)" }}
+                    className="max-w-[80vw] sm:max-w-[75vw] object-contain rounded-md cursor-pointer"
+                    style={{ maxHeight: "calc(100vh - 12rem)" }}
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
