@@ -28,9 +28,83 @@ import ShareSection from "@/components/admin/ShareSection";
 import SkillsSection from "@/components/admin/SkillsSection";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
-const SECTIONS = ["gallery", "projects", "skills", "archive"] as const;
 const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
-const SPECIAL_TABS = ["share"] as const;
+const PORTFOLIO_SECTION_KEYS = ["gallery", "projects", "skills", "archive", "share"];
+
+import type { SectionSetting } from "@/hooks/useSectionSettings";
+
+interface SortableSectionTabProps {
+  sec: SectionSetting;
+  isActive: boolean;
+  isVisible: boolean;
+  isEditing: boolean;
+  editLabel: string;
+  editLabelJp: string;
+  onSelect: () => void;
+  onToggle: () => void;
+  onStartEdit: () => void;
+  onLabelChange: (v: string) => void;
+  onLabelJpChange: (v: string) => void;
+  onSaveEdit: () => void;
+  onCancelEdit: () => void;
+}
+
+const SortableSectionTab = ({ sec, isActive, isVisible, isEditing, editLabel, editLabelJp, onSelect, onToggle, onStartEdit, onLabelChange, onLabelJpChange, onSaveEdit, onCancelEdit }: SortableSectionTabProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sec.section });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center gap-0">
+      <button
+        {...attributes}
+        {...listeners}
+        className="px-1 py-1.5 text-muted-foreground/40 hover:text-muted-foreground cursor-grab active:cursor-grabbing"
+        title="Drag to reorder"
+      >
+        <GripVertical size={10} />
+      </button>
+      {isEditing ? (
+        <div className="flex items-center gap-1 px-2 py-0.5 border border-foreground">
+          <input
+            value={editLabel}
+            onChange={(e) => onLabelChange(e.target.value)}
+            className="w-16 bg-transparent text-xs font-display tracking-wider uppercase outline-none text-foreground"
+            placeholder="EN"
+            autoFocus
+          />
+          <input
+            value={editLabelJp}
+            onChange={(e) => onLabelJpChange(e.target.value)}
+            className="w-16 bg-transparent text-xs font-display outline-none text-foreground"
+            placeholder="JP"
+          />
+          <button onClick={onSaveEdit} className="text-foreground hover:text-foreground/80"><Check size={10} /></button>
+          <button onClick={onCancelEdit} className="text-muted-foreground hover:text-foreground"><X size={10} /></button>
+        </div>
+      ) : (
+        <button
+          onClick={onSelect}
+          onDoubleClick={onStartEdit}
+          className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border-y border-l transition-colors ${
+            isActive ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground"
+          }`}
+          title="Double-click to rename"
+        >
+          {sec.label || sec.section}
+        </button>
+      )}
+      <button
+        onClick={onToggle}
+        className={`px-1.5 py-1.5 border transition-colors ${
+          isActive ? "border-foreground" : "border-border"
+        } ${isVisible ? "text-foreground/60 hover:text-foreground" : "text-muted-foreground/30 hover:text-muted-foreground"}`}
+        title={isVisible ? `Hide ${sec.section} on site` : `Show ${sec.section} on site`}
+      >
+        {isVisible ? <Eye size={11} /> : <EyeOff size={11} />}
+      </button>
+    </div>
+  );
+};
 
 interface PortfolioItem {
   id: string;
