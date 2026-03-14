@@ -211,6 +211,67 @@ const Index = () => {
       <AnimatePresence>
         {loading && <LoadingScreen onComplete={() => { sessionStorage.setItem('loaded', '1'); setLoading(false); }} />}
       </AnimatePresence>
+      {/* Fixed header — outside stacking contexts */}
+      <motion.header
+          className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}>
+          
+        <span
+            className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
+            onClick={() => setShowNav((prev) => !prev)}>
+            
+          ビコ・ク
+        </span>
+        <nav className="hidden md:flex items-center gap-8 lg:gap-12">
+          {["Secret Door", "Shop"].map((item, i) =>
+            <motion.a
+              key={item}
+              onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => setActiveSection("shop")}
+              className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.1 }}>
+              {item}
+            </motion.a>
+            )}
+          <motion.div
+              className="flex items-center gap-2"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}>
+            {bgOptions.map((bg, i) =>
+              <div
+                key={i}
+                className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
+                style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
+                onClick={() => setBgImage(bg)} />
+              )}
+            <div
+                className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
+                onClick={toggleMute}
+                aria-label={muted ? "Unmute sound" : "Mute sound"}>
+              {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            </div>
+          </motion.div>
+        </nav>
+        <MobileNav
+            onSecretDoor={() => setSecretDoorOpen(true)}
+            onShop={() => setActiveSection("shop")}
+            navButtons={navButtons}
+            actionMap={{
+              about: handleAboutClick,
+              portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+              gallery: () => navigate("/gallery"),
+              contacts: handleContactClick,
+            }}
+            bgOptions={bgOptions}
+            bgImage={bgImage}
+            onBgChange={setBgImage} />
+          
+      </motion.header>
+
       <div className="relative bg-background overflow-hidden rounded-none min-h-[100dvh]">
       {/* === MAIN section === */}
       {/* Hero background illustration */}
@@ -228,66 +289,8 @@ const Index = () => {
 
       {/* Content layer */}
       <div className="relative z-10 min-h-[100dvh] flex flex-col">
-        {/* Top nav bar */}
-        <motion.header
-            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}>
-            
-          <span
-              className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
-              onClick={() => setShowNav((prev) => !prev)}>
-              
-            ビコ・ク
-          </span>
-          <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-            {["Secret Door", "Shop"].map((item, i) =>
-              <motion.a
-                key={item}
-                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => setActiveSection("shop")}
-                className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}>
-                {item}
-              </motion.a>
-              )}
-            <motion.div
-                className="flex items-center gap-2"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}>
-              {bgOptions.map((bg, i) =>
-                <div
-                  key={i}
-                  className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
-                  style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
-                  onClick={() => setBgImage(bg)} />
-                )}
-              <div
-                  className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
-                  onClick={toggleMute}
-                  aria-label={muted ? "Unmute sound" : "Mute sound"}>
-                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </div>
-            </motion.div>
-          </nav>
-          <MobileNav
-              onSecretDoor={() => setSecretDoorOpen(true)}
-              onShop={() => setActiveSection("shop")}
-              navButtons={navButtons}
-              actionMap={{
-                about: handleAboutClick,
-                portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
-                gallery: () => navigate("/gallery"),
-                contacts: handleContactClick,
-              }}
-              bgOptions={bgOptions}
-              bgImage={bgImage}
-              onBgChange={setBgImage} />
-            
-        </motion.header>
+        {/* Spacer for fixed header */}
+        <div className="h-16 sm:h-20 md:h-24" />
 
         {/* Main content */}
         <div className="flex-1 flex items-center px-4 sm:px-8 md:px-16 relative">
@@ -311,7 +314,7 @@ const Index = () => {
     <AnimatePresence>
       {showNav && (
         <motion.nav
-          className="hidden md:flex flex-col gap-8 fixed left-4 sm:left-8 md:left-16 top-1/2 -translate-y-1/2 z-50"
+          className="hidden md:flex flex-col gap-8 fixed left-4 sm:left-8 md:left-16 top-1/2 -translate-y-1/2 z-[100]"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
