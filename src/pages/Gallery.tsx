@@ -89,6 +89,8 @@ const ShareBar = ({ shareUrl, title, compact = false }: { shareUrl: string; titl
 const Gallery = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { subs: gallerySubs } = useGallerySubs();
+  const tabs = useMemo(() => ["ALL", ...gallerySubs.map((s) => s.en)], [gallerySubs]);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
