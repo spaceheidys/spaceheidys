@@ -165,6 +165,10 @@ const Index = () => {
   const siteMusicEnabled = !contentLoading && getContent("site_music_enabled") !== "false";
 
   useEffect(() => {
+    setSiteMusicEnabled(siteMusicEnabled);
+  }, [siteMusicEnabled, setSiteMusicEnabled]);
+
+  useEffect(() => {
     if (contentLoading) return;
     if (!siteMusicEnabled) return;
 
