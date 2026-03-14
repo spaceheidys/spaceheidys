@@ -291,51 +291,6 @@ const Index = () => {
 
         {/* Main content */}
         <div className="flex-1 flex items-center px-4 sm:px-8 md:px-16 relative">
-          {/* Left side nav */}
-          <AnimatePresence>
-            {showNav &&
-              <motion.nav
-                className="hidden md:flex flex-col gap-8 mr-auto"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.4 }}>
-                
-                {(() => {
-                  const actionMap: Record<string, () => void> = {
-                    about: handleAboutClick,
-                    portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
-                    gallery: () => navigate("/gallery"),
-                    contacts: handleContactClick,
-                  };
-                  return navButtons
-                    .filter(b => b.is_visible)
-                    .map(b => ({ jp: b.label_jp, en: b.label, action: actionMap[b.key] }));
-                })().
-                map((item, i) =>
-                <motion.a
-                  key={item.en}
-                  href={item.action ? undefined : `#${item.en.toLowerCase()}`}
-                  onClick={() => {
-                    if (!muted) {
-                      const bell = new Audio("/audio/bell-sounds.mp3");
-                      bell.play().catch(() => {});
-                    }
-                    item.action?.();
-                  }}
-                  className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}>
-                  
-                    <span className="font-jp text-xs tracking-widest">{item.jp}</span>
-                    <span className="text-[10px] tracking-[0.3em] font-display">{item.en}</span>
-                  </motion.a>
-                )}
-              </motion.nav>
-              }
-          </AnimatePresence>
-
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="pointer-events-auto">
               <BikoKuLogo />
