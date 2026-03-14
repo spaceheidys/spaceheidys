@@ -379,8 +379,8 @@ const AdminMain = () => {
                   Library
                 </p>
                 <label className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-xs font-display tracking-[0.2em] uppercase">
-                  {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                   Add to Library
+                   {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                   Add to Library{uploadProgress !== null && ` ${uploadProgress}%`}
                    <input
                      ref={libraryFileRef}
                      type="file"
