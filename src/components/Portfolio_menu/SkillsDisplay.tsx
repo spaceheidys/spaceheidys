@@ -52,11 +52,11 @@ const SkillsDisplay = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+      <div className="flex flex-wrap items-start justify-center gap-4 sm:gap-6">
         {skills.map((skill, i) => (
           <motion.div
             key={skill.id}
-            className="flex flex-col items-center gap-2 group"
+            className="flex flex-col items-center group w-[60px] sm:w-[70px]"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.05 + i * 0.05 }}
@@ -68,7 +68,7 @@ const SkillsDisplay = () => {
                 <span className="text-white/30 text-[8px] font-display">{skill.name.slice(0,2)}</span>
               )}
             </div>
-            <span className="text-[8px] sm:text-[9px] text-white/50 group-hover:text-white/80 transition-colors duration-300 font-display tracking-wider uppercase text-center max-w-[60px] leading-tight break-words">
+            <span className="mt-2 text-[8px] sm:text-[9px] text-white/50 group-hover:text-white/80 transition-colors duration-300 font-display tracking-wider uppercase text-center leading-tight break-words w-full">
               {skill.name}
             </span>
           </motion.div>
