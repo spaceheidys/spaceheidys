@@ -28,7 +28,10 @@ import { useFavorites } from "@/hooks/useFavorites";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    if (sessionStorage.getItem('loaded')) return false;
+    return true;
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
@@ -204,7 +207,7 @@ const Index = () => {
   return (
     <>
       <AnimatePresence>
-        {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
+        {loading && <LoadingScreen onComplete={() => { sessionStorage.setItem('loaded', '1'); setLoading(false); }} />}
       </AnimatePresence>
       <div className="relative bg-background overflow-hidden rounded-none min-h-[100dvh]">
       {/* === MAIN section === */}
