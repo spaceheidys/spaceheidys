@@ -206,7 +206,6 @@ const AdminMain = () => {
           <Main2Section get={getContent} update={updateContent} />
         ) : (
           <>
-            {/* Buttons section — at top */}
             <ButtonsSection
               buttons={navButtons}
               onUpdate={updateButton}
@@ -214,8 +213,6 @@ const AdminMain = () => {
               onAdd={addButton}
               onDelete={deleteButton}
             />
-
-            {/* Section content editing */}
             <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
           </>
         )}
@@ -271,7 +268,6 @@ const AdminMain = () => {
                   )}
                   {!item.isDefault && (
                     <>
-                      {/* Swap button — top left */}
                       <button
                         onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)}
                         title="Click to swap with a Library image"
@@ -283,7 +279,6 @@ const AdminMain = () => {
                       >
                         <ArrowUpDown size={14} />
                       </button>
-                      {/* Visibility toggle — bottom left */}
                       <button
                         onClick={async () => {
                           const bg = backgrounds.find(b => b.id === item.id);
@@ -306,7 +301,6 @@ const AdminMain = () => {
                       >
                         {backgrounds.find(b => b.id === item.id)?.is_active === false ? <EyeOff size={14} /> : <Eye size={14} />}
                       </button>
-                      {/* Delete button — top right */}
                       <button
                         onClick={() => handleDelete(item.id)}
                         className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
@@ -317,7 +311,7 @@ const AdminMain = () => {
                   )}
                 </div>
               ))}
-              {sectionItems.length === 0 && activeSection === "portfolio" && (
+              {sectionItems.length === 0 && activeSection !== "main" && (
                 <p className="text-muted-foreground text-sm col-span-full text-center py-8">
                   No backgrounds yet. Upload one to get started.
                 </p>
@@ -368,7 +362,6 @@ const AdminMain = () => {
                           </span>
                         </div>
                       )}
-                      {/* Delete from library */}
                       {!swapTarget && (
                         <button
                           onClick={() => handleDelete(item.id)}

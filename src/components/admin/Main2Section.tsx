@@ -116,7 +116,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
       {/* Background type toggle */}
       <div className="space-y-3">
         <label className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-          Section Background
+          CARDS
         </label>
         <div className="flex items-center gap-2">
           <button
@@ -219,7 +219,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
       </div>
 
       {/* Card images */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-6 max-w-[320px]">
         <CardImageUpload
           label="Card front"
           imageUrl={frontImage}
