@@ -287,6 +287,33 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
   const pageItems = entries.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
+  // Swipe support for pagination
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const diff = touchStartX.current - touchEndX.current;
+    const threshold = 50;
+    if (diff > threshold && page < totalPages - 1) {
+      setPage((p) => p + 1);
+    } else if (diff < -threshold && page > 0) {
+      setPage((p) => p - 1);
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  }, [page, totalPages]);
+
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
   const isProject = selectedEntry && selectedEntry.project_url;
 
