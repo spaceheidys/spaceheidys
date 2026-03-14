@@ -312,25 +312,6 @@ const Gallery = () => {
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Navigation arrows — desktop only */}
-            {!isGroup && selectedIndex > 0 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
-                className="hidden sm:flex fixed left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-10 h-10" />
-              </button>
-            )}
-            {!isGroup && selectedIndex < navigableEntries.length - 1 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
-                className="hidden sm:flex fixed right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-10 h-10" />
-              </button>
-            )}
 
             <motion.div
               key={selectedEntry.id}
