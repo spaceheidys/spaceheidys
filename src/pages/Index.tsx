@@ -353,7 +353,7 @@ const Index = () => {
     </div>
 
     {/* === MAIN_TEXT section === */}
-    <div className="relative w-full bg-background" style={{ height: 420 }}>
+    <div ref={mainTextRef} className="relative w-full bg-background" style={{ height: 420 }}>
       <AnimatePresence mode="wait">
         {activeSection === "about" &&
           <motion.div
