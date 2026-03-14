@@ -353,7 +353,7 @@ const Index = () => {
               key={item.en}
               href={item.action ? undefined : `#${item.en.toLowerCase()}`}
               onClick={() => {
-                if (!muted) {
+                if (!muted && siteMusicEnabled) {
                   new Audio("/audio/bell-sounds.mp3").play().catch(() => {});
                 }
                 item.action?.();
