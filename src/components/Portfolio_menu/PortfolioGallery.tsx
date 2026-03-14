@@ -45,12 +45,7 @@ const defaultSectionItems: Partial<Record<PortfolioMenuKey, PortfolioItem[]>> = 
   archive: makeItems(8),
 };
 
-const defaultGallerySubItems: Record<string, PortfolioItem[]> = {
-  VECTOR: makeItems(16),
-  DIGITAL: makeItems(16),
-  AI: makeItems(16),
-  SKETCHES: makeItems(16),
-};
+const defaultGallerySubItems: Record<string, PortfolioItem[]> = {};
 
 interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
