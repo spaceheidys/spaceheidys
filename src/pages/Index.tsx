@@ -266,7 +266,7 @@ const Index = () => {
         </nav>
         <MobileNav
             onSecretDoor={() => setSecretDoorOpen(true)}
-            onShop={() => setActiveSection("shop")}
+            onShop={() => handleSectionClick("shop")}
             navButtons={navButtons}
             actionMap={{
               about: handleAboutClick,
