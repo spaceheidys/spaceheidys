@@ -30,7 +30,8 @@ const AdminMain = () => {
   const [backgrounds, setBackgrounds] = useState<BackgroundItem[]>([]);
   const [fetching, setFetching] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [swapTarget, setSwapTarget] = useState<string | null>(null); // id of active image being swapped
+  const [swapTarget, setSwapTarget] = useState<string | null>(null);
+  const [confirmBg, setConfirmBg] = useState<{ action: string; id: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
