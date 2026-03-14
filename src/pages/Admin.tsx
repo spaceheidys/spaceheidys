@@ -540,69 +540,58 @@ const Admin = () => {
       </header>
 
       <div className="px-4 sm:px-8 py-6 max-w-5xl mx-auto">
-        {/* Section tabs */}
-        <div className="flex gap-2 mb-4 flex-wrap items-center">
-          {SECTIONS.map((s) => (
-            <div key={s} className="flex items-center gap-0">
-              <button
-                onClick={() => { setActiveSection(s); setActiveSub("VECTOR"); }}
-                className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border-y border-l transition-colors ${
-                  activeSection === s
-                    ? "border-foreground text-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {s}
-              </button>
-              <button
-                onClick={() => toggleSection(s as any)}
-                className={`px-1.5 py-1.5 border transition-colors ${
-                  activeSection === s ? "border-foreground" : "border-border"
-                } ${visibility[s as keyof typeof visibility] ? "text-foreground/60 hover:text-foreground" : "text-muted-foreground/30 hover:text-muted-foreground"}`}
-                title={visibility[s as keyof typeof visibility] ? `Hide ${s} on site` : `Show ${s} on site`}
-              >
-                {visibility[s as keyof typeof visibility] ? <Eye size={11} /> : <EyeOff size={11} />}
-              </button>
+        {/* Section tabs - draggable */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={(event) => {
+            const { active, over } = event;
+            if (!over || active.id === over.id) return;
+            const filtered = sections.filter((s) => PORTFOLIO_SECTION_KEYS.includes(s.section));
+            const oldIdx = filtered.findIndex((s) => s.section === active.id);
+            const newIdx = filtered.findIndex((s) => s.section === over.id);
+            if (oldIdx === -1 || newIdx === -1) return;
+            const reordered = arrayMove(filtered, oldIdx, newIdx).map((s, i) => ({ ...s, sort_order: i }));
+            reorder(reordered);
+          }}
+        >
+          <SortableContext items={sections.filter((s) => PORTFOLIO_SECTION_KEYS.includes(s.section)).map((s) => s.section)} strategy={horizontalListSortingStrategy}>
+            <div className="flex gap-2 mb-4 flex-wrap items-center">
+              {sections.filter((s) => PORTFOLIO_SECTION_KEYS.includes(s.section)).map((sec) => (
+                <SortableSectionTab
+                  key={sec.section}
+                  sec={sec}
+                  isActive={activeSection === sec.section}
+                  isVisible={visibility[sec.section as keyof typeof visibility] ?? true}
+                  isEditing={editingSection === sec.section}
+                  editLabel={editLabel}
+                  editLabelJp={editLabelJp}
+                  onSelect={() => { setActiveSection(sec.section); if (sec.section === "gallery") setActiveSub("VECTOR"); }}
+                  onToggle={() => toggleSection(sec.section as any)}
+                  onStartEdit={() => { setEditingSection(sec.section); setEditLabel(sec.label); setEditLabelJp(sec.label_jp); }}
+                  onLabelChange={setEditLabel}
+                  onLabelJpChange={setEditLabelJp}
+                  onSaveEdit={() => { updateLabel(sec.section, editLabel, editLabelJp); setEditingSection(null); toast.success("Label updated"); }}
+                  onCancelEdit={() => setEditingSection(null)}
+                />
+              ))}
+
+              <div className="ml-auto">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className="flex items-center gap-1.5 text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
+                      <StickyNote size={12} />
+                      NOTES
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-auto p-4 border-border bg-background">
+                    {user && <NotesPanel userId={user.id} />}
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-          ))}
-
-          {/* SHARE tab */}
-          <div className="flex items-center gap-0">
-            <button
-              onClick={() => setActiveSection("share")}
-              className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border-y border-l transition-colors ${
-                activeSection === "share"
-                  ? "border-foreground text-foreground"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              SHARE
-            </button>
-            <button
-              onClick={() => toggleSection("share" as any)}
-              className={`px-1.5 py-1.5 border transition-colors ${
-                activeSection === "share" ? "border-foreground" : "border-border"
-              } ${visibility["share" as keyof typeof visibility] ? "text-foreground/60 hover:text-foreground" : "text-muted-foreground/30 hover:text-muted-foreground"}`}
-              title={visibility["share" as keyof typeof visibility] ? "Hide share on site" : "Show share on site"}
-            >
-              {visibility["share" as keyof typeof visibility] ? <Eye size={11} /> : <EyeOff size={11} />}
-            </button>
-          </div>
-
-          <div className="ml-auto">
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="flex items-center gap-1.5 text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
-                  <StickyNote size={12} />
-                  NOTES
-                </button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-auto p-4 border-border bg-background">
-                {user && <NotesPanel userId={user.id} />}
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
+          </SortableContext>
+        </DndContext>
 
         {activeSection === "share" && <ShareSection />}
 
