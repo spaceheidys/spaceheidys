@@ -345,6 +345,18 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
   const isProject = selectedEntry && selectedEntry.project_url;
 
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!selectedEntry || isGroup) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goLightbox(-1);
+      else if (e.key === "ArrowRight") goLightbox(1);
+      else if (e.key === "Escape") setSelectedEntry(null);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selectedEntry, isGroup, selectedIndex, navigableEntries]);
+
   // Share URL for current entry: prefer project_url, else current page URL
   const getShareUrl = (entry: GalleryEntry) =>
     entry.project_url || window.location.href;
