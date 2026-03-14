@@ -452,23 +452,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                 <span className="hidden sm:inline">Back</span>
               </button>
 
-              {/* Top-right: heart + close */}
-              <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
-                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
-                  aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
-                >
-                  <Heart className={`w-4 h-4 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
-                </button>
-                <button
-                  onClick={() => setSelectedEntry(null)}
-                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
-                  aria-label="Close preview"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
 
               {/* ── PROJECT view ── */}
               {isProject ? (
