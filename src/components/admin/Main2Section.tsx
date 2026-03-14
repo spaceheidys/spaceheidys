@@ -219,7 +219,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
       </div>
 
       {/* Card images */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-6 max-w-[320px]">
         <CardImageUpload
           label="Card front"
           imageUrl={frontImage}
