@@ -544,7 +544,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                       key={idx}
                       src={url}
                       alt={`${selectedEntry.label} ${idx + 1}`}
-                      className="w-full object-contain rounded-md"
+                      className="max-w-full max-h-[80vh] object-contain rounded-md"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   ))}
