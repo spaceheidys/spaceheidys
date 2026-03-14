@@ -276,11 +276,24 @@ const Index = () => {
       {/* === MAIN section === */}
       {/* Hero background illustration */}
       <div className="absolute inset-0 w-full h-[100dvh]">
-        <img
+        {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(bgImage) ? (
+          <video
+            key={bgImage}
+            src={bgImage}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover object-center opacity-60"
+          />
+        ) : (
+          <img
             src={bgImage}
             alt="BIKO KU manga illustration"
             className="w-full h-full object-cover object-center opacity-60"
-            loading="eager" />
+            loading="eager"
+          />
+        )}
           
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
