@@ -26,7 +26,6 @@ interface GalleryEntry {
   groupImages?: string[];
 }
 
-const TABS = ["ALL", "VECTOR", "DIGITAL", "AI", "SKETCHES"] as const;
 const SWIPE_THRESHOLD = 50;
 
 // ─── PlatformIcon ──────────────────────────────────────────────────────────────
