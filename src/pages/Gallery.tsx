@@ -176,12 +176,12 @@ const Gallery = () => {
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (touchStartX.current === null || isGroup) return;
+    if (touchStartX.current === null) return;
     const delta = touchStartX.current - e.changedTouches[0].clientX;
     touchStartX.current = null;
     if (Math.abs(delta) < SWIPE_THRESHOLD) return;
     goLightbox(delta > 0 ? 1 : -1);
-  }, [goLightbox, isGroup]);
+  }, [goLightbox]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
