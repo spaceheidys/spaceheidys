@@ -334,7 +334,7 @@ const Gallery = () => {
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative my-auto ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh]"}`}
+              className={`relative my-auto ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[80vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw]"}`}
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.75, opacity: 0, y: 20 }}
@@ -387,7 +387,7 @@ const Gallery = () => {
                   <img
                     src={selectedEntry.image_url}
                     alt={selectedEntry.title}
-                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[80vh] object-contain rounded-md cursor-pointer"
+                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[65vh] object-contain rounded-md cursor-pointer"
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
