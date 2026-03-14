@@ -303,7 +303,7 @@ const Gallery = () => {
           const shareUrl = `${window.location.origin}/gallery?id=${selectedEntry.id}`;
           return (
           <motion.div
-            className="fixed inset-0 z-50 flex items-start justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer overflow-y-auto"
+            className={`fixed inset-0 z-50 flex ${isGroup ? "items-start overflow-y-auto" : "items-center overflow-hidden"} justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
