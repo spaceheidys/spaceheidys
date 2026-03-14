@@ -12,6 +12,7 @@ interface MobileNavProps {
   bgOptions: string[];
   bgImage: string;
   onBgChange: (bg: string) => void;
+  siteMusicEnabled?: boolean;
 }
 
 const MobileNav = ({
@@ -22,6 +23,7 @@ const MobileNav = ({
   bgOptions,
   bgImage,
   onBgChange,
+  siteMusicEnabled = true,
 }: MobileNavProps) => {
   const [open, setOpen] = useState(false);
   const { muted, toggleMute } = useSoundContext();
@@ -85,13 +87,15 @@ const MobileNav = ({
                   onClick={() => onBgChange(bg)}
                 />
               ))}
-              <button
-                className="ml-2 text-foreground/60 hover:text-foreground transition-colors"
-                onClick={toggleMute}
-                aria-label={muted ? "Unmute" : "Mute"}
-              >
-                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </button>
+              {siteMusicEnabled && (
+                <button
+                  className="ml-2 text-foreground/60 hover:text-foreground transition-colors"
+                  onClick={toggleMute}
+                  aria-label={muted ? "Unmute" : "Mute"}
+                >
+                  {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                </button>
+              )}
             </div>
           </motion.div>
         )}

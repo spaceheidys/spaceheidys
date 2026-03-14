@@ -252,12 +252,14 @@ const Index = () => {
                 style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
                 onClick={() => setBgImage(bg)} />
               )}
-            <div
+            {siteMusicEnabled && (
+              <div
                 className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
                 onClick={toggleMute}
                 aria-label={muted ? "Unmute sound" : "Mute sound"}>
-              {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-            </div>
+                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </div>
+            )}
           </motion.div>
         </nav>
         <MobileNav
@@ -272,7 +274,8 @@ const Index = () => {
             }}
             bgOptions={bgOptions}
             bgImage={bgImage}
-            onBgChange={setBgImage} />
+            onBgChange={setBgImage}
+            siteMusicEnabled={siteMusicEnabled} />
           
       </motion.header>
 
