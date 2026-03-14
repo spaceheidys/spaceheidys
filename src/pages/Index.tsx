@@ -95,7 +95,7 @@ const Index = () => {
           }
           // Flip card back if it's currently unflipped
           if (!thirdCardFlipped) {
-            if (!muted) {
+            if (!muted && siteMusicEnabled) {
               new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
             }
             setThirdCardFlipped(true);
@@ -161,7 +161,11 @@ const Index = () => {
 
   const handleContactClick = () => handleSectionClick("contact");
 
+  const siteMusicEnabled = getContent("site_music_enabled") !== "false";
+
   useEffect(() => {
+    if (!siteMusicEnabled) return;
+
     const audio = new Audio("/audio/main_buddhist.mp3");
     audio.loop = false;
     audioRef.current = audio;
@@ -185,7 +189,7 @@ const Index = () => {
       window.removeEventListener("keydown", playAudio);
       window.removeEventListener("touchstart", playAudio);
     };
-  }, []);
+  }, [siteMusicEnabled]);
 
   // Ctrl+Shift+A shortcut to navigate to admin
   useEffect(() => {
@@ -349,7 +353,7 @@ const Index = () => {
               key={item.en}
               href={item.action ? undefined : `#${item.en.toLowerCase()}`}
               onClick={() => {
-                if (!muted) {
+                if (!muted && siteMusicEnabled) {
                   new Audio("/audio/bell-sounds.mp3").play().catch(() => {});
                 }
                 item.action?.();
