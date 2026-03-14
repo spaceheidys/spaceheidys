@@ -55,7 +55,7 @@ const Index = () => {
   const closingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { visibility: sectionVisibility } = useSectionSettings();
   const { buttons: navButtons } = useNavButtons();
-  const { get: getContent, getDuration } = useSectionContent();
+  const { get: getContent, getDuration, loading: contentLoading } = useSectionContent();
   const { count: favoritesCount } = useFavorites();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
