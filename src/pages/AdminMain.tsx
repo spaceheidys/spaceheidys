@@ -30,6 +30,7 @@ const AdminMain = () => {
   const [backgrounds, setBackgrounds] = useState<BackgroundItem[]>([]);
   const [fetching, setFetching] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [swapTarget, setSwapTarget] = useState<string | null>(null);
   const [confirmBg, setConfirmBg] = useState<{ action: string; id: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -57,16 +58,37 @@ const AdminMain = () => {
 
   const uploadToSection = async (file: File, section: string) => {
     setUploading(true);
+    setUploadProgress(0);
     const ext = file.name.split(".").pop();
     const path = `backgrounds/${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
-      .from("portfolio-images")
-      .upload(path, file);
-    if (uploadError) {
+
+    // Use XMLHttpRequest for progress tracking
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+
+    const uploaded = await new Promise<boolean>((resolve) => {
+      const xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          setUploadProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      });
+      xhr.addEventListener("load", () => resolve(xhr.status >= 200 && xhr.status < 300));
+      xhr.addEventListener("error", () => resolve(false));
+      xhr.open("POST", `${supabaseUrl}/storage/v1/object/portfolio-images/${path}`);
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      xhr.setRequestHeader("x-upsert", "false");
+      xhr.send(file);
+    });
+
+    if (!uploaded) {
       toast.error("Upload failed");
       setUploading(false);
+      setUploadProgress(null);
       return;
     }
+
     const { data: urlData } = supabase.storage
       .from("portfolio-images")
       .getPublicUrl(path);
@@ -82,10 +104,11 @@ const AdminMain = () => {
     if (insertError) {
       toast.error("Failed to save");
     } else {
-      toast.success("Image added");
+      toast.success("Added");
       fetchBackgrounds();
     }
     setUploading(false);
+    setUploadProgress(null);
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -228,7 +251,7 @@ const AdminMain = () => {
           </p>
           <label className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-xs font-display tracking-[0.2em] uppercase">
             {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-            Upload
+            Upload{uploadProgress !== null && ` ${uploadProgress}%`}
             <input
               ref={fileRef}
               type="file"
@@ -356,8 +379,8 @@ const AdminMain = () => {
                   Library
                 </p>
                 <label className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-xs font-display tracking-[0.2em] uppercase">
-                  {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                   Add to Library
+                   {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                   Add to Library{uploadProgress !== null && ` ${uploadProgress}%`}
                    <input
                      ref={libraryFileRef}
                      type="file"
