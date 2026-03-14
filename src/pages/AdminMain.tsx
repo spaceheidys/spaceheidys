@@ -30,6 +30,7 @@ const AdminMain = () => {
   const [backgrounds, setBackgrounds] = useState<BackgroundItem[]>([]);
   const [fetching, setFetching] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [swapTarget, setSwapTarget] = useState<string | null>(null);
   const [confirmBg, setConfirmBg] = useState<{ action: string; id: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
