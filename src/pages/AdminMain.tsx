@@ -382,6 +382,7 @@ const AdminMain = () => {
     </div>
   );
 
+  return (
     <div className="min-h-screen bg-background text-foreground font-body">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
