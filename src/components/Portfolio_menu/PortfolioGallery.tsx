@@ -314,6 +314,29 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     touchEndX.current = null;
   }, [page, totalPages]);
 
+  // Swipe support for lightbox
+  const lbTouchStartX = useRef<number | null>(null);
+  const lbTouchEndX = useRef<number | null>(null);
+
+  const handleLbTouchStart = useCallback((e: React.TouchEvent) => {
+    lbTouchStartX.current = e.touches[0].clientX;
+    lbTouchEndX.current = null;
+  }, []);
+
+  const handleLbTouchMove = useCallback((e: React.TouchEvent) => {
+    lbTouchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleLbTouchEnd = useCallback(() => {
+    if (lbTouchStartX.current === null || lbTouchEndX.current === null) return;
+    const diff = lbTouchStartX.current - lbTouchEndX.current;
+    const threshold = 50;
+    if (diff > threshold) goLightbox(1);
+    else if (diff < -threshold) goLightbox(-1);
+    lbTouchStartX.current = null;
+    lbTouchEndX.current = null;
+  }, [selectedIndex, navigableEntries.length]);
+
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
   const isProject = selectedEntry && selectedEntry.project_url;
 
