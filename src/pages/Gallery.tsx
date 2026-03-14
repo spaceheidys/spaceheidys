@@ -194,7 +194,7 @@ const Gallery = () => {
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-300 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
