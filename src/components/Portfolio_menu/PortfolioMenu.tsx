@@ -16,6 +16,7 @@ interface PortfolioMenuProps {
 
 const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect, favoritesCount = 0 }: PortfolioMenuProps) => {
   const { visibility, sections } = useSectionSettings();
+  const { subs: gallerySubs } = useGallerySubs();
 
   if (!visible) return null;
 
