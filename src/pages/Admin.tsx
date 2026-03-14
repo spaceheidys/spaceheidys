@@ -52,6 +52,9 @@ interface SortableSectionTabProps {
 const SortableSectionTab = ({ sec, isActive, isVisible, isEditing, editLabel, editLabelJp, onSelect, onToggle, onStartEdit, onLabelChange, onLabelJpChange, onSaveEdit, onCancelEdit }: SortableSectionTabProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sec.section });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const isDirty = isEditing && (editLabel !== sec.label || editLabelJp !== sec.label_jp);
 
   return (
     <div ref={setNodeRef} style={style} className="flex items-center gap-0">
@@ -67,19 +70,44 @@ const SortableSectionTab = ({ sec, isActive, isVisible, isEditing, editLabel, ed
         <div className="flex items-center gap-1 px-2 py-0.5 border border-foreground">
           <input
             value={editLabel}
-            onChange={(e) => onLabelChange(e.target.value)}
+            onChange={(e) => { onLabelChange(e.target.value); setShowConfirm(false); }}
             className="w-16 bg-transparent text-xs font-display tracking-wider uppercase outline-none text-foreground"
             placeholder="EN"
             autoFocus
           />
           <input
             value={editLabelJp}
-            onChange={(e) => onLabelJpChange(e.target.value)}
+            onChange={(e) => { onLabelJpChange(e.target.value); setShowConfirm(false); }}
             className="w-16 bg-transparent text-xs font-display outline-none text-foreground"
             placeholder="JP"
           />
-          <button onClick={onSaveEdit} className="text-foreground hover:text-foreground/80"><Check size={10} /></button>
-          <button onClick={onCancelEdit} className="text-muted-foreground hover:text-foreground"><X size={10} /></button>
+          {showConfirm ? (
+            <>
+              <button
+                onClick={() => { onSaveEdit(); setShowConfirm(false); }}
+                className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+              >
+                <Check size={9} /> YES
+              </button>
+              <button
+                onClick={() => { onCancelEdit(); setShowConfirm(false); }}
+                className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={9} /> NO
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => { if (isDirty) { setShowConfirm(true); } else { onCancelEdit(); } }}
+                className="text-foreground hover:text-foreground/80"
+                title={isDirty ? "Save changes" : "Close"}
+              >
+                <Check size={10} />
+              </button>
+              <button onClick={onCancelEdit} className="text-muted-foreground hover:text-foreground"><X size={10} /></button>
+            </>
+          )}
         </div>
       ) : (
         <button
