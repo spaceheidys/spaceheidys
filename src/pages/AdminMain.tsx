@@ -232,7 +232,7 @@ const AdminMain = () => {
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               className="hidden"
               onChange={handleUpload}
               disabled={uploading}
