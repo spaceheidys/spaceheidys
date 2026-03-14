@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, X, ExternalLink, Heart, Copy, ArrowLeft } from "lucide-react";
@@ -287,6 +287,33 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
   const pageItems = entries.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
+  // Swipe support for pagination
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const diff = touchStartX.current - touchEndX.current;
+    const threshold = 50;
+    if (diff > threshold && page < totalPages - 1) {
+      setPage((p) => p + 1);
+    } else if (diff < -threshold && page > 0) {
+      setPage((p) => p - 1);
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  }, [page, totalPages]);
+
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
   const isProject = selectedEntry && selectedEntry.project_url;
 
@@ -295,26 +322,32 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     entry.project_url || window.location.href;
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center">
+    <div
+      className="relative w-full h-full flex flex-col items-center justify-center"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {hasPagination && (
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           disabled={page === 0}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -ml-5 sm:-translate-x-[calc(100%+8px)] sm:ml-0"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -ml-1 sm:-translate-x-[calc(100%+8px)] sm:ml-0"
           aria-label="Previous page"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-[40px] sm:h-[40px]" />
+          <ChevronLeft className="w-4 h-4 sm:w-[40px] sm:h-[40px]" />
         </button>
       )}
 
       <AnimatePresence mode="wait">
         <motion.div
           key={`${sectionKey}-${gallerySub}-${page}`}
-          className="w-full h-full grid grid-cols-2 sm:grid-cols-3 gap-2 p-2"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.3 }}
+          ref={gridRef}
+          className="w-full h-full grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 px-6 sm:px-2 py-1 sm:p-2"
+          initial={{ opacity: 0, x: 0 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
         >
           {pageItems.map((item, i) => (
             <motion.div
@@ -358,10 +391,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
         <button
           onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
           disabled={page === totalPages - 1}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -mr-5 sm:translate-x-[calc(100%+8px)] sm:mr-0"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -mr-1 sm:translate-x-[calc(100%+8px)] sm:mr-0"
           aria-label="Next page"
         >
-          <ChevronRight className="w-5 h-5 sm:w-[40px] sm:h-[40px]" />
+          <ChevronRight className="w-4 h-4 sm:w-[40px] sm:h-[40px]" />
         </button>
       )}
 
