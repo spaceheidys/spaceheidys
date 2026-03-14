@@ -58,16 +58,37 @@ const AdminMain = () => {
 
   const uploadToSection = async (file: File, section: string) => {
     setUploading(true);
+    setUploadProgress(0);
     const ext = file.name.split(".").pop();
     const path = `backgrounds/${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
-      .from("portfolio-images")
-      .upload(path, file);
-    if (uploadError) {
+
+    // Use XMLHttpRequest for progress tracking
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+
+    const uploaded = await new Promise<boolean>((resolve) => {
+      const xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          setUploadProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      });
+      xhr.addEventListener("load", () => resolve(xhr.status >= 200 && xhr.status < 300));
+      xhr.addEventListener("error", () => resolve(false));
+      xhr.open("POST", `${supabaseUrl}/storage/v1/object/portfolio-images/${path}`);
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      xhr.setRequestHeader("x-upsert", "false");
+      xhr.send(file);
+    });
+
+    if (!uploaded) {
       toast.error("Upload failed");
       setUploading(false);
+      setUploadProgress(null);
       return;
     }
+
     const { data: urlData } = supabase.storage
       .from("portfolio-images")
       .getPublicUrl(path);
@@ -83,10 +104,11 @@ const AdminMain = () => {
     if (insertError) {
       toast.error("Failed to save");
     } else {
-      toast.success("Image added");
+      toast.success("Added");
       fetchBackgrounds();
     }
     setUploading(false);
+    setUploadProgress(null);
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
