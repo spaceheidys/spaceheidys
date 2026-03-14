@@ -2,14 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 
-const allMenuItems = [
-  { label: "ギャラリー", en: "GALLERY", key: "gallery" },
-  { label: "プロジェクト", en: "PROJECTS", key: "projects" },
-  { label: "スキル", en: "SKILLS", key: "skills" },
-  { label: "アーカイブ", en: "ARCHIVE", key: "archive" },
-] as const;
-
-export type PortfolioMenuKey = (typeof allMenuItems)[number]["key"] | "favorites";
+export type PortfolioMenuKey = "gallery" | "projects" | "skills" | "archive" | "favorites";
 
 interface PortfolioMenuProps {
   visible: boolean;
@@ -21,11 +14,15 @@ interface PortfolioMenuProps {
 }
 
 const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect, favoritesCount = 0 }: PortfolioMenuProps) => {
-  const { visibility } = useSectionSettings();
+  const { visibility, sections } = useSectionSettings();
 
   if (!visible) return null;
 
-  const menuItems = allMenuItems.filter((item) => visibility[item.key]);
+  const portfolioKeys = ["gallery", "projects", "skills", "archive"];
+  const menuItems = sections
+    .filter((s) => portfolioKeys.includes(s.section) && visibility[s.section as keyof typeof visibility])
+    .map((s) => ({ label: s.label_jp || s.label, en: s.label || s.section.toUpperCase(), key: s.section }));
+
   const hasFavorites = favoritesCount > 0;
 
   return (
@@ -95,12 +92,12 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelec
         >
           {menuItems.map((item, i) => (
             <motion.button
-              key={item.en}
+              key={item.key}
               className="group flex flex-col items-center gap-0.5 cursor-pointer"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.08 }}
-              onClick={() => onSelect?.(item.key)}
+              onClick={() => onSelect?.(item.key as PortfolioMenuKey)}
             >
               <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase text-white/50 group-hover:text-white transition-colors duration-300 font-display">
                 {item.en}
