@@ -432,7 +432,7 @@ const Index = () => {
     {/* === 2nd_dimension === */}
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100dvh]">
+    <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100svh]">
       {/* Portfolio background image */}
       {portfolioBg && (
         <div className="absolute inset-0">
