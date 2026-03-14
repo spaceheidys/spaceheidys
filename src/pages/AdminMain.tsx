@@ -39,6 +39,44 @@ const AdminMain = () => {
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
   const { get: getContent, getDuration, update: updateContent, updateDuration } = useSectionContent();
 
+  // Reorderable MAIN tab sections
+  const MAIN_SECTION_KEYS = ["buttons", "content", "music", "backgrounds", "logos", "library"] as const;
+  type MainSectionKey = typeof MAIN_SECTION_KEYS[number];
+  const MAIN_SECTION_LABELS: Record<MainSectionKey, string> = {
+    buttons: "Buttons",
+    content: "Section Content",
+    music: "Site Music",
+    backgrounds: "Active Backgrounds",
+    logos: "Logos",
+    library: "Library",
+  };
+
+  const [mainSectionOrder, setMainSectionOrder] = useState<MainSectionKey[]>(() => {
+    try {
+      const saved = localStorage.getItem("admin_main_section_order");
+      if (saved) {
+        const parsed = JSON.parse(saved) as MainSectionKey[];
+        // Ensure all keys are present
+        const valid = parsed.filter((k) => MAIN_SECTION_KEYS.includes(k));
+        const missing = MAIN_SECTION_KEYS.filter((k) => !valid.includes(k));
+        return [...valid, ...missing];
+      }
+    } catch {}
+    return [...MAIN_SECTION_KEYS];
+  });
+
+  const moveMainSection = (key: MainSectionKey, dir: -1 | 1) => {
+    setMainSectionOrder((prev) => {
+      const idx = prev.indexOf(key);
+      const newIdx = idx + dir;
+      if (newIdx < 0 || newIdx >= prev.length) return prev;
+      const next = [...prev];
+      [next[idx], next[newIdx]] = [next[newIdx], next[idx]];
+      localStorage.setItem("admin_main_section_order", JSON.stringify(next));
+      return next;
+    });
+  };
+
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
   }, [loading, user, navigate]);
