@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const ITEMS_PER_PAGE_MOBILE = 6;
+const ITEMS_PER_PAGE_MOBILE = 4;
 const ITEMS_PER_PAGE_DESKTOP = 9;
 
 interface PortfolioItem {
