@@ -232,7 +232,7 @@ const AdminMain = () => {
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               className="hidden"
               onChange={handleUpload}
               disabled={uploading}
@@ -261,7 +261,11 @@ const AdminMain = () => {
                       : "border-border"
                   } ${!item.isDefault && backgrounds.find(b => b.id === item.id)?.is_active === false ? "opacity-40" : ""}`}
                 >
-                  <img src={item.src} alt="Background" className="w-full h-full object-cover" />
+                  {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(item.src) ? (
+                    <video src={item.src} muted className="w-full h-full object-cover" />
+                  ) : (
+                    <img src={item.src} alt="Background" className="w-full h-full object-cover" />
+                  )}
                   {item.isDefault && (
                     <span className="absolute bottom-2 left-2 text-[9px] font-display tracking-widest uppercase text-foreground/60 bg-background/70 px-1.5 py-0.5">
                       Default
@@ -353,12 +357,12 @@ const AdminMain = () => {
                 </p>
                 <label className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-xs font-display tracking-[0.2em] uppercase">
                   {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                  Add to Library
-                  <input
-                    ref={libraryFileRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
+                   Add to Library
+                   <input
+                     ref={libraryFileRef}
+                     type="file"
+                     accept="image/*,video/*"
+                     className="hidden"
                     onChange={handleLibraryUpload}
                     disabled={uploading}
                   />
@@ -381,7 +385,11 @@ const AdminMain = () => {
                       }`}
                       onClick={swapTarget ? () => handleSwap(item.id) : undefined}
                     >
-                      <img src={item.image_url} alt="Library" className="w-full h-full object-cover" />
+                      {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(item.image_url) ? (
+                        <video src={item.image_url} muted className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={item.image_url} alt="Library" className="w-full h-full object-cover" />
+                      )}
                       {swapTarget && (
                         <div className="absolute inset-0 bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                           <span className="text-[10px] font-display tracking-widest uppercase text-primary bg-background/90 px-2 py-1">
