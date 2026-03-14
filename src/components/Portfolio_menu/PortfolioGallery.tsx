@@ -463,7 +463,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative my-auto ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[80vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw]"}`}
+              className={`relative my-auto ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[80vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[85vh]"}`}
               onTouchStart={handleLbTouchStart}
               onTouchMove={handleLbTouchMove}
               onTouchEnd={handleLbTouchEnd}
