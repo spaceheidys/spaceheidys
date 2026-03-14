@@ -548,10 +548,24 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
-                  {/* Share bar under single image */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <span className="text-[9px] text-white/30 font-display tracking-widest uppercase">Share</span>
+                  {/* Bottom bar: share + heart + close */}
+                  <div className="flex items-center justify-center gap-3 pt-2">
                     <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               )}
