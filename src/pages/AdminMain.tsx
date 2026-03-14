@@ -35,6 +35,7 @@ const AdminMain = () => {
   const [confirmBg, setConfirmBg] = useState<{ action: string; id: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
+  const logosFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
   const { get: getContent, getDuration, update: updateContent, updateDuration } = useSectionContent();
 
