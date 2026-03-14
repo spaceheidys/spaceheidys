@@ -343,7 +343,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
         <motion.div
           key={`${sectionKey}-${gallerySub}-${page}`}
           ref={gridRef}
-          className="w-full h-full grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 px-6 sm:px-2 py-1 sm:p-2"
+          className="w-full h-full grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-2 px-2 sm:px-2 py-1 sm:p-2"
           initial={{ opacity: 0, x: 0 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0 }}
