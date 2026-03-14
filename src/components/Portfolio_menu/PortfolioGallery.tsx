@@ -314,6 +314,29 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
     touchEndX.current = null;
   }, [page, totalPages]);
 
+  // Swipe support for lightbox
+  const lbTouchStartX = useRef<number | null>(null);
+  const lbTouchEndX = useRef<number | null>(null);
+
+  const handleLbTouchStart = useCallback((e: React.TouchEvent) => {
+    lbTouchStartX.current = e.touches[0].clientX;
+    lbTouchEndX.current = null;
+  }, []);
+
+  const handleLbTouchMove = useCallback((e: React.TouchEvent) => {
+    lbTouchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleLbTouchEnd = useCallback(() => {
+    if (lbTouchStartX.current === null || lbTouchEndX.current === null) return;
+    const diff = lbTouchStartX.current - lbTouchEndX.current;
+    const threshold = 50;
+    if (diff > threshold) goLightbox(1);
+    else if (diff < -threshold) goLightbox(-1);
+    lbTouchStartX.current = null;
+    lbTouchEndX.current = null;
+  }, [selectedIndex, navigableEntries.length]);
+
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
   const isProject = selectedEntry && selectedEntry.project_url;
 
@@ -409,33 +432,36 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             transition={{ duration: 0.3 }}
             onClick={() => setSelectedEntry(null)}
           >
-            {/* Navigation arrows */}
+            {/* Navigation arrows — desktop only */}
             {!isGroup && selectedIndex > 0 && (
               <motion.button
                 onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
-                className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                className="hidden sm:flex fixed left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
                 aria-label="Previous image"
               >
-                <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
+                <ChevronLeft className="w-10 h-10" />
               </motion.button>
             )}
             {!isGroup && selectedIndex < navigableEntries.length - 1 && (
               <motion.button
                 onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
-                className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                className="hidden sm:flex fixed right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
                 initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
                 aria-label="Next image"
               >
-                <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
+                <ChevronRight className="w-10 h-10" />
               </motion.button>
             )}
 
             <motion.div
               key={selectedEntry.id}
               className={`relative my-auto ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh]"}`}
+              onTouchStart={handleLbTouchStart}
+              onTouchMove={handleLbTouchMove}
+              onTouchEnd={handleLbTouchEnd}
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.75, opacity: 0, y: 20 }}
