@@ -35,6 +35,7 @@ const AdminMain = () => {
   const [confirmBg, setConfirmBg] = useState<{ action: string; id: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
+  const logosFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
   const { get: getContent, getDuration, update: updateContent, updateDuration } = useSectionContent();
 
@@ -169,6 +170,14 @@ const AdminMain = () => {
 
   const sectionItems = backgrounds.filter((b) => b.section === activeSection);
   const libraryItems = backgrounds.filter((b) => b.section === "library");
+  const logoItems = backgrounds.filter((b) => b.section === "main_logos");
+
+  const handleLogosUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadToSection(file, "main_logos");
+    if (logosFileRef.current) logosFileRef.current.value = "";
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
@@ -372,7 +381,97 @@ const AdminMain = () => {
               )}
             </div>
 
-            {/* Library section */}
+            {/* Logos section — only on main tab */}
+            {activeSection === "main" && (
+              <div className="border-t border-border pt-6 mb-10">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
+                    Logos — main section
+                  </p>
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-xs font-display tracking-[0.2em] uppercase">
+                    {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                    Upload{uploadProgress !== null && ` ${uploadProgress}%`}
+                    <input
+                      ref={logosFileRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleLogosUpload}
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {logoItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`group relative border aspect-video overflow-hidden transition-all ${
+                        item.is_active === false ? "opacity-40" : ""
+                      } border-border`}
+                    >
+                      <img src={item.image_url} alt="Logo" className="w-full h-full object-contain bg-background/50" />
+                      {/* Visibility toggle */}
+                      {confirmBg?.action === "logo_toggle" && confirmBg.id === item.id ? (
+                        <span className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                          <button onClick={async () => {
+                            const { error } = await supabase
+                              .from("page_backgrounds")
+                              .update({ is_active: !item.is_active })
+                              .eq("id", item.id);
+                            if (!error) {
+                              setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b));
+                              toast.success(item.is_active ? "Hidden" : "Visible");
+                            }
+                            setConfirmBg(null);
+                          }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                            <Check size={9} /> YES
+                          </button>
+                          <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                            <X size={9} /> NO
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmBg({ action: "logo_toggle", id: item.id })}
+                          title={item.is_active ? "Hide from site" : "Show on site"}
+                          className={`absolute bottom-2 left-2 p-1 transition-opacity ${
+                            item.is_active === false
+                              ? "bg-background/80 text-muted-foreground/40 opacity-100"
+                              : "bg-background/80 text-foreground opacity-0 group-hover:opacity-100"
+                          }`}
+                        >
+                          {item.is_active === false ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                      )}
+                      {/* Delete button */}
+                      {confirmBg?.action === "logo_delete" && confirmBg.id === item.id ? (
+                        <span className="absolute top-2 right-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                          <button onClick={() => { handleDelete(item.id); setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                            <Check size={9} /> YES
+                          </button>
+                          <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                            <X size={9} /> NO
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmBg({ action: "logo_delete", id: item.id })}
+                          className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {logoItems.length === 0 && (
+                    <p className="text-muted-foreground text-sm col-span-full text-center py-8">
+                      No logos yet. Upload one to get started.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="border-t border-border pt-6">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
