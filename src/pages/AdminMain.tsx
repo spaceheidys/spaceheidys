@@ -385,7 +385,11 @@ const AdminMain = () => {
                       }`}
                       onClick={swapTarget ? () => handleSwap(item.id) : undefined}
                     >
-                      <img src={item.image_url} alt="Library" className="w-full h-full object-cover" />
+                      {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(item.image_url) ? (
+                        <video src={item.image_url} muted className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={item.image_url} alt="Library" className="w-full h-full object-cover" />
+                      )}
                       {swapTarget && (
                         <div className="absolute inset-0 bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                           <span className="text-[10px] font-display tracking-widest uppercase text-primary bg-background/90 px-2 py-1">
