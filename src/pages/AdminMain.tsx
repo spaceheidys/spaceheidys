@@ -390,12 +390,23 @@ const AdminMain = () => {
                         </div>
                       )}
                       {!swapTarget && (
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        confirmBg?.action === "lib_delete" && confirmBg.id === item.id ? (
+                          <span className="absolute top-2 right-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                            <button onClick={() => { handleDelete(item.id); setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                              <Check size={9} /> YES
+                            </button>
+                            <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                              <X size={9} /> NO
+                            </button>
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmBg({ action: "lib_delete", id: item.id })}
+                            className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )
                       )}
                     </div>
                   ))}
