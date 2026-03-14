@@ -18,7 +18,6 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
   const cyberpunkAudioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mainAudioRef = useRef<HTMLAudioElement | null>(null);
-  const mainAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const findMainAudio = () => {
     const allAudio = document.querySelectorAll("audio");
