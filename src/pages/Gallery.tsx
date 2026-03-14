@@ -383,16 +383,17 @@ const Gallery = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-2 max-h-[85vh]">
                   <img
                     src={selectedEntry.image_url}
                     alt={selectedEntry.title}
-                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[65vh] object-contain rounded-md cursor-pointer"
+                    className="max-w-[80vw] sm:max-w-[75vw] object-contain rounded-md cursor-pointer flex-shrink min-h-0"
+                    style={{ maxHeight: "calc(85vh - 3rem)" }}
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
                   {/* Bottom bar */}
-                  <div className="flex items-center justify-center gap-3 pt-2">
+                  <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
                     <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
