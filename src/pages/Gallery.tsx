@@ -1,8 +1,13 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, X, ChevronLeft, ChevronRight, Heart, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useFavorites } from "@/hooks/useFavorites";
+import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
+import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface GalleryItem {
   id: string;
@@ -23,12 +28,72 @@ interface GalleryEntry {
 const TABS = ["ALL", "VECTOR", "DIGITAL", "AI", "SKETCHES"] as const;
 const SWIPE_THRESHOLD = 50;
 
+// ─── PlatformIcon ──────────────────────────────────────────────────────────────
+const PlatformIcon = ({ label }: { label: string }) => {
+  const l = label.toLowerCase();
+  if (l.includes("x") || l.includes("twitter"))
+    return <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>;
+  if (l.includes("facebook"))
+    return <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>;
+  if (l.includes("telegram"))
+    return <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>;
+  return <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>;
+};
+
+// ─── ShareBar ──────────────────────────────────────────────────────────────────
+const ShareBar = ({ shareUrl, title, compact = false }: { shareUrl: string; title: string; compact?: boolean }) => {
+  const { links } = useSocialLinks();
+  const shareLinks = links.filter((l) => l.share_url_template);
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success("Link copied to clipboard", { style: { background: "#111", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" } });
+  };
+  if (shareLinks.length === 0 && !shareUrl) return null;
+  return (
+    <TooltipProvider delayDuration={300}>
+      <div className={`flex items-center ${compact ? "gap-1.5" : "gap-3"}`}>
+        {shareLinks.map((link) => (
+          <Tooltip key={link.id}>
+            <TooltipTrigger asChild>
+              <a
+                href={buildShareUrl(link.share_url_template, shareUrl, title)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className={`${compact ? "w-6 h-6" : "w-7 h-7"} flex items-center justify-center border border-white/15 text-white/40 hover:text-white hover:border-white/40 transition-colors rounded-sm shrink-0`}
+              >
+                {link.icon_url ? (
+                  <img src={link.icon_url} alt={link.label} className="w-3.5 h-3.5 object-contain invert opacity-60 hover:opacity-100 transition-opacity" />
+                ) : (
+                  <PlatformIcon label={link.label} />
+                )}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="text-[10px] tracking-widest font-display uppercase bg-card border-border text-foreground">{link.label}</TooltipContent>
+          </Tooltip>
+        ))}
+        {shareLinks.length > 0 && <div className="w-[1px] h-4 bg-white/10" />}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button onClick={(e) => { e.stopPropagation(); copyLink(); }} className={`${compact ? "w-6 h-6" : "w-7 h-7"} flex items-center justify-center border border-white/15 text-white/40 hover:text-white hover:border-white/40 transition-colors rounded-sm shrink-0`}>
+              <Copy className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="text-[10px] tracking-widest font-display uppercase bg-card border-border text-foreground">Copy Link</TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  );
+};
+
 const Gallery = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const { toggle, isFavorite } = useFavorites();
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -234,9 +299,11 @@ const Gallery = () => {
 
       {/* Lightbox */}
       <AnimatePresence>
-        {selectedEntry && (
+        {selectedEntry && (() => {
+          const shareUrl = `${window.location.origin}/gallery?id=${selectedEntry.id}`;
+          return (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 z-50 flex items-start justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer overflow-y-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -245,41 +312,43 @@ const Gallery = () => {
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
+            {/* Navigation arrows — desktop only */}
             {!isGroup && selectedIndex > 0 && (
               <button
                 onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
-                className="fixed left-3 sm:left-8 top-1/2 -translate-y-1/2 z-[60] text-foreground/30 hover:text-foreground transition-colors duration-200"
+                className="hidden sm:flex fixed left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
                 aria-label="Previous image"
               >
-                <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
+                <ChevronLeft className="w-10 h-10" />
               </button>
             )}
             {!isGroup && selectedIndex < navigableEntries.length - 1 && (
               <button
                 onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
-                className="fixed right-3 sm:right-8 top-1/2 -translate-y-1/2 z-[60] text-foreground/30 hover:text-foreground transition-colors duration-200"
+                className="hidden sm:flex fixed right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
                 aria-label="Next image"
               >
-                <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
+                <ChevronRight className="w-10 h-10" />
               </button>
             )}
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[85vw] sm:max-w-[80vw] max-h-[90vh]"}`}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              className={`relative my-auto ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh]"}`}
+              initial={{ scale: 0.7, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.75, opacity: 0, y: 20 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Back button */}
               <button
-                onClick={() => setSelectedEntry(null)}
-                className="absolute top-2 right-2 z-10 w-8 h-8 bg-background/50 border border-border/40 flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-background/80 transition-colors duration-200"
-                style={{ position: "sticky", top: 8, float: "right" }}
-                aria-label="Close preview"
+                onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
+                className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-200 text-[9px] font-display tracking-[0.2em] uppercase"
+                aria-label="Back"
               >
-                <X className="w-4 h-4" />
+                <ArrowLeft className="w-3 h-3" />
+                <span className="hidden sm:inline">Back</span>
               </button>
 
               {isGroup ? (
@@ -289,23 +358,64 @@ const Gallery = () => {
                       key={idx}
                       src={url}
                       alt={`${selectedEntry.title} ${idx + 1}`}
-                      className="w-full object-contain"
+                      className="w-full object-contain rounded-md"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   ))}
+                  {/* Bottom bar */}
+                  <div className="flex items-center justify-center gap-3 py-2">
+                    <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <img
-                  src={selectedEntry.image_url}
-                  alt={selectedEntry.title}
-                  className="max-w-[85vw] sm:max-w-[80vw] max-h-[90vh] object-contain cursor-pointer"
-                  onClick={() => setSelectedEntry(null)}
-                  onContextMenu={(e) => e.preventDefault()}
-                />
+                <div className="flex flex-col items-center gap-2">
+                  <img
+                    src={selectedEntry.image_url}
+                    alt={selectedEntry.title}
+                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[80vh] object-contain rounded-md cursor-pointer"
+                    onClick={() => setSelectedEntry(null)}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  {/* Bottom bar */}
+                  <div className="flex items-center justify-center gap-3 pt-2">
+                    <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
               )}
             </motion.div>
           </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </div>
   );
