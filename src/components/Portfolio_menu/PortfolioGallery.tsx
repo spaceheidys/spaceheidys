@@ -56,6 +56,7 @@ interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
   gallerySub?: string | null;
   onPageInfo?: (info: { current: number; total: number }) => void;
+  onLightboxChange?: (open: boolean) => void;
 }
 
 // ─── Share buttons bar ────────────────────────────────────────────────────────
