@@ -430,7 +430,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
       <AnimatePresence mode="wait">
         {selectedEntry && (
           <motion.div
-            className="fixed inset-0 z-[200] flex items-start justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer overflow-y-auto"
+            className={`fixed inset-0 z-[200] flex ${isGroup ? "items-start overflow-y-auto" : "items-center overflow-hidden"} justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer`}
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
@@ -463,7 +463,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative my-auto ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[80vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw]"}`}
+              className={`relative my-auto ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[80vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[85vh]"}`}
               onTouchStart={handleLbTouchStart}
               onTouchMove={handleLbTouchMove}
               onTouchEnd={handleLbTouchEnd}
@@ -575,12 +575,13 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                   <img
                     src={selectedEntry.image_url}
                     alt={selectedEntry.label}
-                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[65vh] object-contain rounded-md cursor-pointer"
+                    className="max-w-[80vw] sm:max-w-[75vw] object-contain rounded-md cursor-pointer"
+                    style={{ maxHeight: 'calc(100vh - 12rem)' }}
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
                   {/* Bottom bar: share + heart + close */}
-                  <div className="flex items-center justify-center gap-3 pt-2">
+                  <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
                     <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button

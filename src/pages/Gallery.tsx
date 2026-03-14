@@ -303,7 +303,7 @@ const Gallery = () => {
           const shareUrl = `${window.location.origin}/gallery?id=${selectedEntry.id}`;
           return (
           <motion.div
-            className="fixed inset-0 z-50 flex items-start justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer overflow-y-auto"
+            className={`fixed inset-0 z-50 flex ${isGroup ? "items-start overflow-y-auto" : "items-center overflow-hidden"} justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -334,7 +334,7 @@ const Gallery = () => {
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative my-auto ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[80vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw]"}`}
+              className={`relative my-auto ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[80vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[85vh]"}`}
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.75, opacity: 0, y: 20 }}
@@ -387,12 +387,13 @@ const Gallery = () => {
                   <img
                     src={selectedEntry.image_url}
                     alt={selectedEntry.title}
-                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[65vh] object-contain rounded-md cursor-pointer"
+                    className="max-w-[80vw] sm:max-w-[75vw] object-contain rounded-md cursor-pointer"
+                    style={{ maxHeight: 'calc(100vh - 12rem)' }}
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
                   {/* Bottom bar */}
-                  <div className="flex items-center justify-center gap-3 pt-2">
+                  <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
                     <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
