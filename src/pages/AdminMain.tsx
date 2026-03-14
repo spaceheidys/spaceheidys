@@ -443,8 +443,8 @@ const AdminMain = () => {
         ) : (
           <>
             {activeSection === "main" && mainSectionOrder.map((sectionKey, idx) => {
-              const SectionWrapper = ({ children, label }: { children: React.ReactNode; label: string }) => (
-                <div className="relative">
+              const renderWrapper = (label: string, children: React.ReactNode) => (
+                <div key={sectionKey} className="relative">
                   <div className="flex items-center gap-2 mb-2 mt-4">
                     <div className="flex flex-col">
                       <button
