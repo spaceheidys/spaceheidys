@@ -137,9 +137,9 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      animate={{ opacity: closing ? 0 : 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: closing ? 1.5 : 0.3, ease: "easeInOut" }}
       onClick={handleClose}
     >
       {settings.background_url ? (
