@@ -299,9 +299,11 @@ const Gallery = () => {
 
       {/* Lightbox */}
       <AnimatePresence>
-        {selectedEntry && (
+        {selectedEntry && (() => {
+          const shareUrl = `${window.location.origin}/gallery?id=${selectedEntry.id}`;
+          return (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 z-50 flex items-start justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer overflow-y-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -310,41 +312,43 @@ const Gallery = () => {
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
+            {/* Navigation arrows — desktop only */}
             {!isGroup && selectedIndex > 0 && (
               <button
                 onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
-                className="fixed left-3 sm:left-8 top-1/2 -translate-y-1/2 z-[60] text-foreground/30 hover:text-foreground transition-colors duration-200"
+                className="hidden sm:flex fixed left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
                 aria-label="Previous image"
               >
-                <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
+                <ChevronLeft className="w-10 h-10" />
               </button>
             )}
             {!isGroup && selectedIndex < navigableEntries.length - 1 && (
               <button
                 onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
-                className="fixed right-3 sm:right-8 top-1/2 -translate-y-1/2 z-[60] text-foreground/30 hover:text-foreground transition-colors duration-200"
+                className="hidden sm:flex fixed right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
                 aria-label="Next image"
               >
-                <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
+                <ChevronRight className="w-10 h-10" />
               </button>
             )}
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isGroup ? "max-w-[85vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[85vw] sm:max-w-[80vw] max-h-[90vh]"}`}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              className={`relative my-auto ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh]"}`}
+              initial={{ scale: 0.7, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.75, opacity: 0, y: 20 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Back button */}
               <button
-                onClick={() => setSelectedEntry(null)}
-                className="absolute top-2 right-2 z-10 w-8 h-8 bg-background/50 border border-border/40 flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-background/80 transition-colors duration-200"
-                style={{ position: "sticky", top: 8, float: "right" }}
-                aria-label="Close preview"
+                onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
+                className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-200 text-[9px] font-display tracking-[0.2em] uppercase"
+                aria-label="Back"
               >
-                <X className="w-4 h-4" />
+                <ArrowLeft className="w-3 h-3" />
+                <span className="hidden sm:inline">Back</span>
               </button>
 
               {isGroup ? (
@@ -354,23 +358,64 @@ const Gallery = () => {
                       key={idx}
                       src={url}
                       alt={`${selectedEntry.title} ${idx + 1}`}
-                      className="w-full object-contain"
+                      className="w-full object-contain rounded-md"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   ))}
+                  {/* Bottom bar */}
+                  <div className="flex items-center justify-center gap-3 py-2">
+                    <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <img
-                  src={selectedEntry.image_url}
-                  alt={selectedEntry.title}
-                  className="max-w-[85vw] sm:max-w-[80vw] max-h-[90vh] object-contain cursor-pointer"
-                  onClick={() => setSelectedEntry(null)}
-                  onContextMenu={(e) => e.preventDefault()}
-                />
+                <div className="flex flex-col items-center gap-2">
+                  <img
+                    src={selectedEntry.image_url}
+                    alt={selectedEntry.title}
+                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[80vh] object-contain rounded-md cursor-pointer"
+                    onClick={() => setSelectedEntry(null)}
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  {/* Bottom bar */}
+                  <div className="flex items-center justify-center gap-3 pt-2">
+                    <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
               )}
             </motion.div>
           </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </div>
   );
