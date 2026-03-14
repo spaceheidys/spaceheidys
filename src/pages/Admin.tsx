@@ -634,21 +634,12 @@ const Admin = () => {
 
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
-          <div className="flex gap-2 mb-6 flex-wrap">
-            {GALLERY_SUBS.map((sub) => (
-              <button
-                key={sub}
-                onClick={() => setActiveSub(sub)}
-                className={`text-[10px] font-display tracking-[0.2em] uppercase px-2 py-1 border transition-colors ${
-                  activeSub === sub
-                    ? "border-foreground/60 text-foreground/80"
-                    : "border-border text-muted-foreground hover:text-foreground/60"
-                }`}
-              >
-                {sub}
-              </button>
-            ))}
-          </div>
+          <GallerySubTabs
+            subs={gallerySubs}
+            activeSub={activeSub}
+            onSelect={setActiveSub}
+            onSave={saveGallerySubs}
+          />
         )}
 
         {/* Upload area */}
