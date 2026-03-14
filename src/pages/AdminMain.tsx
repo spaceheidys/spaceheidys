@@ -388,18 +388,48 @@ const AdminMain = () => {
                   <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
                     Logos — main section
                   </p>
-                  <label className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-xs font-display tracking-[0.2em] uppercase">
-                    {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                    Upload{uploadProgress !== null && ` ${uploadProgress}%`}
-                    <input
-                      ref={logosFileRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleLogosUpload}
-                      disabled={uploading}
-                    />
-                  </label>
+                  <div className="flex items-center gap-3">
+                    {/* Fade toggle */}
+                    {confirmBg?.action === "logo_fade_toggle" ? (
+                      <span className="flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                        <button onClick={async () => {
+                          const current = getContent("logo_fade_enabled");
+                          const newVal = current === "true" ? "false" : "true";
+                          await updateContent("logo_fade_enabled", newVal);
+                          toast.success(newVal === "true" ? "Fade ON" : "Fade OFF");
+                          setConfirmBg(null);
+                        }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                          <Check size={9} /> YES
+                        </button>
+                        <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                          <X size={9} /> NO
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmBg({ action: "logo_fade_toggle", id: "fade" })}
+                        className={`px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${
+                          getContent("logo_fade_enabled") === "true"
+                            ? "border-foreground text-foreground"
+                            : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+                        }`}
+                      >
+                        Fade {getContent("logo_fade_enabled") === "true" ? "ON" : "OFF"}
+                      </button>
+                    )}
+                    <label className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-xs font-display tracking-[0.2em] uppercase">
+                      {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                      Upload{uploadProgress !== null && ` ${uploadProgress}%`}
+                      <input
+                        ref={logosFileRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleLogosUpload}
+                        disabled={uploading}
+                      />
+                    </label>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {logoItems.map((item) => (
