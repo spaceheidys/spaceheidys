@@ -58,6 +58,7 @@ const Index = () => {
   const { get: getContent, getDuration } = useSectionContent();
   const { count: favoritesCount } = useFavorites();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Show scroll-to-top arrow only when in portfolio section
   useEffect(() => {
@@ -499,7 +500,7 @@ const Index = () => {
                   </motion.div> :
                 activePortfolioKey ?
                   <motion.div key={`${activePortfolioKey}-${activeGallerySub}`} className="w-full h-full" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97, y: 8 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-                    <PortfolioGallery sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} />
+                    <PortfolioGallery sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} onLightboxChange={setLightboxOpen} />
                   </motion.div> :
 
                   <motion.div
@@ -522,7 +523,7 @@ const Index = () => {
               </AnimatePresence>
             </div>
             {/* Menu positioned below card without affecting layout */}
-            <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max ${activePortfolioKey ? 'sm:hidden' : ''}`}>
+            <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max transition-opacity duration-300 ${activePortfolioKey ? 'sm:hidden' : ''} ${lightboxOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
               <PortfolioMenu
                   visible={!thirdCardFlipped}
                   activeKey={activePortfolioKey}
@@ -557,7 +558,7 @@ const Index = () => {
 
       {/* Menu at bottom position when section is active (desktop only) */}
       {activePortfolioKey &&
-        <div className="hidden sm:flex relative z-10 items-center justify-center pb-4">
+        <div className={`hidden sm:flex relative z-10 items-center justify-center pb-4 transition-opacity duration-300 ${lightboxOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <PortfolioMenu
             visible={!thirdCardFlipped}
             activeKey={activePortfolioKey}

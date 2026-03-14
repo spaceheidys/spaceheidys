@@ -56,6 +56,7 @@ interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
   gallerySub?: string | null;
   onPageInfo?: (info: { current: number; total: number }) => void;
+  onLightboxChange?: (open: boolean) => void;
 }
 
 // ─── Share buttons bar ────────────────────────────────────────────────────────
@@ -151,13 +152,17 @@ const PlatformIcon = ({ label }: { label: string }) => {
 };
 
 // ─── Main component ────────────────────────────────────────────────────────────
-const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: PortfolioGalleryProps) => {
+const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLightboxChange }: PortfolioGalleryProps) => {
   const isMobile = useIsMobile();
   const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const { favorites, toggle, isFavorite } = useFavorites();
+
+  useEffect(() => {
+    onLightboxChange?.(!!selectedEntry);
+  }, [selectedEntry, onLightboxChange]);
 
   useEffect(() => {
     const fetchItems = async () => {
