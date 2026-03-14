@@ -558,7 +558,7 @@ const Index = () => {
 
       {/* Menu at bottom position when section is active (desktop only) */}
       {activePortfolioKey &&
-        <div className="hidden sm:flex relative z-10 items-center justify-center pb-4">
+        <div className={`hidden sm:flex relative z-10 items-center justify-center pb-4 transition-opacity duration-300 ${lightboxOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <PortfolioMenu
             visible={!thirdCardFlipped}
             activeKey={activePortfolioKey}
