@@ -307,6 +307,49 @@ const Index = () => {
       </div>
     </div>
 
+    {/* Fixed left side nav — stays visible on scroll */}
+    <AnimatePresence>
+      {showNav && (
+        <motion.nav
+          className="hidden md:flex flex-col gap-8 fixed left-4 sm:left-8 md:left-16 top-1/2 -translate-y-1/2 z-40"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.4 }}
+        >
+          {(() => {
+            const actionMap: Record<string, () => void> = {
+              about: handleAboutClick,
+              portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+              gallery: () => navigate("/gallery"),
+              contacts: handleContactClick,
+            };
+            return navButtons
+              .filter(b => b.is_visible)
+              .map(b => ({ jp: b.label_jp, en: b.label, action: actionMap[b.key] }));
+          })().map((item, i) => (
+            <motion.a
+              key={item.en}
+              href={item.action ? undefined : `#${item.en.toLowerCase()}`}
+              onClick={() => {
+                if (!muted) {
+                  new Audio("/audio/bell-sounds.mp3").play().catch(() => {});
+                }
+                item.action?.();
+              }}
+              className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <span className="font-jp text-xs tracking-widest">{item.jp}</span>
+              <span className="text-[10px] tracking-[0.3em] font-display">{item.en}</span>
+            </motion.a>
+          ))}
+        </motion.nav>
+      )}
+    </AnimatePresence>
+
     {/* === MAIN_TEXT section === */}
     <div ref={mainTextRef} className="relative w-full bg-background" style={{ height: 420 }}>
       <AnimatePresence mode="wait">
