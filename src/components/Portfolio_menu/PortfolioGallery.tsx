@@ -355,10 +355,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           disabled={page === 0}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -ml-1 sm:-translate-x-[calc(100%+8px)] sm:ml-0"
+          className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 sm:-translate-x-[calc(100%+8px)]"
           aria-label="Previous page"
         >
-          <ChevronLeft className="w-4 h-4 sm:w-[40px] sm:h-[40px]" />
+          <ChevronLeft className="w-[40px] h-[40px]" />
         </button>
       )}
 
