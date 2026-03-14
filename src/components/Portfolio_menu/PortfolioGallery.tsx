@@ -345,6 +345,18 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
   const isProject = selectedEntry && selectedEntry.project_url;
 
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!selectedEntry || isGroup) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goLightbox(-1);
+      else if (e.key === "ArrowRight") goLightbox(1);
+      else if (e.key === "Escape") setSelectedEntry(null);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selectedEntry, isGroup, selectedIndex, navigableEntries]);
+
   // Share URL for current entry: prefer project_url, else current page URL
   const getShareUrl = (entry: GalleryEntry) =>
     entry.project_url || window.location.href;
@@ -437,31 +449,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
             transition={{ duration: 0.3 }}
             onClick={() => setSelectedEntry(null)}
           >
-            {/* Navigation arrows — desktop only */}
-            {!isGroup && navigableEntries.length > 1 && (
-              <motion.button
-                onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
-                className={`hidden sm:flex fixed left-36 top-1/2 -translate-y-1/2 z-[210] transition-colors duration-200 ${selectedIndex > 0 ? 'text-white/40 hover:text-white cursor-pointer' : 'text-white/10 cursor-default'}`}
-                disabled={selectedIndex <= 0}
-                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-10 h-10" />
-              </motion.button>
-            )}
-            {!isGroup && navigableEntries.length > 1 && (
-              <motion.button
-                onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
-                className={`hidden sm:flex fixed right-6 top-1/2 -translate-y-1/2 z-[210] transition-colors duration-200 ${selectedIndex < navigableEntries.length - 1 ? 'text-white/40 hover:text-white cursor-pointer' : 'text-white/10 cursor-default'}`}
-                disabled={selectedIndex >= navigableEntries.length - 1}
-                initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-10 h-10" />
-              </motion.button>
-            )}
 
             <motion.div
               key={selectedEntry.id}
