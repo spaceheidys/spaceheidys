@@ -29,7 +29,7 @@ const MobileNav = ({
   const { muted, toggleMute } = useSoundContext();
 
   const handleClick = (action: () => void) => {
-    if (!muted) {
+    if (!muted && siteMusicEnabled) {
       new Audio("/audio/bell-sounds.mp3").play().catch(() => {});
     }
     action();
