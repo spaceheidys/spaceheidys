@@ -443,8 +443,8 @@ const AdminMain = () => {
         ) : (
           <>
             {activeSection === "main" && mainSectionOrder.map((sectionKey, idx) => {
-              const SectionWrapper = ({ children, label }: { children: React.ReactNode; label: string }) => (
-                <div className="relative">
+              const renderWrapper = (label: string, children: React.ReactNode) => (
+                <div key={sectionKey} className="relative">
                   <div className="flex items-center gap-2 mb-2 mt-4">
                     <div className="flex flex-col">
                       <button
@@ -470,78 +470,60 @@ const AdminMain = () => {
 
               switch (sectionKey) {
                 case "buttons":
-                  return (
-                    <SectionWrapper key={sectionKey} label={MAIN_SECTION_LABELS[sectionKey]}>
-                      <ButtonsSection
-                        buttons={navButtons}
-                        onUpdate={updateButton}
-                        onSwapOrder={swapOrder}
-                        onAdd={addButton}
-                        onDelete={deleteButton}
-                      />
-                    </SectionWrapper>
+                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
+                    <ButtonsSection
+                      buttons={navButtons}
+                      onUpdate={updateButton}
+                      onSwapOrder={swapOrder}
+                      onAdd={addButton}
+                      onDelete={deleteButton}
+                    />
                   );
                 case "content":
-                  return (
-                    <SectionWrapper key={sectionKey} label={MAIN_SECTION_LABELS[sectionKey]}>
-                      <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
-                    </SectionWrapper>
+                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
+                    <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
                   );
                 case "music":
-                  return (
-                    <SectionWrapper key={sectionKey} label={MAIN_SECTION_LABELS[sectionKey]}>
-                      <div className="border-t border-border pt-4 pb-2 flex items-center gap-3">
-                        <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-                          Site Music
-                        </p>
-                        {confirmBg?.action === "music_toggle" ? (
-                          <span className="flex items-center gap-1 bg-background/90 px-1 py-0.5">
-                            <button onClick={async () => {
-                              const current = getContent("site_music_enabled");
-                              const newVal = current === "false" ? "true" : "false";
-                              await updateContent("site_music_enabled", newVal);
-                              toast.success(newVal === "true" ? "Music ON" : "Music OFF");
-                              setConfirmBg(null);
-                            }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
-                              <Check size={9} /> YES
-                            </button>
-                            <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
-                              <X size={9} /> NO
-                            </button>
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => setConfirmBg({ action: "music_toggle", id: "music" })}
-                            className={`px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${
-                              getContent("site_music_enabled") !== "false"
-                                ? "border-foreground text-foreground bg-foreground/10"
-                                : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
-                            }`}
-                          >
-                            {getContent("site_music_enabled") !== "false" ? "ON" : "OFF"}
+                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
+                    <div className="border-t border-border pt-4 pb-2 flex items-center gap-3">
+                      <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
+                        Site Music
+                      </p>
+                      {confirmBg?.action === "music_toggle" ? (
+                        <span className="flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                          <button onClick={async () => {
+                            const current = getContent("site_music_enabled");
+                            const newVal = current === "false" ? "true" : "false";
+                            await updateContent("site_music_enabled", newVal);
+                            toast.success(newVal === "true" ? "Music ON" : "Music OFF");
+                            setConfirmBg(null);
+                          }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                            <Check size={9} /> YES
                           </button>
-                        )}
-                      </div>
-                    </SectionWrapper>
+                          <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                            <X size={9} /> NO
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmBg({ action: "music_toggle", id: "music" })}
+                          className={`px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${
+                            getContent("site_music_enabled") !== "false"
+                              ? "border-foreground text-foreground bg-foreground/10"
+                              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+                          }`}
+                        >
+                          {getContent("site_music_enabled") !== "false" ? "ON" : "OFF"}
+                        </button>
+                      )}
+                    </div>
                   );
                 case "backgrounds":
-                  return (
-                    <SectionWrapper key={sectionKey} label={MAIN_SECTION_LABELS[sectionKey]}>
-                      {renderActiveBackgrounds()}
-                    </SectionWrapper>
-                  );
+                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderActiveBackgrounds());
                 case "logos":
-                  return (
-                    <SectionWrapper key={sectionKey} label={MAIN_SECTION_LABELS[sectionKey]}>
-                      {renderLogosSection()}
-                    </SectionWrapper>
-                  );
+                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderLogosSection());
                 case "library":
-                  return (
-                    <SectionWrapper key={sectionKey} label={MAIN_SECTION_LABELS[sectionKey]}>
-                      {renderLibrarySection()}
-                    </SectionWrapper>
-                  );
+                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderLibrarySection());
                 default:
                   return null;
               }
