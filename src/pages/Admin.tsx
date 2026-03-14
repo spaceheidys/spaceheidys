@@ -27,8 +27,8 @@ import SortableImageCard from "@/components/admin/SortableImageCard";
 import ShareSection from "@/components/admin/ShareSection";
 import SkillsSection from "@/components/admin/SkillsSection";
 import { useSectionContent } from "@/hooks/useSectionContent";
-
-const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
+import { useGallerySubs } from "@/hooks/useGallerySubs";
+import { Plus } from "lucide-react";
 const PORTFOLIO_SECTION_KEYS = ["gallery", "projects", "skills", "archive", "share"];
 
 import type { SectionSetting } from "@/hooks/useSectionSettings";
