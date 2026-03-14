@@ -55,7 +55,7 @@ const Index = () => {
   const closingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { visibility: sectionVisibility } = useSectionSettings();
   const { buttons: navButtons } = useNavButtons();
-  const { get: getContent, getDuration } = useSectionContent();
+  const { get: getContent, getDuration, loading: contentLoading } = useSectionContent();
   const { count: favoritesCount } = useFavorites();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -162,9 +162,10 @@ const Index = () => {
 
   const handleContactClick = () => handleSectionClick("contact");
 
-  const siteMusicEnabled = getContent("site_music_enabled") !== "false";
+  const siteMusicEnabled = !contentLoading && getContent("site_music_enabled") !== "false";
 
   useEffect(() => {
+    if (contentLoading) return;
     if (!siteMusicEnabled) return;
 
     const audio = new Audio("/audio/main_buddhist.mp3");
@@ -190,7 +191,7 @@ const Index = () => {
       window.removeEventListener("keydown", playAudio);
       window.removeEventListener("touchstart", playAudio);
     };
-  }, [siteMusicEnabled]);
+  }, [contentLoading, siteMusicEnabled]);
 
   // Ctrl+Shift+A shortcut to navigate to admin
   useEffect(() => {
