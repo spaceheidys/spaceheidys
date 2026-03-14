@@ -261,7 +261,11 @@ const AdminMain = () => {
                       : "border-border"
                   } ${!item.isDefault && backgrounds.find(b => b.id === item.id)?.is_active === false ? "opacity-40" : ""}`}
                 >
-                  <img src={item.src} alt="Background" className="w-full h-full object-cover" />
+                  {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(item.src) ? (
+                    <video src={item.src} muted className="w-full h-full object-cover" />
+                  ) : (
+                    <img src={item.src} alt="Background" className="w-full h-full object-cover" />
+                  )}
                   {item.isDefault && (
                     <span className="absolute bottom-2 left-2 text-[9px] font-display tracking-widest uppercase text-foreground/60 bg-background/70 px-1.5 py-0.5">
                       Default
