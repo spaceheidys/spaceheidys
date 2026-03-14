@@ -58,6 +58,7 @@ const Index = () => {
   const { get: getContent, getDuration } = useSectionContent();
   const { count: favoritesCount } = useFavorites();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Show scroll-to-top arrow only when in portfolio section
   useEffect(() => {
