@@ -170,6 +170,14 @@ const AdminMain = () => {
 
   const sectionItems = backgrounds.filter((b) => b.section === activeSection);
   const libraryItems = backgrounds.filter((b) => b.section === "library");
+  const logoItems = backgrounds.filter((b) => b.section === "main_logos");
+
+  const handleLogosUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadToSection(file, "main_logos");
+    if (logosFileRef.current) logosFileRef.current.value = "";
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
