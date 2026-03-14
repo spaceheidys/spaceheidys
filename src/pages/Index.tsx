@@ -138,6 +138,7 @@ const Index = () => {
   const handleSectionClick = (section: "about" | "contact" | "shop") => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
     setActiveSection(section);
+    setTimeout(() => mainTextRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
     // Use the max duration among the section's content keys, or the single key's duration
     const sectionKeys: Record<string, string[]> = {
       about: ["about"],
