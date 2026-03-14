@@ -39,10 +39,7 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelec
           transition={{ duration: 0.3 }}
         >
           {[
-            { en: "VECTOR", jp: "ベクター" },
-            { en: "DIGITAL", jp: "デジタル" },
-            { en: "AI", jp: "エーアイ" },
-            { en: "SKETCHES", jp: "スケッチ" },
+            ...gallerySubs.map((s) => ({ en: s.en, jp: s.jp })),
             { en: "RETURN", jp: "戻る", isBack: true },
           ].map((item, i) => (
             <motion.button
