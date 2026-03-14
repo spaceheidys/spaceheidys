@@ -97,7 +97,10 @@ const SkillsDescriptionBox = ({ getContent, updateContent }: { getContent: (k: s
 
 const Admin = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
-  const { visibility, toggle: toggleSection } = useSectionSettings();
+  const { visibility, sections, toggle: toggleSection, updateLabel, reorder } = useSectionSettings();
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [editLabel, setEditLabel] = useState("");
+  const [editLabelJp, setEditLabelJp] = useState("");
   const { get: getContent, update: updateContent, loading: contentLoading } = useSectionContent();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
