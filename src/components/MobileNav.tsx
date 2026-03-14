@@ -51,7 +51,7 @@ const MobileNav = ({
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center gap-8"
+            className="fixed inset-0 z-[150] bg-background flex flex-col items-center justify-center gap-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
