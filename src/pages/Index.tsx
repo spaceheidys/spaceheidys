@@ -42,6 +42,7 @@ const Index = () => {
   });
   const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mainTextRef = useRef<HTMLDivElement | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
