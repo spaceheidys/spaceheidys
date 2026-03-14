@@ -464,7 +464,7 @@ const Index = () => {
             {activePortfolioKey ?
               <motion.p
                 key={`section-${activePortfolioKey}`}
-                className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-[20px] font-display"
+                className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-2 sm:my-[20px] font-display"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
