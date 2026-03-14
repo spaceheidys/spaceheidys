@@ -23,6 +23,7 @@ const MobileNav = ({
   bgOptions,
   bgImage,
   onBgChange,
+  siteMusicEnabled = true,
 }: MobileNavProps) => {
   const [open, setOpen] = useState(false);
   const { muted, toggleMute } = useSoundContext();
