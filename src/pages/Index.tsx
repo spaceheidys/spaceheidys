@@ -225,7 +225,7 @@ const Index = () => {
       <div className="relative z-10 min-h-[100dvh] flex flex-col">
         {/* Top nav bar */}
         <motion.header
-            className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8 bg-background/80 backdrop-blur-sm"
+            className="flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}>
