@@ -28,7 +28,10 @@ import { useFavorites } from "@/hooks/useFavorites";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    if (sessionStorage.getItem('loaded')) return false;
+    return true;
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
