@@ -204,6 +204,7 @@ const Admin = () => {
   const [editLabel, setEditLabel] = useState("");
   const [editLabelJp, setEditLabelJp] = useState("");
   const { get: getContent, update: updateContent, loading: contentLoading } = useSectionContent();
+  const { subs: gallerySubs, save: saveGallerySubs } = useGallerySubs();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [activeSection, setActiveSection] = useState<string>("gallery");
