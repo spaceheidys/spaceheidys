@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useGallerySubs } from "@/hooks/useGallerySubs";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, X, ChevronLeft, ChevronRight, Heart, Copy } from "lucide-react";
@@ -25,7 +26,6 @@ interface GalleryEntry {
   groupImages?: string[];
 }
 
-const TABS = ["ALL", "VECTOR", "DIGITAL", "AI", "SKETCHES"] as const;
 const SWIPE_THRESHOLD = 50;
 
 // ─── PlatformIcon ──────────────────────────────────────────────────────────────
@@ -89,6 +89,8 @@ const ShareBar = ({ shareUrl, title, compact = false }: { shareUrl: string; titl
 const Gallery = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { subs: gallerySubs } = useGallerySubs();
+  const tabs = useMemo(() => ["ALL", ...gallerySubs.map((s) => s.en)], [gallerySubs]);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
@@ -223,7 +225,7 @@ const Gallery = () => {
 
         {/* Filter tabs */}
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 pb-3 flex items-center gap-4 sm:gap-6 overflow-x-auto scrollbar-hide">
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

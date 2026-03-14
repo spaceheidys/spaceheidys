@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
+import { useGallerySubs } from "@/hooks/useGallerySubs";
 
 export type PortfolioMenuKey = "gallery" | "projects" | "skills" | "archive" | "favorites";
 
@@ -15,6 +16,7 @@ interface PortfolioMenuProps {
 
 const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelect, favoritesCount = 0 }: PortfolioMenuProps) => {
   const { visibility, sections } = useSectionSettings();
+  const { subs: gallerySubs } = useGallerySubs();
 
   if (!visible) return null;
 
@@ -37,10 +39,7 @@ const PortfolioMenu = ({ visible, activeKey, onSelect, onBack, onGallerySubSelec
           transition={{ duration: 0.3 }}
         >
           {[
-            { en: "VECTOR", jp: "ベクター" },
-            { en: "DIGITAL", jp: "デジタル" },
-            { en: "AI", jp: "エーアイ" },
-            { en: "SKETCHES", jp: "スケッチ" },
+            ...gallerySubs.map((s) => ({ en: s.en, jp: s.jp })),
             { en: "RETURN", jp: "戻る", isBack: true },
           ].map((item, i) => (
             <motion.button

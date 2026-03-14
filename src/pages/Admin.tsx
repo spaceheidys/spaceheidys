@@ -27,8 +27,8 @@ import SortableImageCard from "@/components/admin/SortableImageCard";
 import ShareSection from "@/components/admin/ShareSection";
 import SkillsSection from "@/components/admin/SkillsSection";
 import { useSectionContent } from "@/hooks/useSectionContent";
-
-const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
+import { useGallerySubs } from "@/hooks/useGallerySubs";
+import { Plus } from "lucide-react";
 const PORTFOLIO_SECTION_KEYS = ["gallery", "projects", "skills", "archive", "share"];
 
 import type { SectionSetting } from "@/hooks/useSectionSettings";
@@ -197,6 +197,111 @@ const SkillsDescriptionBox = ({ getContent, updateContent }: { getContent: (k: s
   );
 };
 
+// ─── Gallery Sub-Tabs with add/delete ──────────────────────────────────────────
+import type { GallerySub } from "@/hooks/useGallerySubs";
+
+const GallerySubTabs = ({
+  subs,
+  activeSub,
+  onSelect,
+  onSave,
+}: {
+  subs: GallerySub[];
+  activeSub: string;
+  onSelect: (sub: string) => void;
+  onSave: (subs: GallerySub[]) => Promise<void>;
+}) => {
+  const [adding, setAdding] = useState(false);
+  const [newEn, setNewEn] = useState("");
+  const [newJp, setNewJp] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  const handleAdd = async () => {
+    const label = newEn.trim().toUpperCase();
+    if (!label) return;
+    if (subs.some((s) => s.en === label)) {
+      toast.error("Already exists");
+      return;
+    }
+    await onSave([...subs, { en: label, jp: newJp.trim() || label }]);
+    onSelect(label);
+    setNewEn("");
+    setNewJp("");
+    setAdding(false);
+    toast.success(`${label} added`);
+  };
+
+  const handleDelete = async (en: string) => {
+    const updated = subs.filter((s) => s.en !== en);
+    await onSave(updated);
+    if (activeSub === en && updated.length > 0) onSelect(updated[0].en);
+    setConfirmDelete(null);
+    toast.success(`${en} removed`);
+  };
+
+  return (
+    <div className="flex gap-2 mb-6 flex-wrap items-center">
+      {subs.map((sub) => (
+        <div key={sub.en} className="relative group">
+          <button
+            onClick={() => onSelect(sub.en)}
+            className={`text-[10px] font-display tracking-[0.2em] uppercase px-2 py-1 border transition-colors ${
+              activeSub === sub.en
+                ? "border-foreground/60 text-foreground/80"
+                : "border-border text-muted-foreground hover:text-foreground/60"
+            }`}
+          >
+            {sub.en}
+          </button>
+          {confirmDelete === sub.en ? (
+            <span className="absolute -top-5 left-0 flex items-center gap-0.5 bg-background border border-border px-1 z-10">
+              <button onClick={() => handleDelete(sub.en)} className="text-[9px] text-red-400 hover:text-red-300 font-display tracking-wider">YES</button>
+              <span className="text-muted-foreground/30 text-[9px]">/</span>
+              <button onClick={() => setConfirmDelete(null)} className="text-[9px] text-muted-foreground hover:text-foreground font-display tracking-wider">NO</button>
+            </span>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(sub.en)}
+              className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-background border border-border rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              title={`Delete ${sub.en}`}
+            >
+              <X size={8} className="text-muted-foreground" />
+            </button>
+          )}
+        </div>
+      ))}
+
+      {adding ? (
+        <div className="flex items-center gap-1">
+          <input
+            value={newEn}
+            onChange={(e) => setNewEn(e.target.value)}
+            placeholder="EN"
+            className="w-16 bg-transparent border border-border px-1.5 py-0.5 text-[10px] font-display tracking-wider uppercase outline-none text-foreground"
+            autoFocus
+          />
+          <input
+            value={newJp}
+            onChange={(e) => setNewJp(e.target.value)}
+            placeholder="JP"
+            className="w-16 bg-transparent border border-border px-1.5 py-0.5 text-[10px] font-jp outline-none text-foreground"
+          />
+          <button onClick={handleAdd} className="text-foreground/60 hover:text-foreground"><Check size={12} /></button>
+          <button onClick={() => { setAdding(false); setNewEn(""); setNewJp(""); }} className="text-muted-foreground hover:text-foreground"><X size={12} /></button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setAdding(true)}
+          className="w-6 h-6 border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors flex items-center justify-center"
+          title="Add subcategory"
+        >
+          <Plus size={12} />
+        </button>
+      )}
+    </div>
+  );
+};
+
 const Admin = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const { visibility, sections, toggle: toggleSection, updateLabel, reorder } = useSectionSettings();
@@ -204,6 +309,7 @@ const Admin = () => {
   const [editLabel, setEditLabel] = useState("");
   const [editLabelJp, setEditLabelJp] = useState("");
   const { get: getContent, update: updateContent, loading: contentLoading } = useSectionContent();
+  const { subs: gallerySubs, save: saveGallerySubs } = useGallerySubs();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [activeSection, setActiveSection] = useState<string>("gallery");
@@ -633,21 +739,12 @@ const Admin = () => {
 
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
-          <div className="flex gap-2 mb-6 flex-wrap">
-            {GALLERY_SUBS.map((sub) => (
-              <button
-                key={sub}
-                onClick={() => setActiveSub(sub)}
-                className={`text-[10px] font-display tracking-[0.2em] uppercase px-2 py-1 border transition-colors ${
-                  activeSub === sub
-                    ? "border-foreground/60 text-foreground/80"
-                    : "border-border text-muted-foreground hover:text-foreground/60"
-                }`}
-              >
-                {sub}
-              </button>
-            ))}
-          </div>
+          <GallerySubTabs
+            subs={gallerySubs}
+            activeSub={activeSub}
+            onSelect={setActiveSub}
+            onSave={saveGallerySubs}
+          />
         )}
 
         {/* Upload area */}
