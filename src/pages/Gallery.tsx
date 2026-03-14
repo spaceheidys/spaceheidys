@@ -387,7 +387,7 @@ const Gallery = () => {
                   <img
                     src={selectedEntry.image_url}
                     alt={selectedEntry.title}
-                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[80vh] object-contain rounded-md cursor-pointer"
+                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[65vh] object-contain rounded-md cursor-pointer"
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
