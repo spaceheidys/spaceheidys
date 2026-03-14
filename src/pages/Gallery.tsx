@@ -358,7 +358,7 @@ const Gallery = () => {
                       key={idx}
                       src={url}
                       alt={`${selectedEntry.title} ${idx + 1}`}
-                      className="w-full object-contain rounded-md"
+                      className="max-w-full max-h-[80vh] object-contain rounded-md"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   ))}
