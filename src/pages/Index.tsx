@@ -274,7 +274,8 @@ const Index = () => {
             }}
             bgOptions={bgOptions}
             bgImage={bgImage}
-            onBgChange={setBgImage} />
+            onBgChange={setBgImage}
+            siteMusicEnabled={siteMusicEnabled} />
           
       </motion.header>
 

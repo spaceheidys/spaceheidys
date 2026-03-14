@@ -12,6 +12,7 @@ interface MobileNavProps {
   bgOptions: string[];
   bgImage: string;
   onBgChange: (bg: string) => void;
+  siteMusicEnabled?: boolean;
 }
 
 const MobileNav = ({
