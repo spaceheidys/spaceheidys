@@ -500,7 +500,7 @@ const Index = () => {
                   </motion.div> :
                 activePortfolioKey ?
                   <motion.div key={`${activePortfolioKey}-${activeGallerySub}`} className="w-full h-full" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97, y: 8 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-                    <PortfolioGallery sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} />
+                    <PortfolioGallery sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} onLightboxChange={setLightboxOpen} />
                   </motion.div> :
 
                   <motion.div
