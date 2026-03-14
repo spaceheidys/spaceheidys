@@ -42,6 +42,7 @@ const Index = () => {
   });
   const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mainTextRef = useRef<HTMLDivElement | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
@@ -137,6 +138,7 @@ const Index = () => {
   const handleSectionClick = (section: "about" | "contact" | "shop") => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
     setActiveSection(section);
+    setTimeout(() => mainTextRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
     // Use the max duration among the section's content keys, or the single key's duration
     const sectionKeys: Record<string, string[]> = {
       about: ["about"],
@@ -351,7 +353,7 @@ const Index = () => {
     </div>
 
     {/* === MAIN_TEXT section === */}
-    <div className="relative w-full bg-background" style={{ height: 420 }}>
+    <div ref={mainTextRef} className="relative w-full bg-background" style={{ height: 420 }}>
       <AnimatePresence mode="wait">
         {activeSection === "about" &&
           <motion.div
