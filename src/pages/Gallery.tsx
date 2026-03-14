@@ -303,7 +303,7 @@ const Gallery = () => {
           const shareUrl = `${window.location.origin}/gallery?id=${selectedEntry.id}`;
           return (
           <motion.div
-            className={`fixed inset-0 z-50 flex ${isGroup ? "items-start overflow-y-auto" : "items-center overflow-hidden"} justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer`}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -334,7 +334,7 @@ const Gallery = () => {
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative my-auto ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[80vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[85vh]"}`}
+              className={`relative ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.75, opacity: 0, y: 20 }}
@@ -358,7 +358,7 @@ const Gallery = () => {
                       key={idx}
                       src={url}
                       alt={`${selectedEntry.title} ${idx + 1}`}
-                      className="w-full object-contain rounded-md"
+                      className="max-w-full max-h-[80vh] object-contain rounded-md"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   ))}
@@ -383,12 +383,11 @@ const Gallery = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-2 min-h-0 flex-1">
                   <img
                     src={selectedEntry.image_url}
                     alt={selectedEntry.title}
-                    className="max-w-[80vw] sm:max-w-[75vw] object-contain rounded-md cursor-pointer"
-                    style={{ maxHeight: 'calc(100vh - 12rem)' }}
+                    className="max-w-[80vw] sm:max-w-[75vw] max-h-[80vh] object-contain rounded-md cursor-pointer"
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
