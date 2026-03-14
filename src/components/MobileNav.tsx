@@ -75,6 +75,21 @@ const MobileNav = ({
               </button>
             ))}
 
+            <div className="w-12 h-[1px] bg-foreground/10 my-1" />
+
+            <button
+              onClick={() => handleClick(onSecretDoor)}
+              className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
+            >
+              Secret Door
+            </button>
+            <button
+              onClick={() => handleClick(onShop)}
+              className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
+            >
+              Shop
+            </button>
+
             {/* BG switcher + mute */}
             <div className="flex items-center gap-3 mt-4">
               {bgOptions.map((bg, i) => (
