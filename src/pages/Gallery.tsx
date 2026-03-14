@@ -171,6 +171,18 @@ const Gallery = () => {
 
   const isGroup = selectedEntry?.groupImages && selectedEntry.groupImages.length > 1;
 
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!selectedEntry) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goLightbox(-1);
+      else if (e.key === "ArrowRight") goLightbox(1);
+      else if (e.key === "Escape") setSelectedEntry(null);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selectedEntry, selectedIndex, navigableEntries]);
+
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   }, []);
