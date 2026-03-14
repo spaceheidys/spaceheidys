@@ -409,27 +409,27 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
             transition={{ duration: 0.3 }}
             onClick={() => setSelectedEntry(null)}
           >
-            {/* Navigation arrows */}
+            {/* Navigation arrows — desktop only */}
             {!isGroup && selectedIndex > 0 && (
               <motion.button
                 onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
-                className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                className="hidden sm:flex fixed left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
                 aria-label="Previous image"
               >
-                <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
+                <ChevronLeft className="w-10 h-10" />
               </motion.button>
             )}
             {!isGroup && selectedIndex < navigableEntries.length - 1 && (
               <motion.button
                 onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
-                className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                className="hidden sm:flex fixed right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
                 initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
                 aria-label="Next image"
               >
-                <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
+                <ChevronRight className="w-10 h-10" />
               </motion.button>
             )}
 
