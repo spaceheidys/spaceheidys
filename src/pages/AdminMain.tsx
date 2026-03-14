@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff } from "lucide-react";
+import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X } from "lucide-react";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
@@ -30,7 +30,8 @@ const AdminMain = () => {
   const [backgrounds, setBackgrounds] = useState<BackgroundItem[]>([]);
   const [fetching, setFetching] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [swapTarget, setSwapTarget] = useState<string | null>(null); // id of active image being swapped
+  const [swapTarget, setSwapTarget] = useState<string | null>(null);
+  const [confirmBg, setConfirmBg] = useState<{ action: string; id: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const libraryFileRef = useRef<HTMLInputElement>(null);
   const { buttons: navButtons, updateButton, swapOrder, addButton, deleteButton } = useNavButtons();
@@ -268,6 +269,7 @@ const AdminMain = () => {
                   )}
                   {!item.isDefault && (
                     <>
+                      {/* Swap button */}
                       <button
                         onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)}
                         title="Click to swap with a Library image"
@@ -279,34 +281,59 @@ const AdminMain = () => {
                       >
                         <ArrowUpDown size={14} />
                       </button>
-                      <button
-                        onClick={async () => {
-                          const bg = backgrounds.find(b => b.id === item.id);
-                          if (!bg) return;
-                          const { error } = await supabase
-                            .from("page_backgrounds")
-                            .update({ is_active: !bg.is_active })
-                            .eq("id", item.id);
-                          if (!error) {
-                            setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b));
-                            toast.success(bg.is_active ? "Hidden" : "Visible");
-                          }
-                        }}
-                        title={backgrounds.find(b => b.id === item.id)?.is_active ? "Hide from site" : "Show on site"}
-                        className={`absolute bottom-2 left-2 p-1 transition-opacity ${
-                          backgrounds.find(b => b.id === item.id)?.is_active === false
-                            ? "bg-background/80 text-muted-foreground/40 opacity-100"
-                            : "bg-background/80 text-foreground opacity-0 group-hover:opacity-100"
-                        }`}
-                      >
-                        {backgrounds.find(b => b.id === item.id)?.is_active === false ? <EyeOff size={14} /> : <Eye size={14} />}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      {/* Visibility toggle */}
+                      {confirmBg?.action === "toggle" && confirmBg.id === item.id ? (
+                        <span className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                          <button onClick={async () => {
+                            const bg = backgrounds.find(b => b.id === item.id);
+                            if (!bg) return;
+                            const { error } = await supabase
+                              .from("page_backgrounds")
+                              .update({ is_active: !bg.is_active })
+                              .eq("id", item.id);
+                            if (!error) {
+                              setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b));
+                              toast.success(bg.is_active ? "Hidden" : "Visible");
+                            }
+                            setConfirmBg(null);
+                          }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                            <Check size={9} /> YES
+                          </button>
+                          <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                            <X size={9} /> NO
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmBg({ action: "toggle", id: item.id })}
+                          title={backgrounds.find(b => b.id === item.id)?.is_active ? "Hide from site" : "Show on site"}
+                          className={`absolute bottom-2 left-2 p-1 transition-opacity ${
+                            backgrounds.find(b => b.id === item.id)?.is_active === false
+                              ? "bg-background/80 text-muted-foreground/40 opacity-100"
+                              : "bg-background/80 text-foreground opacity-0 group-hover:opacity-100"
+                          }`}
+                        >
+                          {backgrounds.find(b => b.id === item.id)?.is_active === false ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                      )}
+                      {/* Delete button */}
+                      {confirmBg?.action === "delete" && confirmBg.id === item.id ? (
+                        <span className="absolute top-2 right-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                          <button onClick={() => { handleDelete(item.id); setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                            <Check size={9} /> YES
+                          </button>
+                          <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                            <X size={9} /> NO
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmBg({ action: "delete", id: item.id })}
+                          className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
@@ -363,12 +390,23 @@ const AdminMain = () => {
                         </div>
                       )}
                       {!swapTarget && (
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        confirmBg?.action === "lib_delete" && confirmBg.id === item.id ? (
+                          <span className="absolute top-2 right-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                            <button onClick={() => { handleDelete(item.id); setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                              <Check size={9} /> YES
+                            </button>
+                            <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                              <X size={9} /> NO
+                            </button>
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmBg({ action: "lib_delete", id: item.id })}
+                            className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )
                       )}
                     </div>
                   ))}
