@@ -95,7 +95,7 @@ const Index = () => {
           }
           // Flip card back if it's currently unflipped
           if (!thirdCardFlipped) {
-            if (!muted) {
+            if (!muted && siteMusicEnabled) {
               new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
             }
             setThirdCardFlipped(true);
