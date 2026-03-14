@@ -74,9 +74,26 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
         setProgress(((duration - currentSeconds) / duration) * 100);
         if (currentSeconds <= 0) {
           if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-          if (cyberpunkAudioRef.current) { cyberpunkAudioRef.current.pause(); cyberpunkAudioRef.current.currentTime = 0; }
-          onClose();
-          onClose();
+          // Fade out audio
+          if (cyberpunkAudioRef.current) {
+            const audio = cyberpunkAudioRef.current;
+            const fadeAudio = setInterval(() => {
+              if (audio.volume > 0.05) {
+                audio.volume = Math.max(0, audio.volume - 0.05);
+              } else {
+                audio.volume = 0;
+                audio.pause();
+                audio.currentTime = 0;
+                clearInterval(fadeAudio);
+              }
+            }, 80);
+          }
+          // Trigger fade-out animation, then close after 1.5s
+          setClosing(true);
+          setTimeout(() => {
+            setClosing(false);
+            onClose();
+          }, 1500);
         }
       }, 1000);
     }
