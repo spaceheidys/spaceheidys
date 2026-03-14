@@ -438,10 +438,11 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
             onClick={() => setSelectedEntry(null)}
           >
             {/* Navigation arrows — desktop only */}
-            {!isGroup && selectedIndex > 0 && (
+            {!isGroup && navigableEntries.length > 1 && (
               <motion.button
                 onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
-                className="hidden sm:flex fixed left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                className={`hidden sm:flex fixed left-36 top-1/2 -translate-y-1/2 z-[210] transition-colors duration-200 ${selectedIndex > 0 ? 'text-white/40 hover:text-white cursor-pointer' : 'text-white/10 cursor-default'}`}
+                disabled={selectedIndex <= 0}
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
                 aria-label="Previous image"
@@ -449,10 +450,11 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                 <ChevronLeft className="w-10 h-10" />
               </motion.button>
             )}
-            {!isGroup && selectedIndex < navigableEntries.length - 1 && (
+            {!isGroup && navigableEntries.length > 1 && (
               <motion.button
                 onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
-                className="hidden sm:flex fixed right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
+                className={`hidden sm:flex fixed right-6 top-1/2 -translate-y-1/2 z-[210] transition-colors duration-200 ${selectedIndex < navigableEntries.length - 1 ? 'text-white/40 hover:text-white cursor-pointer' : 'text-white/10 cursor-default'}`}
+                disabled={selectedIndex >= navigableEntries.length - 1}
                 initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
                 aria-label="Next image"
