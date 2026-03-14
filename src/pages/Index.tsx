@@ -234,7 +234,7 @@ const Index = () => {
           {["Secret Door", "Shop"].map((item, i) =>
             <motion.a
               key={item}
-              onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => setActiveSection("shop")}
+              onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => handleSectionClick("shop")}
               className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -266,7 +266,7 @@ const Index = () => {
         </nav>
         <MobileNav
             onSecretDoor={() => setSecretDoorOpen(true)}
-            onShop={() => setActiveSection("shop")}
+            onShop={() => handleSectionClick("shop")}
             navButtons={navButtons}
             actionMap={{
               about: handleAboutClick,
