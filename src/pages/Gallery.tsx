@@ -340,6 +340,8 @@ const Gallery = () => {
               exit={{ scale: 0.75, opacity: 0, y: 20 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             >
               {/* Back button */}
               <button
