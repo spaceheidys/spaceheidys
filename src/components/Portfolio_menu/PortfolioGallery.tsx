@@ -161,6 +161,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const { favorites, toggle, isFavorite } = useFavorites();
 
   useEffect(() => {
+    onLightboxChange?.(!!selectedEntry);
+  }, [selectedEntry, onLightboxChange]);
+
+  useEffect(() => {
     const fetchItems = async () => {
       if (sectionKey === "favorites") {
         const favIds = Array.from(favorites);
