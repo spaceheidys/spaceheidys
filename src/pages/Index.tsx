@@ -277,8 +277,6 @@ const Index = () => {
                 portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
                 gallery: () => navigate("/gallery"),
                 contacts: handleContactClick,
-                secret_door: () => setSecretDoorOpen(true),
-                shop: () => setActiveSection("shop"),
               }}
               bgOptions={bgOptions}
               bgImage={bgImage}
@@ -288,11 +286,11 @@ const Index = () => {
 
         {/* Main content */}
         <div className="flex-1 flex items-center px-4 sm:px-8 md:px-16 relative">
-          {/* Left side nav — fixed to stay visible on scroll */}
+          {/* Left side nav */}
           <AnimatePresence>
             {showNav &&
               <motion.nav
-                className="hidden md:flex flex-col gap-8 fixed left-4 sm:left-8 md:left-16 top-1/2 -translate-y-1/2 z-40"
+                className="hidden md:flex flex-col gap-8 mr-auto"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -304,8 +302,6 @@ const Index = () => {
                     portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
                     gallery: () => navigate("/gallery"),
                     contacts: handleContactClick,
-                    secret_door: () => setSecretDoorOpen(true),
-                    shop: () => setActiveSection("shop"),
                   };
                   return navButtons
                     .filter(b => b.is_visible)
