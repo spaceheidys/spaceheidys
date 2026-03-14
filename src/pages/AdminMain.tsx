@@ -410,12 +410,32 @@ const AdminMain = () => {
                         onClick={() => setConfirmBg({ action: "logo_fade_toggle", id: "fade" })}
                         className={`px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${
                           getContent("logo_fade_enabled") === "true"
-                            ? "border-foreground text-foreground"
+                            ? "border-foreground text-foreground bg-foreground/10"
                             : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
                         }`}
                       >
                         Fade {getContent("logo_fade_enabled") === "true" ? "ON" : "OFF"}
                       </button>
+                    )}
+                    {/* Fade duration input — only when fade is ON */}
+                    {getContent("logo_fade_enabled") === "true" && (
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          min={1}
+                          max={120}
+                          defaultValue={getContent("logo_fade_seconds") || "6"}
+                          className="w-14 px-2 py-1.5 border border-border bg-background text-foreground text-xs font-display tracking-widest text-center"
+                          onBlur={async (e) => {
+                            const val = Math.max(1, Math.min(120, parseInt(e.target.value) || 6));
+                            e.target.value = String(val);
+                            await updateContent("logo_fade_seconds", String(val));
+                            toast.success(`Fade: ${val}s`);
+                          }}
+                          onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+                        />
+                        <span className="text-[9px] text-muted-foreground font-display tracking-widest uppercase">sec</span>
+                      </div>
                     )}
                     <label className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-xs font-display tracking-[0.2em] uppercase">
                       {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
