@@ -68,7 +68,7 @@ const SkillsDisplay = () => {
                 <span className="text-white/30 text-[8px] font-display">{skill.name.slice(0,2)}</span>
               )}
             </div>
-            <span className="text-[8px] sm:text-[9px] text-white/50 group-hover:text-white/80 transition-colors duration-300 font-display tracking-wider uppercase text-center max-w-[60px] truncate">
+            <span className="text-[8px] sm:text-[9px] text-white/50 group-hover:text-white/80 transition-colors duration-300 font-display tracking-wider uppercase text-center max-w-[60px] leading-tight break-words">
               {skill.name}
             </span>
           </motion.div>
