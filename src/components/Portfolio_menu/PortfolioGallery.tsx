@@ -402,7 +402,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
       <AnimatePresence mode="wait">
         {selectedEntry && (
           <motion.div
-            className="fixed inset-0 z-[200] flex items-start justify-center pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer overflow-y-auto"
+            className="fixed inset-0 z-[200] flex items-start justify-center pt-14 sm:pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer overflow-y-auto"
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
@@ -452,23 +452,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                 <span className="hidden sm:inline">Back</span>
               </button>
 
-              {/* Top-right: heart + close */}
-              <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
-                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
-                  aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
-                >
-                  <Heart className={`w-4 h-4 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
-                </button>
-                <button
-                  onClick={() => setSelectedEntry(null)}
-                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
-                  aria-label="Close preview"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
 
               {/* ── PROJECT view ── */}
               {isProject ? (
@@ -534,9 +517,24 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   ))}
-                  {/* Share bar at bottom of group */}
-                  <div className="flex items-center justify-center py-2">
-                    <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />
+                  {/* Bottom bar: share + heart + close */}
+                  <div className="flex items-center justify-center gap-3 py-2">
+                    <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
 
@@ -550,10 +548,24 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
-                  {/* Share bar under single image */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <span className="text-[9px] text-white/30 font-display tracking-widest uppercase">Share</span>
+                  {/* Bottom bar: share + heart + close */}
+                  <div className="flex items-center justify-center gap-3 pt-2">
                     <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               )}
