@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
+import { useGallerySubs } from "@/hooks/useGallerySubs";
 
 export type PortfolioMenuKey = "gallery" | "projects" | "skills" | "archive" | "favorites";
 
