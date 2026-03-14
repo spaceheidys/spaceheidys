@@ -282,7 +282,7 @@ const Index = () => {
       <div className="relative bg-background overflow-hidden rounded-none min-h-[100dvh]">
       {/* === MAIN section === */}
       {/* Hero background illustration */}
-      <div className="absolute inset-0 w-full h-[100dvh]">
+      <div className="absolute inset-0 w-full h-full">
         {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(bgImage) ? (
           <video
             key={bgImage}
