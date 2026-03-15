@@ -53,6 +53,7 @@ const NotesPanel = ({ userId }: { userId: string }) => {
 
   const deleteNote = async (id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id));
+    setConfirmDeleteId(null);
     await supabase.from("admin_notes" as any).delete().eq("id", id);
   };
 
