@@ -14,6 +14,7 @@ const NotesPanel = ({ userId }: { userId: string }) => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [newNote, setNewNote] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchNotes = async () => {
