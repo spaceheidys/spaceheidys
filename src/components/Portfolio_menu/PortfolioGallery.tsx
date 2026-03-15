@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, X, ExternalLink, Heart, Copy, ArrowLeft } from "lucide-react";
@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const ITEMS_PER_PAGE_MOBILE = 6;
+const ITEMS_PER_PAGE_MOBILE = 4;
 const ITEMS_PER_PAGE_DESKTOP = 9;
 
 interface PortfolioItem {
@@ -45,17 +45,13 @@ const defaultSectionItems: Partial<Record<PortfolioMenuKey, PortfolioItem[]>> = 
   archive: makeItems(8),
 };
 
-const defaultGallerySubItems: Record<string, PortfolioItem[]> = {
-  VECTOR: makeItems(16),
-  DIGITAL: makeItems(16),
-  AI: makeItems(16),
-  SKETCHES: makeItems(16),
-};
+const defaultGallerySubItems: Record<string, PortfolioItem[]> = {};
 
 interface PortfolioGalleryProps {
   sectionKey?: PortfolioMenuKey;
   gallerySub?: string | null;
   onPageInfo?: (info: { current: number; total: number }) => void;
+  onLightboxChange?: (open: boolean) => void;
 }
 
 // ─── Share buttons bar ────────────────────────────────────────────────────────
@@ -151,13 +147,17 @@ const PlatformIcon = ({ label }: { label: string }) => {
 };
 
 // ─── Main component ────────────────────────────────────────────────────────────
-const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: PortfolioGalleryProps) => {
+const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLightboxChange }: PortfolioGalleryProps) => {
   const isMobile = useIsMobile();
   const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const { favorites, toggle, isFavorite } = useFavorites();
+
+  useEffect(() => {
+    onLightboxChange?.(!!selectedEntry);
+  }, [selectedEntry, onLightboxChange]);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -287,34 +287,102 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
 
   const pageItems = entries.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
+  // Swipe support for pagination
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const diff = touchStartX.current - touchEndX.current;
+    const threshold = 50;
+    if (diff > threshold && page < totalPages - 1) {
+      setPage((p) => p + 1);
+    } else if (diff < -threshold && page > 0) {
+      setPage((p) => p - 1);
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  }, [page, totalPages]);
+
+  // Swipe support for lightbox
+  const lbTouchStartX = useRef<number | null>(null);
+  const lbTouchEndX = useRef<number | null>(null);
+
+  const handleLbTouchStart = useCallback((e: React.TouchEvent) => {
+    lbTouchStartX.current = e.touches[0].clientX;
+    lbTouchEndX.current = null;
+  }, []);
+
+  const handleLbTouchMove = useCallback((e: React.TouchEvent) => {
+    lbTouchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleLbTouchEnd = useCallback(() => {
+    if (lbTouchStartX.current === null || lbTouchEndX.current === null) return;
+    const diff = lbTouchStartX.current - lbTouchEndX.current;
+    const threshold = 50;
+    if (diff > threshold) goLightbox(1);
+    else if (diff < -threshold) goLightbox(-1);
+    lbTouchStartX.current = null;
+    lbTouchEndX.current = null;
+  }, [selectedIndex, navigableEntries.length]);
+
   const isGroup = selectedEntry && selectedEntry.groupImages && selectedEntry.groupImages.length > 1;
   const isProject = selectedEntry && selectedEntry.project_url;
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!selectedEntry || isGroup) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goLightbox(-1);
+      else if (e.key === "ArrowRight") goLightbox(1);
+      else if (e.key === "Escape") setSelectedEntry(null);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selectedEntry, isGroup, selectedIndex, navigableEntries]);
 
   // Share URL for current entry: prefer project_url, else current page URL
   const getShareUrl = (entry: GalleryEntry) =>
     entry.project_url || window.location.href;
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center">
+    <div
+      className="relative w-full h-full flex flex-col items-center justify-center"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {hasPagination && (
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           disabled={page === 0}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -ml-5 sm:-translate-x-[calc(100%+8px)] sm:ml-0"
+          className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 sm:-translate-x-[calc(100%+8px)]"
           aria-label="Previous page"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-[40px] sm:h-[40px]" />
+          <ChevronLeft className="w-[40px] h-[40px]" />
         </button>
       )}
 
       <AnimatePresence mode="wait">
         <motion.div
           key={`${sectionKey}-${gallerySub}-${page}`}
-          className="w-full h-full grid grid-cols-2 sm:grid-cols-3 gap-2 p-2"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.3 }}
+          ref={gridRef}
+          className="w-full grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-2 px-2 sm:px-2 py-1 sm:p-2 content-center"
+          initial={{ opacity: 0, x: 0 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
         >
           {pageItems.map((item, i) => (
             <motion.div
@@ -358,10 +426,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
         <button
           onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
           disabled={page === totalPages - 1}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 -mr-5 sm:translate-x-[calc(100%+8px)] sm:mr-0"
+          className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 z-10 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-default transition-colors duration-300 sm:translate-x-[calc(100%+8px)]"
           aria-label="Next page"
         >
-          <ChevronRight className="w-5 h-5 sm:w-[40px] sm:h-[40px]" />
+          <ChevronRight className="w-[40px] h-[40px]" />
         </button>
       )}
 
@@ -369,40 +437,20 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
       <AnimatePresence mode="wait">
         {selectedEntry && (
           <motion.div
-            className="fixed inset-0 z-[200] flex items-start justify-center pt-4 pb-24 sm:pb-20 bg-black/80 backdrop-blur-sm cursor-pointer overflow-y-auto"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer pt-16 sm:pt-16 sm:pl-32"
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
             transition={{ duration: 0.3 }}
             onClick={() => setSelectedEntry(null)}
           >
-            {/* Navigation arrows */}
-            {!isGroup && selectedIndex > 0 && (
-              <motion.button
-                onClick={(e) => { e.stopPropagation(); goLightbox(-1); }}
-                className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
-                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-8 h-8 sm:w-10 sm:h-10" />
-              </motion.button>
-            )}
-            {!isGroup && selectedIndex < navigableEntries.length - 1 && (
-              <motion.button
-                onClick={(e) => { e.stopPropagation(); goLightbox(1); }}
-                className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[60] text-white/40 hover:text-white transition-colors duration-200"
-                initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />
-              </motion.button>
-            )}
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative my-auto ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[70vh]"}`}
+              className={`relative ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
+              onTouchStart={handleLbTouchStart}
+              onTouchMove={handleLbTouchMove}
+              onTouchEnd={handleLbTouchEnd}
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.75, opacity: 0, y: 20 }}
@@ -419,23 +467,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                 <span className="hidden sm:inline">Back</span>
               </button>
 
-              {/* Top-right: heart + close */}
-              <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
-                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
-                  aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
-                >
-                  <Heart className={`w-4 h-4 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
-                </button>
-                <button
-                  onClick={() => setSelectedEntry(null)}
-                  className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
-                  aria-label="Close preview"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
 
               {/* ── PROJECT view ── */}
               {isProject ? (
@@ -497,19 +528,34 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                       key={idx}
                       src={url}
                       alt={`${selectedEntry.label} ${idx + 1}`}
-                      className="w-full object-contain rounded-md"
+                      className="max-w-full max-h-[80vh] object-contain rounded-md"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   ))}
-                  {/* Share bar at bottom of group */}
-                  <div className="flex items-center justify-center py-2">
-                    <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />
+                  {/* Bottom bar: share + heart + close */}
+                  <div className="flex items-center justify-center gap-3 py-2">
+                    <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
 
               /* ── SINGLE IMAGE view ── */
               ) : (
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-2 min-h-0 flex-1">
                   <img
                     src={selectedEntry.image_url}
                     alt={selectedEntry.label}
@@ -517,10 +563,24 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo }: Po
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
-                  {/* Share bar under single image */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <span className="text-[9px] text-white/30 font-display tracking-widest uppercase">Share</span>
+                  {/* Bottom bar: share + heart + close */}
+                  <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
                     <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
+                    <div className="w-[1px] h-4 bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label={isFavorite(selectedEntry.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
+                    </button>
+                    <button
+                      onClick={() => setSelectedEntry(null)}
+                      className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               )}
