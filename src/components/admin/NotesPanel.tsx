@@ -14,7 +14,6 @@ const NotesPanel = ({ userId }: { userId: string }) => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [newNote, setNewNote] = useState("");
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchNotes = async () => {
@@ -53,7 +52,6 @@ const NotesPanel = ({ userId }: { userId: string }) => {
 
   const deleteNote = async (id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id));
-    setConfirmDeleteId(null);
     await supabase.from("admin_notes" as any).delete().eq("id", id);
   };
 
@@ -104,30 +102,12 @@ const NotesPanel = ({ userId }: { userId: string }) => {
               >
                 {note.content}
               </span>
-              {confirmDeleteId === note.id ? (
-                <span className="flex items-center gap-1 flex-shrink-0">
-                  <button
-                    onClick={() => deleteNote(note.id)}
-                    className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors"
-                  >
-                    YES
-                  </button>
-                  <span className="text-[9px] text-muted-foreground/40">/</span>
-                  <button
-                    onClick={() => setConfirmDeleteId(null)}
-                    className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    NO
-                  </button>
-                </span>
-              ) : (
-                <button
-                  onClick={() => setConfirmDeleteId(note.id)}
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all flex-shrink-0"
-                >
-                  <Trash2 size={11} />
-                </button>
-              )}
+              <button
+                onClick={() => deleteNote(note.id)}
+                className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all flex-shrink-0"
+              >
+                <Trash2 size={11} />
+              </button>
             </div>
           ))}
         </div>

@@ -30,21 +30,11 @@ export function useSectionContent() {
   };
 
   const update = async (key: string, content: string) => {
-    const existing = items.find((i) => i.key === key);
-    if (existing) {
-      await supabase
-        .from("section_content")
-        .update({ content, updated_at: new Date().toISOString() })
-        .eq("key", key);
-      setItems((prev) => prev.map((i) => (i.key === key ? { ...i, content } : i)));
-    } else {
-      const { data } = await supabase
-        .from("section_content")
-        .insert({ key, content })
-        .select()
-        .single();
-      if (data) setItems((prev) => [...prev, data as SectionContent]);
-    }
+    await supabase
+      .from("section_content")
+      .update({ content, updated_at: new Date().toISOString() })
+      .eq("key", key);
+    setItems((prev) => prev.map((i) => (i.key === key ? { ...i, content } : i)));
   };
 
   const updateDuration = async (key: string, duration: number | null) => {

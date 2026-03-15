@@ -17,10 +17,10 @@ interface PortfolioCardProps {
 const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, flipped: controlledFlipped, onFlip }: PortfolioCardProps) => {
   const [internalFlipped, setInternalFlipped] = useState(true);
   const flipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped;
-  const { muted, siteMusicEnabled } = useSoundContext();
+  const { muted } = useSoundContext();
 
   const handleFlip = () => {
-    if (!muted && siteMusicEnabled) {
+    if (!muted) {
       new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
     }
     const next = !flipped;

@@ -258,28 +258,19 @@ export type Database = {
         Row: {
           id: string
           is_visible: boolean
-          label: string
-          label_jp: string
           section: string
-          sort_order: number
           updated_at: string
         }
         Insert: {
           id?: string
           is_visible?: boolean
-          label?: string
-          label_jp?: string
           section: string
-          sort_order?: number
           updated_at?: string
         }
         Update: {
           id?: string
           is_visible?: boolean
-          label?: string
-          label_jp?: string
           section?: string
-          sort_order?: number
           updated_at?: string
         }
         Relationships: []

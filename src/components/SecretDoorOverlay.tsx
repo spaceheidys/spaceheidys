@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useSecretDoorSettings } from "@/hooks/useSecretDoorSettings";
 
 interface SecretDoorOverlayProps {
@@ -13,7 +13,6 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
   const [progress, setProgress] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(60);
   const [denied, setDenied] = useState(false);
-  const [closing, setClosing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const cyberpunkAudioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -74,26 +73,9 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
         setProgress(((duration - currentSeconds) / duration) * 100);
         if (currentSeconds <= 0) {
           if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-          // Fade out audio
-          if (cyberpunkAudioRef.current) {
-            const audio = cyberpunkAudioRef.current;
-            const fadeAudio = setInterval(() => {
-              if (audio.volume > 0.05) {
-                audio.volume = Math.max(0, audio.volume - 0.05);
-              } else {
-                audio.volume = 0;
-                audio.pause();
-                audio.currentTime = 0;
-                clearInterval(fadeAudio);
-              }
-            }, 80);
-          }
-          // Trigger fade-out animation, then close after 1.5s
-          setClosing(true);
-          setTimeout(() => {
-            setClosing(false);
-            onClose();
-          }, 1500);
+          if (cyberpunkAudioRef.current) { cyberpunkAudioRef.current.pause(); cyberpunkAudioRef.current.currentTime = 0; }
+          onClose();
+          onClose();
         }
       }, 1000);
     }
@@ -137,9 +119,9 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center"
       initial={{ opacity: 0 }}
-      animate={{ opacity: closing ? 0 : 1 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: closing ? 1.5 : 0.3, ease: "easeInOut" }}
+      transition={{ duration: 0.3 }}
       onClick={handleClose}
     >
       {settings.background_url ? (

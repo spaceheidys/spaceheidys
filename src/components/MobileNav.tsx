@@ -12,7 +12,6 @@ interface MobileNavProps {
   bgOptions: string[];
   bgImage: string;
   onBgChange: (bg: string) => void;
-  siteMusicEnabled?: boolean;
 }
 
 const MobileNav = ({
@@ -23,13 +22,12 @@ const MobileNav = ({
   bgOptions,
   bgImage,
   onBgChange,
-  siteMusicEnabled = true,
 }: MobileNavProps) => {
   const [open, setOpen] = useState(false);
   const { muted, toggleMute } = useSoundContext();
 
   const handleClick = (action: () => void) => {
-    if (!muted && siteMusicEnabled) {
+    if (!muted) {
       new Audio("/audio/bell-sounds.mp3").play().catch(() => {});
     }
     action();
@@ -51,7 +49,7 @@ const MobileNav = ({
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[150] bg-background flex flex-col items-center justify-center gap-8"
+            className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center gap-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -75,21 +73,6 @@ const MobileNav = ({
               </button>
             ))}
 
-            <div className="w-12 h-[1px] bg-foreground/10 my-1" />
-
-            <button
-              onClick={() => handleClick(onSecretDoor)}
-              className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
-            >
-              Secret Door
-            </button>
-            <button
-              onClick={() => handleClick(onShop)}
-              className="text-sm tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors font-display"
-            >
-              Shop
-            </button>
-
             {/* BG switcher + mute */}
             <div className="flex items-center gap-3 mt-4">
               {bgOptions.map((bg, i) => (
@@ -102,15 +85,13 @@ const MobileNav = ({
                   onClick={() => onBgChange(bg)}
                 />
               ))}
-              {siteMusicEnabled && (
-                <button
-                  className="ml-2 text-foreground/60 hover:text-foreground transition-colors"
-                  onClick={toggleMute}
-                  aria-label={muted ? "Unmute" : "Mute"}
-                >
-                  {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                </button>
-              )}
+              <button
+                className="ml-2 text-foreground/60 hover:text-foreground transition-colors"
+                onClick={toggleMute}
+                aria-label={muted ? "Unmute" : "Mute"}
+              >
+                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </button>
             </div>
           </motion.div>
         )}

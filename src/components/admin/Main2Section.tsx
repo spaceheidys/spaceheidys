@@ -1,31 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Loader2, Trash2, Check, X } from "lucide-react";
+import { Upload, Loader2, Trash2 } from "lucide-react";
 
 interface Main2SectionProps {
   get: (key: string) => string;
   update: (key: string, content: string) => Promise<void>;
-}
-
-/** Inline YES / NO confirmation button pair */
-function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }) {
-  return (
-    <span className="inline-flex items-center gap-1 ml-1">
-      <button
-        onClick={onYes}
-        className="flex items-center gap-0.5 px-2 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"
-      >
-        <Check size={9} /> YES
-      </button>
-      <button
-        onClick={onNo}
-        className="flex items-center gap-0.5 px-2 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors"
-      >
-        <X size={9} /> NO
-      </button>
-    </span>
-  );
 }
 
 const Main2Section = ({ get, update }: Main2SectionProps) => {
@@ -36,8 +16,6 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [bgVideo, setBgVideo] = useState("");
   const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
-  const [confirm, setConfirm] = useState<string | null>(null); // tracks which action needs confirmation
-  const [pendingFile, setPendingFile] = useState<{ file: File; key: string } | null>(null);
   const frontRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -107,30 +85,6 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     toast.success(type === "polygon" ? "Polygon background active" : "Video background active");
   };
 
-  // Helper: request confirmation for an action
-  const askConfirm = (action: string) => setConfirm(action);
-  const cancelConfirm = () => { setConfirm(null); setPendingFile(null); };
-
-  const executeConfirm = async () => {
-    if (!confirm) return;
-    if (confirm === "save_wisdom") await handleSave();
-    else if (confirm === "bg_polygon") await handleBgTypeChange("polygon");
-    else if (confirm === "bg_video") await handleBgTypeChange("video");
-    else if (confirm === "clear_card_front_image") await handleClear("card_front_image");
-    else if (confirm === "clear_card_back_image") await handleClear("card_back_image");
-    else if (confirm === "clear_card_bg_video") await handleClear("card_bg_video");
-    else if (confirm === "upload_card_front_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_front_image");
-    else if (confirm === "upload_card_back_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_back_image");
-    else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
-    setConfirm(null);
-    setPendingFile(null);
-  };
-
-  const handleFileSelect = (file: File, key: string, uploadKey: string) => {
-    setPendingFile({ file, key });
-    askConfirm(uploadKey);
-  };
-
   return (
     <div className="space-y-6">
       <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
@@ -142,7 +96,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
         <label className="text-xs text-muted-foreground font-display tracking-widest uppercase">
           Text above cards
         </label>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2">
           <input
             type="text"
             value={wisdomText}
@@ -150,57 +104,41 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             placeholder="The cards know what the mind has forgotten"
             className="flex-1 bg-transparent border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-foreground transition-colors"
           />
-          {confirm === "save_wisdom" ? (
-            <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-          ) : (
-            <button
-              onClick={() => askConfirm("save_wisdom")}
-              className="px-4 py-2 border border-border text-xs font-display tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
-            >
-              Save
-            </button>
-          )}
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 border border-border text-xs font-display tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+          >
+            Save
+          </button>
         </div>
       </div>
 
       {/* Background type toggle */}
       <div className="space-y-3">
         <label className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-          CARDS
+          Section Background
         </label>
         <div className="flex items-center gap-2">
-          {confirm === "bg_polygon" ? (
-            <span className="flex items-center gap-1 px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase border border-foreground text-foreground">
-              Polygon? <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-            </span>
-          ) : (
-            <button
-              onClick={() => bgType !== "polygon" ? askConfirm("bg_polygon") : undefined}
-              className={`px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase transition-colors border ${
-                bgType === "polygon"
-                  ? "border-foreground text-foreground"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Polygon
-            </button>
-          )}
-          {confirm === "bg_video" ? (
-            <span className="flex items-center gap-1 px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase border border-foreground text-foreground">
-              Video? <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-            </span>
-          ) : (
-            <button
-              onClick={() => bgType !== "video" ? askConfirm("bg_video") : undefined}
-              className={`px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase transition-colors border ${
-                bgType === "video"
-                  ? "border-foreground text-foreground"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Video
-            </button>
-          )}
+          <button
+            onClick={() => handleBgTypeChange("polygon")}
+            className={`px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase transition-colors border ${
+              bgType === "polygon"
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Polygon
+          </button>
+          <button
+            onClick={() => handleBgTypeChange("video")}
+            className={`px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase transition-colors border ${
+              bgType === "video"
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Video
+          </button>
         </div>
 
         {bgType === "video" && (
@@ -209,48 +147,8 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
               <div className="relative group border border-border aspect-video overflow-hidden">
                 <video src={bgVideo} className="w-full h-full object-cover" muted autoPlay loop playsInline />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
-                  {confirm === "upload_card_bg_video" ? (
-                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                  ) : (
-                    <label className="p-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
-                      {uploading === "card_bg_video" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                      <input
-                        ref={videoRef}
-                        type="file"
-                        accept="video/mp4,video/webm"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) handleFileSelect(f, "card_bg_video", "upload_card_bg_video");
-                          if (videoRef.current) videoRef.current.value = "";
-                        }}
-                        disabled={!!uploading}
-                      />
-                    </label>
-                  )}
-                  {confirm === "clear_card_bg_video" ? (
-                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                  ) : (
-                    <button
-                      onClick={() => askConfirm("clear_card_bg_video")}
-                      className="p-2 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <>
-                {confirm === "upload_card_bg_video" ? (
-                  <div className="flex items-center justify-center gap-2 border border-dashed border-foreground aspect-video text-foreground">
-                    <span className="text-xs font-display tracking-[0.2em] uppercase">Upload?</span>
-                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                  </div>
-                ) : (
-                  <label className="flex items-center justify-center gap-2 border border-dashed border-border aspect-video cursor-pointer text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
+                  <label className="p-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
                     {uploading === "card_bg_video" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                    <span className="text-xs font-display tracking-[0.2em] uppercase">Upload MP4 / WebM</span>
                     <input
                       ref={videoRef}
                       type="file"
@@ -258,14 +156,37 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
                       className="hidden"
                       onChange={(e) => {
                         const f = e.target.files?.[0];
-                        if (f) handleFileSelect(f, "card_bg_video", "upload_card_bg_video");
+                        if (f) handleVideoUpload(f);
                         if (videoRef.current) videoRef.current.value = "";
                       }}
                       disabled={!!uploading}
                     />
                   </label>
-                )}
-              </>
+                  <button
+                    onClick={() => handleClear("card_bg_video")}
+                    className="p-2 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <label className="flex items-center justify-center gap-2 border border-dashed border-border aspect-video cursor-pointer text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
+                {uploading === "card_bg_video" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                <span className="text-xs font-display tracking-[0.2em] uppercase">Upload MP4 / WebM</span>
+                <input
+                  ref={videoRef}
+                  type="file"
+                  accept="video/mp4,video/webm"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleVideoUpload(f);
+                    if (videoRef.current) videoRef.current.value = "";
+                  }}
+                  disabled={!!uploading}
+                />
+              </label>
             )}
             <p className="text-[10px] text-muted-foreground/50 font-display tracking-wider">
               MP4 (H.264) or WebM recommended. Keep under 10 MB for fast loading.
@@ -298,30 +219,22 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
       </div>
 
       {/* Card images */}
-      <div className="grid grid-cols-2 gap-6 max-w-[320px]">
+      <div className="grid grid-cols-2 gap-6">
         <CardImageUpload
           label="Card front"
           imageUrl={frontImage}
           uploading={uploading === "card_front_image"}
           inputRef={frontRef}
-          onUpload={(f) => handleFileSelect(f, "card_front_image", "upload_card_front_image")}
-          onClear={() => askConfirm("clear_card_front_image")}
-          confirmAction={confirm}
-          confirmKey="card_front_image"
-          onConfirmYes={executeConfirm}
-          onConfirmNo={cancelConfirm}
+          onUpload={(f) => handleImageUpload(f, "card_front_image")}
+          onClear={() => handleClear("card_front_image")}
         />
         <CardImageUpload
           label="Card back"
           imageUrl={backImage}
           uploading={uploading === "card_back_image"}
           inputRef={backRef}
-          onUpload={(f) => handleFileSelect(f, "card_back_image", "upload_card_back_image")}
-          onClear={() => askConfirm("clear_card_back_image")}
-          confirmAction={confirm}
-          confirmKey="card_back_image"
-          onConfirmYes={executeConfirm}
-          onConfirmNo={cancelConfirm}
+          onUpload={(f) => handleImageUpload(f, "card_back_image")}
+          onClear={() => handleClear("card_back_image")}
         />
       </div>
     </div>
@@ -335,10 +248,6 @@ function CardImageUpload({
   inputRef,
   onUpload,
   onClear,
-  confirmAction,
-  confirmKey,
-  onConfirmYes,
-  onConfirmNo,
 }: {
   label: string;
   imageUrl: string;
@@ -346,14 +255,7 @@ function CardImageUpload({
   inputRef: React.RefObject<HTMLInputElement>;
   onUpload: (file: File) => void;
   onClear: () => void;
-  confirmAction: string | null;
-  confirmKey: string;
-  onConfirmYes: () => void;
-  onConfirmNo: () => void;
 }) {
-  const showUploadConfirm = confirmAction === `upload_${confirmKey}`;
-  const showClearConfirm = confirmAction === `clear_${confirmKey}`;
-
   return (
     <div className="space-y-2">
       <label className="text-xs text-muted-foreground font-display tracking-widest uppercase">
@@ -368,36 +270,28 @@ function CardImageUpload({
           </div>
         )}
         <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
-          {showUploadConfirm ? (
-            <ConfirmButtons onYes={onConfirmYes} onNo={onConfirmNo} />
-          ) : (
-            <label className="p-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
-              {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-              <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) onUpload(f);
-                  if (inputRef.current) inputRef.current.value = "";
-                }}
-                disabled={uploading}
-              />
-            </label>
-          )}
+          <label className="p-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
+            {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) onUpload(f);
+                if (inputRef.current) inputRef.current.value = "";
+              }}
+              disabled={uploading}
+            />
+          </label>
           {imageUrl && (
-            showClearConfirm ? (
-              <ConfirmButtons onYes={onConfirmYes} onNo={onConfirmNo} />
-            ) : (
-              <button
-                onClick={onClear}
-                className="p-2 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-              >
-                <Trash2 size={16} />
-              </button>
-            )
+            <button
+              onClick={onClear}
+              className="p-2 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+            >
+              <Trash2 size={16} />
+            </button>
           )}
         </div>
       </div>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, Pencil } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NotesPanel from "@/components/admin/NotesPanel";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
@@ -18,121 +18,16 @@ import {
 import {
   SortableContext,
   rectSortingStrategy,
-  horizontalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import SortableImageCard from "@/components/admin/SortableImageCard";
 import ShareSection from "@/components/admin/ShareSection";
 import SkillsSection from "@/components/admin/SkillsSection";
 import { useSectionContent } from "@/hooks/useSectionContent";
-import { useGallerySubs } from "@/hooks/useGallerySubs";
-import { Plus } from "lucide-react";
-const PORTFOLIO_SECTION_KEYS = ["gallery", "projects", "skills", "archive", "share"];
 
-import type { SectionSetting } from "@/hooks/useSectionSettings";
-
-interface SortableSectionTabProps {
-  sec: SectionSetting;
-  isActive: boolean;
-  isVisible: boolean;
-  isEditing: boolean;
-  editLabel: string;
-  editLabelJp: string;
-  onSelect: () => void;
-  onToggle: () => void;
-  onStartEdit: () => void;
-  onLabelChange: (v: string) => void;
-  onLabelJpChange: (v: string) => void;
-  onSaveEdit: () => void;
-  onCancelEdit: () => void;
-}
-
-const SortableSectionTab = ({ sec, isActive, isVisible, isEditing, editLabel, editLabelJp, onSelect, onToggle, onStartEdit, onLabelChange, onLabelJpChange, onSaveEdit, onCancelEdit }: SortableSectionTabProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sec.section });
-  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  const isDirty = isEditing && (editLabel !== sec.label || editLabelJp !== sec.label_jp);
-
-  return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-0">
-      <button
-        {...attributes}
-        {...listeners}
-        className="px-1 py-1.5 text-muted-foreground/40 hover:text-muted-foreground cursor-grab active:cursor-grabbing"
-        title="Drag to reorder"
-      >
-        <GripVertical size={10} />
-      </button>
-      {isEditing ? (
-        <div className="flex items-center gap-1 px-2 py-0.5 border border-foreground">
-          <input
-            value={editLabel}
-            onChange={(e) => { onLabelChange(e.target.value); setShowConfirm(false); }}
-            className="w-16 bg-transparent text-xs font-display tracking-wider uppercase outline-none text-foreground"
-            placeholder="EN"
-            autoFocus
-          />
-          <input
-            value={editLabelJp}
-            onChange={(e) => { onLabelJpChange(e.target.value); setShowConfirm(false); }}
-            className="w-16 bg-transparent text-xs font-display outline-none text-foreground"
-            placeholder="JP"
-          />
-          {showConfirm ? (
-            <>
-              <button
-                onClick={() => { onSaveEdit(); setShowConfirm(false); }}
-                className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
-              >
-                <Check size={9} /> YES
-              </button>
-              <button
-                onClick={() => { onCancelEdit(); setShowConfirm(false); }}
-                className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X size={9} /> NO
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => { if (isDirty) { setShowConfirm(true); } else { onCancelEdit(); } }}
-                className="text-foreground hover:text-foreground/80"
-                title={isDirty ? "Save changes" : "Close"}
-              >
-                <Check size={10} />
-              </button>
-              <button onClick={onCancelEdit} className="text-muted-foreground hover:text-foreground"><X size={10} /></button>
-            </>
-          )}
-        </div>
-      ) : (
-        <button
-          onClick={onSelect}
-          onDoubleClick={onStartEdit}
-          className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border-y border-l transition-colors ${
-            isActive ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground"
-          }`}
-          title="Double-click to rename"
-        >
-          {sec.label || sec.section}
-        </button>
-      )}
-      <button
-        onClick={onToggle}
-        className={`px-1.5 py-1.5 border transition-colors ${
-          isActive ? "border-foreground" : "border-border"
-        } ${isVisible ? "text-foreground/60 hover:text-foreground" : "text-muted-foreground/30 hover:text-muted-foreground"}`}
-        title={isVisible ? `Hide ${sec.section} on site` : `Show ${sec.section} on site`}
-      >
-        {isVisible ? <Eye size={11} /> : <EyeOff size={11} />}
-      </button>
-    </div>
-  );
-};
+const SECTIONS = ["gallery", "projects", "skills", "archive"] as const;
+const GALLERY_SUBS = ["VECTOR", "DIGITAL", "AI", "SKETCHES"];
+const SPECIAL_TABS = ["share"] as const;
 
 interface PortfolioItem {
   id: string;
@@ -197,119 +92,10 @@ const SkillsDescriptionBox = ({ getContent, updateContent }: { getContent: (k: s
   );
 };
 
-// ─── Gallery Sub-Tabs with add/delete ──────────────────────────────────────────
-import type { GallerySub } from "@/hooks/useGallerySubs";
-
-const GallerySubTabs = ({
-  subs,
-  activeSub,
-  onSelect,
-  onSave,
-}: {
-  subs: GallerySub[];
-  activeSub: string;
-  onSelect: (sub: string) => void;
-  onSave: (subs: GallerySub[]) => Promise<void>;
-}) => {
-  const [adding, setAdding] = useState(false);
-  const [newEn, setNewEn] = useState("");
-  const [newJp, setNewJp] = useState("");
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-
-  const handleAdd = async () => {
-    const label = newEn.trim().toUpperCase();
-    if (!label) return;
-    if (subs.some((s) => s.en === label)) {
-      toast.error("Already exists");
-      return;
-    }
-    await onSave([...subs, { en: label, jp: newJp.trim() || label }]);
-    onSelect(label);
-    setNewEn("");
-    setNewJp("");
-    setAdding(false);
-    toast.success(`${label} added`);
-  };
-
-  const handleDelete = async (en: string) => {
-    const updated = subs.filter((s) => s.en !== en);
-    await onSave(updated);
-    if (activeSub === en && updated.length > 0) onSelect(updated[0].en);
-    setConfirmDelete(null);
-    toast.success(`${en} removed`);
-  };
-
-  return (
-    <div className="flex gap-2 mb-6 flex-wrap items-center">
-      {subs.map((sub) => (
-        <div key={sub.en} className="relative group">
-          <button
-            onClick={() => onSelect(sub.en)}
-            className={`text-[10px] font-display tracking-[0.2em] uppercase px-2 py-1 border transition-colors ${
-              activeSub === sub.en
-                ? "border-foreground/60 text-foreground/80"
-                : "border-border text-muted-foreground hover:text-foreground/60"
-            }`}
-          >
-            {sub.en}
-          </button>
-          {confirmDelete === sub.en ? (
-            <span className="absolute -top-5 left-0 flex items-center gap-0.5 bg-background border border-border px-1 z-10">
-              <button onClick={() => handleDelete(sub.en)} className="text-[9px] text-red-400 hover:text-red-300 font-display tracking-wider">YES</button>
-              <span className="text-muted-foreground/30 text-[9px]">/</span>
-              <button onClick={() => setConfirmDelete(null)} className="text-[9px] text-muted-foreground hover:text-foreground font-display tracking-wider">NO</button>
-            </span>
-          ) : (
-            <button
-              onClick={() => setConfirmDelete(sub.en)}
-              className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-background border border-border rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              title={`Delete ${sub.en}`}
-            >
-              <X size={8} className="text-muted-foreground" />
-            </button>
-          )}
-        </div>
-      ))}
-
-      {adding ? (
-        <div className="flex items-center gap-1">
-          <input
-            value={newEn}
-            onChange={(e) => setNewEn(e.target.value)}
-            placeholder="EN"
-            className="w-16 bg-transparent border border-border px-1.5 py-0.5 text-[10px] font-display tracking-wider uppercase outline-none text-foreground"
-            autoFocus
-          />
-          <input
-            value={newJp}
-            onChange={(e) => setNewJp(e.target.value)}
-            placeholder="JP"
-            className="w-16 bg-transparent border border-border px-1.5 py-0.5 text-[10px] font-jp outline-none text-foreground"
-          />
-          <button onClick={handleAdd} className="text-foreground/60 hover:text-foreground"><Check size={12} /></button>
-          <button onClick={() => { setAdding(false); setNewEn(""); setNewJp(""); }} className="text-muted-foreground hover:text-foreground"><X size={12} /></button>
-        </div>
-      ) : (
-        <button
-          onClick={() => setAdding(true)}
-          className="w-6 h-6 border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors flex items-center justify-center"
-          title="Add subcategory"
-        >
-          <Plus size={12} />
-        </button>
-      )}
-    </div>
-  );
-};
-
 const Admin = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
-  const { visibility, sections, toggle: toggleSection, updateLabel, reorder } = useSectionSettings();
-  const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [editLabel, setEditLabel] = useState("");
-  const [editLabelJp, setEditLabelJp] = useState("");
+  const { visibility, toggle: toggleSection } = useSectionSettings();
   const { get: getContent, update: updateContent, loading: contentLoading } = useSectionContent();
-  const { subs: gallerySubs, save: saveGallerySubs } = useGallerySubs();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [activeSection, setActiveSection] = useState<string>("gallery");
@@ -674,58 +460,69 @@ const Admin = () => {
       </header>
 
       <div className="px-4 sm:px-8 py-6 max-w-5xl mx-auto">
-        {/* Section tabs - draggable */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={(event) => {
-            const { active, over } = event;
-            if (!over || active.id === over.id) return;
-            const filtered = sections.filter((s) => PORTFOLIO_SECTION_KEYS.includes(s.section));
-            const oldIdx = filtered.findIndex((s) => s.section === active.id);
-            const newIdx = filtered.findIndex((s) => s.section === over.id);
-            if (oldIdx === -1 || newIdx === -1) return;
-            const reordered = arrayMove(filtered, oldIdx, newIdx).map((s, i) => ({ ...s, sort_order: i }));
-            reorder(reordered);
-          }}
-        >
-          <SortableContext items={sections.filter((s) => PORTFOLIO_SECTION_KEYS.includes(s.section)).map((s) => s.section)} strategy={horizontalListSortingStrategy}>
-            <div className="flex gap-2 mb-4 flex-wrap items-center">
-              {sections.filter((s) => PORTFOLIO_SECTION_KEYS.includes(s.section)).map((sec) => (
-                <SortableSectionTab
-                  key={sec.section}
-                  sec={sec}
-                  isActive={activeSection === sec.section}
-                  isVisible={visibility[sec.section as keyof typeof visibility] ?? true}
-                  isEditing={editingSection === sec.section}
-                  editLabel={editLabel}
-                  editLabelJp={editLabelJp}
-                  onSelect={() => { setActiveSection(sec.section); if (sec.section === "gallery") setActiveSub("VECTOR"); }}
-                  onToggle={() => toggleSection(sec.section as any)}
-                  onStartEdit={() => { setEditingSection(sec.section); setEditLabel(sec.label); setEditLabelJp(sec.label_jp); }}
-                  onLabelChange={setEditLabel}
-                  onLabelJpChange={setEditLabelJp}
-                  onSaveEdit={() => { updateLabel(sec.section, editLabel, editLabelJp); setEditingSection(null); toast.success("Label updated"); }}
-                  onCancelEdit={() => setEditingSection(null)}
-                />
-              ))}
-
-              <div className="ml-auto">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button className="flex items-center gap-1.5 text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
-                      <StickyNote size={12} />
-                      NOTES
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-auto p-4 border-border bg-background">
-                    {user && <NotesPanel userId={user.id} />}
-                  </PopoverContent>
-                </Popover>
-              </div>
+        {/* Section tabs */}
+        <div className="flex gap-2 mb-4 flex-wrap items-center">
+          {SECTIONS.map((s) => (
+            <div key={s} className="flex items-center gap-0">
+              <button
+                onClick={() => { setActiveSection(s); setActiveSub("VECTOR"); }}
+                className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border-y border-l transition-colors ${
+                  activeSection === s
+                    ? "border-foreground text-foreground"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {s}
+              </button>
+              <button
+                onClick={() => toggleSection(s as any)}
+                className={`px-1.5 py-1.5 border transition-colors ${
+                  activeSection === s ? "border-foreground" : "border-border"
+                } ${visibility[s as keyof typeof visibility] ? "text-foreground/60 hover:text-foreground" : "text-muted-foreground/30 hover:text-muted-foreground"}`}
+                title={visibility[s as keyof typeof visibility] ? `Hide ${s} on site` : `Show ${s} on site`}
+              >
+                {visibility[s as keyof typeof visibility] ? <Eye size={11} /> : <EyeOff size={11} />}
+              </button>
             </div>
-          </SortableContext>
-        </DndContext>
+          ))}
+
+          {/* SHARE tab */}
+          <div className="flex items-center gap-0">
+            <button
+              onClick={() => setActiveSection("share")}
+              className={`text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border-y border-l transition-colors ${
+                activeSection === "share"
+                  ? "border-foreground text-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              SHARE
+            </button>
+            <button
+              onClick={() => toggleSection("share" as any)}
+              className={`px-1.5 py-1.5 border transition-colors ${
+                activeSection === "share" ? "border-foreground" : "border-border"
+              } ${visibility["share" as keyof typeof visibility] ? "text-foreground/60 hover:text-foreground" : "text-muted-foreground/30 hover:text-muted-foreground"}`}
+              title={visibility["share" as keyof typeof visibility] ? "Hide share on site" : "Show share on site"}
+            >
+              {visibility["share" as keyof typeof visibility] ? <Eye size={11} /> : <EyeOff size={11} />}
+            </button>
+          </div>
+
+          <div className="ml-auto">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1.5 text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
+                  <StickyNote size={12} />
+                  NOTES
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-auto p-4 border-border bg-background">
+                {user && <NotesPanel userId={user.id} />}
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
 
         {activeSection === "share" && <ShareSection />}
 
@@ -739,12 +536,21 @@ const Admin = () => {
 
         {/* Gallery sub-tabs */}
         {activeSection === "gallery" && (
-          <GallerySubTabs
-            subs={gallerySubs}
-            activeSub={activeSub}
-            onSelect={setActiveSub}
-            onSave={saveGallerySubs}
-          />
+          <div className="flex gap-2 mb-6 flex-wrap">
+            {GALLERY_SUBS.map((sub) => (
+              <button
+                key={sub}
+                onClick={() => setActiveSub(sub)}
+                className={`text-[10px] font-display tracking-[0.2em] uppercase px-2 py-1 border transition-colors ${
+                  activeSub === sub
+                    ? "border-foreground/60 text-foreground/80"
+                    : "border-border text-muted-foreground hover:text-foreground/60"
+                }`}
+              >
+                {sub}
+              </button>
+            ))}
+          </div>
         )}
 
         {/* Upload area */}

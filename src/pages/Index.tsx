@@ -28,10 +28,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(() => {
-    if (sessionStorage.getItem('loaded')) return false;
-    return true;
-  });
+  const [loading, setLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
@@ -42,12 +39,11 @@ const Index = () => {
   });
   const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const mainTextRef = useRef<HTMLDivElement | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
   const [flipCount, setFlipCount] = useState(0);
-  const { muted, toggleMute, setSiteMusicEnabled } = useSoundContext();
+  const { muted, toggleMute } = useSoundContext();
   const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
@@ -55,10 +51,9 @@ const Index = () => {
   const closingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { visibility: sectionVisibility } = useSectionSettings();
   const { buttons: navButtons } = useNavButtons();
-  const { get: getContent, getDuration, loading: contentLoading } = useSectionContent();
+  const { get: getContent, getDuration } = useSectionContent();
   const { count: favoritesCount } = useFavorites();
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Show scroll-to-top arrow only when in portfolio section
   useEffect(() => {
@@ -96,7 +91,7 @@ const Index = () => {
           }
           // Flip card back if it's currently unflipped
           if (!thirdCardFlipped) {
-            if (!muted && siteMusicEnabled) {
+            if (!muted) {
               new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
             }
             setThirdCardFlipped(true);
@@ -139,7 +134,6 @@ const Index = () => {
   const handleSectionClick = (section: "about" | "contact" | "shop") => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
     setActiveSection(section);
-    setTimeout(() => mainTextRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
     // Use the max duration among the section's content keys, or the single key's duration
     const sectionKeys: Record<string, string[]> = {
       about: ["about"],
@@ -162,16 +156,7 @@ const Index = () => {
 
   const handleContactClick = () => handleSectionClick("contact");
 
-  const siteMusicEnabled = !contentLoading && getContent("site_music_enabled") !== "false";
-
   useEffect(() => {
-    setSiteMusicEnabled(siteMusicEnabled);
-  }, [siteMusicEnabled, setSiteMusicEnabled]);
-
-  useEffect(() => {
-    if (contentLoading) return;
-    if (!siteMusicEnabled) return;
-
     const audio = new Audio("/audio/main_buddhist.mp3");
     audio.loop = false;
     audioRef.current = audio;
@@ -195,7 +180,7 @@ const Index = () => {
       window.removeEventListener("keydown", playAudio);
       window.removeEventListener("touchstart", playAudio);
     };
-  }, [contentLoading, siteMusicEnabled]);
+  }, []);
 
   // Ctrl+Shift+A shortcut to navigate to admin
   useEffect(() => {
@@ -219,94 +204,17 @@ const Index = () => {
   return (
     <>
       <AnimatePresence>
-        {loading && <LoadingScreen onComplete={() => { sessionStorage.setItem('loaded', '1'); setLoading(false); }} />}
+        {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       </AnimatePresence>
-      {/* Fixed header — outside stacking contexts */}
-      <motion.header
-          className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}>
-          
-        <span
-            className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
-            onClick={() => setShowNav((prev) => !prev)}>
-            
-          ビコ・ク
-        </span>
-        <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-          {["Secret Door", "Shop"].map((item, i) =>
-            <motion.a
-              key={item}
-              onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => handleSectionClick("shop")}
-              className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.1 }}>
-              {item}
-            </motion.a>
-            )}
-          <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}>
-            {bgOptions.map((bg, i) =>
-              <div
-                key={i}
-                className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
-                style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
-                onClick={() => setBgImage(bg)} />
-              )}
-            {siteMusicEnabled && (
-              <div
-                className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
-                onClick={toggleMute}
-                aria-label={muted ? "Unmute sound" : "Mute sound"}>
-                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </div>
-            )}
-          </motion.div>
-        </nav>
-        <MobileNav
-            onSecretDoor={() => setSecretDoorOpen(true)}
-            onShop={() => handleSectionClick("shop")}
-            navButtons={navButtons}
-            actionMap={{
-              about: handleAboutClick,
-              portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
-              gallery: () => navigate("/gallery"),
-              contacts: handleContactClick,
-            }}
-            bgOptions={bgOptions}
-            bgImage={bgImage}
-            onBgChange={setBgImage}
-            siteMusicEnabled={siteMusicEnabled} />
-          
-      </motion.header>
-
       <div className="relative bg-background overflow-hidden rounded-none min-h-[100dvh]">
       {/* === MAIN section === */}
       {/* Hero background illustration */}
-      <div className="absolute inset-0 w-full h-full">
-        {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(bgImage) ? (
-          <video
-            key={bgImage}
-            src={bgImage}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover object-center opacity-60"
-          />
-        ) : (
-          <img
+      <div className="absolute inset-0 w-full h-[100dvh]">
+        <img
             src={bgImage}
             alt="BIKO KU manga illustration"
             className="w-full h-full object-cover object-center opacity-60"
-            loading="eager"
-          />
-        )}
+            loading="eager" />
           
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
@@ -315,17 +223,180 @@ const Index = () => {
 
       {/* Content layer */}
       <div className="relative z-10 min-h-[100dvh] flex flex-col">
-        {/* Spacer for fixed header */}
-        <div className="h-16 sm:h-20 md:h-24" />
+        {/* Top nav bar */}
+        <motion.header
+            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 sm:py-6 md:py-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}>
+            
+          <span
+              className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
+              onClick={() => setShowNav((prev) => !prev)}>
+              
+            ビコ・ク
+          </span>
+          <nav className="hidden md:flex items-center gap-8 lg:gap-12">
+            {["Secret Door", "Shop"].map((item, i) =>
+              <motion.a
+                key={item}
+                onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => setActiveSection("shop")}
+                className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + i * 0.1 }}>
+                {item}
+              </motion.a>
+              )}
+            <motion.div
+                className="flex items-center gap-2"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}>
+              {bgOptions.map((bg, i) =>
+                <div
+                  key={i}
+                  className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
+                  style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
+                  onClick={() => setBgImage(bg)} />
+                )}
+              <div
+                  className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
+                  onClick={toggleMute}
+                  aria-label={muted ? "Unmute sound" : "Mute sound"}>
+                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </div>
+            </motion.div>
+          </nav>
+          <MobileNav
+              onSecretDoor={() => setSecretDoorOpen(true)}
+              onShop={() => setActiveSection("shop")}
+              navButtons={navButtons}
+              actionMap={{
+                about: handleAboutClick,
+                portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+                gallery: () => navigate("/gallery"),
+                contacts: handleContactClick,
+              }}
+              bgOptions={bgOptions}
+              bgImage={bgImage}
+              onBgChange={setBgImage} />
+            
+        </motion.header>
 
         {/* Main content */}
         <div className="flex-1 flex items-center px-4 sm:px-8 md:px-16 relative">
+          {/* Left side nav */}
+          <AnimatePresence>
+            {showNav &&
+              <motion.nav
+                className="hidden md:flex flex-col gap-8 mr-auto"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.4 }}>
+                
+                {(() => {
+                  const actionMap: Record<string, () => void> = {
+                    about: handleAboutClick,
+                    portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
+                    gallery: () => navigate("/gallery"),
+                    contacts: handleContactClick,
+                  };
+                  return navButtons
+                    .filter(b => b.is_visible)
+                    .map(b => ({ jp: b.label_jp, en: b.label, action: actionMap[b.key] }));
+                })().
+                map((item, i) =>
+                <motion.a
+                  key={item.en}
+                  href={item.action ? undefined : `#${item.en.toLowerCase()}`}
+                  onClick={() => {
+                    if (!muted) {
+                      const bell = new Audio("/audio/bell-sounds.mp3");
+                      bell.play().catch(() => {});
+                    }
+                    item.action?.();
+                  }}
+                  className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}>
+                  
+                    <span className="font-jp text-xs tracking-widest">{item.jp}</span>
+                    <span className="text-[10px] tracking-[0.3em] font-display">{item.en}</span>
+                  </motion.a>
+                )}
+              </motion.nav>
+              }
+          </AnimatePresence>
+
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="pointer-events-auto">
               <BikoKuLogo />
             </div>
           </div>
         </div>
+
+        {/* About text - between logo and bottom illustration */}
+        <AnimatePresence mode="wait">
+          {activeSection === "about" &&
+            <motion.div
+              key="about"
+              className="flex justify-center px-4 sm:px-8 md:px-16"
+              style={{ marginBottom: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4 }}>
+              
+              {sectionVisibility.about !== false && (
+                <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
+                  {getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
+                </p>
+              )}
+            </motion.div>
+            }
+          {activeSection === "contact" &&
+            <motion.div
+              key="contact"
+              className="flex justify-center px-4 sm:px-8 md:px-16"
+              style={{ marginBottom: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4 }}>
+              
+              <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
+                {(sectionVisibility as any).contact_title !== false && (
+                  <p className="font-display tracking-widest text-foreground/90 mb-2">{getContent("contact_title") || "Cooperation & Commissions"}</p>
+                )}
+                {(sectionVisibility as any).contact_body !== false && (
+                  <p>{getContent("contact_body") || "For collaboration projects or custom commissions, please contact me via email."}</p>
+                )}
+                {(sectionVisibility as any).contact_email !== false && (
+                  <p className="mt-2 text-foreground/90">{getContent("contact_email") || "spaceheidys@gmail.com"}</p>
+                )}
+              </div>
+            </motion.div>
+            }
+          {activeSection === "shop" &&
+            <motion.div
+              key="shop"
+              className="flex justify-center px-4 sm:px-8 md:px-16"
+              style={{ marginBottom: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.4 }}>
+              
+              <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
+                <p className="font-display tracking-widest text-foreground/90 mb-2">✦ Shop✦</p>
+                <p>This section is currently under construction
+                </p>
+              </div>
+            </motion.div>}
+        </AnimatePresence>
 
         {/* Bottom section */}
         <div className="mt-auto flex items-center justify-center py-4 sm:py-5 pb-10 sm:pb-12 md:pb-16">
@@ -335,110 +406,10 @@ const Index = () => {
 
       </div>
     </div>
-
-    {/* Fixed left side nav — stays visible on scroll */}
-    <AnimatePresence>
-      {showNav && (
-        <motion.nav
-          className="hidden md:flex flex-col gap-8 fixed left-4 sm:left-8 md:left-16 z-[100] items-start justify-center"
-          style={{ top: '4rem', bottom: 0 }}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.4 }}
-        >
-          {(() => {
-            const actionMap: Record<string, () => void> = {
-              about: handleAboutClick,
-              portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
-              gallery: () => navigate("/gallery"),
-              contacts: handleContactClick,
-            };
-            return navButtons
-              .filter(b => b.is_visible)
-              .map(b => ({ jp: b.label_jp, en: b.label, action: actionMap[b.key] }));
-          })().map((item, i) => (
-            <motion.a
-              key={item.en}
-              href={item.action ? undefined : `#${item.en.toLowerCase()}`}
-              onClick={() => {
-                if (!muted && siteMusicEnabled) {
-                  new Audio("/audio/bell-sounds.mp3").play().catch(() => {});
-                }
-                item.action?.();
-              }}
-              className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <span className="font-jp text-xs tracking-widest">{item.jp}</span>
-              <span className="text-[10px] tracking-[0.3em] font-display">{item.en}</span>
-            </motion.a>
-          ))}
-        </motion.nav>
-      )}
-    </AnimatePresence>
-
-    {/* === MAIN_TEXT section === */}
-    <div ref={mainTextRef} className="relative w-full bg-background" style={{ height: 420 }}>
-      <AnimatePresence mode="wait">
-        {activeSection === "about" &&
-          <motion.div
-            key="about"
-            className="absolute inset-0 flex items-center justify-center px-4 sm:px-8 md:px-16"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.4 }}>
-            {sectionVisibility.about !== false && (
-              <p className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-                {getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
-              </p>
-            )}
-          </motion.div>
-        }
-        {activeSection === "contact" &&
-          <motion.div
-            key="contact"
-            className="absolute inset-0 flex items-center justify-center px-4 sm:px-8 md:px-16"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.4 }}>
-            <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-              {(sectionVisibility as any).contact_title !== false && (
-                <p className="font-display tracking-widest text-foreground/90 mb-2">{getContent("contact_title") || "Cooperation & Commissions"}</p>
-              )}
-              {(sectionVisibility as any).contact_body !== false && (
-                <p>{getContent("contact_body") || "For collaboration projects or custom commissions, please contact me via email."}</p>
-              )}
-              {(sectionVisibility as any).contact_email !== false && (
-                <p className="mt-2 text-foreground/90">{getContent("contact_email") || "spaceheidys@gmail.com"}</p>
-              )}
-            </div>
-          </motion.div>
-        }
-        {activeSection === "shop" &&
-          <motion.div
-            key="shop"
-            className="absolute inset-0 flex items-center justify-center px-4 sm:px-8 md:px-16"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.4 }}>
-            <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center">
-              <p className="font-display tracking-widest text-foreground/90 mb-2">✦ Shop✦</p>
-              <p>This section is currently under construction</p>
-            </div>
-          </motion.div>
-        }
-      </AnimatePresence>
-    </div>
     {/* === 2nd_dimension === */}
     <div className="w-full h-8 bg-black" />
     {/* White section with image placeholders */}
-    <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100svh]">
+    <div ref={portfolioRef} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100dvh]">
       {/* Portfolio background image */}
       {portfolioBg && (
         <div className="absolute inset-0">
@@ -470,7 +441,7 @@ const Index = () => {
             {activePortfolioKey ?
               <motion.p
                 key={`section-${activePortfolioKey}`}
-                className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-2 sm:my-[20px] font-display"
+                className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-[20px] font-display"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
@@ -497,7 +468,7 @@ const Index = () => {
           </AnimatePresence>
           <div className="relative flex items-center justify-center">
             {/* Fixed-height card wrapper */}
-            <div className={`flex items-center justify-center ${activePortfolioKey ? 'w-[88vw] h-[110vw] max-w-[400px] max-h-[530px] sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px] sm:max-w-none sm:max-h-none' : 'w-[60vw] h-[90vw] max-w-[300px] max-h-[450px] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px] sm:max-w-none sm:max-h-none'} transition-all duration-500`}>
+            <div className={`flex items-center justify-center w-[60vw] h-[90vw] max-w-[300px] max-h-[450px] ${activePortfolioKey ? 'sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px] sm:max-w-none sm:max-h-none' : 'sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px] sm:max-w-none sm:max-h-none'} transition-all duration-500`}>
               <AnimatePresence mode="wait">
                 {activePortfolioKey === "skills" ?
                   <motion.div key="skills" className="w-full h-full" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97, y: 8 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
@@ -505,7 +476,7 @@ const Index = () => {
                   </motion.div> :
                 activePortfolioKey ?
                   <motion.div key={`${activePortfolioKey}-${activeGallerySub}`} className="w-full h-full" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97, y: 8 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-                    <PortfolioGallery sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} onLightboxChange={setLightboxOpen} />
+                    <PortfolioGallery sectionKey={activePortfolioKey} gallerySub={activeGallerySub} onPageInfo={setPageInfo} />
                   </motion.div> :
 
                   <motion.div
@@ -528,7 +499,7 @@ const Index = () => {
               </AnimatePresence>
             </div>
             {/* Menu positioned below card without affecting layout */}
-            <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max transition-opacity duration-300 ${activePortfolioKey ? 'sm:hidden' : ''} ${lightboxOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+            <div className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max ${activePortfolioKey ? 'sm:hidden' : ''}`}>
               <PortfolioMenu
                   visible={!thirdCardFlipped}
                   activeKey={activePortfolioKey}
@@ -563,7 +534,7 @@ const Index = () => {
 
       {/* Menu at bottom position when section is active (desktop only) */}
       {activePortfolioKey &&
-        <div className={`hidden sm:flex relative z-10 items-center justify-center pb-4 transition-opacity duration-300 ${lightboxOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <div className="hidden sm:flex relative z-10 items-center justify-center pb-4">
           <PortfolioMenu
             visible={!thirdCardFlipped}
             activeKey={activePortfolioKey}

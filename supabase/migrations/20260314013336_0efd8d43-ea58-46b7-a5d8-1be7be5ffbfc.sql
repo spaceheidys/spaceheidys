@@ -1,5 +1,0 @@
-
-ALTER TABLE public.section_settings
-  ADD COLUMN IF NOT EXISTS sort_order integer NOT NULL DEFAULT 0,
-  ADD COLUMN IF NOT EXISTS label text NOT NULL DEFAULT '',
-  ADD COLUMN IF NOT EXISTS label_jp text NOT NULL DEFAULT '';
