@@ -138,6 +138,9 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm === "clear_card_front_image") await handleClear("card_front_image");
     else if (confirm === "clear_card_back_image") await handleClear("card_back_image");
     else if (confirm === "clear_card_bg_video") await handleClear("card_bg_video");
+    else if (confirm === "bg_wallpaper") await handleBgTypeChange("wallpaper");
+    else if (confirm === "upload_card_bg_wallpaper" && pendingFile) await handleWallpaperUpload(pendingFile.file);
+    else if (confirm === "clear_card_bg_wallpaper") await handleClear("card_bg_wallpaper");
     else if (confirm === "upload_card_front_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_front_image");
     else if (confirm === "upload_card_back_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_back_image");
     else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
