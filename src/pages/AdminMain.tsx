@@ -485,6 +485,8 @@ const AdminMain = () => {
                   return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
                     <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
                   );
+                case "social":
+                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], <SocialSection />);
                 case "music":
                   return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
                     <div className="border-t border-border pt-4 pb-2 flex items-center gap-3">
