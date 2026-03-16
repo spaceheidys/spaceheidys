@@ -12,6 +12,7 @@ import { useSectionContent } from "@/hooks/useSectionContent";
 import ButtonsSection from "@/components/admin/ButtonsSection";
 import ContentSection from "@/components/admin/ContentSection";
 import Main2Section from "@/components/admin/Main2Section";
+import SocialSection from "@/components/admin/SocialSection";
 
 interface BackgroundItem {
   id: string;
