@@ -101,6 +101,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     if (key === "card_front_image") setFrontImage("");
     else if (key === "card_back_image") setBackImage("");
     else if (key === "card_bg_video") setBgVideo("");
+    else if (key === "card_bg_wallpaper") setBgWallpaper("");
     toast.success("Reset to default");
   };
 
