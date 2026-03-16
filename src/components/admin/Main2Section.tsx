@@ -34,13 +34,15 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [backImage, setBackImage] = useState("");
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
+  const [bgWallpaper, setBgWallpaper] = useState("");
   const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
-  const [confirm, setConfirm] = useState<string | null>(null); // tracks which action needs confirmation
+  const [confirm, setConfirm] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<{ file: File; key: string } | null>(null);
   const frontRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
+  const wallpaperRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setWisdomText(get("cards_wisdom"));
