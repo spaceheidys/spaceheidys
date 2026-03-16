@@ -105,10 +105,25 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     toast.success("Reset to default");
   };
 
+  const handleWallpaperUpload = async (file: File) => {
+    setUploading("card_bg_wallpaper");
+    const ext = file.name.split(".").pop();
+    const path = `cards/bg_wallpaper_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    await update("card_bg_wallpaper", url);
+    setBgWallpaper(url);
+    toast.success("Wallpaper uploaded");
+    setUploading(null);
+  };
+
   const handleBgTypeChange = async (type: string) => {
     setBgType(type);
     await update("card_bg_type", type);
-    toast.success(type === "polygon" ? "Polygon background active" : "Video background active");
+    const labels: Record<string, string> = { polygon: "Polygon background active", video: "Video background active", wallpaper: "Wallpaper background active" };
+    toast.success(labels[type] || "Background updated");
   };
 
   // Helper: request confirmation for an action
