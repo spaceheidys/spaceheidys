@@ -34,13 +34,15 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [backImage, setBackImage] = useState("");
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
+  const [bgWallpaper, setBgWallpaper] = useState("");
   const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
-  const [confirm, setConfirm] = useState<string | null>(null); // tracks which action needs confirmation
+  const [confirm, setConfirm] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<{ file: File; key: string } | null>(null);
   const frontRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
+  const wallpaperRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setWisdomText(get("cards_wisdom"));
@@ -48,6 +50,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setBackImage(get("card_back_image"));
     setBgType(get("card_bg_type") || "polygon");
     setBgVideo(get("card_bg_video"));
+    setBgWallpaper(get("card_bg_wallpaper"));
     setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
   }, [get]);
 
@@ -98,13 +101,29 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     if (key === "card_front_image") setFrontImage("");
     else if (key === "card_back_image") setBackImage("");
     else if (key === "card_bg_video") setBgVideo("");
+    else if (key === "card_bg_wallpaper") setBgWallpaper("");
     toast.success("Reset to default");
+  };
+
+  const handleWallpaperUpload = async (file: File) => {
+    setUploading("card_bg_wallpaper");
+    const ext = file.name.split(".").pop();
+    const path = `cards/bg_wallpaper_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    await update("card_bg_wallpaper", url);
+    setBgWallpaper(url);
+    toast.success("Wallpaper uploaded");
+    setUploading(null);
   };
 
   const handleBgTypeChange = async (type: string) => {
     setBgType(type);
     await update("card_bg_type", type);
-    toast.success(type === "polygon" ? "Polygon background active" : "Video background active");
+    const labels: Record<string, string> = { polygon: "Polygon background active", video: "Video background active", wallpaper: "Wallpaper background active" };
+    toast.success(labels[type] || "Background updated");
   };
 
   // Helper: request confirmation for an action
@@ -119,6 +138,9 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm === "clear_card_front_image") await handleClear("card_front_image");
     else if (confirm === "clear_card_back_image") await handleClear("card_back_image");
     else if (confirm === "clear_card_bg_video") await handleClear("card_bg_video");
+    else if (confirm === "bg_wallpaper") await handleBgTypeChange("wallpaper");
+    else if (confirm === "upload_card_bg_wallpaper" && pendingFile) await handleWallpaperUpload(pendingFile.file);
+    else if (confirm === "clear_card_bg_wallpaper") await handleClear("card_bg_wallpaper");
     else if (confirm === "upload_card_front_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_front_image");
     else if (confirm === "upload_card_back_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_back_image");
     else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
@@ -201,7 +223,110 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
               Video
             </button>
           )}
+          {confirm === "bg_wallpaper" ? (
+            <span className="flex items-center gap-1 px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase border border-foreground text-foreground">
+              Wallpaper? <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+            </span>
+          ) : (
+            <button
+              onClick={() => bgType !== "wallpaper" ? askConfirm("bg_wallpaper") : undefined}
+              className={`px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase transition-colors border ${
+                bgType === "wallpaper"
+                  ? "border-foreground text-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Wallpaper
+            </button>
+          )}
         </div>
+
+        {bgType === "wallpaper" && (
+          <div className="space-y-2">
+            {bgWallpaper ? (
+              <div className="relative group border border-border aspect-video overflow-hidden">
+                <img src={bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                  {confirm === "upload_card_bg_wallpaper" ? (
+                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                  ) : (
+                    <label className="p-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
+                      {uploading === "card_bg_wallpaper" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                      <input
+                        ref={wallpaperRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) handleFileSelect(f, "card_bg_wallpaper", "upload_card_bg_wallpaper");
+                          if (wallpaperRef.current) wallpaperRef.current.value = "";
+                        }}
+                        disabled={!!uploading}
+                      />
+                    </label>
+                  )}
+                  {confirm === "clear_card_bg_wallpaper" ? (
+                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                  ) : (
+                    <button
+                      onClick={() => askConfirm("clear_card_bg_wallpaper")}
+                      className="p-2 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <>
+                {confirm === "upload_card_bg_wallpaper" ? (
+                  <div className="flex items-center justify-center gap-2 border border-dashed border-foreground aspect-video text-foreground">
+                    <span className="text-xs font-display tracking-[0.2em] uppercase">Upload?</span>
+                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                  </div>
+                ) : (
+                  <label className="flex items-center justify-center gap-2 border border-dashed border-border aspect-video cursor-pointer text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
+                    {uploading === "card_bg_wallpaper" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                    <span className="text-xs font-display tracking-[0.2em] uppercase">Upload image</span>
+                    <input
+                      ref={wallpaperRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleFileSelect(f, "card_bg_wallpaper", "upload_card_bg_wallpaper");
+                        if (wallpaperRef.current) wallpaperRef.current.value = "";
+                      }}
+                      disabled={!!uploading}
+                    />
+                  </label>
+                )}
+              </>
+            )}
+            {/* Opacity slider */}
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase shrink-0">
+                Opacity
+              </span>
+              <input
+                type="range"
+                min="5"
+                max="100"
+                step="5"
+                value={bgOpacity}
+                onChange={(e) => setBgOpacity(parseInt(e.target.value, 10))}
+                onMouseUp={() => update("card_bg_video_opacity", String(bgOpacity))}
+                onTouchEnd={() => update("card_bg_video_opacity", String(bgOpacity))}
+                className="flex-1 h-1 appearance-none bg-border rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground"
+              />
+              <span className="text-[10px] text-muted-foreground font-display w-8 text-right">
+                {bgOpacity}%
+              </span>
+            </div>
+          </div>
+        )}
 
         {bgType === "video" && (
           <div className="space-y-2">
