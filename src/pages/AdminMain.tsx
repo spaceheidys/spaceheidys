@@ -41,11 +41,12 @@ const AdminMain = () => {
   const { get: getContent, getDuration, update: updateContent, updateDuration } = useSectionContent();
 
   // Reorderable MAIN tab sections
-  const MAIN_SECTION_KEYS = ["buttons", "content", "music", "backgrounds", "logos", "library"] as const;
+  const MAIN_SECTION_KEYS = ["buttons", "content", "social", "music", "backgrounds", "logos", "library"] as const;
   type MainSectionKey = typeof MAIN_SECTION_KEYS[number];
   const MAIN_SECTION_LABELS: Record<MainSectionKey, string> = {
     buttons: "Buttons",
     content: "Section Content",
+    social: "Social",
     music: "Site Music",
     backgrounds: "Active Backgrounds",
     logos: "Logos",
