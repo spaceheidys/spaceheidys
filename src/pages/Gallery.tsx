@@ -109,7 +109,7 @@ const Gallery = () => {
     const fetch = async () => {
       const { data } = await supabase
         .from("portfolio_items")
-        .select("id, title, image_url, subsection, group_id")
+        .select("id, title, description, image_url, subsection, group_id")
         .eq("section", "gallery")
         .order("sort_order", { ascending: true });
 
@@ -118,6 +118,7 @@ const Gallery = () => {
           data.map((d: any) => ({
             id: d.id,
             title: d.title || "",
+            description: d.description || "",
             image_url: d.image_url,
             subsection: d.subsection,
             group_id: d.group_id || null,
