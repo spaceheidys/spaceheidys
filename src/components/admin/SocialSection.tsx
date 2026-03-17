@@ -170,7 +170,7 @@ const SocialSection = () => {
 
   const fetchLinks = async () => {
     setLoading(true);
-    const { data } = await supabase.from("social_links").select("id, label, url, icon_url, is_visible, sort_order").order("sort_order");
+    const { data } = await supabase.from("social_links").select("id, label, url, icon_url, is_visible, sort_order").eq("link_type", "social").order("sort_order");
     if (data) {
       const d = data as SocialLink[];
       setLinks(d);
@@ -232,7 +232,7 @@ const SocialSection = () => {
         if (originalLinks.find(o => o.id === l.id)) {
           await supabase.from("social_links").update({ ...row, updated_at: new Date().toISOString() }).eq("id", l.id);
         } else {
-          await supabase.from("social_links").insert({ ...row, share_url_template: "" });
+          await supabase.from("social_links").insert({ ...row, share_url_template: "", link_type: "social" });
         }
       }
       invalidateSocialLinksCache();

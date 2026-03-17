@@ -19,6 +19,7 @@ const SocialLinks = () => {
       .from("social_links")
       .select("id, label, url, icon_url, is_visible, sort_order")
       .eq("is_visible", true)
+      .eq("link_type", "social")
       .order("sort_order", { ascending: true })
       .then(({ data }) => {
         if (data) setLinks(data as SocialLink[]);
