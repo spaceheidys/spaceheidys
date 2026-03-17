@@ -13,17 +13,24 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface GalleryItem {
   id: string;
   title: string;
+  description: string;
   image_url: string;
   subsection: string | null;
   group_id: string | null;
 }
 
+interface GroupImageEntry {
+  url: string;
+  description: string;
+}
+
 interface GalleryEntry {
   id: string;
   title: string;
+  description: string;
   image_url: string;
   subsection: string | null;
-  groupImages?: string[];
+  groupImages?: GroupImageEntry[];
 }
 
 const SWIPE_THRESHOLD = 50;
@@ -102,7 +109,7 @@ const Gallery = () => {
     const fetch = async () => {
       const { data } = await supabase
         .from("portfolio_items")
-        .select("id, title, image_url, subsection, group_id")
+        .select("id, title, description, image_url, subsection, group_id")
         .eq("section", "gallery")
         .order("sort_order", { ascending: true });
 
@@ -111,6 +118,7 @@ const Gallery = () => {
           data.map((d: any) => ({
             id: d.id,
             title: d.title || "",
+            description: d.description || "",
             image_url: d.image_url,
             subsection: d.subsection,
             group_id: d.group_id || null,
@@ -139,14 +147,16 @@ const Gallery = () => {
         result.push({
           id: item.id,
           title: item.title,
+          description: item.description,
           image_url: item.image_url,
           subsection: item.subsection,
-          groupImages: groupItems.map((g) => g.image_url).filter(Boolean),
+          groupImages: groupItems.map((g) => ({ url: g.image_url, description: g.description })).filter((g) => g.url),
         });
       } else {
         result.push({
           id: item.id,
           title: item.title,
+          description: item.description,
           image_url: item.image_url,
           subsection: item.subsection,
         });
@@ -349,15 +359,21 @@ const Gallery = () => {
               </button>
 
               {isGroup ? (
-                <div className="flex flex-col gap-3">
-                  {selectedEntry.groupImages!.map((url, idx) => (
-                    <img
-                      key={idx}
-                      src={url}
-                      alt={`${selectedEntry.title} ${idx + 1}`}
-                      className="max-w-full max-h-[80vh] object-contain rounded-md"
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
+                <div className="flex flex-col gap-6">
+                  {selectedEntry.groupImages!.map((img, idx) => (
+                    <div key={idx} className="flex flex-col gap-2">
+                      <img
+                        src={img.url}
+                        alt={`${selectedEntry.title} ${idx + 1}`}
+                        className="max-w-full max-h-[80vh] object-contain rounded-md"
+                        onContextMenu={(e) => e.preventDefault()}
+                      />
+                      {img.description && (
+                        <p className="text-[11px] sm:text-xs text-white/60 font-display tracking-wide leading-relaxed max-w-[75vw] mx-auto px-2">
+                          {img.description}
+                        </p>
+                      )}
+                    </div>
                   ))}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 py-2">
@@ -388,6 +404,11 @@ const Gallery = () => {
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
+                  {selectedEntry.description && (
+                    <p className="text-[11px] sm:text-xs text-white/60 font-display tracking-wide leading-relaxed max-w-[75vw] px-2 text-center">
+                      {selectedEntry.description}
+                    </p>
+                  )}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
                     <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
