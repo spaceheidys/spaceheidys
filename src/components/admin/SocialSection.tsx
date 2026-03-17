@@ -232,7 +232,7 @@ const SocialSection = () => {
         if (originalLinks.find(o => o.id === l.id)) {
           await supabase.from("social_links").update({ ...row, updated_at: new Date().toISOString() }).eq("id", l.id);
         } else {
-          await supabase.from("social_links").insert({ ...row, share_url_template: "" });
+          await supabase.from("social_links").insert({ ...row, share_url_template: "", link_type: "social" });
         }
       }
       invalidateSocialLinksCache();

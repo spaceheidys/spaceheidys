@@ -30,6 +30,7 @@ export const useSocialLinks = () => {
       .from("social_links")
       .select("*")
       .eq("is_visible", true)
+      .eq("link_type", "share")
       .order("sort_order", { ascending: true })
       .then(({ data }) => {
         if (data) {

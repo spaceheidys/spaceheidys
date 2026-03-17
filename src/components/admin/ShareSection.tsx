@@ -404,7 +404,7 @@ const ShareSection = () => {
         };
 
         if (link.id.startsWith("temp-")) {
-          await supabase.from("social_links").insert(payload);
+          await supabase.from("social_links").insert({ ...payload, link_type: "share" });
         } else {
           await supabase.from("social_links").update(payload).eq("id", link.id);
         }
