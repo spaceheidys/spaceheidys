@@ -170,7 +170,7 @@ const SocialSection = () => {
 
   const fetchLinks = async () => {
     setLoading(true);
-    const { data } = await supabase.from("social_links").select("id, label, url, icon_url, is_visible, sort_order").order("sort_order");
+    const { data } = await supabase.from("social_links").select("id, label, url, icon_url, is_visible, sort_order").eq("link_type", "social").order("sort_order");
     if (data) {
       const d = data as SocialLink[];
       setLinks(d);
