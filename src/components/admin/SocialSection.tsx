@@ -1,8 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff, Trash2, Plus, Loader2, Upload, Check, X } from "lucide-react";
+import { Eye, EyeOff, Trash2, Plus, Loader2, Upload, Check, X, GripVertical } from "lucide-react";
 import { invalidateSocialLinksCache } from "@/hooks/useSocialLinks";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface SocialLink {
   id: string;
@@ -71,8 +86,8 @@ const IconPicker = ({ onSelect, onClose, currentUrl }: { onSelect: (url: string)
   </div>
 );
 
-/* ── Single social link row ─────────────────────────────────────── */
-const SocialRow = ({
+/* ── Sortable social link row ───────────────────────────────────── */
+const SortableSocialRow = ({
   link, onUpdate, onDelete, onIconUpload, uploadingId,
 }: {
   link: SocialLink;
@@ -81,10 +96,13 @@ const SocialRow = ({
   onIconUpload: (id: string, file: File) => void;
   uploadingId: string | null;
 }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: link.id });
   const [pickerOpen, setPickerOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmVis, setConfirmVis] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
+
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
 
   useEffect(() => {
     if (!pickerOpen) return;
@@ -104,7 +122,13 @@ const SocialRow = ({
   };
 
   return (
-    <div className="border border-border bg-background flex items-center gap-2 px-3 py-2.5">
+    <div ref={setNodeRef} style={style} className="border border-border bg-background flex items-center gap-2 px-3 py-2.5">
+      {/* Drag handle */}
+      <button {...attributes} {...listeners}
+        className="text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none shrink-0">
+        <GripVertical size={14} />
+      </button>
+
       {/* Icon picker */}
       <div className="relative shrink-0" ref={handlePickerRef}>
         <button onClick={() => setPickerOpen(v => !v)}
@@ -168,6 +192,8 @@ const SocialSection = () => {
   const [confirmSave, setConfirmSave] = useState(false);
   const [confirmAdd, setConfirmAdd] = useState(false);
 
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
   const fetchLinks = async () => {
     setLoading(true);
     const { data } = await supabase.from("social_links").select("id, label, url, icon_url, is_visible, sort_order").eq("link_type", "social").order("sort_order");
@@ -204,6 +230,14 @@ const SocialSection = () => {
     setUploadingId(null);
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIdx = links.findIndex((l) => l.id === active.id);
+    const newIdx = links.findIndex((l) => l.id === over.id);
+    setLinks(arrayMove(links, oldIdx, newIdx));
+  };
+
   const addNew = () => {
     const maxOrder = links.reduce((m, l) => Math.max(m, l.sort_order), -1);
     const newLink: SocialLink = {
@@ -221,11 +255,9 @@ const SocialSection = () => {
   const saveAll = async () => {
     setSaving(true);
     try {
-      // Delete removed
       for (const id of deletedIds) {
         await supabase.from("social_links").delete().eq("id", id);
       }
-      // Upsert remaining
       for (let i = 0; i < links.length; i++) {
         const l = links[i];
         const row = { label: l.label || "Link", url: l.url, icon_url: l.icon_url, is_visible: l.is_visible, sort_order: i };
@@ -253,14 +285,17 @@ const SocialSection = () => {
         Social links — Main page hero
       </p>
 
-      <div className="space-y-1.5">
-        {links.map(link => (
-          <SocialRow key={link.id} link={link} onUpdate={handleUpdate} onDelete={handleDelete} onIconUpload={handleIconUpload} uploadingId={uploadingId} />
-        ))}
-      </div>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={links.map(l => l.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-1.5">
+            {links.map(link => (
+              <SortableSocialRow key={link.id} link={link} onUpdate={handleUpdate} onDelete={handleDelete} onIconUpload={handleIconUpload} uploadingId={uploadingId} />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       <div className="flex items-center gap-3">
-        {/* Add */}
         {confirmAdd ? (
           <span className="flex items-center gap-1 text-xs font-display tracking-[0.2em] uppercase">
             Add? <ConfirmButtons onYes={addNew} onNo={() => setConfirmAdd(false)} />
@@ -272,7 +307,6 @@ const SocialSection = () => {
           </button>
         )}
 
-        {/* Save */}
         {hasChanges && (
           confirmSave ? (
             <span className="flex items-center gap-1 text-xs font-display tracking-[0.2em] uppercase">
