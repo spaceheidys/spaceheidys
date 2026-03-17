@@ -317,6 +317,7 @@ export type Database = {
           id: string
           is_visible: boolean
           label: string
+          link_type: string
           share_url_template: string
           sort_order: number
           updated_at: string
@@ -327,6 +328,7 @@ export type Database = {
           id?: string
           is_visible?: boolean
           label: string
+          link_type?: string
           share_url_template?: string
           sort_order?: number
           updated_at?: string
@@ -337,6 +339,7 @@ export type Database = {
           id?: string
           is_visible?: boolean
           label?: string
+          link_type?: string
           share_url_template?: string
           sort_order?: number
           updated_at?: string
