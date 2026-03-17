@@ -404,6 +404,11 @@ const Gallery = () => {
                     onClick={() => setSelectedEntry(null)}
                     onContextMenu={(e) => e.preventDefault()}
                   />
+                  {selectedEntry.description && (
+                    <p className="text-[11px] sm:text-xs text-white/60 font-display tracking-wide leading-relaxed max-w-[75vw] px-2 text-center">
+                      {selectedEntry.description}
+                    </p>
+                  )}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
                     <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
