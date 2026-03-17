@@ -307,7 +307,7 @@ const ShareSection = () => {
 
   const fetchLinks = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("social_links").select("*").order("sort_order", { ascending: true });
+    const { data, error } = await supabase.from("social_links").select("*").eq("link_type", "share").order("sort_order", { ascending: true });
     if (error) toast.error("Failed to load social links");
     else {
       const d = (data as SocialLink[]) || [];
