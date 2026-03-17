@@ -147,14 +147,16 @@ const Gallery = () => {
         result.push({
           id: item.id,
           title: item.title,
+          description: item.description,
           image_url: item.image_url,
           subsection: item.subsection,
-          groupImages: groupItems.map((g) => g.image_url).filter(Boolean),
+          groupImages: groupItems.map((g) => ({ url: g.image_url, description: g.description })).filter((g) => g.url),
         });
       } else {
         result.push({
           id: item.id,
           title: item.title,
+          description: item.description,
           image_url: item.image_url,
           subsection: item.subsection,
         });
