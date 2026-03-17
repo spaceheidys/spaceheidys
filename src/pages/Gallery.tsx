@@ -13,17 +13,24 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface GalleryItem {
   id: string;
   title: string;
+  description: string;
   image_url: string;
   subsection: string | null;
   group_id: string | null;
 }
 
+interface GroupImageEntry {
+  url: string;
+  description: string;
+}
+
 interface GalleryEntry {
   id: string;
   title: string;
+  description: string;
   image_url: string;
   subsection: string | null;
-  groupImages?: string[];
+  groupImages?: GroupImageEntry[];
 }
 
 const SWIPE_THRESHOLD = 50;
