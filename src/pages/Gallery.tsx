@@ -359,15 +359,21 @@ const Gallery = () => {
               </button>
 
               {isGroup ? (
-                <div className="flex flex-col gap-3">
-                  {selectedEntry.groupImages!.map((url, idx) => (
-                    <img
-                      key={idx}
-                      src={url}
-                      alt={`${selectedEntry.title} ${idx + 1}`}
-                      className="max-w-full max-h-[80vh] object-contain rounded-md"
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
+                <div className="flex flex-col gap-6">
+                  {selectedEntry.groupImages!.map((img, idx) => (
+                    <div key={idx} className="flex flex-col gap-2">
+                      <img
+                        src={img.url}
+                        alt={`${selectedEntry.title} ${idx + 1}`}
+                        className="max-w-full max-h-[80vh] object-contain rounded-md"
+                        onContextMenu={(e) => e.preventDefault()}
+                      />
+                      {img.description && (
+                        <p className="text-[11px] sm:text-xs text-white/60 font-display tracking-wide leading-relaxed max-w-[75vw] mx-auto px-2">
+                          {img.description}
+                        </p>
+                      )}
+                    </div>
                   ))}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 py-2">
