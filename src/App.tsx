@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import AdminMain from "./pages/AdminMain";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSecretDoor from "./pages/AdminSecretDoor";
+import Shop from "./pages/Shop";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/secret" element={<SecretPage />} />
+            <Route path="/shop" element={<Shop />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/main" element={<AdminMain />} />
             <Route path="/admin/login" element={<AdminLogin />} />
