@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import AdminMain from "./pages/AdminMain";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSecretDoor from "./pages/AdminSecretDoor";
+import Shop from "./pages/Shop";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

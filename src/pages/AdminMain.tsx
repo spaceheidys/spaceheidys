@@ -441,9 +441,44 @@ const AdminMain = () => {
       {/* Content */}
       <div className="px-4 sm:px-8 py-6">
         {activeSection === "shop" ? (
-          <div className="py-12 text-center">
-            <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase mb-4">Shop Settings</p>
-            <p className="text-sm text-muted-foreground/60">Coming soon — shop page configuration will be available here.</p>
+          <div className="py-8">
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase">Shop Page</p>
+              {confirmBg?.action === "shop_toggle" ? (
+                <span className="flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                  <button onClick={async () => {
+                    const current = getContent("shop_visible");
+                    const newVal = current === "true" ? "false" : "true";
+                    await updateContent("shop_visible", newVal);
+                    toast.success(newVal === "true" ? "Shop visible" : "Shop hidden");
+                    setConfirmBg(null);
+                  }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
+                    <Check size={9} /> YES
+                  </button>
+                  <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
+                    <X size={9} /> NO
+                  </button>
+                </span>
+              ) : (
+                <button
+                  onClick={() => setConfirmBg({ action: "shop_toggle", id: "shop" })}
+                  className={`flex items-center gap-2 px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${
+                    getContent("shop_visible") === "true"
+                      ? "border-foreground text-foreground bg-foreground/10"
+                      : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+                  }`}
+                >
+                  {getContent("shop_visible") === "true" ? <Eye size={14} /> : <EyeOff size={14} />}
+                  {getContent("shop_visible") === "true" ? "Visible" : "Hidden"}
+                </button>
+              )}
+            </div>
+            <div className="border border-border p-6 text-center">
+              <p className="text-sm text-muted-foreground/60">Shop page content settings will be available here.</p>
+              <a href="/shop" target="_blank" rel="noopener noreferrer" className="inline-block mt-4 text-xs text-muted-foreground hover:text-foreground font-display tracking-[0.2em] uppercase underline underline-offset-4 transition-colors">
+                Preview Shop Page →
+              </a>
+            </div>
           </div>
         ) : activeSection === "main2" ? (
           <Main2Section get={getContent} update={updateContent} />
