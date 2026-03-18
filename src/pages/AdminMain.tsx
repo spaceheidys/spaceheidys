@@ -440,7 +440,12 @@ const AdminMain = () => {
 
       {/* Content */}
       <div className="px-4 sm:px-8 py-6">
-        {activeSection === "main2" ? (
+        {activeSection === "shop" ? (
+          <div className="py-12 text-center">
+            <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase mb-4">Shop Settings</p>
+            <p className="text-sm text-muted-foreground/60">Coming soon — shop page configuration will be available here.</p>
+          </div>
+        ) : activeSection === "main2" ? (
           <Main2Section get={getContent} update={updateContent} />
         ) : (
           <>
