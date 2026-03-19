@@ -217,6 +217,17 @@ const AdminSecretDoor = () => {
           <h1 className="font-display text-sm tracking-[0.3em] uppercase">Secret Door</h1>
         </div>
         <div className="flex items-center gap-4">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-1.5 text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
+                <StickyNote size={12} />
+                NOTES
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-auto p-4 border-border bg-background">
+              {user && <NotesPanel userId={user.id} />}
+            </PopoverContent>
+          </Popover>
           <button
             onClick={() => navigate("/")}
             className="text-muted-foreground text-[10px] tracking-widest hover:text-foreground transition-colors font-display uppercase"
