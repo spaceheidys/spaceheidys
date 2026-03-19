@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp } from "lucide-react";
 
 interface Note {
   id: string;
@@ -8,22 +8,27 @@ interface Note {
   is_done: boolean;
   sort_order: number;
   created_at: string;
+  image_url: string | null;
 }
 
-const NotesPanel = ({ userId }: { userId: string }) => {
+const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => void }) => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [newNote, setNewNote] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [expandedImages, setExpandedImages] = useState<Set<string>>(new Set());
+  const [uploading, setUploading] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const imgInputRef = useRef<HTMLInputElement>(null);
+  const pendingNoteId = useRef<string | null>(null);
 
   const fetchNotes = async () => {
     const { data } = await supabase
-      .from("admin_notes" as any)
+      .from("admin_notes")
       .select("*")
       .eq("user_id", userId)
       .order("sort_order", { ascending: true });
-    setNotes((data as any as Note[]) || []);
+    setNotes((data as Note[]) || []);
     setLoading(false);
   };
 
@@ -31,34 +36,73 @@ const NotesPanel = ({ userId }: { userId: string }) => {
     fetchNotes();
   }, [userId]);
 
+  const notifyUpdate = () => onUpdate?.();
+
   const addNote = async () => {
     if (!newNote.trim()) return;
     const { data } = await supabase
-      .from("admin_notes" as any)
-      .insert({ user_id: userId, content: newNote.trim(), sort_order: notes.length } as any)
+      .from("admin_notes")
+      .insert({ user_id: userId, content: newNote.trim(), sort_order: notes.length })
       .select()
       .single();
     if (data) {
-      setNotes((prev) => [...prev, data as any as Note]);
+      setNotes((prev) => [...prev, data as Note]);
       setNewNote("");
       inputRef.current?.focus();
+      notifyUpdate();
     }
   };
 
   const toggleDone = async (note: Note) => {
     const updated = !note.is_done;
     setNotes((prev) => prev.map((n) => (n.id === note.id ? { ...n, is_done: updated } : n)));
-    await supabase.from("admin_notes" as any).update({ is_done: updated } as any).eq("id", note.id);
+    await supabase.from("admin_notes").update({ is_done: updated }).eq("id", note.id);
+    notifyUpdate();
   };
 
   const deleteNote = async (id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id));
     setConfirmDeleteId(null);
-    await supabase.from("admin_notes" as any).delete().eq("id", id);
+    await supabase.from("admin_notes").delete().eq("id", id);
+    notifyUpdate();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") addNote();
+  };
+
+  const toggleImage = (id: string) => {
+    setExpandedImages((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const triggerImageUpload = (noteId: string) => {
+    pendingNoteId.current = noteId;
+    imgInputRef.current?.click();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const noteId = pendingNoteId.current;
+    if (!file || !noteId) return;
+    if (file.size > 5 * 1024 * 1024) return;
+
+    setUploading(noteId);
+    const ext = file.name.split(".").pop();
+    const path = `notes/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (upErr) { setUploading(null); return; }
+
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    await supabase.from("admin_notes").update({ image_url: urlData.publicUrl }).eq("id", noteId);
+    setNotes((prev) => prev.map((n) => n.id === noteId ? { ...n, image_url: urlData.publicUrl } : n));
+    setExpandedImages((prev) => new Set(prev).add(noteId));
+    setUploading(null);
+    if (imgInputRef.current) imgInputRef.current.value = "";
   };
 
   return (
@@ -67,66 +111,111 @@ const NotesPanel = ({ userId }: { userId: string }) => {
         Notes & To-Do
       </h3>
 
+      <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+
       {loading ? (
         <div className="flex justify-center py-6">
           <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto space-y-1.5 mb-3 pr-1 max-h-[50vh]">
+        <div className="flex-1 overflow-y-auto space-y-1 mb-3 pr-1 max-h-[50vh]">
           {notes.length === 0 && (
             <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
               No notes yet
             </p>
           )}
           {notes.map((note) => (
-            <div
-              key={note.id}
-              className="flex items-start gap-2 group px-2 py-1.5 rounded hover:bg-secondary/50 transition-colors"
-            >
-              <button
-                onClick={() => toggleDone(note)}
-                className={`mt-0.5 w-3.5 h-3.5 border flex-shrink-0 flex items-center justify-center transition-colors ${
-                  note.is_done
-                    ? "border-foreground/40 bg-foreground/10"
-                    : "border-border hover:border-foreground/40"
-                }`}
-              >
-                {note.is_done && (
-                  <span className="text-[8px] text-foreground/60">✓</span>
-                )}
-              </button>
-              <span
-                className={`text-xs font-display flex-1 leading-relaxed ${
-                  note.is_done
-                    ? "line-through text-muted-foreground/50"
-                    : "text-foreground/80"
-                }`}
-              >
-                {note.content}
-              </span>
-              {confirmDeleteId === note.id ? (
-                <span className="flex items-center gap-1 flex-shrink-0">
-                  <button
-                    onClick={() => deleteNote(note.id)}
-                    className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors"
-                  >
-                    YES
-                  </button>
-                  <span className="text-[9px] text-muted-foreground/40">/</span>
-                  <button
-                    onClick={() => setConfirmDeleteId(null)}
-                    className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    NO
-                  </button>
-                </span>
-              ) : (
+            <div key={note.id} className="group">
+              <div className="flex items-start gap-2 px-2 py-1.5 rounded hover:bg-secondary/50 transition-colors">
                 <button
-                  onClick={() => setConfirmDeleteId(note.id)}
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all flex-shrink-0"
+                  onClick={() => toggleDone(note)}
+                  className={`mt-0.5 w-3.5 h-3.5 border flex-shrink-0 flex items-center justify-center transition-colors ${
+                    note.is_done
+                      ? "border-foreground/40 bg-foreground/10"
+                      : "border-border hover:border-foreground/40"
+                  }`}
                 >
-                  <Trash2 size={11} />
+                  {note.is_done && (
+                    <span className="text-[8px] text-foreground/60">✓</span>
+                  )}
                 </button>
+                <span
+                  className={`text-xs font-display flex-1 leading-relaxed ${
+                    note.is_done
+                      ? "line-through text-muted-foreground/50"
+                      : "text-foreground/80"
+                  }`}
+                >
+                  {note.content}
+                </span>
+
+                <div className="flex items-center gap-0.5 flex-shrink-0">
+                  {/* Image attach button */}
+                  {uploading === note.id ? (
+                    <Loader2 size={10} className="animate-spin text-muted-foreground" />
+                  ) : (
+                    <button
+                      onClick={() => triggerImageUpload(note.id)}
+                      className={`transition-all ${
+                        note.image_url
+                          ? "text-yellow-500/70 hover:text-yellow-400"
+                          : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground"
+                      }`}
+                      title="Attach image"
+                    >
+                      <ImagePlus size={11} />
+                    </button>
+                  )}
+
+                  {/* Expand/collapse image */}
+                  {note.image_url && (
+                    <button
+                      onClick={() => toggleImage(note.id)}
+                      className="text-muted-foreground/60 hover:text-foreground transition-colors"
+                      title={expandedImages.has(note.id) ? "Collapse" : "Expand"}
+                    >
+                      {expandedImages.has(note.id) ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                    </button>
+                  )}
+
+                  {/* Delete */}
+                  {confirmDeleteId === note.id ? (
+                    <span className="flex items-center gap-1">
+                      <button
+                        onClick={() => deleteNote(note.id)}
+                        className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors"
+                      >
+                        YES
+                      </button>
+                      <span className="text-[9px] text-muted-foreground/40">/</span>
+                      <button
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        NO
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDeleteId(note.id)}
+                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
+                    >
+                      <Trash2 size={11} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Collapsible image */}
+              {note.image_url && expandedImages.has(note.id) && (
+                <div className="ml-7 mr-2 mb-1.5 mt-0.5 border border-border rounded overflow-hidden">
+                  <img
+                    src={note.image_url}
+                    alt=""
+                    className="w-full max-h-40 object-contain bg-black/20 cursor-pointer"
+                    onClick={() => window.open(note.image_url!, "_blank")}
+                  />
+                </div>
               )}
             </div>
           ))}

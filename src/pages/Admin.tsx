@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, Pencil } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import NotesPanel from "@/components/admin/NotesPanel";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, Pencil } from "lucide-react";
+import NotesButton from "@/components/admin/NotesButton";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import {
   DndContext,
@@ -711,17 +710,7 @@ const Admin = () => {
               ))}
 
               <div className="ml-auto">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button className="flex items-center gap-1.5 text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
-                      <StickyNote size={12} />
-                      NOTES
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-auto p-4 border-border bg-background">
-                    {user && <NotesPanel userId={user.id} />}
-                  </PopoverContent>
-                </Popover>
+                {user && <NotesButton userId={user.id} />}
               </div>
             </div>
           </SortableContext>

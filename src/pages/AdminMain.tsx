@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, StickyNote } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import NotesPanel from "@/components/admin/NotesPanel";
+import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X, ChevronUp, ChevronDown } from "lucide-react";
+import NotesButton from "@/components/admin/NotesButton";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
@@ -408,17 +407,7 @@ const AdminMain = () => {
           </button>
         </div>
         <div className="flex items-center gap-4">
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-1.5 text-xs font-display tracking-[0.2em] uppercase px-3 py-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
-                <StickyNote size={12} />
-                NOTES
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-auto p-4 border-border bg-background">
-              {user && <NotesPanel userId={user.id} />}
-            </PopoverContent>
-          </Popover>
+          {user && <NotesButton userId={user.id} />}
           <button
             onClick={() => navigate("/")}
             className="text-muted-foreground text-[10px] tracking-widest hover:text-foreground transition-colors font-display uppercase"
