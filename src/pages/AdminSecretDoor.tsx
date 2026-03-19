@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, StickyNote } from "lucide-react";
+import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NotesButton from "@/components/admin/NotesButton";
 
 interface SecretDoorSettings {
