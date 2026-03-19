@@ -1,0 +1,1 @@
+ALTER TABLE public.admin_notes ADD COLUMN image_url text DEFAULT NULL;
