@@ -4,8 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, StickyNote, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, Pencil } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import NotesPanel from "@/components/admin/NotesPanel";
+import NotesButton from "@/components/admin/NotesButton";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import {
   DndContext,
