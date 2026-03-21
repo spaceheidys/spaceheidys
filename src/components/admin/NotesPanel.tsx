@@ -21,6 +21,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [editText, setEditText] = useState("");
   const [expandedImages, setExpandedImages] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState<string | null>(null);
+  const [confirmResetScore, setConfirmResetScore] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
@@ -147,11 +148,58 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     notifyUpdate();
   };
 
+  const doneCount = notes.filter((n) => n.is_done).length;
+
+  const resetScore = async () => {
+    const doneIds = notes.filter((n) => n.is_done).map((n) => n.id);
+    if (doneIds.length === 0) return;
+    // Mark all done tasks as not done (un-check them)
+    setNotes((prev) => prev.map((n) => n.is_done ? { ...n, is_done: false } : n));
+    for (const id of doneIds) {
+      await supabase.from("admin_notes").update({ is_done: false }).eq("id", id);
+    }
+    setConfirmResetScore(false);
+    notifyUpdate();
+  };
+
   return (
     <div className="w-80 max-h-[70vh] flex flex-col">
-      <h3 className="text-[10px] font-display tracking-[0.3em] uppercase text-muted-foreground mb-3">
-        Notes & To-Do
-      </h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-[10px] font-display tracking-[0.3em] uppercase text-muted-foreground">
+          Notes & To-Do
+        </h3>
+        {doneCount > 0 && (
+          <div className="flex items-center gap-1.5">
+            {confirmResetScore ? (
+              <span className="flex items-center gap-1">
+                <span className="text-[9px] font-display tracking-wider text-muted-foreground">Reset?</span>
+                <button
+                  onClick={resetScore}
+                  className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors"
+                >
+                  YES
+                </button>
+                <span className="text-[9px] text-muted-foreground/40">/</span>
+                <button
+                  onClick={() => setConfirmResetScore(false)}
+                  className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  NO
+                </button>
+              </span>
+            ) : (
+              <button
+                onClick={() => setConfirmResetScore(true)}
+                className="flex items-center gap-1 text-[10px] font-display tracking-wider text-green-400/80 hover:text-green-300 transition-colors"
+                title="Reset completed score"
+              >
+                <span>✓</span>
+                <span>{doneCount}</span>
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
 
