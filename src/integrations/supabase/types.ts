@@ -21,6 +21,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_done: boolean
+          is_starred: boolean
           sort_order: number
           user_id: string
         }
@@ -30,6 +31,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_done?: boolean
+          is_starred?: boolean
           sort_order?: number
           user_id: string
         }
@@ -39,6 +41,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_done?: boolean
+          is_starred?: boolean
           sort_order?: number
           user_id?: string
         }

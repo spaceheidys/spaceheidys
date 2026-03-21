@@ -1,0 +1,1 @@
+ALTER TABLE public.admin_notes ADD COLUMN is_starred boolean NOT NULL DEFAULT false;
