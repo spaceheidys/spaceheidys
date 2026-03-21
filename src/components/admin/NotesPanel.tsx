@@ -149,7 +149,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   };
 
   const doneCount = notes.filter((n) => n.is_done).length;
-  const [confirmResetScore, setConfirmResetScore] = useState(false);
 
   const resetScore = async () => {
     const doneIds = notes.filter((n) => n.is_done).map((n) => n.id);
