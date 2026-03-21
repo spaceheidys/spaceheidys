@@ -70,6 +70,31 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     notifyUpdate();
   };
 
+  const startEdit = (note: Note) => {
+    setEditingId(note.id);
+    setEditText(note.content);
+    setConfirmDeleteId(null);
+    setTimeout(() => editInputRef.current?.focus(), 50);
+  };
+
+  const confirmEdit = async () => {
+    if (!editingId || !editText.trim()) return;
+    setNotes((prev) => prev.map((n) => n.id === editingId ? { ...n, content: editText.trim() } : n));
+    await supabase.from("admin_notes").update({ content: editText.trim() }).eq("id", editingId);
+    setEditingId(null);
+    notifyUpdate();
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditText("");
+  };
+
+  const handleEditKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") confirmEdit();
+    if (e.key === "Escape") cancelEdit();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") addNote();
   };
