@@ -16,6 +16,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [loading, setLoading] = useState(true);
   const [newNote, setNewNote] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmImageAction, setConfirmImageAction] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [expandedImages, setExpandedImages] = useState<Set<string>>(new Set());
@@ -113,6 +114,18 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     imgInputRef.current?.click();
   };
 
+  const removeImage = async (noteId: string) => {
+    setNotes((prev) => prev.map((n) => n.id === noteId ? { ...n, image_url: null } : n));
+    await supabase.from("admin_notes").update({ image_url: null }).eq("id", noteId);
+    setConfirmImageAction(null);
+    notifyUpdate();
+  };
+
+  const replaceImage = (noteId: string) => {
+    setConfirmImageAction(null);
+    triggerImageUpload(noteId);
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const noteId = pendingNoteId.current;
@@ -131,6 +144,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setExpandedImages((prev) => new Set(prev).add(noteId));
     setUploading(null);
     if (imgInputRef.current) imgInputRef.current.value = "";
+    notifyUpdate();
   };
 
   return (
@@ -260,13 +274,45 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
 
               {/* Collapsible image */}
               {note.image_url && expandedImages.has(note.id) && (
-                <div className="ml-7 mr-2 mb-1.5 mt-0.5 border border-border rounded overflow-hidden">
+                <div className="ml-7 mr-2 mb-1.5 mt-0.5 border border-border rounded overflow-hidden relative group/img">
                   <img
                     src={note.image_url}
                     alt=""
                     className="w-full max-h-40 object-contain bg-black/20 cursor-pointer"
                     onClick={() => window.open(note.image_url!, "_blank")}
                   />
+                  {/* Hover overlay with actions */}
+                  {confirmImageAction === note.id ? (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-3">
+                      <button
+                        onClick={() => removeImage(note.id)}
+                        className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors bg-background/80 px-2 py-1 rounded"
+                      >
+                        DELETE
+                      </button>
+                      <button
+                        onClick={() => replaceImage(note.id)}
+                        className="text-[9px] font-display tracking-wider text-foreground hover:text-foreground/80 transition-colors bg-background/80 px-2 py-1 rounded"
+                      >
+                        REPLACE
+                      </button>
+                      <button
+                        onClick={() => setConfirmImageAction(null)}
+                        className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors bg-background/80 px-2 py-1 rounded"
+                      >
+                        CANCEL
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setConfirmImageAction(note.id); }}
+                        className="text-[9px] font-display tracking-wider text-white/90 hover:text-white bg-black/50 px-2 py-1 rounded transition-colors"
+                      >
+                        EDIT IMAGE
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
