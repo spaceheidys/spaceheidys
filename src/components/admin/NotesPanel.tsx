@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil } from "lucide-react";
 
 interface Note {
   id: string;
@@ -16,9 +16,12 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [loading, setLoading] = useState(true);
   const [newNote, setNewNote] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
   const [expandedImages, setExpandedImages] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
   const pendingNoteId = useRef<string | null>(null);
 
@@ -65,6 +68,31 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setConfirmDeleteId(null);
     await supabase.from("admin_notes").delete().eq("id", id);
     notifyUpdate();
+  };
+
+  const startEdit = (note: Note) => {
+    setEditingId(note.id);
+    setEditText(note.content);
+    setConfirmDeleteId(null);
+    setTimeout(() => editInputRef.current?.focus(), 50);
+  };
+
+  const confirmEdit = async () => {
+    if (!editingId || !editText.trim()) return;
+    setNotes((prev) => prev.map((n) => n.id === editingId ? { ...n, content: editText.trim() } : n));
+    await supabase.from("admin_notes").update({ content: editText.trim() }).eq("id", editingId);
+    setEditingId(null);
+    notifyUpdate();
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditText("");
+  };
+
+  const handleEditKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") confirmEdit();
+    if (e.key === "Escape") cancelEdit();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -139,18 +167,42 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                     <span className="text-[8px] text-foreground/60">✓</span>
                   )}
                 </button>
-                <span
-                  className={`text-xs font-display flex-1 leading-relaxed ${
-                    note.is_done
-                      ? "line-through text-muted-foreground/50"
-                      : "text-foreground/80"
-                  }`}
-                >
-                  {note.content}
-                </span>
+                {editingId === note.id ? (
+                  <div className="flex items-center gap-1 flex-1">
+                    <input
+                      ref={editInputRef}
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      onKeyDown={handleEditKeyDown}
+                      className="flex-1 bg-transparent text-xs font-display text-foreground outline-none border-b border-foreground/30 tracking-wider"
+                    />
+                    <button onClick={confirmEdit} className="text-[9px] font-display tracking-wider text-green-400 hover:text-green-300 transition-colors">YES</button>
+                    <span className="text-[9px] text-muted-foreground/40">/</span>
+                    <button onClick={cancelEdit} className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+                  </div>
+                ) : (
+                  <span
+                    className={`text-xs font-display flex-1 leading-relaxed ${
+                      note.is_done
+                        ? "line-through text-muted-foreground/50"
+                        : "text-foreground/80"
+                    }`}
+                  >
+                    {note.content}
+                  </span>
+                )}
 
                 <div className="flex items-center gap-0.5 flex-shrink-0">
-                  {/* Image attach button */}
+                  {/* Edit button */}
+                  {editingId !== note.id && (
+                    <button
+                      onClick={() => startEdit(note)}
+                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all"
+                      title="Edit"
+                    >
+                      <Pencil size={10} />
+                    </button>
+                  )}
                   {uploading === note.id ? (
                     <Loader2 size={10} className="animate-spin text-muted-foreground" />
                   ) : (
