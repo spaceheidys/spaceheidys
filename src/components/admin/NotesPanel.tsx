@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical } from "lucide-react";
 
 interface Note {
   id: string;
   content: string;
   is_done: boolean;
+  is_starred: boolean;
   sort_order: number;
   created_at: string;
   image_url: string | null;
@@ -22,6 +23,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [expandedImages, setExpandedImages] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirmResetScore, setConfirmResetScore] = useState(false);
+  const [dragId, setDragId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +64,13 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     const updated = !note.is_done;
     setNotes((prev) => prev.map((n) => (n.id === note.id ? { ...n, is_done: updated } : n)));
     await supabase.from("admin_notes").update({ is_done: updated }).eq("id", note.id);
+    notifyUpdate();
+  };
+
+  const toggleStar = async (note: Note) => {
+    const updated = !note.is_starred;
+    setNotes((prev) => prev.map((n) => (n.id === note.id ? { ...n, is_starred: updated } : n)));
+    await supabase.from("admin_notes").update({ is_starred: updated }).eq("id", note.id);
     notifyUpdate();
   };
 
@@ -148,12 +157,46 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     notifyUpdate();
   };
 
+  // Drag & drop handlers
+  const handleDragStart = (noteId: string) => {
+    setDragId(noteId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!dragId || dragId === targetId) return;
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!dragId || dragId === targetId) return;
+
+    const dragIndex = sortedNotes.findIndex((n) => n.id === dragId);
+    const targetIndex = sortedNotes.findIndex((n) => n.id === targetId);
+    if (dragIndex === -1 || targetIndex === -1) return;
+
+    const reordered = [...sortedNotes];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+
+    const updated = reordered.map((n, i) => ({ ...n, sort_order: i }));
+    setNotes(updated);
+    setDragId(null);
+
+    for (const n of updated) {
+      await supabase.from("admin_notes").update({ sort_order: n.sort_order }).eq("id", n.id);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDragId(null);
+  };
+
   const doneCount = notes.filter((n) => n.is_done).length;
 
   const resetScore = async () => {
     const doneIds = notes.filter((n) => n.is_done).map((n) => n.id);
     if (doneIds.length === 0) return;
-    // Mark all done tasks as not done (un-check them)
     setNotes((prev) => prev.map((n) => n.is_done ? { ...n, is_done: false } : n));
     for (const id of doneIds) {
       await supabase.from("admin_notes").update({ is_done: false }).eq("id", id);
@@ -161,6 +204,192 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setConfirmResetScore(false);
     notifyUpdate();
   };
+
+  // Sort: starred first, then by sort_order
+  const sortedNotes = [...notes].sort((a, b) => {
+    if (a.is_starred && !b.is_starred) return -1;
+    if (!a.is_starred && b.is_starred) return 1;
+    return a.sort_order - b.sort_order;
+  });
+
+  const renderNote = (note: Note) => (
+    <div
+      key={note.id}
+      className={`group ${dragId === note.id ? "opacity-40" : ""}`}
+      draggable
+      onDragStart={() => handleDragStart(note.id)}
+      onDragOver={(e) => handleDragOver(e, note.id)}
+      onDrop={(e) => handleDrop(e, note.id)}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex items-start gap-1.5 px-1.5 py-1.5 rounded hover:bg-secondary/50 transition-colors">
+        {/* Drag handle */}
+        <GripVertical size={10} className="mt-1 flex-shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing" />
+
+        {/* Star */}
+        <button
+          onClick={() => toggleStar(note)}
+          className={`mt-0.5 flex-shrink-0 transition-colors ${
+            note.is_starred
+              ? "text-yellow-400"
+              : "opacity-0 group-hover:opacity-100 text-muted-foreground/40 hover:text-yellow-400"
+          }`}
+          title={note.is_starred ? "Unstar" : "Star"}
+        >
+          <Star size={10} fill={note.is_starred ? "currentColor" : "none"} />
+        </button>
+
+        {/* Checkbox */}
+        <button
+          onClick={() => toggleDone(note)}
+          className={`mt-0.5 w-3.5 h-3.5 border flex-shrink-0 flex items-center justify-center transition-colors ${
+            note.is_done
+              ? "border-foreground/40 bg-foreground/10"
+              : "border-border hover:border-foreground/40"
+          }`}
+        >
+          {note.is_done && (
+            <span className="text-[8px] text-foreground/60">✓</span>
+          )}
+        </button>
+
+        {/* Content */}
+        {editingId === note.id ? (
+          <div className="flex items-center gap-1 flex-1">
+            <input
+              ref={editInputRef}
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              onKeyDown={handleEditKeyDown}
+              className="flex-1 bg-transparent text-xs font-display text-foreground outline-none border-b border-foreground/30 tracking-wider"
+            />
+            <button onClick={confirmEdit} className="text-[9px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
+            <span className="text-[9px] text-muted-foreground/40">/</span>
+            <button onClick={cancelEdit} className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+          </div>
+        ) : (
+          <span
+            className={`text-xs font-display flex-1 leading-relaxed ${
+              note.is_done
+                ? "line-through text-muted-foreground/50"
+                : "text-foreground/80"
+            }`}
+          >
+            {note.content}
+          </span>
+        )}
+
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {/* Edit button */}
+          {editingId !== note.id && (
+            <button
+              onClick={() => startEdit(note)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all"
+              title="Edit"
+            >
+              <Pencil size={10} />
+            </button>
+          )}
+          {/* Image attach */}
+          {uploading === note.id ? (
+            <Loader2 size={10} className="animate-spin text-muted-foreground" />
+          ) : (
+            <button
+              onClick={() => triggerImageUpload(note.id)}
+              className={`transition-all ${
+                note.image_url
+                  ? "text-yellow-500/70 hover:text-yellow-400"
+                  : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground"
+              }`}
+              title="Attach image"
+            >
+              <ImagePlus size={11} />
+            </button>
+          )}
+
+          {/* Expand/collapse image */}
+          {note.image_url && (
+            <button
+              onClick={() => toggleImage(note.id)}
+              className="text-muted-foreground/60 hover:text-foreground transition-colors"
+              title={expandedImages.has(note.id) ? "Collapse" : "Expand"}
+            >
+              {expandedImages.has(note.id) ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+            </button>
+          )}
+
+          {/* Delete */}
+          {confirmDeleteId === note.id ? (
+            <span className="flex items-center gap-1">
+              <button
+                onClick={() => deleteNote(note.id)}
+                className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors"
+              >
+                YES
+              </button>
+              <span className="text-[9px] text-muted-foreground/40">/</span>
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+              >
+                NO
+              </button>
+            </span>
+          ) : (
+            <button
+              onClick={() => setConfirmDeleteId(note.id)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
+            >
+              <Trash2 size={11} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Collapsible image */}
+      {note.image_url && expandedImages.has(note.id) && (
+        <div className="ml-7 mr-2 mb-1.5 mt-0.5 border border-border rounded overflow-hidden relative group/img">
+          <img
+            src={note.image_url}
+            alt=""
+            className="w-full max-h-40 object-contain bg-black/20 cursor-pointer"
+            onClick={() => window.open(note.image_url!, "_blank")}
+          />
+          {confirmImageAction === note.id ? (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-3">
+              <button
+                onClick={() => removeImage(note.id)}
+                className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors bg-background/80 px-2 py-1 rounded"
+              >
+                DELETE
+              </button>
+              <button
+                onClick={() => replaceImage(note.id)}
+                className="text-[9px] font-display tracking-wider text-foreground hover:text-foreground/80 transition-colors bg-background/80 px-2 py-1 rounded"
+              >
+                REPLACE
+              </button>
+              <button
+                onClick={() => setConfirmImageAction(null)}
+                className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors bg-background/80 px-2 py-1 rounded"
+              >
+                CANCEL
+              </button>
+            </div>
+          ) : (
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+              <button
+                onClick={(e) => { e.stopPropagation(); setConfirmImageAction(note.id); }}
+                className="text-[9px] font-display tracking-wider text-white/90 hover:text-white bg-black/50 px-2 py-1 rounded transition-colors"
+              >
+                EDIT IMAGE
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="w-80 max-h-[70vh] flex flex-col">
@@ -190,7 +419,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             ) : (
               <button
                 onClick={() => setConfirmResetScore(true)}
-                className="flex items-center gap-1 text-[10px] font-display tracking-wider text-green-400/80 hover:text-green-300 transition-colors"
+                className="flex items-center gap-1 text-[10px] font-display tracking-wider text-foreground/60 hover:text-foreground transition-colors"
                 title="Reset completed score"
               >
                 <span>✓</span>
@@ -208,163 +437,13 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto space-y-1 mb-3 pr-1 max-h-[50vh]">
+        <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1 max-h-[50vh]">
           {notes.length === 0 && (
             <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
               No notes yet
             </p>
           )}
-          {notes.map((note) => (
-            <div key={note.id} className="group">
-              <div className="flex items-start gap-2 px-2 py-1.5 rounded hover:bg-secondary/50 transition-colors">
-                <button
-                  onClick={() => toggleDone(note)}
-                  className={`mt-0.5 w-3.5 h-3.5 border flex-shrink-0 flex items-center justify-center transition-colors ${
-                    note.is_done
-                      ? "border-foreground/40 bg-foreground/10"
-                      : "border-border hover:border-foreground/40"
-                  }`}
-                >
-                  {note.is_done && (
-                    <span className="text-[8px] text-foreground/60">✓</span>
-                  )}
-                </button>
-                {editingId === note.id ? (
-                  <div className="flex items-center gap-1 flex-1">
-                    <input
-                      ref={editInputRef}
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                      onKeyDown={handleEditKeyDown}
-                      className="flex-1 bg-transparent text-xs font-display text-foreground outline-none border-b border-foreground/30 tracking-wider"
-                    />
-                    <button onClick={confirmEdit} className="text-[9px] font-display tracking-wider text-green-400 hover:text-green-300 transition-colors">YES</button>
-                    <span className="text-[9px] text-muted-foreground/40">/</span>
-                    <button onClick={cancelEdit} className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
-                  </div>
-                ) : (
-                  <span
-                    className={`text-xs font-display flex-1 leading-relaxed ${
-                      note.is_done
-                        ? "line-through text-muted-foreground/50"
-                        : "text-foreground/80"
-                    }`}
-                  >
-                    {note.content}
-                  </span>
-                )}
-
-                <div className="flex items-center gap-0.5 flex-shrink-0">
-                  {/* Edit button */}
-                  {editingId !== note.id && (
-                    <button
-                      onClick={() => startEdit(note)}
-                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all"
-                      title="Edit"
-                    >
-                      <Pencil size={10} />
-                    </button>
-                  )}
-                  {uploading === note.id ? (
-                    <Loader2 size={10} className="animate-spin text-muted-foreground" />
-                  ) : (
-                    <button
-                      onClick={() => triggerImageUpload(note.id)}
-                      className={`transition-all ${
-                        note.image_url
-                          ? "text-yellow-500/70 hover:text-yellow-400"
-                          : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground"
-                      }`}
-                      title="Attach image"
-                    >
-                      <ImagePlus size={11} />
-                    </button>
-                  )}
-
-                  {/* Expand/collapse image */}
-                  {note.image_url && (
-                    <button
-                      onClick={() => toggleImage(note.id)}
-                      className="text-muted-foreground/60 hover:text-foreground transition-colors"
-                      title={expandedImages.has(note.id) ? "Collapse" : "Expand"}
-                    >
-                      {expandedImages.has(note.id) ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-                    </button>
-                  )}
-
-                  {/* Delete */}
-                  {confirmDeleteId === note.id ? (
-                    <span className="flex items-center gap-1">
-                      <button
-                        onClick={() => deleteNote(note.id)}
-                        className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors"
-                      >
-                        YES
-                      </button>
-                      <span className="text-[9px] text-muted-foreground/40">/</span>
-                      <button
-                        onClick={() => setConfirmDeleteId(null)}
-                        className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        NO
-                      </button>
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => setConfirmDeleteId(note.id)}
-                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
-                    >
-                      <Trash2 size={11} />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Collapsible image */}
-              {note.image_url && expandedImages.has(note.id) && (
-                <div className="ml-7 mr-2 mb-1.5 mt-0.5 border border-border rounded overflow-hidden relative group/img">
-                  <img
-                    src={note.image_url}
-                    alt=""
-                    className="w-full max-h-40 object-contain bg-black/20 cursor-pointer"
-                    onClick={() => window.open(note.image_url!, "_blank")}
-                  />
-                  {/* Hover overlay with actions */}
-                  {confirmImageAction === note.id ? (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-3">
-                      <button
-                        onClick={() => removeImage(note.id)}
-                        className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors bg-background/80 px-2 py-1 rounded"
-                      >
-                        DELETE
-                      </button>
-                      <button
-                        onClick={() => replaceImage(note.id)}
-                        className="text-[9px] font-display tracking-wider text-foreground hover:text-foreground/80 transition-colors bg-background/80 px-2 py-1 rounded"
-                      >
-                        REPLACE
-                      </button>
-                      <button
-                        onClick={() => setConfirmImageAction(null)}
-                        className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors bg-background/80 px-2 py-1 rounded"
-                      >
-                        CANCEL
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setConfirmImageAction(note.id); }}
-                        className="text-[9px] font-display tracking-wider text-white/90 hover:text-white bg-black/50 px-2 py-1 rounded transition-colors"
-                      >
-                        EDIT IMAGE
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+          {sortedNotes.map((note) => renderNote(note))}
         </div>
       )}
 
