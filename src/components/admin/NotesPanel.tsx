@@ -114,6 +114,18 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     imgInputRef.current?.click();
   };
 
+  const removeImage = async (noteId: string) => {
+    setNotes((prev) => prev.map((n) => n.id === noteId ? { ...n, image_url: null } : n));
+    await supabase.from("admin_notes").update({ image_url: null }).eq("id", noteId);
+    setConfirmImageAction(null);
+    notifyUpdate();
+  };
+
+  const replaceImage = (noteId: string) => {
+    setConfirmImageAction(null);
+    triggerImageUpload(noteId);
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const noteId = pendingNoteId.current;
@@ -132,6 +144,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setExpandedImages((prev) => new Set(prev).add(noteId));
     setUploading(null);
     if (imgInputRef.current) imgInputRef.current.value = "";
+    notifyUpdate();
   };
 
   return (
