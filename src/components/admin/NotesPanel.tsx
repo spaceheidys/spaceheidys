@@ -21,6 +21,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [editText, setEditText] = useState("");
   const [expandedImages, setExpandedImages] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState<string | null>(null);
+  const [confirmResetScore, setConfirmResetScore] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
