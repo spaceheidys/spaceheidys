@@ -193,7 +193,16 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                 )}
 
                 <div className="flex items-center gap-0.5 flex-shrink-0">
-                  {/* Image attach button */}
+                  {/* Edit button */}
+                  {editingId !== note.id && (
+                    <button
+                      onClick={() => startEdit(note)}
+                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all"
+                      title="Edit"
+                    >
+                      <Pencil size={10} />
+                    </button>
+                  )}
                   {uploading === note.id ? (
                     <Loader2 size={10} className="animate-spin text-muted-foreground" />
                   ) : (
