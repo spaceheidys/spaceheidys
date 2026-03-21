@@ -167,15 +167,30 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                     <span className="text-[8px] text-foreground/60">✓</span>
                   )}
                 </button>
-                <span
-                  className={`text-xs font-display flex-1 leading-relaxed ${
-                    note.is_done
-                      ? "line-through text-muted-foreground/50"
-                      : "text-foreground/80"
-                  }`}
-                >
-                  {note.content}
-                </span>
+                {editingId === note.id ? (
+                  <div className="flex items-center gap-1 flex-1">
+                    <input
+                      ref={editInputRef}
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      onKeyDown={handleEditKeyDown}
+                      className="flex-1 bg-transparent text-xs font-display text-foreground outline-none border-b border-foreground/30 tracking-wider"
+                    />
+                    <button onClick={confirmEdit} className="text-[9px] font-display tracking-wider text-green-400 hover:text-green-300 transition-colors">YES</button>
+                    <span className="text-[9px] text-muted-foreground/40">/</span>
+                    <button onClick={cancelEdit} className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+                  </div>
+                ) : (
+                  <span
+                    className={`text-xs font-display flex-1 leading-relaxed ${
+                      note.is_done
+                        ? "line-through text-muted-foreground/50"
+                        : "text-foreground/80"
+                    }`}
+                  >
+                    {note.content}
+                  </span>
+                )}
 
                 <div className="flex items-center gap-0.5 flex-shrink-0">
                   {/* Image attach button */}
