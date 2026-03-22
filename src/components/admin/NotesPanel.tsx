@@ -245,7 +245,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     return a.sort_order - b.sort_order;
   });
 
-  const folderPendingCounts = FOLDER_LABELS.map((_, i) =>
+  const folderPendingCounts = folderLabels.map((_, i) =>
     notes.filter((n) => n.folder === i && !n.is_done && !n.is_divider).length
   );
 
