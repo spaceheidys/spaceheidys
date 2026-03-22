@@ -534,7 +534,19 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               No notes yet
             </p>
           )}
-          {sortedNotes.map((note) => renderNote(note))}
+          {(() => {
+            let currentDividerId: string | null = null;
+            return sortedNotes.map((note) => {
+              if (note.is_divider) {
+                currentDividerId = note.id;
+                return renderNote(note);
+              }
+              if (currentDividerId && collapsedDividers.has(currentDividerId)) {
+                return null;
+              }
+              return renderNote(note);
+            });
+          })()}
         </div>
       )}
 
