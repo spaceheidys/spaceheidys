@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string | null
+          is_divider: boolean
           is_done: boolean
           is_starred: boolean
           sort_order: number
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          is_divider?: boolean
           is_done?: boolean
           is_starred?: boolean
           sort_order?: number
@@ -40,6 +42,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          is_divider?: boolean
           is_done?: boolean
           is_starred?: boolean
           sort_order?: number

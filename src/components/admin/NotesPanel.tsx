@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus } from "lucide-react";
 
 interface Note {
   id: string;
   content: string;
   is_done: boolean;
   is_starred: boolean;
+  is_divider: boolean;
   sort_order: number;
   created_at: string;
   image_url: string | null;
@@ -192,7 +193,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setDragId(null);
   };
 
-  const doneCount = notes.filter((n) => n.is_done).length;
+  const doneCount = notes.filter((n) => n.is_done && !n.is_divider).length;
 
   const resetScore = async () => {
     const doneIds = notes.filter((n) => n.is_done).map((n) => n.id);
@@ -205,14 +206,91 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     notifyUpdate();
   };
 
-  // Sort: starred first, then by sort_order
+  const addDivider = async () => {
+    const { data } = await supabase
+      .from("admin_notes")
+      .insert({ user_id: userId, content: "New Category", sort_order: notes.length, is_divider: true })
+      .select()
+      .single();
+    if (data) {
+      setNotes((prev) => [...prev, data as Note]);
+      notifyUpdate();
+    }
+  };
+
+  // Sort: starred first (non-dividers), then by sort_order
   const sortedNotes = [...notes].sort((a, b) => {
-    if (a.is_starred && !b.is_starred) return -1;
-    if (!a.is_starred && b.is_starred) return 1;
+    if (!a.is_divider && !b.is_divider) {
+      if (a.is_starred && !b.is_starred) return -1;
+      if (!a.is_starred && b.is_starred) return 1;
+    }
     return a.sort_order - b.sort_order;
   });
 
-  const renderNote = (note: Note) => (
+  const renderDivider = (note: Note) => (
+    <div
+      key={note.id}
+      className={`group ${dragId === note.id ? "opacity-40" : ""}`}
+      draggable
+      onDragStart={() => handleDragStart(note.id)}
+      onDragOver={(e) => handleDragOver(e, note.id)}
+      onDrop={(e) => handleDrop(e, note.id)}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex items-center gap-1.5 py-2">
+        <GripVertical size={10} className="flex-shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing" />
+        <div className="h-[1px] flex-1 bg-border" />
+        {editingId === note.id ? (
+          <div className="flex items-center gap-1">
+            <input
+              ref={editInputRef}
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              onKeyDown={handleEditKeyDown}
+              className="bg-transparent text-[9px] font-display text-muted-foreground outline-none border-b border-foreground/30 tracking-[0.2em] uppercase w-20 text-center"
+            />
+            <button onClick={confirmEdit} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
+            <span className="text-[8px] text-muted-foreground/40">/</span>
+            <button onClick={cancelEdit} className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+          </div>
+        ) : (
+          <span className="text-[9px] font-display tracking-[0.2em] uppercase text-muted-foreground/60 px-1.5 whitespace-nowrap">
+            {note.content}
+          </span>
+        )}
+        <div className="h-[1px] flex-1 bg-border" />
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {editingId !== note.id && (
+            <button
+              onClick={() => startEdit(note)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all"
+              title="Rename"
+            >
+              <Pencil size={9} />
+            </button>
+          )}
+          {confirmDeleteId === note.id ? (
+            <span className="flex items-center gap-1">
+              <button onClick={() => deleteNote(note.id)} className="text-[8px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors">YES</button>
+              <span className="text-[8px] text-muted-foreground/40">/</span>
+              <button onClick={() => setConfirmDeleteId(null)} className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+            </span>
+          ) : (
+            <button
+              onClick={() => setConfirmDeleteId(note.id)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
+            >
+              <Trash2 size={9} />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderNote = (note: Note) => {
+    if (note.is_divider) return renderDivider(note);
+    return (
     <div
       key={note.id}
       className={`group ${dragId === note.id ? "opacity-40" : ""}`}
@@ -390,6 +468,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       )}
     </div>
   );
+  };
 
   return (
     <div className="w-80 max-h-[70vh] flex flex-col">
@@ -460,8 +539,16 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           onClick={addNote}
           disabled={!newNote.trim()}
           className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+          title="Add note"
         >
           <Plus size={14} />
+        </button>
+        <button
+          onClick={addDivider}
+          className="text-muted-foreground/50 hover:text-foreground transition-colors"
+          title="Add divider"
+        >
+          <Minus size={14} />
         </button>
       </div>
     </div>
