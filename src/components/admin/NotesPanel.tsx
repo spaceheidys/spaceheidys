@@ -227,7 +227,70 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     return a.sort_order - b.sort_order;
   });
 
-  const renderNote = (note: Note) => (
+  const renderDivider = (note: Note) => (
+    <div
+      key={note.id}
+      className={`group ${dragId === note.id ? "opacity-40" : ""}`}
+      draggable
+      onDragStart={() => handleDragStart(note.id)}
+      onDragOver={(e) => handleDragOver(e, note.id)}
+      onDrop={(e) => handleDrop(e, note.id)}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex items-center gap-1.5 py-2">
+        <GripVertical size={10} className="flex-shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing" />
+        <div className="h-[1px] flex-1 bg-border" />
+        {editingId === note.id ? (
+          <div className="flex items-center gap-1">
+            <input
+              ref={editInputRef}
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              onKeyDown={handleEditKeyDown}
+              className="bg-transparent text-[9px] font-display text-muted-foreground outline-none border-b border-foreground/30 tracking-[0.2em] uppercase w-20 text-center"
+            />
+            <button onClick={confirmEdit} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
+            <span className="text-[8px] text-muted-foreground/40">/</span>
+            <button onClick={cancelEdit} className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+          </div>
+        ) : (
+          <span className="text-[9px] font-display tracking-[0.2em] uppercase text-muted-foreground/60 px-1.5 whitespace-nowrap">
+            {note.content}
+          </span>
+        )}
+        <div className="h-[1px] flex-1 bg-border" />
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {editingId !== note.id && (
+            <button
+              onClick={() => startEdit(note)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all"
+              title="Rename"
+            >
+              <Pencil size={9} />
+            </button>
+          )}
+          {confirmDeleteId === note.id ? (
+            <span className="flex items-center gap-1">
+              <button onClick={() => deleteNote(note.id)} className="text-[8px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors">YES</button>
+              <span className="text-[8px] text-muted-foreground/40">/</span>
+              <button onClick={() => setConfirmDeleteId(null)} className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+            </span>
+          ) : (
+            <button
+              onClick={() => setConfirmDeleteId(note.id)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
+            >
+              <Trash2 size={9} />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderNote = (note: Note) => {
+    if (note.is_divider) return renderDivider(note);
+    return (
     <div
       key={note.id}
       className={`group ${dragId === note.id ? "opacity-40" : ""}`}
