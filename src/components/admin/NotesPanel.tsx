@@ -14,7 +14,8 @@ interface Note {
   folder: number;
 }
 
-const FOLDER_LABELS = ["1", "2", "3"];
+const DEFAULT_FOLDER_LABELS = ["1", "2", "3"];
+const FOLDER_STORAGE_KEY = "notes-folder-labels";
 
 const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => void }) => {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -31,6 +32,14 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [collapsedDividers, setCollapsedDividers] = useState<Set<string>>(new Set());
   const [activeFolder, setActiveFolder] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
+  const [folderLabels, setFolderLabels] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(FOLDER_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [...DEFAULT_FOLDER_LABELS];
+    } catch { return [...DEFAULT_FOLDER_LABELS]; }
+  });
+  const [renamingFolder, setRenamingFolder] = useState<number | null>(null);
+  const [renameText, setRenameText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
@@ -236,7 +245,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     return a.sort_order - b.sort_order;
   });
 
-  const folderPendingCounts = FOLDER_LABELS.map((_, i) =>
+  const folderPendingCounts = folderLabels.map((_, i) =>
     notes.filter((n) => n.folder === i && !n.is_done && !n.is_divider).length
   );
 
@@ -589,22 +598,61 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
 
           {/* Folder tabs */}
           <div className="flex gap-1 mt-2 border-t border-border pt-2">
-            {FOLDER_LABELS.map((label, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveFolder(i)}
-                className={`flex-1 flex items-center justify-center gap-1 text-[9px] font-display tracking-[0.15em] uppercase py-1.5 border transition-colors ${
-                  activeFolder === i
-                    ? "border-foreground/40 text-foreground bg-foreground/5"
-                    : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-foreground/20"
-                }`}
-              >
-                <FolderOpen size={9} />
-                {label}
-                {folderPendingCounts[i] > 0 && (
-                  <span className="text-[8px] text-yellow-400">{folderPendingCounts[i]}</span>
+            {folderLabels.map((label, i) => (
+              <div key={i} className="flex-1">
+                {renamingFolder === i ? (
+                  <div className="flex items-center gap-0.5 border border-foreground/40 py-1 px-1">
+                    <input
+                      value={renameText}
+                      onChange={(e) => setRenameText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          const updated = [...folderLabels];
+                          updated[i] = renameText.trim() || DEFAULT_FOLDER_LABELS[i];
+                          setFolderLabels(updated);
+                          localStorage.setItem(FOLDER_STORAGE_KEY, JSON.stringify(updated));
+                          setRenamingFolder(null);
+                        }
+                        if (e.key === "Escape") setRenamingFolder(null);
+                      }}
+                      autoFocus
+                      className="w-full bg-transparent text-[9px] font-display tracking-[0.15em] uppercase text-foreground outline-none text-center"
+                    />
+                    <button
+                      onClick={() => {
+                        const updated = [...folderLabels];
+                        updated[i] = renameText.trim() || DEFAULT_FOLDER_LABELS[i];
+                        setFolderLabels(updated);
+                        localStorage.setItem(FOLDER_STORAGE_KEY, JSON.stringify(updated));
+                        setRenamingFolder(null);
+                      }}
+                      className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground"
+                    >YES</button>
+                    <span className="text-[8px] text-muted-foreground/40">/</span>
+                    <button
+                      onClick={() => setRenamingFolder(null)}
+                      className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground"
+                    >NO</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setActiveFolder(i)}
+                    onDoubleClick={() => { setRenamingFolder(i); setRenameText(label); }}
+                    className={`w-full flex items-center justify-center gap-1 text-[9px] font-display tracking-[0.15em] uppercase py-1.5 border transition-colors ${
+                      activeFolder === i
+                        ? "border-foreground/40 text-foreground bg-foreground/5"
+                        : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-foreground/20"
+                    }`}
+                    title="Double-click to rename"
+                  >
+                    <FolderOpen size={9} />
+                    {label}
+                    {folderPendingCounts[i] > 0 && (
+                      <span className="text-[8px] text-yellow-400">{folderPendingCounts[i]}</span>
+                    )}
+                  </button>
                 )}
-              </button>
+              </div>
             ))}
           </div>
         </>
