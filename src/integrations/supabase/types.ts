@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          folder: number
           id: string
           image_url: string | null
           is_divider: boolean
@@ -29,6 +30,7 @@ export type Database = {
         Insert: {
           content?: string
           created_at?: string
+          folder?: number
           id?: string
           image_url?: string | null
           is_divider?: boolean
@@ -40,6 +42,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          folder?: number
           id?: string
           image_url?: string | null
           is_divider?: boolean

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen } from "lucide-react";
 
 interface Note {
   id: string;
@@ -11,7 +11,10 @@ interface Note {
   sort_order: number;
   created_at: string;
   image_url: string | null;
+  folder: number;
 }
+
+const FOLDER_LABELS = ["1", "2", "3"];
 
 const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => void }) => {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -26,6 +29,8 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [confirmResetScore, setConfirmResetScore] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
   const [collapsedDividers, setCollapsedDividers] = useState<Set<string>>(new Set());
+  const [activeFolder, setActiveFolder] = useState(0);
+  const [collapsed, setCollapsed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
@@ -47,11 +52,13 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
 
   const notifyUpdate = () => onUpdate?.();
 
+  const folderNotes = notes.filter((n) => n.folder === activeFolder);
+
   const addNote = async () => {
     if (!newNote.trim()) return;
     const { data } = await supabase
       .from("admin_notes")
-      .insert({ user_id: userId, content: newNote.trim(), sort_order: notes.length })
+      .insert({ user_id: userId, content: newNote.trim(), sort_order: folderNotes.length, folder: activeFolder })
       .select()
       .single();
     if (data) {
@@ -159,7 +166,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     notifyUpdate();
   };
 
-  // Drag & drop handlers
   const handleDragStart = (noteId: string) => {
     setDragId(noteId);
   };
@@ -182,7 +188,10 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     reordered.splice(targetIndex, 0, moved);
 
     const updated = reordered.map((n, i) => ({ ...n, sort_order: i }));
-    setNotes(updated);
+    setNotes((prev) => {
+      const otherNotes = prev.filter((n) => n.folder !== activeFolder);
+      return [...otherNotes, ...updated];
+    });
     setDragId(null);
 
     for (const n of updated) {
@@ -210,7 +219,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const addDivider = async () => {
     const { data } = await supabase
       .from("admin_notes")
-      .insert({ user_id: userId, content: "New Category", sort_order: notes.length, is_divider: true })
+      .insert({ user_id: userId, content: "New Category", sort_order: folderNotes.length, is_divider: true, folder: activeFolder })
       .select()
       .single();
     if (data) {
@@ -219,14 +228,17 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     }
   };
 
-  // Sort: starred first (non-dividers), then by sort_order
-  const sortedNotes = [...notes].sort((a, b) => {
+  const sortedNotes = [...folderNotes].sort((a, b) => {
     if (!a.is_divider && !b.is_divider) {
       if (a.is_starred && !b.is_starred) return -1;
       if (!a.is_starred && b.is_starred) return 1;
     }
     return a.sort_order - b.sort_order;
   });
+
+  const folderPendingCounts = FOLDER_LABELS.map((_, i) =>
+    notes.filter((n) => n.folder === i && !n.is_done && !n.is_divider).length
+  );
 
   const renderDivider = (note: Note) => (
     <div
@@ -313,10 +325,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       onDragEnd={handleDragEnd}
     >
       <div className="flex items-start gap-1.5 px-1.5 py-1.5 rounded hover:bg-secondary/50 transition-colors">
-        {/* Drag handle */}
         <GripVertical size={10} className="mt-1 flex-shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing" />
-
-        {/* Star */}
         <button
           onClick={() => toggleStar(note)}
           className={`mt-0.5 flex-shrink-0 transition-colors ${
@@ -328,8 +337,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         >
           <Star size={10} fill={note.is_starred ? "currentColor" : "none"} />
         </button>
-
-        {/* Checkbox */}
         <button
           onClick={() => toggleDone(note)}
           className={`mt-0.5 w-3.5 h-3.5 border flex-shrink-0 flex items-center justify-center transition-colors ${
@@ -343,7 +350,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           )}
         </button>
 
-        {/* Content */}
         {editingId === note.id ? (
           <div className="flex items-center gap-1 flex-1">
             <input
@@ -374,7 +380,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         )}
 
         <div className="flex items-center gap-0.5 flex-shrink-0">
-          {/* Edit button */}
           {editingId !== note.id && (
             <button
               onClick={() => startEdit(note)}
@@ -384,7 +389,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               <Pencil size={10} />
             </button>
           )}
-          {/* Image attach */}
           {uploading === note.id ? (
             <Loader2 size={10} className="animate-spin text-muted-foreground" />
           ) : (
@@ -400,8 +404,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               <ImagePlus size={11} />
             </button>
           )}
-
-          {/* Expand/collapse image */}
           {note.image_url && (
             <button
               onClick={() => toggleImage(note.id)}
@@ -411,8 +413,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               {expandedImages.has(note.id) ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
           )}
-
-          {/* Delete */}
           {confirmDeleteId === note.id ? (
             <span className="flex items-center gap-1">
               <button
@@ -440,7 +440,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         </div>
       </div>
 
-      {/* Collapsible image */}
       {note.image_url && expandedImages.has(note.id) && (
         <div className="ml-7 mr-2 mb-1.5 mt-0.5 border border-border rounded overflow-hidden relative group/img">
           <img
@@ -488,10 +487,15 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
 
   return (
     <div className="w-80 max-h-[70vh] flex flex-col">
+      {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[10px] font-display tracking-[0.3em] uppercase text-muted-foreground">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="flex items-center gap-1.5 text-[10px] font-display tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {collapsed ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
           Notes & To-Do
-        </h3>
+        </button>
         {doneCount > 0 && (
           <div className="flex items-center gap-1.5">
             {confirmResetScore ? (
@@ -525,60 +529,86 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         )}
       </div>
 
-      <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+      {!collapsed && (
+        <>
+          <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
 
-      {loading ? (
-        <div className="flex justify-center py-6">
-          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-        </div>
-      ) : (
-        <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1 max-h-[50vh]">
-          {notes.length === 0 && (
-            <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
-              No notes yet
-            </p>
+          {loading ? (
+            <div className="flex justify-center py-6">
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1 max-h-[50vh]">
+              {folderNotes.length === 0 && (
+                <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
+                  No notes yet
+                </p>
+              )}
+              {(() => {
+                let currentDividerId: string | null = null;
+                return sortedNotes.map((note) => {
+                  if (note.is_divider) {
+                    currentDividerId = note.id;
+                    return renderNote(note);
+                  }
+                  if (currentDividerId && collapsedDividers.has(currentDividerId)) {
+                    return null;
+                  }
+                  return renderNote(note);
+                });
+              })()}
+            </div>
           )}
-          {(() => {
-            let currentDividerId: string | null = null;
-            return sortedNotes.map((note) => {
-              if (note.is_divider) {
-                currentDividerId = note.id;
-                return renderNote(note);
-              }
-              if (currentDividerId && collapsedDividers.has(currentDividerId)) {
-                return null;
-              }
-              return renderNote(note);
-            });
-          })()}
-        </div>
-      )}
 
-      <div className="flex gap-1.5 border-t border-border pt-3">
-        <input
-          ref={inputRef}
-          value={newNote}
-          onChange={(e) => setNewNote(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Add a note..."
-          className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider"
-        />
-        <button
-          onClick={addNote}
-          disabled={!newNote.trim()}
-          className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-          title="Add note"
-        >
-          <Plus size={14} />
-        </button>
-        <button
-          onClick={addDivider}
-          className="text-muted-foreground/50 hover:text-foreground transition-colors"
-          title="Add divider"
-        >
-          <Minus size={14} />
-        </button>
-      </div>
+          {/* Input + add buttons */}
+          <div className="flex gap-1.5 border-t border-border pt-3">
+            <input
+              ref={inputRef}
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Add a note..."
+              className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider"
+            />
+            <button
+              onClick={addNote}
+              disabled={!newNote.trim()}
+              className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+              title="Add note"
+            >
+              <Plus size={14} />
+            </button>
+            <button
+              onClick={addDivider}
+              className="text-muted-foreground/50 hover:text-foreground transition-colors"
+              title="Add divider"
+            >
+              <Minus size={14} />
+            </button>
+          </div>
+
+          {/* Folder tabs */}
+          <div className="flex gap-1 mt-2 border-t border-border pt-2">
+            {FOLDER_LABELS.map((label, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveFolder(i)}
+                className={`flex-1 flex items-center justify-center gap-1 text-[9px] font-display tracking-[0.15em] uppercase py-1.5 border transition-colors ${
+                  activeFolder === i
+                    ? "border-foreground/40 text-foreground bg-foreground/5"
+                    : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-foreground/20"
+                }`}
+              >
+                <FolderOpen size={9} />
+                {label}
+                {folderPendingCounts[i] > 0 && (
+                  <span className="text-[8px] text-yellow-400">{folderPendingCounts[i]}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

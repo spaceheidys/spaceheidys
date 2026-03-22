@@ -1,0 +1,1 @@
+ALTER TABLE public.admin_notes ADD COLUMN folder integer NOT NULL DEFAULT 0;
