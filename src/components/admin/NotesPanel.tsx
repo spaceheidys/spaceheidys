@@ -539,8 +539,16 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           onClick={addNote}
           disabled={!newNote.trim()}
           className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+          title="Add note"
         >
           <Plus size={14} />
+        </button>
+        <button
+          onClick={addDivider}
+          className="text-muted-foreground/50 hover:text-foreground transition-colors"
+          title="Add divider"
+        >
+          <Minus size={14} />
         </button>
       </div>
     </div>
