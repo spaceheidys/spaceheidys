@@ -193,7 +193,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setDragId(null);
   };
 
-  const doneCount = notes.filter((n) => n.is_done).length;
+  const doneCount = notes.filter((n) => n.is_done && !n.is_divider).length;
 
   const resetScore = async () => {
     const doneIds = notes.filter((n) => n.is_done).map((n) => n.id);
@@ -206,10 +206,24 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     notifyUpdate();
   };
 
-  // Sort: starred first, then by sort_order
+  const addDivider = async () => {
+    const { data } = await supabase
+      .from("admin_notes")
+      .insert({ user_id: userId, content: "New Category", sort_order: notes.length, is_divider: true })
+      .select()
+      .single();
+    if (data) {
+      setNotes((prev) => [...prev, data as Note]);
+      notifyUpdate();
+    }
+  };
+
+  // Sort: starred first (non-dividers), then by sort_order
   const sortedNotes = [...notes].sort((a, b) => {
-    if (a.is_starred && !b.is_starred) return -1;
-    if (!a.is_starred && b.is_starred) return 1;
+    if (!a.is_divider && !b.is_divider) {
+      if (a.is_starred && !b.is_starred) return -1;
+      if (!a.is_starred && b.is_starred) return 1;
+    }
     return a.sort_order - b.sort_order;
   });
 
