@@ -32,6 +32,14 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [collapsedDividers, setCollapsedDividers] = useState<Set<string>>(new Set());
   const [activeFolder, setActiveFolder] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
+  const [folderLabels, setFolderLabels] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(FOLDER_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [...DEFAULT_FOLDER_LABELS];
+    } catch { return [...DEFAULT_FOLDER_LABELS]; }
+  });
+  const [renamingFolder, setRenamingFolder] = useState<number | null>(null);
+  const [renameText, setRenameText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
