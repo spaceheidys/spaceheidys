@@ -359,11 +359,15 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           </div>
         ) : (
           <span
-            className={`text-xs font-display flex-1 leading-relaxed ${
+            onClick={() => {
+              navigator.clipboard.writeText(note.content);
+            }}
+            className={`text-xs font-display flex-1 leading-relaxed cursor-pointer hover:opacity-70 active:opacity-50 transition-opacity ${
               note.is_done
                 ? "line-through text-muted-foreground/50"
                 : "text-foreground/80"
             }`}
+            title="Click to copy"
           >
             {note.content}
           </span>
