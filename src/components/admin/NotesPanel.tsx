@@ -25,6 +25,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirmResetScore, setConfirmResetScore] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [collapsedDividers, setCollapsedDividers] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
