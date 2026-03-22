@@ -14,7 +14,8 @@ interface Note {
   folder: number;
 }
 
-const FOLDER_LABELS = ["1", "2", "3"];
+const DEFAULT_FOLDER_LABELS = ["1", "2", "3"];
+const FOLDER_STORAGE_KEY = "notes-folder-labels";
 
 const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => void }) => {
   const [notes, setNotes] = useState<Note[]>([]);
