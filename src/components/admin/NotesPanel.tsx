@@ -468,6 +468,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       )}
     </div>
   );
+  };
 
   return (
     <div className="w-80 max-h-[70vh] flex flex-col">
