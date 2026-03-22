@@ -255,9 +255,20 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             <button onClick={cancelEdit} className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
           </div>
         ) : (
-          <span className="text-[9px] font-display tracking-[0.2em] uppercase text-muted-foreground/60 px-1.5 whitespace-nowrap">
+          <button
+            onClick={() => {
+              setCollapsedDividers((prev) => {
+                const next = new Set(prev);
+                if (next.has(note.id)) next.delete(note.id);
+                else next.add(note.id);
+                return next;
+              });
+            }}
+            className="text-[9px] font-display tracking-[0.2em] uppercase text-muted-foreground/60 px-1.5 whitespace-nowrap hover:text-muted-foreground transition-colors flex items-center gap-1"
+          >
+            {collapsedDividers.has(note.id) ? <ChevronDown size={9} /> : <ChevronUp size={9} />}
             {note.content}
-          </span>
+          </button>
         )}
         <div className="h-[1px] flex-1 bg-border" />
         <div className="flex items-center gap-0.5 flex-shrink-0">
