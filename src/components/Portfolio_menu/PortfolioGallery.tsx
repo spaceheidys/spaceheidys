@@ -170,9 +170,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
         const { data } = await (supabase
           .from("portfolio_items")
           .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date, section")
-          .in("id", favIds) as any)
-          .eq("is_visible", true)
-          .order("sort_order", { ascending: true });
+          .in("id", favIds)
+          .eq("is_visible", true as any)
+          .order("sort_order", { ascending: true }) as any);
         if (data && data.length > 0) {
           setDbItems(
             data.map((d: any) => ({
