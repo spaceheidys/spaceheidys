@@ -503,7 +503,6 @@ const SortableImageCard = ({
                 </div>
               )}
             </div>
-          )}
 
           <div className="grid gap-4 py-2">
             <div className="grid gap-2">
