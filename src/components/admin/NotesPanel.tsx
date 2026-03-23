@@ -419,9 +419,9 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           )}
           {note.image_url && (
             <button
-              onClick={() => toggleImage(note.id)}
+              onClick={() => setOverlayImage({ url: note.image_url!, noteId: note.id })}
               className="relative text-muted-foreground/60 hover:text-foreground transition-colors"
-              title={expandedImages.has(note.id) ? "Hide image" : "Show image"}
+              title="Preview image"
             >
               <Image size={11} />
               <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-yellow-400 rounded-full" />
