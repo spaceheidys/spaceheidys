@@ -44,6 +44,8 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
   const pendingNoteId = useRef<string | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [lockedHeight, setLockedHeight] = useState<number | null>(null);
 
   const fetchNotes = async () => {
     const { data } = await supabase
