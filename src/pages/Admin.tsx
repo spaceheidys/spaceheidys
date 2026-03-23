@@ -1160,6 +1160,8 @@ const Admin = () => {
                           onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
                           onTagsChange={(tags) => handleTagsChange(item.id, tags)}
                           onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
+                          is_visible={(item as any).is_visible !== false}
+                          onVisibilityChange={(visible) => handleVisibilityChange(item.id, visible)}
                           onImageReplace={async (newUrl) => {
                             const { error } = await supabase.from("portfolio_items").update({ image_url: newUrl }).eq("id", item.id);
                             if (!error) {
