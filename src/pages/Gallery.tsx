@@ -386,7 +386,7 @@ const Gallery = () => {
                   ))}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 py-2">
-                    <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
+                    {shareVisible && <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
                       onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
