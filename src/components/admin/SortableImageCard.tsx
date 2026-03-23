@@ -243,21 +243,19 @@ const SortableImageCard = ({
         <Edit2 size={14} className="text-foreground/70" />
       </div>
 
-      {/* Preview Button */}
-      {showProjectUrl && (
-        <div
-          onClick={(e) => { e.stopPropagation(); setIsPreviewOpen(true); }}
-          className="absolute top-[60px] right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
-          title="Preview"
-        >
-          <Eye size={14} className="text-foreground/70" />
-        </div>
-      )}
+      {/* Delete Button (small icon) */}
+      <div
+        onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
+        className="absolute top-[60px] right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
+        title="Delete"
+      >
+        <Trash2 size={14} className="text-destructive/70" />
+      </div>
 
-      {/* Delete overlay */}
-      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-        {confirmDelete ? (
-          <div className="flex items-center gap-3 pointer-events-auto">
+      {/* Delete confirmation overlay */}
+      {confirmDelete && (
+        <div className="absolute inset-0 z-20 bg-black/60 flex items-center justify-center">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => { onDelete(); setConfirmDelete(false); }}
               className="p-1.5 rounded bg-destructive/80 hover:bg-destructive transition-colors"
@@ -271,15 +269,20 @@ const SortableImageCard = ({
               <X size={14} className="text-foreground" />
             </button>
           </div>
-        ) : (
+        </div>
+      )}
+
+      {/* Preview overlay (center) */}
+      {showProjectUrl && (
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
           <button
-            onClick={() => setConfirmDelete(true)}
-            className="text-destructive hover:text-destructive/80 transition-colors pointer-events-auto"
+            onClick={(e) => { e.stopPropagation(); setIsPreviewOpen(true); }}
+            className="pointer-events-auto text-foreground/80 hover:text-foreground transition-colors"
           >
-            <Trash2 size={20} />
+            <Eye size={20} />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Title area below image */}
       <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1.5 py-1 flex items-center gap-1">
