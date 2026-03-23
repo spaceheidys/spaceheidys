@@ -458,7 +458,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
+              className={`relative ${isProject ? "w-[95vw] sm:w-[85vw]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
               onTouchStart={handleLbTouchStart}
               onTouchMove={handleLbTouchMove}
               onTouchEnd={handleLbTouchEnd}
@@ -481,9 +481,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
               {/* ── PROJECT view ── */}
               {isProject ? (
-                <div className="w-full h-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
-                  {/* Preview iframe - fills available space */}
-                  <div className="flex-1 relative overflow-hidden min-h-0">
+                <div className="w-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
+                  {/* Preview iframe - sized by aspect ratio */}
+                  <div className="flex-1 relative overflow-hidden" style={{ aspectRatio: '1440 / 900' }}>
                     <iframe
                       src={selectedEntry.project_url!}
                       title={selectedEntry.label}
