@@ -103,9 +103,29 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   };
 
   const deleteNote = async (id: string) => {
-    setNotes((prev) => prev.filter((n) => n.id !== id));
+    // Soft delete - move to trash
+    setNotes((prev) => prev.map((n) => n.id === id ? { ...n, is_deleted: true } : n));
     setConfirmDeleteId(null);
-    await supabase.from("admin_notes").delete().eq("id", id);
+    await supabase.from("admin_notes").update({ is_deleted: true } as any).eq("id", id);
+    notifyUpdate();
+  };
+
+  const restoreNotes = async (ids: string[]) => {
+    setNotes((prev) => prev.map((n) => ids.includes(n.id) ? { ...n, is_deleted: false } : n));
+    setSelectedTrashIds(new Set());
+    for (const id of ids) {
+      await supabase.from("admin_notes").update({ is_deleted: false } as any).eq("id", id);
+    }
+    notifyUpdate();
+  };
+
+  const permanentlyDeleteNotes = async (ids: string[]) => {
+    setNotes((prev) => prev.filter((n) => !ids.includes(n.id)));
+    setSelectedTrashIds(new Set());
+    setConfirmEmptyTrash(false);
+    for (const id of ids) {
+      await supabase.from("admin_notes").delete().eq("id", id);
+    }
     notifyUpdate();
   };
 
