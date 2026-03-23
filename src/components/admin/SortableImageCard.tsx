@@ -25,6 +25,7 @@ interface SortableImageCardProps {
   tags?: string[];
   project_date?: string;
   showProjectUrl?: boolean;
+  is_visible?: boolean;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
   onZoomChange: (zoom: number) => void;
@@ -35,6 +36,7 @@ interface SortableImageCardProps {
   onTagsChange?: (tags: string[]) => void;
   onProjectDateChange?: (date: string) => void;
   onImageReplace?: (newUrl: string) => void;
+  onVisibilityChange?: (visible: boolean) => void;
 }
 
 const GROUP_COLORS = [
