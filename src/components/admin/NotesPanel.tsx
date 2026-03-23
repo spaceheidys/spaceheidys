@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image, RotateCcw } from "lucide-react";
 
 interface Note {
   id: string;
@@ -9,6 +9,7 @@ interface Note {
   is_done: boolean;
   is_starred: boolean;
   is_divider: boolean;
+  is_deleted: boolean;
   sort_order: number;
   created_at: string;
   image_url: string | null;
@@ -34,6 +35,9 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [collapsedDividers, setCollapsedDividers] = useState<Set<string>>(new Set());
   const [activeFolder, setActiveFolder] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
+  const [showTrash, setShowTrash] = useState(false);
+  const [selectedTrashIds, setSelectedTrashIds] = useState<Set<string>>(new Set());
+  const [confirmEmptyTrash, setConfirmEmptyTrash] = useState(false);
   const [folderLabels, setFolderLabels] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(FOLDER_STORAGE_KEY);
@@ -66,7 +70,8 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
 
   const notifyUpdate = () => onUpdate?.();
 
-  const folderNotes = notes.filter((n) => n.folder === activeFolder);
+  const folderNotes = notes.filter((n) => n.folder === activeFolder && !n.is_deleted);
+  const trashedNotes = notes.filter((n) => n.is_deleted);
 
   const addNote = async () => {
     if (!newNote.trim()) return;
@@ -98,9 +103,29 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   };
 
   const deleteNote = async (id: string) => {
-    setNotes((prev) => prev.filter((n) => n.id !== id));
+    // Soft delete - move to trash
+    setNotes((prev) => prev.map((n) => n.id === id ? { ...n, is_deleted: true } : n));
     setConfirmDeleteId(null);
-    await supabase.from("admin_notes").delete().eq("id", id);
+    await supabase.from("admin_notes").update({ is_deleted: true } as any).eq("id", id);
+    notifyUpdate();
+  };
+
+  const restoreNotes = async (ids: string[]) => {
+    setNotes((prev) => prev.map((n) => ids.includes(n.id) ? { ...n, is_deleted: false } : n));
+    setSelectedTrashIds(new Set());
+    for (const id of ids) {
+      await supabase.from("admin_notes").update({ is_deleted: false } as any).eq("id", id);
+    }
+    notifyUpdate();
+  };
+
+  const permanentlyDeleteNotes = async (ids: string[]) => {
+    setNotes((prev) => prev.filter((n) => !ids.includes(n.id)));
+    setSelectedTrashIds(new Set());
+    setConfirmEmptyTrash(false);
+    for (const id of ids) {
+      await supabase.from("admin_notes").delete().eq("id", id);
+    }
     notifyUpdate();
   };
 
@@ -217,7 +242,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setDragId(null);
   };
 
-  const doneCount = notes.filter((n) => n.is_done && !n.is_divider).length;
+  const doneCount = notes.filter((n) => n.is_done && !n.is_divider && !n.is_deleted).length;
 
   const resetScore = async () => {
     const doneIds = notes.filter((n) => n.is_done).map((n) => n.id);
@@ -251,7 +276,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   });
 
   const folderPendingCounts = folderLabels.map((_, i) =>
-    notes.filter((n) => n.folder === i && !n.is_done && !n.is_divider).length
+    notes.filter((n) => n.folder === i && !n.is_done && !n.is_divider && !n.is_deleted).length
   );
 
   const renderDivider = (note: Note) => (
@@ -511,6 +536,84 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             <div className="flex justify-center py-6">
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             </div>
+          ) : showTrash ? (
+            <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1">
+              {trashedNotes.length === 0 ? (
+                <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
+                  Trash is empty
+                </p>
+              ) : (
+                <>
+                  {trashedNotes.map((note) => (
+                    <div key={note.id} className="flex items-center gap-1.5 px-1.5 py-1.5 rounded hover:bg-secondary/50 transition-colors">
+                      <button
+                        onClick={() => {
+                          setSelectedTrashIds((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(note.id)) next.delete(note.id);
+                            else next.add(note.id);
+                            return next;
+                          });
+                        }}
+                        className={`w-3.5 h-3.5 border flex-shrink-0 flex items-center justify-center transition-colors ${
+                          selectedTrashIds.has(note.id)
+                            ? "border-foreground/40 bg-foreground/10"
+                            : "border-border hover:border-foreground/40"
+                        }`}
+                      >
+                        {selectedTrashIds.has(note.id) && <span className="text-[8px] text-foreground/60">✓</span>}
+                      </button>
+                      <span className={`text-xs font-display flex-1 leading-relaxed ${
+                        note.is_divider ? "text-muted-foreground/50 italic" : "text-foreground/60 line-through"
+                      }`}>
+                        {note.content}
+                      </span>
+                      {note.image_url && (
+                        <button
+                          onClick={() => setOverlayImage({ url: note.image_url!, noteId: note.id })}
+                          className="text-muted-foreground/40"
+                        >
+                          <Image size={10} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2 pt-2 border-t border-border mt-2">
+                    {selectedTrashIds.size > 0 && (
+                      <button
+                        onClick={() => restoreNotes(Array.from(selectedTrashIds))}
+                        className="flex items-center gap-1 text-[9px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors"
+                      >
+                        <RotateCcw size={10} />
+                        RESTORE ({selectedTrashIds.size})
+                      </button>
+                    )}
+                    <div className="flex-1" />
+                    {confirmEmptyTrash ? (
+                      <span className="flex items-center gap-1">
+                        <span className="text-[9px] font-display tracking-wider text-muted-foreground">Delete all?</span>
+                        <button
+                          onClick={() => permanentlyDeleteNotes(trashedNotes.map(n => n.id))}
+                          className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors"
+                        >YES</button>
+                        <span className="text-[9px] text-muted-foreground/40">/</span>
+                        <button
+                          onClick={() => setConfirmEmptyTrash(false)}
+                          className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                        >NO</button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmEmptyTrash(true)}
+                        className="text-[9px] font-display tracking-wider text-muted-foreground/50 hover:text-destructive transition-colors"
+                      >
+                        DELETE ALL
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           ) : (
             <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1">
               {folderNotes.length === 0 && (
@@ -533,35 +636,36 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               })()}
             </div>
           )}
-
           {/* Input + add buttons */}
-          <div className="flex gap-1.5 border-t border-border pt-3">
-            <input
-              ref={inputRef}
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Add a note..."
-              className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider"
-            />
-            <button
-              onClick={addNote}
-              disabled={!newNote.trim()}
-              className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-              title="Add note"
-            >
-              <Plus size={14} />
-            </button>
-            <button
-              onClick={addDivider}
-              className="text-muted-foreground/50 hover:text-foreground transition-colors"
-              title="Add divider"
-            >
-              <Minus size={14} />
-            </button>
-          </div>
+          {!showTrash && (
+            <div className="flex gap-1.5 border-t border-border pt-3">
+              <input
+                ref={inputRef}
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Add a note..."
+                className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider"
+              />
+              <button
+                onClick={addNote}
+                disabled={!newNote.trim()}
+                className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+                title="Add note"
+              >
+                <Plus size={14} />
+              </button>
+              <button
+                onClick={addDivider}
+                className="text-muted-foreground/50 hover:text-foreground transition-colors"
+                title="Add divider"
+              >
+                <Minus size={14} />
+              </button>
+            </div>
+          )}
 
-          {/* Folder tabs */}
+          {/* Folder tabs + trash */}
           <div className="flex gap-1 mt-2 border-t border-border pt-2">
             {folderLabels.map((label, i) => (
               <div key={i} className="flex-1">
@@ -601,10 +705,10 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                   </div>
                 ) : (
                   <button
-                    onClick={() => setActiveFolder(i)}
+                    onClick={() => { setActiveFolder(i); setShowTrash(false); setSelectedTrashIds(new Set()); setConfirmEmptyTrash(false); }}
                     onDoubleClick={() => { setRenamingFolder(i); setRenameText(label); }}
                     className={`w-full flex items-center justify-between px-2 text-[9px] font-display tracking-[0.15em] uppercase py-1.5 border transition-colors ${
-                      activeFolder === i
+                      activeFolder === i && !showTrash
                         ? "border-foreground/40 text-foreground bg-foreground/5"
                         : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-foreground/20"
                     }`}
@@ -621,6 +725,23 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                 )}
               </div>
             ))}
+            {/* Trash button */}
+            <button
+              onClick={() => { setShowTrash(!showTrash); setSelectedTrashIds(new Set()); setConfirmEmptyTrash(false); }}
+              className={`flex items-center justify-center px-2 py-1.5 border transition-colors relative ${
+                showTrash
+                  ? "border-foreground/40 text-foreground bg-foreground/5"
+                  : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-foreground/20"
+              }`}
+              title="Trash"
+            >
+              <Trash2 size={10} />
+              {trashedNotes.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-destructive text-destructive-foreground text-[7px] rounded-full flex items-center justify-center">
+                  {trashedNotes.length}
+                </span>
+              )}
+            </button>
           </div>
         </>
       )}

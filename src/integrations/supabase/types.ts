@@ -21,6 +21,7 @@ export type Database = {
           folder: number
           id: string
           image_url: string | null
+          is_deleted: boolean
           is_divider: boolean
           is_done: boolean
           is_starred: boolean
@@ -33,6 +34,7 @@ export type Database = {
           folder?: number
           id?: string
           image_url?: string | null
+          is_deleted?: boolean
           is_divider?: boolean
           is_done?: boolean
           is_starred?: boolean
@@ -45,6 +47,7 @@ export type Database = {
           folder?: number
           id?: string
           image_url?: string | null
+          is_deleted?: boolean
           is_divider?: boolean
           is_done?: boolean
           is_starred?: boolean
