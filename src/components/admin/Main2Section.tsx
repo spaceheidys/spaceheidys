@@ -177,10 +177,15 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
       </p>
 
       {/* Wisdom text above cards */}
-      <div className="space-y-2">
-        <label className="text-xs text-muted-foreground font-display tracking-widest uppercase">
+      <div>
+        <button
+          onClick={() => toggleCollapse("text")}
+          className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors mb-2"
+        >
+          {collapsedSections.has("text") ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
           Text above cards
-        </label>
+        </button>
+        {!collapsedSections.has("text") && (
         <div className="flex gap-2 items-center">
           <input
             type="text"
