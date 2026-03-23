@@ -70,7 +70,8 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
 
   const notifyUpdate = () => onUpdate?.();
 
-  const folderNotes = notes.filter((n) => n.folder === activeFolder);
+  const folderNotes = notes.filter((n) => n.folder === activeFolder && !n.is_deleted);
+  const trashedNotes = notes.filter((n) => n.is_deleted);
 
   const addNote = async () => {
     if (!newNote.trim()) return;
