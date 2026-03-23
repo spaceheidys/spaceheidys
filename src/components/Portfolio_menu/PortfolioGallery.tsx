@@ -65,7 +65,7 @@ const ShareBar = ({
   compact?: boolean;
 }) => {
   const { links } = useSocialLinks();
-  const shareLinks = links.filter((l) => l.share_url_template);
+  const shareLinks = links;
 
   const copyLink = () => {
     navigator.clipboard.writeText(shareUrl);
