@@ -196,6 +196,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
         .from("portfolio_items")
         .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date")
         .eq("section", sectionKey)
+        .eq("is_visible" as any, true)
         .order("sort_order", { ascending: true });
 
       if (sectionKey === "gallery" && gallerySub) {
