@@ -490,30 +490,26 @@ const SortableImageCard = ({
           </DialogHeader>
           <div className="w-full relative bg-black" style={{ height: '75vh' }}>
             {project_url ? (
-              <div className="w-full h-full overflow-hidden relative">
-                <iframe
-                  src={project_url}
-                  title={title}
-                  className="border-0 origin-top-left"
-                  sandbox="allow-scripts allow-same-origin allow-popups"
-                  style={{
-                    width: '1440px',
-                    height: '900px',
-                    transform: 'scale(var(--preview-scale))',
-                  }}
-                  ref={(el) => {
-                    if (el) {
-                      const container = el.parentElement;
-                      if (container) {
-                        const scaleX = container.clientWidth / 1440;
-                        const scaleY = container.clientHeight / 900;
-                        const scale = Math.min(scaleX, scaleY);
-                        el.style.setProperty('--preview-scale', String(scale));
-                        el.style.transform = `scale(${scale})`;
-                      }
+              <div className="w-full h-full overflow-hidden flex items-center justify-center">
+                <div className="relative" style={{ width: '1440px', height: '900px' }} ref={(container) => {
+                  if (container) {
+                    const parent = container.parentElement;
+                    if (parent) {
+                      const scaleX = parent.clientWidth / 1440;
+                      const scaleY = parent.clientHeight / 900;
+                      const scale = Math.min(scaleX, scaleY);
+                      container.style.transform = `scale(${scale})`;
+                      container.style.transformOrigin = 'center center';
                     }
-                  }}
-                />
+                  }
+                }}>
+                  <iframe
+                    src={project_url}
+                    title={title}
+                    className="border-0 w-full h-full"
+                    sandbox="allow-scripts allow-same-origin allow-popups"
+                  />
+                </div>
               </div>
             ) : image_url ? (
               <img
