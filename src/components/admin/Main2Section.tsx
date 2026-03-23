@@ -1,8 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 import taroBackside from "@/assets/Taro_backside.png";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Main2SectionProps {
   get: (key: string) => string;
