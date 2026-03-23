@@ -121,6 +121,7 @@ export type Database = {
           image_offset_y: number
           image_url: string
           image_zoom: number
+          is_visible: boolean
           project_date: string
           project_url: string | null
           section: string
@@ -140,6 +141,7 @@ export type Database = {
           image_offset_y?: number
           image_url: string
           image_zoom?: number
+          is_visible?: boolean
           project_date?: string
           project_url?: string | null
           section: string
@@ -159,6 +161,7 @@ export type Database = {
           image_offset_y?: number
           image_url?: string
           image_zoom?: number
+          is_visible?: boolean
           project_date?: string
           project_url?: string | null
           section?: string
