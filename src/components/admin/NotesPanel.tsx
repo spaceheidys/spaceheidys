@@ -417,25 +417,14 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             </button>
           )}
           {note.image_url && (
-            <>
-              <button
-                onClick={() => toggleImage(note.id)}
-                className="relative text-muted-foreground/60 hover:text-foreground transition-colors"
-                title={expandedImages.has(note.id) ? "Collapse image" : "Preview image"}
-              >
-                <Image size={11} />
-                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-yellow-400 rounded-full" />
-              </button>
-              {!expandedImages.has(note.id) && (
-                <div
-                  className="w-5 h-5 rounded overflow-hidden border border-border cursor-pointer flex-shrink-0"
-                  onClick={() => toggleImage(note.id)}
-                  title="Click to expand"
-                >
-                  <img src={note.image_url} alt="" className="w-full h-full object-cover" />
-                </div>
-              )}
-            </>
+            <button
+              onClick={() => toggleImage(note.id)}
+              className="relative text-muted-foreground/60 hover:text-foreground transition-colors"
+              title={expandedImages.has(note.id) ? "Hide image" : "Show image"}
+            >
+              <Image size={11} />
+              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-yellow-400 rounded-full" />
+            </button>
           )}
           {confirmDeleteId === note.id ? (
             <span className="flex items-center gap-1">
