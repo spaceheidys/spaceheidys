@@ -420,7 +420,7 @@ const Gallery = () => {
                   )}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
-                    <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
+                    {shareVisible && <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
                       onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
