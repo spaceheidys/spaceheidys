@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image } from "lucide-react";
 
@@ -625,19 +626,19 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       )}
 
       {/* Image overlay */}
-      {overlayImage && (
+      {overlayImage && createPortal(
         <div
-          className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center"
+          className="fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center overflow-auto p-8"
           onClick={() => { setOverlayImage(null); setConfirmImageAction(null); }}
         >
           <div
-            className="relative max-w-[80vw] max-h-[80vh]"
+            className="relative"
             onClick={(e) => e.stopPropagation()}
           >
             <img
               src={overlayImage.url}
               alt=""
-              className="max-w-full max-h-[80vh] object-contain rounded cursor-pointer"
+              className="max-w-[90vw] max-h-[90vh] object-contain rounded cursor-pointer"
               onClick={() => { setOverlayImage(null); setConfirmImageAction(null); }}
             />
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2">
@@ -672,7 +673,8 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
