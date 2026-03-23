@@ -537,56 +537,139 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1">
-              {folderNotes.length === 0 && (
-                <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
-                  No notes yet
-                </p>
-              )}
-              {(() => {
-                let currentDividerId: string | null = null;
-                return sortedNotes.map((note) => {
-                  if (note.is_divider) {
-                    currentDividerId = note.id;
+            {showTrash ? (
+              /* Trash view */
+              <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1">
+                {trashedNotes.length === 0 ? (
+                  <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
+                    Trash is empty
+                  </p>
+                ) : (
+                  <>
+                    {trashedNotes.map((note) => (
+                      <div key={note.id} className="flex items-center gap-1.5 px-1.5 py-1.5 rounded hover:bg-secondary/50 transition-colors">
+                        <button
+                          onClick={() => {
+                            setSelectedTrashIds((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(note.id)) next.delete(note.id);
+                              else next.add(note.id);
+                              return next;
+                            });
+                          }}
+                          className={`w-3.5 h-3.5 border flex-shrink-0 flex items-center justify-center transition-colors ${
+                            selectedTrashIds.has(note.id)
+                              ? "border-foreground/40 bg-foreground/10"
+                              : "border-border hover:border-foreground/40"
+                          }`}
+                        >
+                          {selectedTrashIds.has(note.id) && <span className="text-[8px] text-foreground/60">✓</span>}
+                        </button>
+                        <span className={`text-xs font-display flex-1 leading-relaxed ${
+                          note.is_divider ? "text-muted-foreground/50 italic" : "text-foreground/60 line-through"
+                        }`}>
+                          {note.content}
+                        </span>
+                        {note.image_url && (
+                          <button
+                            onClick={() => setOverlayImage({ url: note.image_url!, noteId: note.id })}
+                            className="text-muted-foreground/40"
+                          >
+                            <Image size={10} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    {/* Trash actions */}
+                    <div className="flex items-center gap-2 pt-2 border-t border-border mt-2">
+                      {selectedTrashIds.size > 0 && (
+                        <button
+                          onClick={() => restoreNotes(Array.from(selectedTrashIds))}
+                          className="flex items-center gap-1 text-[9px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors"
+                        >
+                          <RotateCcw size={10} />
+                          RESTORE ({selectedTrashIds.size})
+                        </button>
+                      )}
+                      <div className="flex-1" />
+                      {confirmEmptyTrash ? (
+                        <span className="flex items-center gap-1">
+                          <span className="text-[9px] font-display tracking-wider text-muted-foreground">Delete all?</span>
+                          <button
+                            onClick={() => permanentlyDeleteNotes(trashedNotes.map(n => n.id))}
+                            className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors"
+                          >YES</button>
+                          <span className="text-[9px] text-muted-foreground/40">/</span>
+                          <button
+                            onClick={() => setConfirmEmptyTrash(false)}
+                            className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                          >NO</button>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmEmptyTrash(true)}
+                          className="text-[9px] font-display tracking-wider text-muted-foreground/50 hover:text-destructive transition-colors"
+                        >
+                          DELETE ALL
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1">
+                {folderNotes.length === 0 && (
+                  <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
+                    No notes yet
+                  </p>
+                )}
+                {(() => {
+                  let currentDividerId: string | null = null;
+                  return sortedNotes.map((note) => {
+                    if (note.is_divider) {
+                      currentDividerId = note.id;
+                      return renderNote(note);
+                    }
+                    if (currentDividerId && collapsedDividers.has(currentDividerId)) {
+                      return null;
+                    }
                     return renderNote(note);
-                  }
-                  if (currentDividerId && collapsedDividers.has(currentDividerId)) {
-                    return null;
-                  }
-                  return renderNote(note);
-                });
-              })()}
+                  });
+                })()}
+              </div>
+            )}
+
+          {/* Input + add buttons */}
+          {!showTrash && (
+            <div className="flex gap-1.5 border-t border-border pt-3">
+              <input
+                ref={inputRef}
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Add a note..."
+                className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider"
+              />
+              <button
+                onClick={addNote}
+                disabled={!newNote.trim()}
+                className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+                title="Add note"
+              >
+                <Plus size={14} />
+              </button>
+              <button
+                onClick={addDivider}
+                className="text-muted-foreground/50 hover:text-foreground transition-colors"
+                title="Add divider"
+              >
+                <Minus size={14} />
+              </button>
             </div>
           )}
 
-          {/* Input + add buttons */}
-          <div className="flex gap-1.5 border-t border-border pt-3">
-            <input
-              ref={inputRef}
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Add a note..."
-              className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider"
-            />
-            <button
-              onClick={addNote}
-              disabled={!newNote.trim()}
-              className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-              title="Add note"
-            >
-              <Plus size={14} />
-            </button>
-            <button
-              onClick={addDivider}
-              className="text-muted-foreground/50 hover:text-foreground transition-colors"
-              title="Add divider"
-            >
-              <Minus size={14} />
-            </button>
-          </div>
-
-          {/* Folder tabs */}
+          {/* Folder tabs + trash */}
           <div className="flex gap-1 mt-2 border-t border-border pt-2">
             {folderLabels.map((label, i) => (
               <div key={i} className="flex-1">
@@ -626,10 +709,10 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                   </div>
                 ) : (
                   <button
-                    onClick={() => setActiveFolder(i)}
+                    onClick={() => { setActiveFolder(i); setShowTrash(false); setSelectedTrashIds(new Set()); setConfirmEmptyTrash(false); }}
                     onDoubleClick={() => { setRenamingFolder(i); setRenameText(label); }}
                     className={`w-full flex items-center justify-between px-2 text-[9px] font-display tracking-[0.15em] uppercase py-1.5 border transition-colors ${
-                      activeFolder === i
+                      activeFolder === i && !showTrash
                         ? "border-foreground/40 text-foreground bg-foreground/5"
                         : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-foreground/20"
                     }`}
@@ -646,6 +729,23 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                 )}
               </div>
             ))}
+            {/* Trash button */}
+            <button
+              onClick={() => { setShowTrash(!showTrash); setSelectedTrashIds(new Set()); setConfirmEmptyTrash(false); }}
+              className={`flex items-center justify-center px-2 py-1.5 border transition-colors relative ${
+                showTrash
+                  ? "border-foreground/40 text-foreground bg-foreground/5"
+                  : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-foreground/20"
+              }`}
+              title="Trash"
+            >
+              <Trash2 size={10} />
+              {trashedNotes.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-destructive text-destructive-foreground text-[7px] rounded-full flex items-center justify-center">
+                  {trashedNotes.length}
+                </span>
+              )}
+            </button>
           </div>
         </>
       )}
