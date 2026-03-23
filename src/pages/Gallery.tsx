@@ -51,7 +51,7 @@ const PlatformIcon = ({ label }: { label: string }) => {
 // ─── ShareBar ──────────────────────────────────────────────────────────────────
 const ShareBar = ({ shareUrl, title, compact = false }: { shareUrl: string; title: string; compact?: boolean }) => {
   const { links } = useSocialLinks();
-  const shareLinks = links.filter((l) => l.share_url_template);
+  const shareLinks = links;
   const copyLink = () => {
     navigator.clipboard.writeText(shareUrl);
     toast.success("Link copied to clipboard", { style: { background: "#111", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" } });
