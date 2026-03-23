@@ -599,24 +599,64 @@ const AdminMain = () => {
             })}
             {activeSection !== "main" && (
               <>
-                <ButtonsSection
-                  buttons={navButtons}
-                  onUpdate={updateButton}
-                  onSwapOrder={swapOrder}
-                  onAdd={addButton}
-                  onDelete={deleteButton}
-                />
-                <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
+                <div className="relative mt-4">
+                  <button
+                    onClick={() => toggleSectionCollapse(`${activeSection}_buttons`)}
+                    className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors mb-2"
+                  >
+                    {collapsedSections.has(`${activeSection}_buttons`) ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+                    Buttons
+                  </button>
+                  {!collapsedSections.has(`${activeSection}_buttons`) && (
+                    <ButtonsSection
+                      buttons={navButtons}
+                      onUpdate={updateButton}
+                      onSwapOrder={swapOrder}
+                      onAdd={addButton}
+                      onDelete={deleteButton}
+                    />
+                  )}
+                </div>
+                <div className="relative mt-4">
+                  <button
+                    onClick={() => toggleSectionCollapse(`${activeSection}_content`)}
+                    className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors mb-2"
+                  >
+                    {collapsedSections.has(`${activeSection}_content`) ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+                    Section Content
+                  </button>
+                  {!collapsedSections.has(`${activeSection}_content`) && (
+                    <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
+                  )}
+                </div>
               </>
             )}
           </>
         )}
 
         {/* For non-main tabs, show backgrounds and library inline */}
-        {activeSection !== "main" && activeSection !== "main2" && (
+        {activeSection !== "main" && activeSection !== "main2" && activeSection !== "shop" && (
           <>
-            {renderActiveBackgrounds()}
-            {renderLibrarySection()}
+            <div className="relative mt-4">
+              <button
+                onClick={() => toggleSectionCollapse(`${activeSection}_backgrounds`)}
+                className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors mb-2"
+              >
+                {collapsedSections.has(`${activeSection}_backgrounds`) ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+                Active Backgrounds
+              </button>
+              {!collapsedSections.has(`${activeSection}_backgrounds`) && renderActiveBackgrounds()}
+            </div>
+            <div className="relative mt-4">
+              <button
+                onClick={() => toggleSectionCollapse(`${activeSection}_library`)}
+                className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors mb-2"
+              >
+                {collapsedSections.has(`${activeSection}_library`) ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+                Library
+              </button>
+              {!collapsedSections.has(`${activeSection}_library`) && renderLibrarySection()}
+            </div>
           </>
         )}
       </div>
