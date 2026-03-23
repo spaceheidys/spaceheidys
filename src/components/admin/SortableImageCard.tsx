@@ -348,36 +348,25 @@ const SortableImageCard = ({
       </div>
 
 
-      {/* Preview Modal */}
-      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] p-0 overflow-hidden" onClick={(e) => e.stopPropagation()}>
-          <DialogHeader className="px-4 pt-4 pb-2">
-            <DialogTitle className="text-sm font-display tracking-widest uppercase">{title}</DialogTitle>
-            <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
-          </DialogHeader>
-          <div className="w-full relative bg-black" style={{ height: '75vh' }}>
+      {/* Preview Overlay (portal) */}
+      {isPreviewOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center overflow-auto p-8"
+          onClick={() => setIsPreviewOpen(false)}
+        >
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
             {project_url ? (
-              <div className="w-full h-full overflow-hidden relative">
+              <div className="relative overflow-hidden rounded" style={{ width: 'min(90vw, 1440px)', aspectRatio: '1440 / 900' }}>
                 <iframe
                   src={project_url}
                   title={title}
-                  className="border-0 origin-top-left"
+                  className="border-0 origin-top-left absolute top-0 left-0"
                   sandbox="allow-scripts allow-same-origin allow-popups"
-                  style={{
-                    width: '1440px',
-                    height: '900px',
-                    transform: 'scale(var(--preview-scale))',
-                  }}
+                  style={{ width: '1440px', height: '900px' }}
                   ref={(el) => {
-                    if (el) {
-                      const container = el.parentElement;
-                      if (container) {
-                        const scaleX = container.clientWidth / 1440;
-                        const scaleY = container.clientHeight / 900;
-                        const scale = Math.min(scaleX, scaleY);
-                        el.style.setProperty('--preview-scale', String(scale));
-                        el.style.transform = `scale(${scale})`;
-                      }
+                    if (el?.parentElement) {
+                      const scale = Math.min(el.parentElement.clientWidth / 1440, el.parentElement.clientHeight / 900);
+                      el.style.transform = `scale(${scale})`;
                     }
                   }}
                 />
@@ -386,21 +375,25 @@ const SortableImageCard = ({
               <img
                 src={image_url}
                 alt={title}
-                className="w-full h-full object-contain"
+                className="max-w-[90vw] max-h-[90vh] object-contain rounded cursor-pointer"
+                onClick={() => setIsPreviewOpen(false)}
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
-                No preview available
+            ) : null}
+            {title && (
+              <div className="absolute top-3 left-3 bg-background/80 px-3 py-1.5 rounded">
+                <span className="text-[10px] font-display tracking-widest uppercase text-foreground/90">{title}</span>
               </div>
             )}
+            <button
+              onClick={() => setIsPreviewOpen(false)}
+              className="absolute top-3 right-3 bg-background/80 p-1.5 rounded hover:bg-background transition-colors"
+            >
+              <X size={14} className="text-foreground" />
+            </button>
           </div>
-          {description && (
-            <div className="px-4 pb-4 pt-2 border-t border-border">
-              <p className="text-xs text-muted-foreground">{description}</p>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+        </div>,
+        document.body
+      )}
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
