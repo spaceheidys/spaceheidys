@@ -482,7 +482,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               {/* ── PROJECT view ── */}
               {isProject ? (
                 <div className="w-full h-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
-                  <div className="flex-1 min-h-[35vh] sm:min-h-0 relative overflow-hidden">
+                  {/* Preview iframe - fills available space */}
+                  <div className="flex-1 relative overflow-hidden min-h-0">
                     <iframe
                       src={selectedEntry.project_url!}
                       title={selectedEntry.label}
@@ -502,8 +503,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                       }}
                     />
                   </div>
-                  <div className="sm:w-[280px] lg:w-[320px] flex flex-col justify-between p-4 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95 overflow-y-auto max-h-[40vh] sm:max-h-none">
-                    <div>
+                  {/* Info panel - matches preview height */}
+                  <div className="sm:w-[280px] lg:w-[320px] flex flex-col p-4 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95 overflow-y-auto shrink-0">
+                    <div className="flex-1">
                       <h3 className="text-lg font-display tracking-[0.15em] uppercase text-white mb-1">
                         {selectedEntry.label}
                       </h3>
@@ -527,7 +529,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                         </div>
                       )}
                     </div>
-                    <div className="mt-6 flex flex-col gap-3">
+                    <div className="flex flex-col gap-3 mt-auto pt-4">
                       <a
                         href={selectedEntry.project_url!}
                         target="_blank"
@@ -537,7 +539,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                         <ExternalLink size={14} />
                         Visit Project
                       </a>
-                      {/* Dynamic share buttons */}
                       {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />}
                     </div>
                   </div>
