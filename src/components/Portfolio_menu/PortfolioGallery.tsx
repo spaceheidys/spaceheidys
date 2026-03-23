@@ -576,7 +576,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                   />
                   {/* Bottom bar: share + heart + close */}
                   <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
-                    <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
+                    {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
                       onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
