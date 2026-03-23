@@ -146,7 +146,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
 
   // Helper: request confirmation for an action
   const askConfirm = (action: string) => setConfirm(action);
-  const cancelConfirm = () => { setConfirm(null); setPendingFile(null); };
+  const cancelConfirm = () => { setConfirm(null); setPendingFile(null); if (pendingPreviewUrl) { URL.revokeObjectURL(pendingPreviewUrl); setPendingPreviewUrl(null); } };
 
   const executeConfirm = async () => {
     if (!confirm) return;
