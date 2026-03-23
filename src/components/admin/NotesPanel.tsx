@@ -547,7 +547,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1 h-[45vh] min-h-[45vh]">
+            <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1">
               {folderNotes.length === 0 && (
                 <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
                   No notes yet
