@@ -410,53 +410,56 @@ const SortableImageCard = ({
           </DialogHeader>
 
           {/* Image / project preview */}
-          {(image_url || project_url) && (
-            <div className="relative w-full aspect-video max-h-[200px] rounded-md overflow-hidden border border-border bg-muted/20 mb-1 flex-shrink-0">
-              {pendingReplacePreview ? (
-                <img
-                  src={pendingReplacePreview}
-                  alt="New image"
-                  className="w-full h-full object-cover"
+          <div className="relative w-full aspect-video max-h-[200px] rounded-md overflow-hidden border border-border bg-muted/20 mb-1 flex-shrink-0">
+            {pendingReplacePreview ? (
+              <img
+                src={pendingReplacePreview}
+                alt="New image"
+                className="w-full h-full object-cover"
+              />
+            ) : image_url ? (
+              <img
+                src={image_url}
+                alt={title}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: `${image_offset_x}% ${image_offset_y}%` }}
+              />
+            ) : project_url ? (
+              <div className="w-full h-full overflow-hidden relative bg-black">
+                <iframe
+                  src={project_url}
+                  title={title}
+                  className="absolute origin-top-left pointer-events-none"
+                  style={{ width: "1200px", height: "800px", transform: "scale(0.2)", transformOrigin: "top left" }}
+                  sandbox="allow-scripts allow-same-origin"
+                  loading="lazy"
                 />
-              ) : image_url ? (
-                <img
-                  src={image_url}
-                  alt={title}
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: `${image_offset_x}% ${image_offset_y}%` }}
-                />
-              ) : project_url ? (
-                <div className="w-full h-full overflow-hidden relative bg-black">
-                  <iframe
-                    src={project_url}
-                    title={title}
-                    className="absolute origin-top-left pointer-events-none"
-                    style={{ width: "1200px", height: "800px", transform: "scale(0.2)", transformOrigin: "top left" }}
-                    sandbox="allow-scripts allow-same-origin"
-                    loading="lazy"
-                  />
-                </div>
-              ) : null}
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground/40 text-xs font-display tracking-widest uppercase">
+                No image
+              </div>
+            )}
 
-              {/* Replace image button */}
-              {image_url && onImageReplace && !pendingReplaceFile && (
-                <label className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-background/80 text-foreground text-[10px] font-display tracking-widest uppercase cursor-pointer hover:bg-background transition-colors">
-                  <Upload size={10} />
-                  Replace
-                  <input
-                    ref={replaceFileRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setPendingReplaceFile(file);
-                      setPendingReplacePreview(URL.createObjectURL(file));
-                    }}
-                  />
-                </label>
-              )}
+            {/* Replace / Add image button */}
+            {onImageReplace && !pendingReplaceFile && (
+              <label className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-background/80 text-foreground text-[10px] font-display tracking-widest uppercase cursor-pointer hover:bg-background transition-colors">
+                <Upload size={10} />
+                {image_url ? "Replace" : "Add Image"}
+                <input
+                  ref={replaceFileRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setPendingReplaceFile(file);
+                    setPendingReplacePreview(URL.createObjectURL(file));
+                  }}
+                />
+              </label>
+            )}
 
               {/* Yes/No confirmation for replacement */}
               {pendingReplaceFile && (
@@ -500,7 +503,6 @@ const SortableImageCard = ({
                 </div>
               )}
             </div>
-          )}
 
           <div className="grid gap-4 py-2">
             <div className="grid gap-2">
