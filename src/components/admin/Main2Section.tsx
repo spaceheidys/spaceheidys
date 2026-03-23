@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp } from "lucide-react";
+import taroBackside from "@/assets/Taro_backside.png";
 
 interface Main2SectionProps {
   get: (key: string) => string;
