@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image } from "lucide-react";
 
 interface Note {
   id: string;
@@ -51,7 +51,10 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       .select("*")
       .eq("user_id", userId)
       .order("sort_order", { ascending: true });
-    setNotes((data as Note[]) || []);
+    const fetched = (data as Note[]) || [];
+    setNotes(fetched);
+    // Auto-expand all notes that have images
+    setExpandedImages(new Set(fetched.filter(n => n.image_url).map(n => n.id)));
     setLoading(false);
   };
 
@@ -414,13 +417,25 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             </button>
           )}
           {note.image_url && (
-            <button
-              onClick={() => toggleImage(note.id)}
-              className="text-muted-foreground/60 hover:text-foreground transition-colors"
-              title={expandedImages.has(note.id) ? "Collapse" : "Expand"}
-            >
-              {expandedImages.has(note.id) ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-            </button>
+            <>
+              <button
+                onClick={() => toggleImage(note.id)}
+                className="relative text-muted-foreground/60 hover:text-foreground transition-colors"
+                title={expandedImages.has(note.id) ? "Collapse image" : "Preview image"}
+              >
+                <Image size={11} />
+                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-yellow-400 rounded-full" />
+              </button>
+              {!expandedImages.has(note.id) && (
+                <div
+                  className="w-5 h-5 rounded overflow-hidden border border-border cursor-pointer flex-shrink-0"
+                  onClick={() => toggleImage(note.id)}
+                  title="Click to expand"
+                >
+                  <img src={note.image_url} alt="" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </>
           )}
           {confirmDeleteId === note.id ? (
             <span className="flex items-center gap-1">
