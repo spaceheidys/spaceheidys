@@ -111,6 +111,8 @@ const Gallery = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const { toggle, isFavorite } = useFavorites();
   const touchStartX = useRef<number | null>(null);
+  const { visibility } = useSectionSettings();
+  const shareVisible = visibility.share;
 
   useEffect(() => {
     const fetch = async () => {
