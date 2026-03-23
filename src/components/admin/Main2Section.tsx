@@ -512,6 +512,43 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   );
 };
 
+function SortableSection({ id, label, collapsed, onToggle, children }: {
+  id: string;
+  label: string;
+  collapsed: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="mb-6">
+      <div className="flex items-center gap-1">
+        <button
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors"
+        >
+          <GripVertical size={10} />
+        </button>
+        <button
+          onClick={onToggle}
+          className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors"
+        >
+          {collapsed ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+          {label}
+        </button>
+      </div>
+      {!collapsed && <div className="mt-2">{children}</div>}
+    </div>
+  );
+}
+
 function CardImageUpload({
   label,
   imageUrl,
