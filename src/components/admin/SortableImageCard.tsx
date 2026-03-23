@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Eye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw, Edit2, Upload, Loader2 } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +25,7 @@ interface SortableImageCardProps {
   tags?: string[];
   project_date?: string;
   showProjectUrl?: boolean;
+  is_visible?: boolean;
   onDelete: () => void;
   onPositionChange: (x: number, y: number) => void;
   onZoomChange: (zoom: number) => void;
@@ -35,6 +36,7 @@ interface SortableImageCardProps {
   onTagsChange?: (tags: string[]) => void;
   onProjectDateChange?: (date: string) => void;
   onImageReplace?: (newUrl: string) => void;
+  onVisibilityChange?: (visible: boolean) => void;
 }
 
 const GROUP_COLORS = [
@@ -67,6 +69,7 @@ const SortableImageCard = ({
   tags,
   project_date,
   showProjectUrl,
+  is_visible = true,
   onDelete,
   onPositionChange,
   onZoomChange,
@@ -77,6 +80,7 @@ const SortableImageCard = ({
   onTagsChange,
   onProjectDateChange,
   onImageReplace,
+  onVisibilityChange,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
@@ -152,7 +156,7 @@ const SortableImageCard = ({
       }}
       className={`relative group aspect-[4/3] bg-secondary border overflow-hidden ${
         isDragging ? "border-foreground/50 shadow-lg" : groupColor ? "" : "border-border"
-      }`}
+      } ${!is_visible ? "opacity-40" : ""}`}
     >
       <div ref={containerRef} className="w-full h-full overflow-hidden">
         {image_url ? (
@@ -250,6 +254,15 @@ const SortableImageCard = ({
         title="Delete"
       >
         <Trash2 size={14} className="text-destructive/70" />
+      </div>
+
+      {/* Visibility Toggle Button */}
+      <div
+        onClick={(e) => { e.stopPropagation(); onVisibilityChange?.(!is_visible); }}
+        className="absolute top-[88px] right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
+        title={is_visible ? "Hide project" : "Show project"}
+      >
+        {is_visible ? <EyeOff size={14} className="text-foreground/70" /> : <Eye size={14} className="text-primary/70" />}
       </div>
 
       {/* Delete confirmation overlay */}

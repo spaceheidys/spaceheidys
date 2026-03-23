@@ -167,10 +167,11 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
           setDbItems([]);
           return;
         }
-        const { data } = await supabase
+        const { data } = await (supabase
           .from("portfolio_items")
           .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date, section")
-          .in("id", favIds)
+          .in("id", favIds) as any)
+          .eq("is_visible", true)
           .order("sort_order", { ascending: true });
         if (data && data.length > 0) {
           setDbItems(
@@ -191,10 +192,11 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
         return;
       }
 
-      let query = supabase
+      let query = (supabase
         .from("portfolio_items")
         .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date")
-        .eq("section", sectionKey)
+        .eq("section", sectionKey) as any)
+        .eq("is_visible", true)
         .order("sort_order", { ascending: true });
 
       if (sectionKey === "gallery" && gallerySub) {

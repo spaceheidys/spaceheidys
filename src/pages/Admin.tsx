@@ -549,6 +549,11 @@ const Admin = () => {
     }, 600);
   };
 
+  const handleVisibilityChange = async (id: string, visible: boolean) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, is_visible: visible } as any : i)));
+    await supabase.from("portfolio_items").update({ is_visible: visible } as any).eq("id", id);
+  };
+
   const handleHtmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1155,6 +1160,8 @@ const Admin = () => {
                           onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
                           onTagsChange={(tags) => handleTagsChange(item.id, tags)}
                           onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
+                          is_visible={(item as any).is_visible !== false}
+                          onVisibilityChange={(visible) => handleVisibilityChange(item.id, visible)}
                           onImageReplace={async (newUrl) => {
                             const { error } = await supabase.from("portfolio_items").update({ image_url: newUrl }).eq("id", item.id);
                             if (!error) {
