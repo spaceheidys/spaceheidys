@@ -9,6 +9,7 @@ interface Note {
   is_done: boolean;
   is_starred: boolean;
   is_divider: boolean;
+  is_deleted: boolean;
   sort_order: number;
   created_at: string;
   image_url: string | null;
