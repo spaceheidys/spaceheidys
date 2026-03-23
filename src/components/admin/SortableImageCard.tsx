@@ -488,19 +488,38 @@ const SortableImageCard = ({
             <DialogTitle className="text-sm font-display tracking-widest uppercase">{title}</DialogTitle>
             <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
           </DialogHeader>
-          <div className="w-full h-[75vh] relative">
+          <div className="w-full relative bg-black" style={{ height: '75vh' }}>
             {project_url ? (
-              <iframe
-                src={project_url}
-                title={title}
-                className="w-full h-full border-0"
-                sandbox="allow-scripts allow-same-origin allow-popups"
-              />
+              <div className="w-full h-full overflow-hidden relative">
+                <iframe
+                  src={project_url}
+                  title={title}
+                  className="border-0 origin-top-left"
+                  sandbox="allow-scripts allow-same-origin allow-popups"
+                  style={{
+                    width: '1440px',
+                    height: '900px',
+                    transform: 'scale(var(--preview-scale))',
+                  }}
+                  ref={(el) => {
+                    if (el) {
+                      const container = el.parentElement;
+                      if (container) {
+                        const scaleX = container.clientWidth / 1440;
+                        const scaleY = container.clientHeight / 900;
+                        const scale = Math.min(scaleX, scaleY);
+                        el.style.setProperty('--preview-scale', String(scale));
+                        el.style.transform = `scale(${scale})`;
+                      }
+                    }
+                  }}
+                />
+              </div>
             ) : image_url ? (
               <img
                 src={image_url}
                 alt={title}
-                className="w-full h-full object-contain bg-black"
+                className="w-full h-full object-contain"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
