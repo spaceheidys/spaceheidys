@@ -523,9 +523,15 @@ const AdminMain = () => {
                         <ChevronDown size={12} />
                       </button>
                     </div>
-                    <span className="text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase">{label}</span>
+                    <button
+                      onClick={() => toggleSectionCollapse(sectionKey)}
+                      className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors"
+                    >
+                      {collapsedSections.has(sectionKey) ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+                      {label}
+                    </button>
                   </div>
-                  {children}
+                  {!collapsedSections.has(sectionKey) && children}
                 </div>
               );
 
