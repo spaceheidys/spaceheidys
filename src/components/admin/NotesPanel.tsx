@@ -51,7 +51,10 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       .select("*")
       .eq("user_id", userId)
       .order("sort_order", { ascending: true });
-    setNotes((data as Note[]) || []);
+    const fetched = (data as Note[]) || [];
+    setNotes(fetched);
+    // Auto-expand all notes that have images
+    setExpandedImages(new Set(fetched.filter(n => n.image_url).map(n => n.id)));
     setLoading(false);
   };
 
