@@ -205,13 +205,20 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             </button>
           )}
         </div>
+        )}
       </div>
 
       {/* Background type toggle */}
-      <div className="space-y-3">
-        <label className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-          CARDS
-        </label>
+      <div>
+        <button
+          onClick={() => toggleCollapse("cards")}
+          className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors mb-2"
+        >
+          {collapsedSections.has("cards") ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+          Cards
+        </button>
+        {!collapsedSections.has("cards") && (
+        <div className="space-y-3">
         <div className="flex items-center gap-2">
           {confirm === "bg_polygon" ? (
             <span className="flex items-center gap-1 px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase border border-foreground text-foreground">
