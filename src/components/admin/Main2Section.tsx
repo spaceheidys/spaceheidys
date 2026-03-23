@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp } from "lucide-react";
+import taroBackside from "@/assets/Taro_backside.png";
 
 interface Main2SectionProps {
   get: (key: string) => string;
@@ -438,6 +439,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <CardImageUpload
             label="Card front"
             imageUrl={frontImage}
+            defaultImage={null}
             uploading={uploading === "card_front_image"}
             inputRef={frontRef}
             onUpload={(f) => handleFileSelect(f, "card_front_image", "upload_card_front_image")}
@@ -451,6 +453,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <CardImageUpload
             label="Card back"
             imageUrl={backImage}
+            defaultImage={taroBackside}
             uploading={uploading === "card_back_image"}
             inputRef={backRef}
             onUpload={(f) => handleFileSelect(f, "card_back_image", "upload_card_back_image")}
@@ -470,6 +473,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
 function CardImageUpload({
   label,
   imageUrl,
+  defaultImage,
   uploading,
   inputRef,
   onUpload,
@@ -482,6 +486,7 @@ function CardImageUpload({
 }: {
   label: string;
   imageUrl: string;
+  defaultImage?: string | null;
   uploading: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
   onUpload: (file: File) => void;
@@ -495,7 +500,7 @@ function CardImageUpload({
   const showUploadConfirm = confirmAction === `upload_${confirmKey}`;
   const showClearConfirm = confirmAction === `clear_${confirmKey}`;
 
-  const displayImage = showUploadConfirm && pendingPreview ? pendingPreview : imageUrl;
+  const displayImage = showUploadConfirm && pendingPreview ? pendingPreview : (imageUrl || defaultImage || "");
 
   return (
     <div className="space-y-2">
