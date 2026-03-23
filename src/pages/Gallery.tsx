@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
 import { toast } from "sonner";
+import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -50,7 +51,7 @@ const PlatformIcon = ({ label }: { label: string }) => {
 // ─── ShareBar ──────────────────────────────────────────────────────────────────
 const ShareBar = ({ shareUrl, title, compact = false }: { shareUrl: string; title: string; compact?: boolean }) => {
   const { links } = useSocialLinks();
-  const shareLinks = links.filter((l) => l.share_url_template);
+  const shareLinks = links;
   const copyLink = () => {
     navigator.clipboard.writeText(shareUrl);
     toast.success("Link copied to clipboard", { style: { background: "#111", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" } });
@@ -63,10 +64,16 @@ const ShareBar = ({ shareUrl, title, compact = false }: { shareUrl: string; titl
           <Tooltip key={link.id}>
             <TooltipTrigger asChild>
               <a
-                href={buildShareUrl(link.share_url_template, shareUrl, title)}
-                target="_blank"
+                href={link.share_url_template ? buildShareUrl(link.share_url_template, shareUrl, title) : "#"}
+                target={link.share_url_template ? "_blank" : undefined}
                 rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!link.share_url_template) {
+                    e.preventDefault();
+                    copyLink();
+                  }
+                }}
                 className={`${compact ? "w-6 h-6" : "w-7 h-7"} flex items-center justify-center border border-white/15 text-white/40 hover:text-white hover:border-white/40 transition-colors rounded-sm shrink-0`}
               >
                 {link.icon_url ? (
@@ -104,6 +111,8 @@ const Gallery = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const { toggle, isFavorite } = useFavorites();
   const touchStartX = useRef<number | null>(null);
+  const { visibility } = useSectionSettings();
+  const shareVisible = visibility.share;
 
   useEffect(() => {
     const fetch = async () => {
@@ -377,7 +386,7 @@ const Gallery = () => {
                   ))}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 py-2">
-                    <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
+                    {shareVisible && <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
                       onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
@@ -411,7 +420,7 @@ const Gallery = () => {
                   )}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
-                    <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />
+                    {shareVisible && <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
                       onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
