@@ -161,6 +161,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const { favorites, toggle, isFavorite } = useFavorites();
+  const { visibility } = useSectionSettings();
+  const shareVisible = visibility.share;
 
   useEffect(() => {
     onLightboxChange?.(!!selectedEntry);
