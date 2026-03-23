@@ -168,6 +168,12 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
 
   const handleFileSelect = (file: File, key: string, uploadKey: string) => {
     setPendingFile({ file, key });
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+    if (file.type.startsWith("image/")) {
+      setPendingPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setPendingPreviewUrl(null);
+    }
     askConfirm(uploadKey);
   };
 
