@@ -638,15 +638,17 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                   <button
                     onClick={() => setActiveFolder(i)}
                     onDoubleClick={() => { setRenamingFolder(i); setRenameText(label); }}
-                    className={`w-full flex items-center justify-center gap-1 text-[9px] font-display tracking-[0.15em] uppercase py-1.5 border transition-colors ${
+                    className={`w-full flex items-center justify-between px-2 text-[9px] font-display tracking-[0.15em] uppercase py-1.5 border transition-colors ${
                       activeFolder === i
                         ? "border-foreground/40 text-foreground bg-foreground/5"
                         : "border-border text-muted-foreground/50 hover:text-muted-foreground hover:border-foreground/20"
                     }`}
                     title="Double-click to rename"
                   >
-                    <FolderOpen size={9} />
-                    {label}
+                    <span className="flex items-center gap-1">
+                      <FolderOpen size={9} />
+                      {label}
+                    </span>
                     {folderPendingCounts[i] > 0 && (
                       <span className="text-[8px] text-yellow-400">{folderPendingCounts[i]}</span>
                     )}
