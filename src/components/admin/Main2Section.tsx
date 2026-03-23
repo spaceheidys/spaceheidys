@@ -39,6 +39,13 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<{ file: File; key: string } | null>(null);
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem("admin_main2_collapsed");
+      if (saved) return new Set(JSON.parse(saved));
+    } catch {}
+    return new Set();
+  });
   const frontRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
