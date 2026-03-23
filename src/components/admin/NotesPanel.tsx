@@ -242,7 +242,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setDragId(null);
   };
 
-  const doneCount = notes.filter((n) => n.is_done && !n.is_divider).length;
+  const doneCount = notes.filter((n) => n.is_done && !n.is_divider && !n.is_deleted).length;
 
   const resetScore = async () => {
     const doneIds = notes.filter((n) => n.is_done).map((n) => n.id);
