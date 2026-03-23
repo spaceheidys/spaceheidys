@@ -526,7 +526,7 @@ const SortableImageCard = ({
 
           {/* Image / project preview */}
           {(image_url || project_url) && (
-            <div className="relative w-full aspect-video rounded-md overflow-hidden border border-border bg-muted/20 mb-1">
+            <div className="relative w-full aspect-video max-h-[200px] rounded-md overflow-hidden border border-border bg-muted/20 mb-1 flex-shrink-0">
               {pendingReplacePreview ? (
                 <img
                   src={pendingReplacePreview}
