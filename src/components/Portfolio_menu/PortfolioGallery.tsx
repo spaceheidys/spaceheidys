@@ -458,7 +458,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[95vw] h-[70vh] sm:w-[85vw] sm:h-[70vh]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
+              className={`relative ${isProject ? "w-[95vw] sm:w-[85vw]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
               onTouchStart={handleLbTouchStart}
               onTouchMove={handleLbTouchMove}
               onTouchEnd={handleLbTouchEnd}
