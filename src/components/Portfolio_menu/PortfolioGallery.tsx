@@ -87,10 +87,16 @@ const ShareBar = ({
           <Tooltip key={link.id}>
             <TooltipTrigger asChild>
               <a
-                href={buildShareUrl(link.share_url_template, shareUrl, title)}
-                target="_blank"
+                href={link.share_url_template ? buildShareUrl(link.share_url_template, shareUrl, title) : "#"}
+                target={link.share_url_template ? "_blank" : undefined}
                 rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!link.share_url_template) {
+                    e.preventDefault();
+                    copyLink();
+                  }
+                }}
                 className={`${compact ? "w-6 h-6" : "w-7 h-7"} flex items-center justify-center border border-white/15 text-white/40 hover:text-white hover:border-white/40 transition-colors rounded-sm shrink-0`}
                 aria-label={`Share on ${link.label}`}
               >
