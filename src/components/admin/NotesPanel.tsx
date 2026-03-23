@@ -276,7 +276,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   });
 
   const folderPendingCounts = folderLabels.map((_, i) =>
-    notes.filter((n) => n.folder === i && !n.is_done && !n.is_divider).length
+    notes.filter((n) => n.folder === i && !n.is_done && !n.is_divider && !n.is_deleted).length
   );
 
   const renderDivider = (note: Note) => (
