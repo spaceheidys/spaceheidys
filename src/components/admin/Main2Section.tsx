@@ -39,6 +39,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<{ file: File; key: string } | null>(null);
+  const [pendingPreviewUrl, setPendingPreviewUrl] = useState<string | null>(null);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => {
     try {
       const saved = localStorage.getItem("admin_main2_collapsed");
@@ -145,7 +146,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
 
   // Helper: request confirmation for an action
   const askConfirm = (action: string) => setConfirm(action);
-  const cancelConfirm = () => { setConfirm(null); setPendingFile(null); };
+  const cancelConfirm = () => { setConfirm(null); setPendingFile(null); if (pendingPreviewUrl) { URL.revokeObjectURL(pendingPreviewUrl); setPendingPreviewUrl(null); } };
 
   const executeConfirm = async () => {
     if (!confirm) return;
@@ -163,10 +164,17 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
     setConfirm(null);
     setPendingFile(null);
+    if (pendingPreviewUrl) { URL.revokeObjectURL(pendingPreviewUrl); setPendingPreviewUrl(null); }
   };
 
   const handleFileSelect = (file: File, key: string, uploadKey: string) => {
     setPendingFile({ file, key });
+    if (pendingPreviewUrl) URL.revokeObjectURL(pendingPreviewUrl);
+    if (file.type.startsWith("image/")) {
+      setPendingPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setPendingPreviewUrl(null);
+    }
     askConfirm(uploadKey);
   };
 
@@ -438,6 +446,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             confirmKey="card_front_image"
             onConfirmYes={executeConfirm}
             onConfirmNo={cancelConfirm}
+            pendingPreview={pendingFile?.key === "card_front_image" ? pendingPreviewUrl : null}
           />
           <CardImageUpload
             label="Card back"
@@ -450,6 +459,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             confirmKey="card_back_image"
             onConfirmYes={executeConfirm}
             onConfirmNo={cancelConfirm}
+            pendingPreview={pendingFile?.key === "card_back_image" ? pendingPreviewUrl : null}
           />
         </div>
       )}
@@ -468,6 +478,7 @@ function CardImageUpload({
   confirmKey,
   onConfirmYes,
   onConfirmNo,
+  pendingPreview,
 }: {
   label: string;
   imageUrl: string;
@@ -479,9 +490,12 @@ function CardImageUpload({
   confirmKey: string;
   onConfirmYes: () => void;
   onConfirmNo: () => void;
+  pendingPreview?: string | null;
 }) {
   const showUploadConfirm = confirmAction === `upload_${confirmKey}`;
   const showClearConfirm = confirmAction === `clear_${confirmKey}`;
+
+  const displayImage = showUploadConfirm && pendingPreview ? pendingPreview : imageUrl;
 
   return (
     <div className="space-y-2">
@@ -489,8 +503,8 @@ function CardImageUpload({
         {label}
       </label>
       <div className="relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10">
-        {imageUrl ? (
-          <img src={imageUrl} alt={label} className="w-full h-full object-cover" />
+        {displayImage ? (
+          <img src={displayImage} alt={label} className={`w-full h-full object-cover ${showUploadConfirm && pendingPreview ? "ring-2 ring-primary/50" : ""}`} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground/30 text-xs font-display tracking-widest uppercase">
             Default
@@ -516,7 +530,7 @@ function CardImageUpload({
               />
             </label>
           )}
-          {imageUrl && (
+          {imageUrl && !showUploadConfirm && (
             showClearConfirm ? (
               <ConfirmButtons onYes={onConfirmYes} onNo={onConfirmNo} />
             ) : (
@@ -529,6 +543,11 @@ function CardImageUpload({
             )
           )}
         </div>
+        {showUploadConfirm && pendingPreview && (
+          <div className="absolute bottom-1 left-1 right-1 text-center">
+            <span className="text-[8px] font-display tracking-wider text-foreground bg-background/80 px-1.5 py-0.5 rounded">NEW IMAGE</span>
+          </div>
+        )}
       </div>
     </div>
   );
