@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
 import { toast } from "sonner";
+import { useSectionSettings } from "@/hooks/useSectionSettings";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -160,6 +161,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const { favorites, toggle, isFavorite } = useFavorites();
+  const { visibility } = useSectionSettings();
+  const shareVisible = visibility.share;
 
   useEffect(() => {
     onLightboxChange?.(!!selectedEntry);
@@ -523,7 +526,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                         Visit Project
                       </a>
                       {/* Dynamic share buttons */}
-                      <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />
+                      {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />}
                     </div>
                   </div>
                 </div>
@@ -542,7 +545,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                   ))}
                   {/* Bottom bar: share + heart + close */}
                   <div className="flex items-center justify-center gap-3 py-2">
-                    <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
+                    {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
                       onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
@@ -573,7 +576,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                   />
                   {/* Bottom bar: share + heart + close */}
                   <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
-                    <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />
+                    {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
                       onClick={(e) => { e.stopPropagation(); toggle(selectedEntry.id); }}
