@@ -439,6 +439,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <CardImageUpload
             label="Card front"
             imageUrl={frontImage}
+            defaultImage={null}
             uploading={uploading === "card_front_image"}
             inputRef={frontRef}
             onUpload={(f) => handleFileSelect(f, "card_front_image", "upload_card_front_image")}
@@ -452,6 +453,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <CardImageUpload
             label="Card back"
             imageUrl={backImage}
+            defaultImage={taroBackside}
             uploading={uploading === "card_back_image"}
             inputRef={backRef}
             onUpload={(f) => handleFileSelect(f, "card_back_image", "upload_card_back_image")}
