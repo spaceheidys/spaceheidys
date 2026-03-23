@@ -61,6 +61,17 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     fetchNotes();
   }, [userId]);
 
+  // Lock height based on folder 0 content
+  useEffect(() => {
+    if (!loading && lockedHeight === null && activeFolder === 0 && listRef.current) {
+      requestAnimationFrame(() => {
+        if (listRef.current) {
+          setLockedHeight(listRef.current.scrollHeight);
+        }
+      });
+    }
+  }, [loading, lockedHeight, activeFolder]);
+
   const notifyUpdate = () => onUpdate?.();
 
   const folderNotes = notes.filter((n) => n.folder === activeFolder);
