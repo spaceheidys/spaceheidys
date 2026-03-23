@@ -150,7 +150,7 @@ const SortableImageCard = ({
         ...style,
         ...(groupColor ? { borderColor: groupColor, borderWidth: "2px" } : {}),
       }}
-      className={`relative group aspect-square bg-secondary border overflow-hidden ${
+      className={`relative group aspect-[4/3] bg-secondary border overflow-hidden ${
         isDragging ? "border-foreground/50 shadow-lg" : groupColor ? "" : "border-border"
       }`}
     >
