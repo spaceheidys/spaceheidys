@@ -67,7 +67,7 @@ const AdminMain = () => {
     return [...MAIN_SECTION_KEYS];
   });
 
-  const [collapsedSections, setCollapsedSections] = useState<Set<MainSectionKey>>(() => {
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => {
     try {
       const saved = localStorage.getItem("admin_main_collapsed_sections");
       if (saved) return new Set(JSON.parse(saved));
@@ -75,7 +75,7 @@ const AdminMain = () => {
     return new Set();
   });
 
-  const toggleSectionCollapse = (key: MainSectionKey) => {
+  const toggleSectionCollapse = (key: string) => {
     setCollapsedSections((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
