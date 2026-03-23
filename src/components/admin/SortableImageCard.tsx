@@ -156,7 +156,7 @@ const SortableImageCard = ({
       }}
       className={`relative group aspect-[4/3] bg-secondary border overflow-hidden ${
         isDragging ? "border-foreground/50 shadow-lg" : groupColor ? "" : "border-border"
-      }`}
+      } ${!is_visible ? "opacity-40" : ""}`}
     >
       <div ref={containerRef} className="w-full h-full overflow-hidden">
         {image_url ? (
