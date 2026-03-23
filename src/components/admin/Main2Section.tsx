@@ -164,6 +164,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
     setConfirm(null);
     setPendingFile(null);
+    if (pendingPreviewUrl) { URL.revokeObjectURL(pendingPreviewUrl); setPendingPreviewUrl(null); }
   };
 
   const handleFileSelect = (file: File, key: string, uploadKey: string) => {
