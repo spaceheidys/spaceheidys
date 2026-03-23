@@ -623,6 +623,56 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           </div>
         </>
       )}
+
+      {/* Image overlay */}
+      {overlayImage && (
+        <div
+          className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center"
+          onClick={() => { setOverlayImage(null); setConfirmImageAction(null); }}
+        >
+          <div
+            className="relative max-w-[80vw] max-h-[80vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={overlayImage.url}
+              alt=""
+              className="max-w-full max-h-[80vh] object-contain rounded"
+            />
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2">
+              {confirmImageAction === overlayImage.noteId ? (
+                <>
+                  <button
+                    onClick={() => { removeImage(overlayImage.noteId); setOverlayImage(null); }}
+                    className="text-[10px] font-display tracking-wider text-destructive bg-background/90 px-3 py-1.5 rounded transition-colors hover:bg-background"
+                  >
+                    DELETE
+                  </button>
+                  <button
+                    onClick={() => { replaceImage(overlayImage.noteId); setOverlayImage(null); }}
+                    className="text-[10px] font-display tracking-wider text-foreground bg-background/90 px-3 py-1.5 rounded transition-colors hover:bg-background"
+                  >
+                    REPLACE
+                  </button>
+                  <button
+                    onClick={() => setConfirmImageAction(null)}
+                    className="text-[10px] font-display tracking-wider text-muted-foreground bg-background/90 px-3 py-1.5 rounded transition-colors hover:bg-background"
+                  >
+                    CANCEL
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setConfirmImageAction(overlayImage.noteId)}
+                  className="text-[10px] font-display tracking-wider text-foreground/90 bg-background/80 px-3 py-1.5 rounded transition-colors hover:bg-background"
+                >
+                  EDIT IMAGE
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
