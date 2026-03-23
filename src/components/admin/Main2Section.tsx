@@ -51,6 +51,16 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const videoRef = useRef<HTMLInputElement>(null);
   const wallpaperRef = useRef<HTMLInputElement>(null);
 
+  const toggleCollapse = (key: string) => {
+    setCollapsedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      localStorage.setItem("admin_main2_collapsed", JSON.stringify([...next]));
+      return next;
+    });
+  };
+
   useEffect(() => {
     setWisdomText(get("cards_wisdom"));
     setFrontImage(get("card_front_image"));
