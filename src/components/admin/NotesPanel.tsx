@@ -44,6 +44,8 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const editInputRef = useRef<HTMLInputElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
   const pendingNoteId = useRef<string | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [lockedHeight, setLockedHeight] = useState<number | null>(null);
 
   const fetchNotes = async () => {
     const { data } = await supabase
@@ -58,6 +60,17 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   useEffect(() => {
     fetchNotes();
   }, [userId]);
+
+  // Lock height based on folder 0 content
+  useEffect(() => {
+    if (!loading && lockedHeight === null && activeFolder === 0 && listRef.current) {
+      requestAnimationFrame(() => {
+        if (listRef.current) {
+          setLockedHeight(listRef.current.scrollHeight);
+        }
+      });
+    }
+  }, [loading, lockedHeight, activeFolder]);
 
   const notifyUpdate = () => onUpdate?.();
 
@@ -547,7 +560,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1 h-[45vh] min-h-[45vh]">
+            <div ref={listRef} className="flex-1 overflow-y-auto space-y-0.5 mb-3 pr-1" style={lockedHeight ? { height: lockedHeight, minHeight: lockedHeight } : undefined}>
               {folderNotes.length === 0 && (
                 <p className="text-muted-foreground text-[10px] text-center py-4 font-display tracking-wider">
                   No notes yet
