@@ -482,12 +482,24 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               {/* ── PROJECT view ── */}
               {isProject ? (
                 <div className="w-full h-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
-                  <div className="flex-1 min-h-[35vh] sm:min-h-0 relative">
+                  <div className="flex-1 min-h-[35vh] sm:min-h-0 relative overflow-hidden">
                     <iframe
                       src={selectedEntry.project_url!}
                       title={selectedEntry.label}
-                      className="absolute inset-0 w-full h-full"
+                      className="absolute origin-top-left border-0"
+                      style={{ width: '1440px', height: '900px' }}
                       sandbox="allow-scripts allow-same-origin allow-popups"
+                      ref={(el) => {
+                        if (el) {
+                          const container = el.parentElement;
+                          if (container) {
+                            const scaleX = container.clientWidth / 1440;
+                            const scaleY = container.clientHeight / 900;
+                            const scale = Math.min(scaleX, scaleY);
+                            el.style.transform = `scale(${scale})`;
+                          }
+                        }
+                      }}
                     />
                   </div>
                   <div className="sm:w-[280px] lg:w-[320px] flex flex-col justify-between p-4 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95 overflow-y-auto max-h-[40vh] sm:max-h-none">
