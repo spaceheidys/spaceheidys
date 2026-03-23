@@ -287,16 +287,14 @@ const SortableImageCard = ({
       )}
 
       {/* Preview overlay (center) */}
-      {showProjectUrl && (
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-          <button
-            onClick={(e) => { e.stopPropagation(); setIsPreviewOpen(true); }}
-            className="pointer-events-auto text-foreground/80 hover:text-foreground transition-colors"
-          >
-            <Eye size={20} />
-          </button>
-        </div>
-      )}
+      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+        <button
+          onClick={(e) => { e.stopPropagation(); setIsPreviewOpen(true); }}
+          className="pointer-events-auto text-foreground/80 hover:text-foreground transition-colors"
+        >
+          <Eye size={20} />
+        </button>
+      </div>
 
       {/* Title area below image */}
       <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-1.5 py-1 flex items-center gap-1">
