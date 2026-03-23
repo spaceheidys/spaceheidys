@@ -495,7 +495,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   };
 
   return (
-    <div className="w-80 max-h-[70vh] flex flex-col">
+    <div className="w-80 h-[45vh] min-h-[45vh] flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <button
