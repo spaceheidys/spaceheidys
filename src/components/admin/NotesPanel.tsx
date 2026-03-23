@@ -637,7 +637,8 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             <img
               src={overlayImage.url}
               alt=""
-              className="max-w-full max-h-[80vh] object-contain rounded"
+              className="max-w-full max-h-[80vh] object-contain rounded cursor-pointer"
+              onClick={() => { setOverlayImage(null); setConfirmImageAction(null); }}
             />
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2">
               {confirmImageAction === overlayImage.noteId ? (
