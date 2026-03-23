@@ -485,6 +485,7 @@ function CardImageUpload({
 }: {
   label: string;
   imageUrl: string;
+  defaultImage?: string | null;
   uploading: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
   onUpload: (file: File) => void;
