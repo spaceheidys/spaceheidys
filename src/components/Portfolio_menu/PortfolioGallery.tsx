@@ -195,9 +195,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
       let query = (supabase
         .from("portfolio_items")
         .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date")
-        .eq("section", sectionKey) as any)
-        .eq("is_visible", true)
-        .order("sort_order", { ascending: true });
+        .eq("section", sectionKey)
+        .eq("is_visible", true as any)
+        .order("sort_order", { ascending: true }) as any);
 
       if (sectionKey === "gallery" && gallerySub) {
         query = query.eq("subsection", gallerySub);
