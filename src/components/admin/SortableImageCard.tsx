@@ -478,6 +478,41 @@ const SortableImageCard = ({
         </div>
       )}
 
+      {/* Preview Modal */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] p-0 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader className="px-4 pt-4 pb-2">
+            <DialogTitle className="text-sm font-display tracking-widest uppercase">{title}</DialogTitle>
+            <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
+          </DialogHeader>
+          <div className="w-full h-[75vh] relative">
+            {project_url ? (
+              <iframe
+                src={project_url}
+                title={title}
+                className="w-full h-full border-0"
+                sandbox="allow-scripts allow-same-origin allow-popups"
+              />
+            ) : image_url ? (
+              <img
+                src={image_url}
+                alt={title}
+                className="w-full h-full object-contain bg-black"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                No preview available
+              </div>
+            )}
+          </div>
+          {description && (
+            <div className="px-4 pb-4 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">{description}</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
