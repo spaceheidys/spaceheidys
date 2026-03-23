@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Eye } from "lucide-react";
 import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw, Edit2, Upload, Loader2 } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,6 +91,7 @@ const SortableImageCard = ({
   const [editDesc, setEditDesc] = useState(description || "");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [replacingImage, setReplacingImage] = useState(false);
   const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
   const [pendingReplacePreview, setPendingReplacePreview] = useState<string | null>(null);
@@ -240,6 +242,17 @@ const SortableImageCard = ({
       >
         <Edit2 size={14} className="text-foreground/70" />
       </div>
+
+      {/* Preview Button */}
+      {showProjectUrl && (
+        <div
+          onClick={(e) => { e.stopPropagation(); setIsPreviewOpen(true); }}
+          className="absolute top-[60px] right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
+          title="Preview"
+        >
+          <Eye size={14} className="text-foreground/70" />
+        </div>
+      )}
 
       {/* Delete overlay */}
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
@@ -464,6 +477,41 @@ const SortableImageCard = ({
           </div>
         </div>
       )}
+
+      {/* Preview Modal */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] p-0 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader className="px-4 pt-4 pb-2">
+            <DialogTitle className="text-sm font-display tracking-widest uppercase">{title}</DialogTitle>
+            <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
+          </DialogHeader>
+          <div className="w-full h-[75vh] relative">
+            {project_url ? (
+              <iframe
+                src={project_url}
+                title={title}
+                className="w-full h-full border-0"
+                sandbox="allow-scripts allow-same-origin allow-popups"
+              />
+            ) : image_url ? (
+              <img
+                src={image_url}
+                alt={title}
+                className="w-full h-full object-contain bg-black"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                No preview available
+              </div>
+            )}
+          </div>
+          {description && (
+            <div className="px-4 pb-4 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">{description}</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
