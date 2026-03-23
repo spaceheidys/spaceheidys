@@ -549,6 +549,11 @@ const Admin = () => {
     }, 600);
   };
 
+  const handleVisibilityChange = async (id: string, visible: boolean) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, is_visible: visible } as any : i)));
+    await supabase.from("portfolio_items").update({ is_visible: visible } as any).eq("id", id);
+  };
+
   const handleHtmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
