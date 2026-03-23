@@ -445,6 +445,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             confirmKey="card_front_image"
             onConfirmYes={executeConfirm}
             onConfirmNo={cancelConfirm}
+            pendingPreview={pendingFile?.key === "card_front_image" ? pendingPreviewUrl : null}
           />
           <CardImageUpload
             label="Card back"
@@ -457,6 +458,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             confirmKey="card_back_image"
             onConfirmYes={executeConfirm}
             onConfirmNo={cancelConfirm}
+            pendingPreview={pendingFile?.key === "card_back_image" ? pendingPreviewUrl : null}
           />
         </div>
       )}
