@@ -526,7 +526,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                         Visit Project
                       </a>
                       {/* Dynamic share buttons */}
-                      <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />
+                      {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />}
                     </div>
                   </div>
                 </div>
