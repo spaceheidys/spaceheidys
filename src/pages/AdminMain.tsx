@@ -59,7 +59,6 @@ const AdminMain = () => {
       const saved = localStorage.getItem("admin_main_section_order");
       if (saved) {
         const parsed = JSON.parse(saved) as MainSectionKey[];
-        // Ensure all keys are present
         const valid = parsed.filter((k) => MAIN_SECTION_KEYS.includes(k));
         const missing = MAIN_SECTION_KEYS.filter((k) => !valid.includes(k));
         return [...valid, ...missing];
@@ -67,6 +66,24 @@ const AdminMain = () => {
     } catch {}
     return [...MAIN_SECTION_KEYS];
   });
+
+  const [collapsedSections, setCollapsedSections] = useState<Set<MainSectionKey>>(() => {
+    try {
+      const saved = localStorage.getItem("admin_main_collapsed_sections");
+      if (saved) return new Set(JSON.parse(saved));
+    } catch {}
+    return new Set();
+  });
+
+  const toggleSectionCollapse = (key: MainSectionKey) => {
+    setCollapsedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      localStorage.setItem("admin_main_collapsed_sections", JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   const moveMainSection = (key: MainSectionKey, dir: -1 | 1) => {
     setMainSectionOrder((prev) => {
