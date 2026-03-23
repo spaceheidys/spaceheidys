@@ -256,6 +256,15 @@ const SortableImageCard = ({
         <Trash2 size={14} className="text-destructive/70" />
       </div>
 
+      {/* Visibility Toggle Button */}
+      <div
+        onClick={(e) => { e.stopPropagation(); onVisibilityChange?.(!is_visible); }}
+        className="absolute top-[88px] right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
+        title={is_visible ? "Hide project" : "Show project"}
+      >
+        {is_visible ? <EyeOff size={14} className="text-foreground/70" /> : <Eye size={14} className="text-primary/70" />}
+      </div>
+
       {/* Delete confirmation overlay */}
       {confirmDelete && (
         <div className="absolute inset-0 z-20 bg-black/60 flex items-center justify-center">
