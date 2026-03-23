@@ -56,6 +56,36 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const videoRef = useRef<HTMLInputElement>(null);
   const wallpaperRef = useRef<HTMLInputElement>(null);
 
+  const [sectionOrder, setSectionOrder] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("admin_main2_order");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Ensure all keys present
+        const defaults = ["text", "cards", "card_images"];
+        const valid = parsed.filter((k: string) => defaults.includes(k));
+        defaults.forEach(k => { if (!valid.includes(k)) valid.push(k); });
+        return valid;
+      }
+    } catch {}
+    return ["text", "cards", "card_images"];
+  });
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setSectionOrder((prev) => {
+        const oldIndex = prev.indexOf(active.id as string);
+        const newIndex = prev.indexOf(over.id as string);
+        const next = arrayMove(prev, oldIndex, newIndex);
+        localStorage.setItem("admin_main2_order", JSON.stringify(next));
+        return next;
+      });
+    }
+  };
+
   const toggleCollapse = (key: string) => {
     setCollapsedSections((prev) => {
       const next = new Set(prev);
