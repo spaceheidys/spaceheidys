@@ -26,6 +26,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [expandedImages, setExpandedImages] = useState<Set<string>>(new Set());
+  const [overlayImage, setOverlayImage] = useState<{ url: string; noteId: string } | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirmResetScore, setConfirmResetScore] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -418,9 +419,9 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           )}
           {note.image_url && (
             <button
-              onClick={() => toggleImage(note.id)}
+              onClick={() => setOverlayImage({ url: note.image_url!, noteId: note.id })}
               className="relative text-muted-foreground/60 hover:text-foreground transition-colors"
-              title={expandedImages.has(note.id) ? "Hide image" : "Show image"}
+              title="Preview image"
             >
               <Image size={11} />
               <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-yellow-400 rounded-full" />
@@ -453,47 +454,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         </div>
       </div>
 
-      {note.image_url && expandedImages.has(note.id) && (
-        <div className="ml-7 mr-2 mb-1.5 mt-0.5 border border-border rounded overflow-hidden relative group/img">
-          <img
-            src={note.image_url}
-            alt=""
-            className="w-full max-h-40 object-contain bg-black/20 cursor-pointer"
-            onClick={() => window.open(note.image_url!, "_blank")}
-          />
-          {confirmImageAction === note.id ? (
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-3">
-              <button
-                onClick={() => removeImage(note.id)}
-                className="text-[9px] font-display tracking-wider text-destructive hover:text-destructive/80 transition-colors bg-background/80 px-2 py-1 rounded"
-              >
-                DELETE
-              </button>
-              <button
-                onClick={() => replaceImage(note.id)}
-                className="text-[9px] font-display tracking-wider text-foreground hover:text-foreground/80 transition-colors bg-background/80 px-2 py-1 rounded"
-              >
-                REPLACE
-              </button>
-              <button
-                onClick={() => setConfirmImageAction(null)}
-                className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors bg-background/80 px-2 py-1 rounded"
-              >
-                CANCEL
-              </button>
-            </div>
-          ) : (
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
-              <button
-                onClick={(e) => { e.stopPropagation(); setConfirmImageAction(note.id); }}
-                className="text-[9px] font-display tracking-wider text-white/90 hover:text-white bg-black/50 px-2 py-1 rounded transition-colors"
-              >
-                EDIT IMAGE
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
   };
@@ -662,6 +622,56 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             ))}
           </div>
         </>
+      )}
+
+      {/* Image overlay */}
+      {overlayImage && (
+        <div
+          className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center"
+          onClick={() => { setOverlayImage(null); setConfirmImageAction(null); }}
+        >
+          <div
+            className="relative max-w-[80vw] max-h-[80vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={overlayImage.url}
+              alt=""
+              className="max-w-full max-h-[80vh] object-contain rounded"
+            />
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2">
+              {confirmImageAction === overlayImage.noteId ? (
+                <>
+                  <button
+                    onClick={() => { removeImage(overlayImage.noteId); setOverlayImage(null); }}
+                    className="text-[10px] font-display tracking-wider text-destructive bg-background/90 px-3 py-1.5 rounded transition-colors hover:bg-background"
+                  >
+                    DELETE
+                  </button>
+                  <button
+                    onClick={() => { replaceImage(overlayImage.noteId); setOverlayImage(null); }}
+                    className="text-[10px] font-display tracking-wider text-foreground bg-background/90 px-3 py-1.5 rounded transition-colors hover:bg-background"
+                  >
+                    REPLACE
+                  </button>
+                  <button
+                    onClick={() => setConfirmImageAction(null)}
+                    className="text-[10px] font-display tracking-wider text-muted-foreground bg-background/90 px-3 py-1.5 rounded transition-colors hover:bg-background"
+                  >
+                    CANCEL
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setConfirmImageAction(overlayImage.noteId)}
+                  className="text-[10px] font-display tracking-wider text-foreground/90 bg-background/80 px-3 py-1.5 rounded transition-colors hover:bg-background"
+                >
+                  EDIT IMAGE
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
