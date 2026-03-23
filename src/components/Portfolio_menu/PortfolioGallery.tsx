@@ -481,9 +481,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
               {/* ── PROJECT view ── */}
               {isProject ? (
-                <div className="w-full h-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
-                  {/* Preview iframe - fills available space */}
-                  <div className="flex-1 relative overflow-hidden min-h-0">
+                <div className="w-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
+                  {/* Preview iframe - sized by aspect ratio */}
+                  <div className="flex-1 relative overflow-hidden" style={{ aspectRatio: '1440 / 900' }}>
                     <iframe
                       src={selectedEntry.project_url!}
                       title={selectedEntry.label}
