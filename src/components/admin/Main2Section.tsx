@@ -473,6 +473,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
 function CardImageUpload({
   label,
   imageUrl,
+  defaultImage,
   uploading,
   inputRef,
   onUpload,
@@ -499,7 +500,7 @@ function CardImageUpload({
   const showUploadConfirm = confirmAction === `upload_${confirmKey}`;
   const showClearConfirm = confirmAction === `clear_${confirmKey}`;
 
-  const displayImage = showUploadConfirm && pendingPreview ? pendingPreview : imageUrl;
+  const displayImage = showUploadConfirm && pendingPreview ? pendingPreview : (imageUrl || defaultImage || "");
 
   return (
     <div className="space-y-2">
