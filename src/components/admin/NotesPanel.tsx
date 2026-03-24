@@ -461,6 +461,29 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-yellow-400 rounded-full" />
             </button>
           )}
+          {movingNoteId === note.id ? (
+            <span className="flex items-center gap-0.5">
+              {folderLabels.map((fl, fi) => fi !== activeFolder && (
+                <button
+                  key={fi}
+                  onClick={() => moveToFolder(note.id, fi)}
+                  className="px-1 py-0.5 text-[8px] font-display tracking-wider border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                  title={`Move to ${fl}`}
+                >
+                  {fl}
+                </button>
+              ))}
+              <button onClick={() => setMovingNoteId(null)} className="text-muted-foreground hover:text-foreground"><X size={9} /></button>
+            </span>
+          ) : (
+            <button
+              onClick={() => setMovingNoteId(note.id)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all"
+              title="Move to folder"
+            >
+              <ArrowRightLeft size={10} />
+            </button>
+          )
           {confirmDeleteId === note.id ? (
             <span className="flex items-center gap-1">
               <button
