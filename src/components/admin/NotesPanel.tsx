@@ -484,8 +484,52 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   );
   };
 
+  const STORAGE_HEIGHT_KEY = "notes-panel-height";
+  const [panelHeight, setPanelHeight] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_HEIGHT_KEY);
+      return saved ? parseInt(saved) : 45;
+    } catch { return 45; }
+  });
+  const resizing = useRef(false);
+  const startY = useRef(0);
+  const startHeight = useRef(45);
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    resizing.current = true;
+    startY.current = e.clientY;
+    startHeight.current = panelHeight;
+
+    const onMove = (ev: MouseEvent) => {
+      if (!resizing.current) return;
+      const deltaVh = ((startY.current - ev.clientY) / window.innerHeight) * 100;
+      const newH = Math.max(20, Math.min(85, startHeight.current + deltaVh));
+      setPanelHeight(newH);
+    };
+    const onUp = () => {
+      resizing.current = false;
+      setPanelHeight((h) => {
+        localStorage.setItem(STORAGE_HEIGHT_KEY, String(Math.round(h)));
+        return h;
+      });
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  };
+
   return (
-    <div className="w-80 h-[45vh] min-h-[45vh] flex flex-col">
+    <div className="w-80 flex flex-col" style={{ height: `${panelHeight}vh`, minHeight: `${panelHeight}vh` }}>
+      {/* Resize handle */}
+      <div
+        onMouseDown={handleResizeStart}
+        className="h-2 -mt-1 cursor-ns-resize flex items-center justify-center group"
+        title="Drag to resize"
+      >
+        <div className="w-8 h-0.5 bg-border group-hover:bg-muted-foreground transition-colors rounded-full" />
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <button
