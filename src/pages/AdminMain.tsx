@@ -3,7 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X, ChevronUp, ChevronDown } from "lucide-react";
+import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import NotesButton from "@/components/admin/NotesButton";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
