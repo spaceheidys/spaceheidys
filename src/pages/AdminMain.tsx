@@ -100,13 +100,15 @@ const AdminMain = () => {
     });
   };
 
-  const moveMainSection = (key: MainSectionKey, dir: -1 | 1) => {
+  const mainSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  const handleMainSectionDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
     setMainSectionOrder((prev) => {
-      const idx = prev.indexOf(key);
-      const newIdx = idx + dir;
-      if (newIdx < 0 || newIdx >= prev.length) return prev;
-      const next = [...prev];
-      [next[idx], next[newIdx]] = [next[newIdx], next[idx]];
+      const oldIdx = prev.indexOf(active.id as MainSectionKey);
+      const newIdx = prev.indexOf(over.id as MainSectionKey);
+      const next = arrayMove(prev, oldIdx, newIdx);
       localStorage.setItem("admin_main_section_order", JSON.stringify(next));
       return next;
     });
