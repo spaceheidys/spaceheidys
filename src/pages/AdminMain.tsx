@@ -68,7 +68,7 @@ const SortableMainSection = ({ id, label, collapsed, onToggleCollapse, children 
   );
 };
 
-
+const AdminMain = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>("main");
