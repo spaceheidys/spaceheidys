@@ -483,7 +483,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             >
               <ArrowRightLeft size={10} />
             </button>
-          )
+          )}
           {confirmDeleteId === note.id ? (
             <span className="flex items-center gap-1">
               <button
