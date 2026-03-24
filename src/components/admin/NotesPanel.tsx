@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image, RotateCcw } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image, RotateCcw, ArrowRightLeft, X } from "lucide-react";
 
 interface Note {
   id: string;
@@ -38,6 +38,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [showTrash, setShowTrash] = useState(false);
   const [selectedTrashIds, setSelectedTrashIds] = useState<Set<string>>(new Set());
   const [confirmEmptyTrash, setConfirmEmptyTrash] = useState(false);
+  const [movingNoteId, setMovingNoteId] = useState<string | null>(null);
   const [folderLabels, setFolderLabels] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(FOLDER_STORAGE_KEY);
@@ -267,6 +268,13 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     }
   };
 
+  const moveToFolder = async (noteId: string, targetFolder: number) => {
+    setNotes((prev) => prev.map((n) => n.id === noteId ? { ...n, folder: targetFolder } : n));
+    setMovingNoteId(null);
+    await supabase.from("admin_notes").update({ folder: targetFolder } as any).eq("id", noteId);
+    notifyUpdate();
+  };
+
   const sortedNotes = [...folderNotes].sort((a, b) => {
     if (!a.is_divider && !b.is_divider) {
       if (a.is_starred && !b.is_starred) return -1;
@@ -451,6 +459,29 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
             >
               <Image size={11} />
               <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-yellow-400 rounded-full" />
+            </button>
+          )}
+          {movingNoteId === note.id ? (
+            <span className="flex items-center gap-0.5">
+              {folderLabels.map((fl, fi) => fi !== activeFolder && (
+                <button
+                  key={fi}
+                  onClick={() => moveToFolder(note.id, fi)}
+                  className="px-1 py-0.5 text-[8px] font-display tracking-wider border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                  title={`Move to ${fl}`}
+                >
+                  {fl}
+                </button>
+              ))}
+              <button onClick={() => setMovingNoteId(null)} className="text-muted-foreground hover:text-foreground"><X size={9} /></button>
+            </span>
+          ) : (
+            <button
+              onClick={() => setMovingNoteId(note.id)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all"
+              title="Move to folder"
+            >
+              <ArrowRightLeft size={10} />
             </button>
           )}
           {confirmDeleteId === note.id ? (
