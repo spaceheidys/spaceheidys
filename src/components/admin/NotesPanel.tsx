@@ -268,6 +268,13 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     }
   };
 
+  const moveToFolder = async (noteId: string, targetFolder: number) => {
+    setNotes((prev) => prev.map((n) => n.id === noteId ? { ...n, folder: targetFolder } : n));
+    setMovingNoteId(null);
+    await supabase.from("admin_notes").update({ folder: targetFolder } as any).eq("id", noteId);
+    notifyUpdate();
+  };
+
   const sortedNotes = [...folderNotes].sort((a, b) => {
     if (!a.is_divider && !b.is_divider) {
       if (a.is_starred && !b.is_starred) return -1;
