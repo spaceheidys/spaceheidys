@@ -40,7 +40,35 @@ interface BackgroundItem {
 
 const SECTIONS = ["main", "main2", "portfolio", "shop"] as const;
 
-const AdminMain = () => {
+const SortableMainSection = ({ id, label, collapsed, onToggleCollapse, children }: { id: string; label: string; collapsed: boolean; onToggleCollapse: () => void; children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <div className="flex items-center gap-2 mb-2 mt-4">
+        <button
+          {...attributes}
+          {...listeners}
+          className="text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
+          title="Drag to reorder"
+        >
+          <GripVertical size={14} />
+        </button>
+        <button
+          onClick={onToggleCollapse}
+          className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors"
+        >
+          {collapsed ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+          {label}
+        </button>
+      </div>
+      {!collapsed && children}
+    </div>
+  );
+};
+
+
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>("main");
