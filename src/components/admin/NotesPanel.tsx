@@ -38,6 +38,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [showTrash, setShowTrash] = useState(false);
   const [selectedTrashIds, setSelectedTrashIds] = useState<Set<string>>(new Set());
   const [confirmEmptyTrash, setConfirmEmptyTrash] = useState(false);
+  const [movingNoteId, setMovingNoteId] = useState<string | null>(null);
   const [folderLabels, setFolderLabels] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(FOLDER_STORAGE_KEY);
