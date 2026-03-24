@@ -3,7 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X, ChevronUp, ChevronDown } from "lucide-react";
+import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import NotesButton from "@/components/admin/NotesButton";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
@@ -25,7 +40,35 @@ interface BackgroundItem {
 
 const SECTIONS = ["main", "main2", "portfolio", "shop"] as const;
 
-const AdminMain = () => {
+const SortableMainSection = ({ id, label, collapsed, onToggleCollapse, children }: { id: string; label: string; collapsed: boolean; onToggleCollapse: () => void; children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative">
+      <div className="flex items-center gap-2 mb-2 mt-4">
+        <button
+          {...attributes}
+          {...listeners}
+          className="text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
+          title="Drag to reorder"
+        >
+          <GripVertical size={14} />
+        </button>
+        <button
+          onClick={onToggleCollapse}
+          className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors"
+        >
+          {collapsed ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+          {label}
+        </button>
+      </div>
+      {!collapsed && children}
+    </div>
+  );
+};
+
+
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>("main");
@@ -85,13 +128,15 @@ const AdminMain = () => {
     });
   };
 
-  const moveMainSection = (key: MainSectionKey, dir: -1 | 1) => {
+  const mainSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  const handleMainSectionDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
     setMainSectionOrder((prev) => {
-      const idx = prev.indexOf(key);
-      const newIdx = idx + dir;
-      if (newIdx < 0 || newIdx >= prev.length) return prev;
-      const next = [...prev];
-      [next[idx], next[newIdx]] = [next[newIdx], next[idx]];
+      const oldIdx = prev.indexOf(active.id as MainSectionKey);
+      const newIdx = prev.indexOf(over.id as MainSectionKey);
+      const next = arrayMove(prev, oldIdx, newIdx);
       localStorage.setItem("admin_main_section_order", JSON.stringify(next));
       return next;
     });
@@ -503,100 +548,61 @@ const AdminMain = () => {
           <Main2Section get={getContent} update={updateContent} />
         ) : (
           <>
-            {activeSection === "main" && mainSectionOrder.map((sectionKey, idx) => {
-              const renderWrapper = (label: string, children: React.ReactNode) => (
-                <div key={sectionKey} className="relative">
-                  <div className="flex items-center gap-2 mb-2 mt-4">
-                    <div className="flex flex-col">
-                      <button
-                        onClick={() => moveMainSection(sectionKey, -1)}
-                        disabled={idx === 0}
-                        className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
-                      >
-                        <ChevronUp size={12} />
-                      </button>
-                      <button
-                        onClick={() => moveMainSection(sectionKey, 1)}
-                        disabled={idx === mainSectionOrder.length - 1}
-                        className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
-                      >
-                        <ChevronDown size={12} />
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => toggleSectionCollapse(sectionKey)}
-                      className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors"
-                    >
-                      {collapsedSections.has(sectionKey) ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
-                      {label}
-                    </button>
-                  </div>
-                  {!collapsedSections.has(sectionKey) && children}
-                </div>
-              );
-
-              switch (sectionKey) {
-                case "buttons":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
-                    <ButtonsSection
-                      buttons={navButtons}
-                      onUpdate={updateButton}
-                      onSwapOrder={swapOrder}
-                      onAdd={addButton}
-                      onDelete={deleteButton}
-                    />
-                  );
-                case "content":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
-                    <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
-                  );
-                case "social":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], <SocialSection />);
-                case "music":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
-                    <div className="border-t border-border pt-4 pb-2 flex items-center gap-3">
-                      <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-                        Site Music
-                      </p>
-                      {confirmBg?.action === "music_toggle" ? (
-                        <span className="flex items-center gap-1 bg-background/90 px-1 py-0.5">
-                          <button onClick={async () => {
-                            const current = getContent("site_music_enabled");
-                            const newVal = current === "false" ? "true" : "false";
-                            await updateContent("site_music_enabled", newVal);
-                            toast.success(newVal === "true" ? "Music ON" : "Music OFF");
-                            setConfirmBg(null);
-                          }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
-                            <Check size={9} /> YES
-                          </button>
-                          <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
-                            <X size={9} /> NO
-                          </button>
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => setConfirmBg({ action: "music_toggle", id: "music" })}
-                          className={`px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${
-                            getContent("site_music_enabled") !== "false"
-                              ? "border-foreground text-foreground bg-foreground/10"
-                              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
-                          }`}
-                        >
-                          {getContent("site_music_enabled") !== "false" ? "ON" : "OFF"}
-                        </button>
-                      )}
-                    </div>
-                  );
-                case "backgrounds":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderActiveBackgrounds());
-                case "logos":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderLogosSection());
-                case "library":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderLibrarySection());
-                default:
-                  return null;
-              }
-            })}
+            {activeSection === "main" && (
+              <DndContext sensors={mainSensors} collisionDetection={closestCenter} onDragEnd={handleMainSectionDragEnd}>
+                <SortableContext items={mainSectionOrder} strategy={verticalListSortingStrategy}>
+                  {mainSectionOrder.map((sectionKey) => {
+                    const renderContent = () => {
+                      switch (sectionKey) {
+                        case "buttons":
+                          return (
+                            <ButtonsSection
+                              buttons={navButtons}
+                              onUpdate={updateButton}
+                              onSwapOrder={swapOrder}
+                              onAdd={addButton}
+                              onDelete={deleteButton}
+                            />
+                          );
+                        case "content":
+                          return <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />;
+                        case "social":
+                          return <SocialSection />;
+                        case "music":
+                          return (
+                            <div className="border-t border-border pt-4 pb-2 flex items-center gap-3">
+                              <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">Site Music</p>
+                              {confirmBg?.action === "music_toggle" ? (
+                                <span className="flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                                  <button onClick={async () => { const current = getContent("site_music_enabled"); const newVal = current === "false" ? "true" : "false"; await updateContent("site_music_enabled", newVal); toast.success(newVal === "true" ? "Music ON" : "Music OFF"); setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>
+                                  <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors"><X size={9} /> NO</button>
+                                </span>
+                              ) : (
+                                <button onClick={() => setConfirmBg({ action: "music_toggle", id: "music" })} className={`px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${getContent("site_music_enabled") !== "false" ? "border-foreground text-foreground bg-foreground/10" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"}`}>
+                                  {getContent("site_music_enabled") !== "false" ? "ON" : "OFF"}
+                                </button>
+                              )}
+                            </div>
+                          );
+                        case "backgrounds":
+                          return renderActiveBackgrounds();
+                        case "logos":
+                          return renderLogosSection();
+                        case "library":
+                          return renderLibrarySection();
+                        default:
+                          return null;
+                      }
+                    };
+                    return (
+                      <SortableMainSection key={sectionKey} id={sectionKey} label={MAIN_SECTION_LABELS[sectionKey]} collapsed={collapsedSections.has(sectionKey)} onToggleCollapse={() => toggleSectionCollapse(sectionKey)}>
+                        {renderContent()}
+                      </SortableMainSection>
+                    );
+                  })}
+                </SortableContext>
+              </DndContext>
+            )}
             {activeSection !== "main" && (
               <>
                 <div className="relative mt-4">
