@@ -520,100 +520,61 @@ const AdminMain = () => {
           <Main2Section get={getContent} update={updateContent} />
         ) : (
           <>
-            {activeSection === "main" && mainSectionOrder.map((sectionKey, idx) => {
-              const renderWrapper = (label: string, children: React.ReactNode) => (
-                <div key={sectionKey} className="relative">
-                  <div className="flex items-center gap-2 mb-2 mt-4">
-                    <div className="flex flex-col">
-                      <button
-                        onClick={() => moveMainSection(sectionKey, -1)}
-                        disabled={idx === 0}
-                        className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
-                      >
-                        <ChevronUp size={12} />
-                      </button>
-                      <button
-                        onClick={() => moveMainSection(sectionKey, 1)}
-                        disabled={idx === mainSectionOrder.length - 1}
-                        className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
-                      >
-                        <ChevronDown size={12} />
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => toggleSectionCollapse(sectionKey)}
-                      className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors"
-                    >
-                      {collapsedSections.has(sectionKey) ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
-                      {label}
-                    </button>
-                  </div>
-                  {!collapsedSections.has(sectionKey) && children}
-                </div>
-              );
-
-              switch (sectionKey) {
-                case "buttons":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
-                    <ButtonsSection
-                      buttons={navButtons}
-                      onUpdate={updateButton}
-                      onSwapOrder={swapOrder}
-                      onAdd={addButton}
-                      onDelete={deleteButton}
-                    />
-                  );
-                case "content":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
-                    <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />
-                  );
-                case "social":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], <SocialSection />);
-                case "music":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey],
-                    <div className="border-t border-border pt-4 pb-2 flex items-center gap-3">
-                      <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">
-                        Site Music
-                      </p>
-                      {confirmBg?.action === "music_toggle" ? (
-                        <span className="flex items-center gap-1 bg-background/90 px-1 py-0.5">
-                          <button onClick={async () => {
-                            const current = getContent("site_music_enabled");
-                            const newVal = current === "false" ? "true" : "false";
-                            await updateContent("site_music_enabled", newVal);
-                            toast.success(newVal === "true" ? "Music ON" : "Music OFF");
-                            setConfirmBg(null);
-                          }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors">
-                            <Check size={9} /> YES
-                          </button>
-                          <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors">
-                            <X size={9} /> NO
-                          </button>
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => setConfirmBg({ action: "music_toggle", id: "music" })}
-                          className={`px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${
-                            getContent("site_music_enabled") !== "false"
-                              ? "border-foreground text-foreground bg-foreground/10"
-                              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
-                          }`}
-                        >
-                          {getContent("site_music_enabled") !== "false" ? "ON" : "OFF"}
-                        </button>
-                      )}
-                    </div>
-                  );
-                case "backgrounds":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderActiveBackgrounds());
-                case "logos":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderLogosSection());
-                case "library":
-                  return renderWrapper(MAIN_SECTION_LABELS[sectionKey], renderLibrarySection());
-                default:
-                  return null;
-              }
-            })}
+            {activeSection === "main" && (
+              <DndContext sensors={mainSensors} collisionDetection={closestCenter} onDragEnd={handleMainSectionDragEnd}>
+                <SortableContext items={mainSectionOrder} strategy={verticalListSortingStrategy}>
+                  {mainSectionOrder.map((sectionKey) => {
+                    const renderContent = () => {
+                      switch (sectionKey) {
+                        case "buttons":
+                          return (
+                            <ButtonsSection
+                              buttons={navButtons}
+                              onUpdate={updateButton}
+                              onSwapOrder={swapOrder}
+                              onAdd={addButton}
+                              onDelete={deleteButton}
+                            />
+                          );
+                        case "content":
+                          return <ContentSection get={getContent} getDuration={getDuration} update={updateContent} updateDuration={updateDuration} />;
+                        case "social":
+                          return <SocialSection />;
+                        case "music":
+                          return (
+                            <div className="border-t border-border pt-4 pb-2 flex items-center gap-3">
+                              <p className="text-xs text-muted-foreground font-display tracking-widest uppercase">Site Music</p>
+                              {confirmBg?.action === "music_toggle" ? (
+                                <span className="flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                                  <button onClick={async () => { const current = getContent("site_music_enabled"); const newVal = current === "false" ? "true" : "false"; await updateContent("site_music_enabled", newVal); toast.success(newVal === "true" ? "Music ON" : "Music OFF"); setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>
+                                  <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors"><X size={9} /> NO</button>
+                                </span>
+                              ) : (
+                                <button onClick={() => setConfirmBg({ action: "music_toggle", id: "music" })} className={`px-3 py-1.5 border text-xs font-display tracking-[0.2em] uppercase transition-colors ${getContent("site_music_enabled") !== "false" ? "border-foreground text-foreground bg-foreground/10" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"}`}>
+                                  {getContent("site_music_enabled") !== "false" ? "ON" : "OFF"}
+                                </button>
+                              )}
+                            </div>
+                          );
+                        case "backgrounds":
+                          return renderActiveBackgrounds();
+                        case "logos":
+                          return renderLogosSection();
+                        case "library":
+                          return renderLibrarySection();
+                        default:
+                          return null;
+                      }
+                    };
+                    return (
+                      <SortableMainSection key={sectionKey} id={sectionKey} label={MAIN_SECTION_LABELS[sectionKey]} collapsed={collapsedSections.has(sectionKey)} onToggleCollapse={() => toggleSectionCollapse(sectionKey)}>
+                        {renderContent()}
+                      </SortableMainSection>
+                    );
+                  })}
+                </SortableContext>
+              </DndContext>
+            )}
             {activeSection !== "main" && (
               <>
                 <div className="relative mt-4">
