@@ -275,6 +275,51 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     notifyUpdate();
   };
 
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  const exportTasks = () => {
+    const data = folderNotes.map(({ content, is_done, is_starred, is_divider, sort_order }) => ({
+      content, is_done, is_starred, is_divider, sort_order,
+    }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `notes-${folderLabels[activeFolder]}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importTasks = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) return;
+      const baseOrder = folderNotes.length;
+      for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        const { data: inserted } = await supabase
+          .from("admin_notes")
+          .insert({
+            user_id: userId,
+            content: item.content || "",
+            is_done: !!item.is_done,
+            is_starred: !!item.is_starred,
+            is_divider: !!item.is_divider,
+            sort_order: baseOrder + i,
+            folder: activeFolder,
+          })
+          .select()
+          .single();
+        if (inserted) setNotes((prev) => [...prev, inserted as Note]);
+      }
+      notifyUpdate();
+    } catch { /* invalid file */ }
+    if (importInputRef.current) importInputRef.current.value = "";
+  };
+
   const sortedNotes = [...folderNotes].sort((a, b) => {
     if (!a.is_divider && !b.is_divider) {
       if (a.is_starred && !b.is_starred) return -1;
