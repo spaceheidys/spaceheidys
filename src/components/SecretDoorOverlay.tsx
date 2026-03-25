@@ -5,9 +5,10 @@ import { useSecretDoorSettings } from "@/hooks/useSecretDoorSettings";
 interface SecretDoorOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  secretDoorSoundUrl?: string;
 }
 
-const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
+const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOverlayProps) => {
   const { settings } = useSecretDoorSettings();
   const [code, setCode] = useState("");
   const [progress, setProgress] = useState(0);
