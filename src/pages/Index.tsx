@@ -97,7 +97,7 @@ const Index = () => {
           // Flip card back if it's currently unflipped
           if (!thirdCardFlipped) {
             if (!muted && siteMusicEnabled) {
-              new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
+              new Audio(getContent("audio_flipcard_sound") || "/audio/flipcard_sound.mp3").play().catch(() => {});
             }
             setThirdCardFlipped(true);
           }
@@ -172,7 +172,7 @@ const Index = () => {
     if (contentLoading) return;
     if (!siteMusicEnabled) return;
 
-    const audio = new Audio("/audio/main_buddhist.mp3");
+    const audio = new Audio(getContent("audio_main_music") || "/audio/main_buddhist.mp3");
     audio.loop = false;
     audioRef.current = audio;
 
@@ -363,7 +363,7 @@ const Index = () => {
               href={item.action ? undefined : `#${item.en.toLowerCase()}`}
               onClick={() => {
                 if (!muted && siteMusicEnabled) {
-                  new Audio("/audio/bell-sounds.mp3").play().catch(() => {});
+                  new Audio(getContent("audio_bell_sound") || "/audio/bell-sounds.mp3").play().catch(() => {});
                 }
                 item.action?.();
               }}
