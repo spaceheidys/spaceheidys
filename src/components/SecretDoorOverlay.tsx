@@ -62,7 +62,7 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
       }
 
       if (settings.music_enabled) {
-        const cyberpunkAudio = new Audio("/audio/Cyberpunk_secret_door.mp3");
+        const cyberpunkAudio = new Audio(secretDoorSoundUrl || "/audio/Cyberpunk_secret_door.mp3");
         cyberpunkAudio.loop = true;
         cyberpunkAudio.play().catch(() => {});
         cyberpunkAudioRef.current = cyberpunkAudio;
