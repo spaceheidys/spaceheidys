@@ -792,14 +792,30 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                 <Minus size={14} />
               </button>
               <div className="w-px h-3.5 bg-border mx-0.5" />
-              <button
-                onClick={exportTasks}
-                disabled={folderNotes.length === 0}
-                className="text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
-                title="Export tasks"
-              >
-                <Download size={13} />
-              </button>
+              {exportPrompt ? (
+                <span className="flex items-center gap-1">
+                  <input
+                    value={exportName}
+                    onChange={(e) => setExportName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") confirmExport(); if (e.key === "Escape") setExportPrompt(false); }}
+                    autoFocus
+                    className="w-24 bg-transparent text-[9px] font-display tracking-wider text-foreground outline-none border-b border-foreground/30"
+                    placeholder="File name"
+                  />
+                  <button onClick={confirmExport} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
+                  <span className="text-[8px] text-muted-foreground/40">/</span>
+                  <button onClick={() => setExportPrompt(false)} className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+                </span>
+              ) : (
+                <button
+                  onClick={startExport}
+                  disabled={folderNotes.length === 0}
+                  className="text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
+                  title="Export tasks"
+                >
+                  <Download size={13} />
+                </button>
+              )}
               <button
                 onClick={() => importInputRef.current?.click()}
                 className="text-muted-foreground/50 hover:text-foreground transition-colors"
