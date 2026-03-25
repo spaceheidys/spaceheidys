@@ -592,7 +592,7 @@ const Index = () => {
         <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">{getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."}</span>
       </div>
     </div>
-    <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} />
+    <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} secretDoorSoundUrl={getContent("audio_secret_door") || undefined} />
     </>);
 
 };
