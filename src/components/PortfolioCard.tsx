@@ -12,16 +12,17 @@ interface PortfolioCardProps {
   height?: number;
   flipped?: boolean;
   onFlip?: (flipped: boolean) => void;
+  flipSoundUrl?: string;
 }
 
-const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, flipped: controlledFlipped, onFlip }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, flipped: controlledFlipped, onFlip, flipSoundUrl }: PortfolioCardProps) => {
   const [internalFlipped, setInternalFlipped] = useState(true);
   const flipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped;
   const { muted, siteMusicEnabled } = useSoundContext();
 
   const handleFlip = () => {
     if (!muted && siteMusicEnabled) {
-      new Audio("/audio/flipcard_sound.mp3").play().catch(() => {});
+      new Audio(flipSoundUrl || "/audio/flipcard_sound.mp3").play().catch(() => {});
     }
     const next = !flipped;
     setInternalFlipped(next);
