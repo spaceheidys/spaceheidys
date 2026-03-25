@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image, RotateCcw, ArrowRightLeft, X } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image, RotateCcw, ArrowRightLeft, X, Download, Upload } from "lucide-react";
 
 interface Note {
   id: string;
@@ -273,6 +273,51 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setMovingNoteId(null);
     await supabase.from("admin_notes").update({ folder: targetFolder } as any).eq("id", noteId);
     notifyUpdate();
+  };
+
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  const exportTasks = () => {
+    const data = folderNotes.map(({ content, is_done, is_starred, is_divider, sort_order }) => ({
+      content, is_done, is_starred, is_divider, sort_order,
+    }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `notes-${folderLabels[activeFolder]}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importTasks = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) return;
+      const baseOrder = folderNotes.length;
+      for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        const { data: inserted } = await supabase
+          .from("admin_notes")
+          .insert({
+            user_id: userId,
+            content: item.content || "",
+            is_done: !!item.is_done,
+            is_starred: !!item.is_starred,
+            is_divider: !!item.is_divider,
+            sort_order: baseOrder + i,
+            folder: activeFolder,
+          })
+          .select()
+          .single();
+        if (inserted) setNotes((prev) => [...prev, inserted as Note]);
+      }
+      notifyUpdate();
+    } catch { /* invalid file */ }
+    if (importInputRef.current) importInputRef.current.value = "";
   };
 
   const sortedNotes = [...folderNotes].sort((a, b) => {
@@ -606,6 +651,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       {!collapsed && (
         <>
           <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+          <input ref={importInputRef} type="file" accept=".json" className="hidden" onChange={importTasks} />
 
           {loading ? (
             <div className="flex justify-center py-6">
@@ -736,6 +782,22 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                 title="Add divider"
               >
                 <Minus size={14} />
+              </button>
+              <div className="w-px h-3.5 bg-border mx-0.5" />
+              <button
+                onClick={exportTasks}
+                disabled={folderNotes.length === 0}
+                className="text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
+                title="Export tasks"
+              >
+                <Download size={13} />
+              </button>
+              <button
+                onClick={() => importInputRef.current?.click()}
+                className="text-muted-foreground/50 hover:text-foreground transition-colors"
+                title="Import tasks"
+              >
+                <Upload size={13} />
               </button>
             </div>
           )}
