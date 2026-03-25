@@ -279,7 +279,12 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
 
   const importInputRef = useRef<HTMLInputElement>(null);
 
-  const exportTasks = () => {
+  const startExport = () => {
+    setExportName(`notes-${folderLabels[activeFolder]}-${new Date().toISOString().slice(0, 10)}`);
+    setExportPrompt(true);
+  };
+
+  const confirmExport = () => {
     const data = folderNotes.map(({ content, is_done, is_starred, is_divider, sort_order }) => ({
       content, is_done, is_starred, is_divider, sort_order,
     }));
@@ -287,9 +292,10 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `notes-${folderLabels[activeFolder]}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `${exportName.trim() || "notes"}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    setExportPrompt(false);
   };
 
   const importTasks = async (e: React.ChangeEvent<HTMLInputElement>) => {
