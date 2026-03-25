@@ -783,6 +783,22 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
               >
                 <Minus size={14} />
               </button>
+              <div className="w-px h-3.5 bg-border mx-0.5" />
+              <button
+                onClick={exportTasks}
+                disabled={folderNotes.length === 0}
+                className="text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
+                title="Export tasks"
+              >
+                <Download size={13} />
+              </button>
+              <button
+                onClick={() => importInputRef.current?.click()}
+                className="text-muted-foreground/50 hover:text-foreground transition-colors"
+                title="Import tasks"
+              >
+                <Upload size={13} />
+              </button>
             </div>
           )}
 
