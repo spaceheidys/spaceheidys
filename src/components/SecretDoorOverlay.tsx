@@ -5,9 +5,10 @@ import { useSecretDoorSettings } from "@/hooks/useSecretDoorSettings";
 interface SecretDoorOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  secretDoorSoundUrl?: string;
 }
 
-const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
+const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOverlayProps) => {
   const { settings } = useSecretDoorSettings();
   const [code, setCode] = useState("");
   const [progress, setProgress] = useState(0);
@@ -61,7 +62,7 @@ const SecretDoorOverlay = ({ isOpen, onClose }: SecretDoorOverlayProps) => {
       }
 
       if (settings.music_enabled) {
-        const cyberpunkAudio = new Audio("/audio/Cyberpunk_secret_door.mp3");
+        const cyberpunkAudio = new Audio(secretDoorSoundUrl || "/audio/Cyberpunk_secret_door.mp3");
         cyberpunkAudio.loop = true;
         cyberpunkAudio.play().catch(() => {});
         cyberpunkAudioRef.current = cyberpunkAudio;
