@@ -281,7 +281,8 @@ const Index = () => {
             bgOptions={bgOptions}
             bgImage={bgImage}
             onBgChange={setBgImage}
-            siteMusicEnabled={siteMusicEnabled} />
+            siteMusicEnabled={siteMusicEnabled}
+            bellSoundUrl={getContent("audio_bell_sound") || undefined} />
           
       </motion.header>
 
@@ -528,6 +529,7 @@ const Index = () => {
                       flipAxis="y-center"
                       frontImage={getContent("card_front_image") || taro01Img}
                       backImage={getContent("card_back_image") || taroEyeImg}
+                      flipSoundUrl={getContent("audio_flipcard_sound") || undefined}
                       flipped={thirdCardFlipped}
                       onFlip={(f: boolean) => {setThirdCardFlipped(f);setFlipCount((c) => c + 1);}} />
                   </motion.div>
