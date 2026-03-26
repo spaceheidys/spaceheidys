@@ -35,6 +35,7 @@ function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }
 const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [wisdomText, setWisdomText] = useState("");
   const [frontImage, setFrontImage] = useState("");
+  const [frontImages, setFrontImages] = useState<string[]>([]);
   const [backImage, setBackImage] = useState("");
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
@@ -99,6 +100,10 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   useEffect(() => {
     setWisdomText(get("cards_wisdom"));
     setFrontImage(get("card_front_image"));
+    try {
+      const parsed = JSON.parse(get("card_front_images") || "[]");
+      if (Array.isArray(parsed)) setFrontImages(parsed);
+    } catch { setFrontImages([]); }
     setBackImage(get("card_back_image"));
     setBgType(get("card_bg_type") || "polygon");
     setBgVideo(get("card_bg_video"));
@@ -128,6 +133,28 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (key === "card_back_image") setBackImage(url);
     toast.success("Image updated");
     setUploading(null);
+  };
+
+  const handleAddFrontImage = async (file: File) => {
+    setUploading("card_front_images");
+    const ext = file.name.split(".").pop();
+    const path = `cards/front_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    const updated = [...frontImages, url];
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
+    toast.success("Front image added");
+    setUploading(null);
+  };
+
+  const handleRemoveFrontImage = async (index: number) => {
+    const updated = frontImages.filter((_, i) => i !== index);
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
+    toast.success("Image removed");
   };
 
   const handleVideoUpload = async (file: File) => {
