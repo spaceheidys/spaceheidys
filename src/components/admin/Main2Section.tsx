@@ -103,7 +103,10 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setFrontImage(get("card_front_image"));
     try {
       const parsed = JSON.parse(get("card_front_images") || "[]");
-      if (Array.isArray(parsed)) setFrontImages(parsed);
+      if (Array.isArray(parsed)) {
+        // Support legacy string[] format
+        setFrontImages(parsed.map((item: any) => typeof item === "string" ? { url: item, text: "" } : item));
+      }
     } catch { setFrontImages([]); }
     setBackImage(get("card_back_image"));
     setBgType(get("card_bg_type") || "polygon");
@@ -144,7 +147,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     if (error) { toast.error("Upload failed"); setUploading(null); return; }
     const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
     const url = urlData.publicUrl;
-    const updated = [...frontImages, url];
+    const updated = [...frontImages, { url, text: "" }];
     setFrontImages(updated);
     await update("card_front_images", JSON.stringify(updated));
     toast.success("Front image added");
@@ -156,6 +159,12 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setFrontImages(updated);
     await update("card_front_images", JSON.stringify(updated));
     toast.success("Image removed");
+  };
+
+  const handleUpdateFrontImageText = async (index: number, text: string) => {
+    const updated = frontImages.map((item, i) => i === index ? { ...item, text } : item);
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
   };
 
   const handleVideoUpload = async (file: File) => {
