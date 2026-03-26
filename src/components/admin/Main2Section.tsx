@@ -53,6 +53,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     return new Set();
   });
   const frontRef = useRef<HTMLInputElement>(null);
+  const frontMultiRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
   const wallpaperRef = useRef<HTMLInputElement>(null);
