@@ -35,7 +35,7 @@ function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }
 const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [wisdomText, setWisdomText] = useState("");
   const [frontImage, setFrontImage] = useState("");
-  const [frontImages, setFrontImages] = useState<string[]>([]);
+  const [frontImages, setFrontImages] = useState<{url: string; text: string}[]>([]);
   const [backImage, setBackImage] = useState("");
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
@@ -103,7 +103,10 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setFrontImage(get("card_front_image"));
     try {
       const parsed = JSON.parse(get("card_front_images") || "[]");
-      if (Array.isArray(parsed)) setFrontImages(parsed);
+      if (Array.isArray(parsed)) {
+        // Support legacy string[] format
+        setFrontImages(parsed.map((item: any) => typeof item === "string" ? { url: item, text: "" } : item));
+      }
     } catch { setFrontImages([]); }
     setBackImage(get("card_back_image"));
     setBgType(get("card_bg_type") || "polygon");
@@ -144,7 +147,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     if (error) { toast.error("Upload failed"); setUploading(null); return; }
     const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
     const url = urlData.publicUrl;
-    const updated = [...frontImages, url];
+    const updated = [...frontImages, { url, text: "" }];
     setFrontImages(updated);
     await update("card_front_images", JSON.stringify(updated));
     toast.success("Front image added");
@@ -156,6 +159,12 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setFrontImages(updated);
     await update("card_front_images", JSON.stringify(updated));
     toast.success("Image removed");
+  };
+
+  const handleUpdateFrontImageText = async (index: number, text: string) => {
+    const updated = frontImages.map((item, i) => i === index ? { ...item, text } : item);
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
   };
 
   const handleVideoUpload = async (file: File) => {
@@ -530,22 +539,31 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             Each time the card is flipped back to front, a different image is shown in sequence.
           </p>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-            {frontImages.map((url, i) => (
-              <div key={i} className="relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10">
-                <img src={url} alt={`Front ${i + 1}`} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
-                  {confirm === `remove_front_${i}` ? (
-                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                  ) : (
-                    <button
-                      onClick={() => askConfirm(`remove_front_${i}`)}
-                      className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  )}
+            {frontImages.map((item, i) => (
+              <div key={i} className="flex flex-col gap-1">
+                <div className="relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10">
+                  <img src={item.url} alt={`Front ${i + 1}`} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                    {confirm === `remove_front_${i}` ? (
+                      <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                    ) : (
+                      <button
+                        onClick={() => askConfirm(`remove_front_${i}`)}
+                        className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                  <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{i + 1}</span>
                 </div>
-                <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{i + 1}</span>
+                <input
+                  type="text"
+                  value={item.text || ""}
+                  onChange={(e) => handleUpdateFrontImageText(i, e.target.value)}
+                  placeholder="Text above card..."
+                  className="w-full bg-transparent border border-border px-1.5 py-1 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-foreground transition-colors"
+                />
               </div>
             ))}
             {/* Add new */}
