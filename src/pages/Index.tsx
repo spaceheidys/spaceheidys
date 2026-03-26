@@ -47,6 +47,7 @@ const Index = () => {
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
   const [flipCount, setFlipCount] = useState(0);
+  const [currentFrontText, setCurrentFrontText] = useState("");
   const { muted, toggleMute, setSiteMusicEnabled } = useSoundContext();
   const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
@@ -499,7 +500,7 @@ const Index = () => {
                 exit={{ opacity: 0, y: -5 }}
                 transition={{ duration: 0.3 }}>
                 
-                {getContent("cards_wisdom") || "The cards know what the mind has forgotten"}
+                {currentFrontText || getContent("cards_wisdom") || "The cards know what the mind has forgotten"}
               </motion.p>
               }
           </AnimatePresence>
@@ -528,10 +529,11 @@ const Index = () => {
                       name="Card_03"
                       flipAxis="y-center"
                       frontImage={getContent("card_front_image") || taro01Img}
-                      frontImages={(() => { try { const p = JSON.parse(getContent("card_front_images") || "[]"); return Array.isArray(p) && p.length > 0 ? p : undefined; } catch { return undefined; } })()}
+                      frontImages={(() => { try { const p = JSON.parse(getContent("card_front_images") || "[]"); if (Array.isArray(p) && p.length > 0) return p.map((item: any) => typeof item === "string" ? { url: item, text: "" } : item); return undefined; } catch { return undefined; } })()}
                       backImage={getContent("card_back_image") || taroEyeImg}
                       flipSoundUrl={getContent("audio_flipcard_sound") || undefined}
                       flipped={thirdCardFlipped}
+                      onFrontTextChange={(text) => setCurrentFrontText(text)}
                       onFlip={(f: boolean) => {setThirdCardFlipped(f);setFlipCount((c) => c + 1);}} />
                   </motion.div>
                   }
