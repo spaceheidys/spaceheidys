@@ -487,35 +487,97 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
       </div>
     ),
     card_images: (
-      <div className="grid grid-cols-2 gap-6 max-w-[320px]">
-        <CardImageUpload
-          label="Card front"
-          imageUrl={frontImage}
-          defaultImage={null}
-          uploading={uploading === "card_front_image"}
-          inputRef={frontRef}
-          onUpload={(f) => handleFileSelect(f, "card_front_image", "upload_card_front_image")}
-          onClear={() => askConfirm("clear_card_front_image")}
-          confirmAction={confirm}
-          confirmKey="card_front_image"
-          onConfirmYes={executeConfirm}
-          onConfirmNo={cancelConfirm}
-          pendingPreview={pendingFile?.key === "card_front_image" ? pendingPreviewUrl : null}
-        />
-        <CardImageUpload
-          label="Card back"
-          imageUrl={backImage}
-          defaultImage={taroBackside}
-          uploading={uploading === "card_back_image"}
-          inputRef={backRef}
-          onUpload={(f) => handleFileSelect(f, "card_back_image", "upload_card_back_image")}
-          onClear={() => askConfirm("clear_card_back_image")}
-          confirmAction={confirm}
-          confirmKey="card_back_image"
-          onConfirmYes={executeConfirm}
-          onConfirmNo={cancelConfirm}
-          pendingPreview={pendingFile?.key === "card_back_image" ? pendingPreviewUrl : null}
-        />
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 gap-6 max-w-[320px]">
+          <CardImageUpload
+            label="Card front (default)"
+            imageUrl={frontImage}
+            defaultImage={null}
+            uploading={uploading === "card_front_image"}
+            inputRef={frontRef}
+            onUpload={(f) => handleFileSelect(f, "card_front_image", "upload_card_front_image")}
+            onClear={() => askConfirm("clear_card_front_image")}
+            confirmAction={confirm}
+            confirmKey="card_front_image"
+            onConfirmYes={executeConfirm}
+            onConfirmNo={cancelConfirm}
+            pendingPreview={pendingFile?.key === "card_front_image" ? pendingPreviewUrl : null}
+          />
+          <CardImageUpload
+            label="Card back"
+            imageUrl={backImage}
+            defaultImage={taroBackside}
+            uploading={uploading === "card_back_image"}
+            inputRef={backRef}
+            onUpload={(f) => handleFileSelect(f, "card_back_image", "upload_card_back_image")}
+            onClear={() => askConfirm("clear_card_back_image")}
+            confirmAction={confirm}
+            confirmKey="card_back_image"
+            onConfirmYes={executeConfirm}
+            onConfirmNo={cancelConfirm}
+            pendingPreview={pendingFile?.key === "card_back_image" ? pendingPreviewUrl : null}
+          />
+        </div>
+
+        {/* Multiple front images — cycle on each flip */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground font-display tracking-widest uppercase">
+              Front images — rotate on flip ({frontImages.length})
+            </span>
+          </div>
+          <p className="text-[10px] text-muted-foreground/60 font-display tracking-wider">
+            Each time the card is flipped back to front, a different image is shown in sequence.
+          </p>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {frontImages.map((url, i) => (
+              <div key={i} className="relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10">
+                <img src={url} alt={`Front ${i + 1}`} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                  {confirm === `remove_front_${i}` ? (
+                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                  ) : (
+                    <button
+                      onClick={() => askConfirm(`remove_front_${i}`)}
+                      className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+                <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{i + 1}</span>
+              </div>
+            ))}
+            {/* Add new */}
+            <div className="border border-dashed border-border aspect-[2/3] overflow-hidden">
+              {confirm === "upload_card_front_multi" && pendingPreviewUrl ? (
+                <div className="relative w-full h-full">
+                  <img src={pendingPreviewUrl} alt="Preview" className="w-full h-full object-cover ring-2 ring-primary/50" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-muted-foreground/40 hover:text-muted-foreground hover:border-foreground transition-colors">
+                  {uploading === "card_front_images" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                  <span className="text-[8px] font-display tracking-wider mt-1">ADD</span>
+                  <input
+                    ref={frontMultiRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleFileSelect(f, "card_front_multi", "upload_card_front_multi");
+                      if (frontMultiRef.current) frontMultiRef.current.value = "";
+                    }}
+                    disabled={!!uploading}
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     ),
   };
