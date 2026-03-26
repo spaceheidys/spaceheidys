@@ -224,6 +224,11 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm === "upload_card_front_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_front_image");
     else if (confirm === "upload_card_back_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_back_image");
     else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
+    else if (confirm === "upload_card_front_multi" && pendingFile) await handleAddFrontImage(pendingFile.file);
+    else if (confirm?.startsWith("remove_front_")) {
+      const idx = parseInt(confirm.replace("remove_front_", ""), 10);
+      if (!isNaN(idx)) await handleRemoveFrontImage(idx);
+    }
     setConfirm(null);
     setPendingFile(null);
     if (pendingPreviewUrl) { URL.revokeObjectURL(pendingPreviewUrl); setPendingPreviewUrl(null); }
