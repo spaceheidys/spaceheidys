@@ -528,6 +528,7 @@ const Index = () => {
                       name="Card_03"
                       flipAxis="y-center"
                       frontImage={getContent("card_front_image") || taro01Img}
+                      frontImages={(() => { try { const p = JSON.parse(getContent("card_front_images") || "[]"); return Array.isArray(p) && p.length > 0 ? p : undefined; } catch { return undefined; } })()}
                       backImage={getContent("card_back_image") || taroEyeImg}
                       flipSoundUrl={getContent("audio_flipcard_sound") || undefined}
                       flipped={thirdCardFlipped}

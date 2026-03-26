@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useSoundContext } from "@/contexts/SoundContext";
 import taroBackside from "@/assets/Taro_backside.png";
@@ -7,6 +7,7 @@ interface PortfolioCardProps {
   name: string;
   flipAxis?: "x" | "y-right" | "y-center";
   frontImage?: string;
+  frontImages?: string[];
   backImage?: string;
   width?: number;
   height?: number;
@@ -15,19 +16,36 @@ interface PortfolioCardProps {
   flipSoundUrl?: string;
 }
 
-const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, flipped: controlledFlipped, onFlip, flipSoundUrl }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, width, height, flipped: controlledFlipped, onFlip, flipSoundUrl }: PortfolioCardProps) => {
   const [internalFlipped, setInternalFlipped] = useState(true);
   const flipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped;
   const { muted, siteMusicEnabled } = useSoundContext();
+  const frontIndexRef = useRef(0);
+  const [currentFrontImage, setCurrentFrontImage] = useState(frontImage);
+
+  // Determine which front image to show
+  const allFrontImages = frontImages && frontImages.length > 0 ? frontImages : (frontImage ? [frontImage] : []);
 
   const handleFlip = () => {
     if (!muted && siteMusicEnabled) {
       new Audio(flipSoundUrl || "/audio/flipcard_sound.mp3").play().catch(() => {});
     }
     const next = !flipped;
+    
+    // When flipping back to front (next = false means showing front), cycle to next image
+    if (!next && allFrontImages.length > 1) {
+      frontIndexRef.current = (frontIndexRef.current + 1) % allFrontImages.length;
+      setCurrentFrontImage(allFrontImages[frontIndexRef.current]);
+    }
+    
     setInternalFlipped(next);
     onFlip?.(next);
   };
+
+  // Use cycled image or fallback
+  const displayFrontImage = allFrontImages.length > 1 
+    ? (currentFrontImage || allFrontImages[0])
+    : frontImage;
 
   if (!flipAxis) {
     return (
@@ -68,8 +86,8 @@ const PortfolioCard = ({ name, flipAxis, frontImage, backImage, width, height, f
           className="absolute inset-0 flex items-center justify-center text-xs bg-muted text-muted-foreground"
           style={{ backfaceVisibility: "hidden" }}>
           
-          {frontImage ? (
-            <img src={frontImage} alt={name} className="w-full h-full object-cover" />
+          {displayFrontImage ? (
+            <img src={displayFrontImage} alt={name} className="w-full h-full object-cover" />
           ) : name}
         </div>
         {/* Back */}
