@@ -35,7 +35,7 @@ function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }
 const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [wisdomText, setWisdomText] = useState("");
   const [frontImage, setFrontImage] = useState("");
-  const [frontImages, setFrontImages] = useState<string[]>([]);
+  const [frontImages, setFrontImages] = useState<{url: string; text: string}[]>([]);
   const [backImage, setBackImage] = useState("");
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
