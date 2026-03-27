@@ -97,7 +97,7 @@ const Index = () => {
           }
           // Flip card back if it's currently unflipped
           if (!thirdCardFlipped) {
-            if (!muted && siteMusicEnabled) {
+            if (!muted && siteMusicEnabled && getContent("audio_flipcard_sound_muted") !== "true") {
               new Audio(getContent("audio_flipcard_sound") || "/audio/flipcard_sound.mp3").play().catch(() => {});
             }
             setThirdCardFlipped(true);
@@ -172,6 +172,7 @@ const Index = () => {
   useEffect(() => {
     if (contentLoading) return;
     if (!siteMusicEnabled) return;
+    if (getContent("audio_main_music_muted") === "true") return;
 
     const audio = new Audio(getContent("audio_main_music") || "/audio/main_buddhist.mp3");
     audio.loop = false;
@@ -283,7 +284,8 @@ const Index = () => {
             bgImage={bgImage}
             onBgChange={setBgImage}
             siteMusicEnabled={siteMusicEnabled}
-            bellSoundUrl={getContent("audio_bell_sound") || undefined} />
+            bellSoundUrl={getContent("audio_bell_sound") || undefined}
+            bellSoundMuted={getContent("audio_bell_sound_muted") === "true"} />
           
       </motion.header>
 
@@ -364,7 +366,7 @@ const Index = () => {
               key={item.en}
               href={item.action ? undefined : `#${item.en.toLowerCase()}`}
               onClick={() => {
-                if (!muted && siteMusicEnabled) {
+                if (!muted && siteMusicEnabled && getContent("audio_bell_sound_muted") !== "true") {
                   new Audio(getContent("audio_bell_sound") || "/audio/bell-sounds.mp3").play().catch(() => {});
                 }
                 item.action?.();
@@ -531,7 +533,7 @@ const Index = () => {
                       frontImage={getContent("card_front_image") || taro01Img}
                       frontImages={(() => { try { const p = JSON.parse(getContent("card_front_images") || "[]"); if (Array.isArray(p) && p.length > 0) return p.map((item: any) => typeof item === "string" ? { url: item, text: "" } : item); return undefined; } catch { return undefined; } })()}
                       backImage={getContent("card_back_image") || taroEyeImg}
-                      flipSoundUrl={getContent("audio_flipcard_sound") || undefined}
+                      flipSoundUrl={getContent("audio_flipcard_sound_muted") !== "true" ? (getContent("audio_flipcard_sound") || undefined) : "muted"}
                       flipped={thirdCardFlipped}
                       onFrontTextChange={(text) => setCurrentFrontText(text)}
                       onFlip={(f: boolean) => {setThirdCardFlipped(f);setFlipCount((c) => c + 1);}} />
@@ -595,7 +597,7 @@ const Index = () => {
         <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">{getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."}</span>
       </div>
     </div>
-    <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} secretDoorSoundUrl={getContent("audio_secret_door") || undefined} />
+    <SecretDoorOverlay isOpen={secretDoorOpen} onClose={() => setSecretDoorOpen(false)} secretDoorSoundUrl={getContent("audio_secret_door_muted") !== "true" ? (getContent("audio_secret_door") || undefined) : "muted"} />
     </>);
 
 };
