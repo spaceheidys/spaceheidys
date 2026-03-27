@@ -34,7 +34,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, wid
   const allFrontUrls = allFrontItems.map(i => i.url);
 
   const handleFlip = () => {
-    if (!muted && siteMusicEnabled) {
+    if (!muted && siteMusicEnabled && flipSoundUrl !== "muted") {
       new Audio(flipSoundUrl || "/audio/flipcard_sound.mp3").play().catch(() => {});
     }
     const next = !flipped;
