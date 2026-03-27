@@ -14,6 +14,7 @@ interface MobileNavProps {
   onBgChange: (bg: string) => void;
   siteMusicEnabled?: boolean;
   bellSoundUrl?: string;
+  bellSoundMuted?: boolean;
 }
 
 const MobileNav = ({
@@ -26,12 +27,13 @@ const MobileNav = ({
   onBgChange,
   siteMusicEnabled = true,
   bellSoundUrl,
+  bellSoundMuted = false,
 }: MobileNavProps) => {
   const [open, setOpen] = useState(false);
   const { muted, toggleMute } = useSoundContext();
 
   const handleClick = (action: () => void) => {
-    if (!muted && siteMusicEnabled) {
+    if (!muted && siteMusicEnabled && !bellSoundMuted) {
       new Audio(bellSoundUrl || "/audio/bell-sounds.mp3").play().catch(() => {});
     }
     action();
