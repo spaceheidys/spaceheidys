@@ -37,6 +37,8 @@ const AdminSecretDoor = () => {
   const [draftTimer, setDraftTimer] = useState(60);
   const [codeDirty, setCodeDirty] = useState(false);
   const [timerDirty, setTimerDirty] = useState(false);
+  const [showCode, setShowCode] = useState(false);
+  const [confirmImport, setConfirmImport] = useState<string | null>(null);
 
   // Confirm states
   const [confirmCodeSave, setConfirmCodeSave] = useState(false);
