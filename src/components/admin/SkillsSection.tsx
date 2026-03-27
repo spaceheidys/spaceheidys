@@ -258,41 +258,35 @@ const SkillsSection = () => {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center mb-4">
         <span className="text-[10px] font-display tracking-widest text-muted-foreground uppercase">
           {skills.length} skill{skills.length !== 1 ? "s" : ""}
         </span>
-        <button
-          onClick={handleAdd}
-          className="text-[10px] font-display tracking-[0.2em] uppercase px-3 py-1 border border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors"
-        >
-          + ADD SKILL
-        </button>
       </div>
 
-      {skills.length === 0 ? (
-        <p className="text-muted-foreground text-xs text-center py-12 font-display tracking-wider">
-          No skills added yet
-        </p>
-      ) : (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={skills.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-            <div className="flex flex-wrap gap-2">
-              {skills.map((skill) => (
-                <SortableSkillRow
-                  key={skill.id}
-                  skill={skill}
-                  onNameChange={handleNameChange}
-                  onToggleVisible={handleToggleVisible}
-                  onDelete={handleDelete}
-                  onIconUpload={handleIconUpload}
-                  uploading={uploadingId}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      )}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={skills.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+          <div className="flex flex-wrap gap-2">
+            {skills.map((skill) => (
+              <SortableSkillRow
+                key={skill.id}
+                skill={skill}
+                onNameChange={handleNameChange}
+                onToggleVisible={handleToggleVisible}
+                onDelete={handleDelete}
+                onIconUpload={handleIconUpload}
+                uploading={uploadingId}
+              />
+            ))}
+            <button
+              onClick={handleAdd}
+              className="flex items-center justify-center border border-dashed border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors text-[10px] font-display tracking-[0.2em] uppercase px-6 py-2"
+            >
+              + ADD SKILL
+            </button>
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
