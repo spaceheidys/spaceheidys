@@ -241,12 +241,20 @@ const AdminSecretDoor = () => {
           <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
             Secret Code (Password)
           </p>
-          <input
-            type="text"
-            value={draftCode}
-            onChange={(e) => { setDraftCode(e.target.value); setCodeDirty(e.target.value !== settings?.secret_code); }}
-            className="w-full max-w-xs p-2 bg-transparent border border-border text-sm font-body text-foreground outline-none focus:border-foreground transition-colors"
-          />
+          <div className="flex items-center gap-2 max-w-xs">
+            <input
+              type={showCode ? "text" : "password"}
+              value={draftCode}
+              onChange={(e) => { setDraftCode(e.target.value); setCodeDirty(e.target.value !== settings?.secret_code); }}
+              className="w-full p-2 bg-transparent border border-border text-sm font-body text-foreground outline-none focus:border-foreground transition-colors"
+            />
+            <button
+              onClick={() => setShowCode(!showCode)}
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showCode ? <EyeOff size={14} /> : <Eye size={14} />}
+            </button>
+          </div>
           {codeDirty && !confirmCodeSave && (
             <button
               onClick={() => setConfirmCodeSave(true)}
@@ -272,9 +280,79 @@ const AdminSecretDoor = () => {
               </button>
             </div>
           )}
-        </section>
 
-        {/* TIMER */}
+          {/* Import / Export */}
+          <div className="flex items-center gap-3 pt-2 border-t border-border/50">
+            <button
+              onClick={() => {
+                const blob = new Blob([settings?.secret_code || ""], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "secret_code.txt";
+                a.click();
+                URL.revokeObjectURL(url);
+                toast.success("Password exported");
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-display tracking-[0.2em] uppercase border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+            >
+              <FileDown size={12} /> EXPORT
+            </button>
+            <label className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-display tracking-[0.2em] uppercase border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
+              <Import size={12} /> IMPORT
+              <input
+                ref={importInputRef}
+                type="file"
+                accept=".txt"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const text = (ev.target?.result as string || "").trim();
+                    if (text) setConfirmImport(text);
+                  };
+                  reader.readAsText(file);
+                  if (importInputRef.current) importInputRef.current.value = "";
+                }}
+              />
+            </label>
+          </div>
+
+          {confirmImport && (
+            <div className="flex items-center gap-2 p-2 border border-border bg-muted/20">
+              <span className="text-[10px] font-display tracking-widest text-muted-foreground">
+                Import password: {"•".repeat(confirmImport.length)}?
+              </span>
+              <button
+                onClick={async () => {
+                  if (!settings) return;
+                  const { error } = await supabase
+                    .from("secret_door_settings" as any)
+                    .update({ secret_code: confirmImport, updated_at: new Date().toISOString() } as any)
+                    .eq("id", settings.id);
+                  if (!error) {
+                    setSettings((s) => s ? { ...s, secret_code: confirmImport } : s);
+                    setDraftCode(confirmImport);
+                    setCodeDirty(false);
+                    toast.success("Password imported");
+                  } else toast.error("Import failed");
+                  setConfirmImport(null);
+                }}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+              >
+                <Check size={10} /> YES
+              </button>
+              <button
+                onClick={() => setConfirmImport(null)}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={10} /> NO
+              </button>
+            </div>
+          )}
+        </section>
         <section className="border border-border p-4 space-y-3">
           <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
             Timer Duration (seconds)
