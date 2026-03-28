@@ -180,12 +180,14 @@ const Index = () => {
     audioRef.current = audio;
 
     const playAudio = () => {
+      connectSource(audio);
       audio.play().catch(() => {});
       window.removeEventListener("click", playAudio);
       window.removeEventListener("keydown", playAudio);
       window.removeEventListener("touchstart", playAudio);
     };
 
+    connectSource(audio);
     audio.play().catch(() => {
       window.addEventListener("click", playAudio);
       window.addEventListener("keydown", playAudio);
