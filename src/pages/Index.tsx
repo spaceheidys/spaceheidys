@@ -232,6 +232,10 @@ const Index = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}>
+          {/* Equalizer bar at bottom of header */}
+          <div className="absolute bottom-0 left-0 right-0 h-[14px] pointer-events-none">
+            <AudioEqualizer height={14} barCount={120} barColor="rgba(255,255,255,0.35)" />
+          </div>
           
         <span
             className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
