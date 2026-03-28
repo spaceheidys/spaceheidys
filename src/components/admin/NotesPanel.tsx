@@ -418,7 +418,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     <div
       key={note.id}
       className={`group ${dragId === note.id ? "opacity-40" : ""}`}
-      draggable
+      draggable={editingId !== note.id}
       onDragStart={() => handleDragStart(note.id)}
       onDragOver={(e) => handleDragOver(e, note.id)}
       onDrop={(e) => handleDrop(e, note.id)}
