@@ -17,6 +17,7 @@ import SecretDoorOverlay from "@/components/SecretDoorOverlay";
 import PortfolioCard from "@/components/PortfolioCard";
 import PolygonBackground from "@/components/PolygonBackground";
 import MobileNav from "@/components/MobileNav";
+import AudioEqualizer from "@/components/AudioEqualizer";
 import PortfolioMenu from "@/components/Portfolio_menu/PortfolioMenu";
 import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu";
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
@@ -48,7 +49,7 @@ const Index = () => {
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
   const [flipCount, setFlipCount] = useState(0);
   const [currentFrontText, setCurrentFrontText] = useState("");
-  const { muted, toggleMute, setSiteMusicEnabled } = useSoundContext();
+  const { muted, toggleMute, setSiteMusicEnabled, connectSource } = useSoundContext();
   const [activePortfolioKey, setActivePortfolioKey] = useState<PortfolioMenuKey | null>(null);
   const [activeGallerySub, setActiveGallerySub] = useState<string | null>(null);
   const [pageInfo, setPageInfo] = useState<{current: number;total: number;} | null>(null);
