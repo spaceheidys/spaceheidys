@@ -356,11 +356,11 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         {editingId === note.id ? (
           <div className="flex items-center gap-1">
             <input
-              ref={editInputRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               onKeyDown={handleEditKeyDown}
               className="bg-transparent text-[9px] font-display text-muted-foreground outline-none border-b border-foreground/30 tracking-[0.2em] uppercase w-20 text-center"
+              autoFocus
             />
             <button onClick={confirmEdit} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
             <span className="text-[8px] text-muted-foreground/40">/</span>
