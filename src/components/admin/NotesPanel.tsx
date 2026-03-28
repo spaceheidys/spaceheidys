@@ -451,17 +451,18 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         </button>
 
         {editingId === note.id ? (
-          <div className="flex items-center gap-1 flex-1">
-            <input
+          <div className="flex items-start gap-1 flex-1" onMouseDown={(e) => e.stopPropagation()} draggable={false}>
+            <textarea
               ref={editInputRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              onKeyDown={handleEditKeyDown}
-              className="flex-1 bg-transparent text-xs font-display text-foreground outline-none border-b border-foreground/30 tracking-wider"
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); confirmEdit(); } if (e.key === "Escape") cancelEdit(); }}
+              rows={2}
+              className="flex-1 bg-transparent text-xs font-display text-foreground outline-none border-b border-foreground/30 tracking-wider resize-none min-h-[2.5rem]"
             />
-            <button onClick={confirmEdit} className="text-[9px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
-            <span className="text-[9px] text-muted-foreground/40">/</span>
-            <button onClick={cancelEdit} className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+            <button onClick={confirmEdit} className="text-[9px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors mt-1">YES</button>
+            <span className="text-[9px] text-muted-foreground/40 mt-1">/</span>
+            <button onClick={cancelEdit} className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors mt-1">NO</button>
           </div>
         ) : (
           <span
