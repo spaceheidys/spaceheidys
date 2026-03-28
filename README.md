@@ -1,8 +1,8 @@
-# Welcome to your Lovable project
+# TBSG 
 
-## Project info
+## SSSSaga 
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**URL**: https://adwancedwytas.lovable.app 
 
 ## How can I edit this code?
 
