@@ -49,7 +49,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   });
   const [renamingFolder, setRenamingFolder] = useState<number | null>(null);
   const [renameText, setRenameText] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
   const pendingNoteId = useRef<string | null>(null);
@@ -769,13 +769,14 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           {/* Input + add buttons */}
           {!showTrash && (
             <div className="flex gap-1.5 border-t border-border pt-3">
-              <input
+              <textarea
                 ref={inputRef}
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
-                onKeyDown={handleKeyDown}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addNote(); } }}
                 placeholder="Add a note..."
-                className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider"
+                rows={2}
+                className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider resize-none min-h-[2.5rem]"
               />
               <button
                 onClick={addNote}
