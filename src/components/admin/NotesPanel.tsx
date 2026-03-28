@@ -49,8 +49,8 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   });
   const [renamingFolder, setRenamingFolder] = useState<number | null>(null);
   const [renameText, setRenameText] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const editInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const editInputRef = useRef<HTMLTextAreaElement>(null);
   const imgInputRef = useRef<HTMLInputElement>(null);
   const pendingNoteId = useRef<string | null>(null);
 
@@ -356,11 +356,11 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         {editingId === note.id ? (
           <div className="flex items-center gap-1">
             <input
-              ref={editInputRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               onKeyDown={handleEditKeyDown}
               className="bg-transparent text-[9px] font-display text-muted-foreground outline-none border-b border-foreground/30 tracking-[0.2em] uppercase w-20 text-center"
+              autoFocus
             />
             <button onClick={confirmEdit} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
             <span className="text-[8px] text-muted-foreground/40">/</span>
@@ -418,7 +418,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     <div
       key={note.id}
       className={`group ${dragId === note.id ? "opacity-40" : ""}`}
-      draggable
+      draggable={editingId !== note.id}
       onDragStart={() => handleDragStart(note.id)}
       onDragOver={(e) => handleDragOver(e, note.id)}
       onDrop={(e) => handleDrop(e, note.id)}
@@ -451,17 +451,18 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
         </button>
 
         {editingId === note.id ? (
-          <div className="flex items-center gap-1 flex-1">
-            <input
+          <div className="flex items-start gap-1 flex-1" onMouseDown={(e) => e.stopPropagation()} draggable={false}>
+            <textarea
               ref={editInputRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              onKeyDown={handleEditKeyDown}
-              className="flex-1 bg-transparent text-xs font-display text-foreground outline-none border-b border-foreground/30 tracking-wider"
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); confirmEdit(); } if (e.key === "Escape") cancelEdit(); }}
+              rows={2}
+              className="flex-1 bg-transparent text-xs font-display text-foreground outline-none border-b border-foreground/30 tracking-wider resize-none min-h-[2.5rem]"
             />
-            <button onClick={confirmEdit} className="text-[9px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
-            <span className="text-[9px] text-muted-foreground/40">/</span>
-            <button onClick={cancelEdit} className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+            <button onClick={confirmEdit} className="text-[9px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors mt-1">YES</button>
+            <span className="text-[9px] text-muted-foreground/40 mt-1">/</span>
+            <button onClick={cancelEdit} className="text-[9px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors mt-1">NO</button>
           </div>
         ) : (
           <span
@@ -768,13 +769,14 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
           {/* Input + add buttons */}
           {!showTrash && (
             <div className="flex gap-1.5 border-t border-border pt-3">
-              <input
+              <textarea
                 ref={inputRef}
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
-                onKeyDown={handleKeyDown}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addNote(); } }}
                 placeholder="Add a note..."
-                className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider"
+                rows={2}
+                className="flex-1 bg-transparent text-xs font-display text-foreground placeholder:text-muted-foreground/50 outline-none tracking-wider resize-none min-h-[2.5rem]"
               />
               <button
                 onClick={addNote}
