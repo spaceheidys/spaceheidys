@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface MainTextSectionProps {
   activeSection: "about" | "contact" | "shop" | null;
-  sectionVisibility: Record<string, boolean>;
+  sectionVisibility: Record<string, boolean> | { [key: string]: boolean | undefined };
   getContent: (key: string) => string;
 }
 
