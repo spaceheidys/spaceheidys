@@ -12,6 +12,7 @@ import BikoKuLogo from "@/components/BikoKuLogo";
 import { useSoundContext } from "@/contexts/SoundContext";
 
 import SocialLinks from "@/components/SocialLinks";
+import HeroSection from "@/pages/IndexPage/HeroSection";
 import LoadingScreen from "@/components/LoadingScreen";
 import SecretDoorOverlay from "@/components/SecretDoorOverlay";
 import PortfolioCard from "@/components/PortfolioCard";
@@ -289,56 +290,7 @@ const Index = () => {
           
       </motion.header>
 
-      <div className="relative bg-background overflow-hidden rounded-none min-h-[100dvh]">
-      {/* === MAIN section === */}
-      {/* Hero background illustration */}
-      <div className="absolute inset-0 w-full h-full">
-        {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(bgImage) ? (
-          <video
-            key={bgImage}
-            src={bgImage}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover object-center opacity-60"
-          />
-        ) : (
-          <img
-            src={bgImage}
-            alt="BIKO KU manga illustration"
-            className="w-full h-full object-cover object-center opacity-60"
-            loading="eager"
-          />
-        )}
-          
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/40" />
-      </div>
-
-      {/* Content layer */}
-      <div className="relative z-10 min-h-[100dvh] flex flex-col">
-        {/* Spacer for fixed header */}
-        <div className="h-16 sm:h-20 md:h-24" />
-
-        {/* Main content */}
-        <div className="flex-1 flex items-center px-4 sm:px-8 md:px-16 relative">
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="pointer-events-auto">
-              <BikoKuLogo />
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom section */}
-        <div className="mt-auto flex items-center justify-center py-4 sm:py-5 pb-10 sm:pb-12 md:pb-16">
-          <SocialLinks />
-        </div>
-
-
-      </div>
-    </div>
+      <HeroSection bgImage={bgImage} />
 
     {/* Fixed left side nav — stays visible on scroll */}
     <AnimatePresence>
