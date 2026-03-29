@@ -1,9 +1,10 @@
 import { forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { SectionVisibility } from "@/hooks/useSectionSettings";
 
 interface MainTextSectionProps {
   activeSection: "about" | "contact" | "shop" | null;
-  sectionVisibility: Record<string, boolean> | { [key: string]: boolean | undefined };
+  sectionVisibility: SectionVisibility;
   getContent: (key: string) => string;
 }
 
