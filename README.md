@@ -1,1 +1,1 @@
-https://github.com/spaceheidys/spaceheidys.git
+Do not commit .env file. Use .env.example.
