@@ -12,6 +12,7 @@ import AdminMain from "./pages/AdminMain";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSecretDoor from "./pages/AdminSecretDoor";
 import Shop from "./pages/Shop";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
