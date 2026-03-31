@@ -243,7 +243,7 @@ const Gallery = () => {
         </div>
 
         {/* Filter tabs */}
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 pb-3 flex items-center gap-4 sm:gap-6 overflow-x-auto scrollbar-hide">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 pb-3 flex items-center gap-3 sm:gap-6 overflow-x-auto scrollbar-hide -webkit-overflow-scrolling-touch">
           {tabs.map((tab) => (
             <button
               key={tab}
