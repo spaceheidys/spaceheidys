@@ -217,7 +217,7 @@ const Gallery = () => {
   }, [goLightbox]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-[100svh] bg-background text-foreground">
       {/* Header */}
       <motion.header
         className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border/30"
@@ -243,7 +243,7 @@ const Gallery = () => {
         </div>
 
         {/* Filter tabs */}
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 pb-3 flex items-center gap-4 sm:gap-6 overflow-x-auto scrollbar-hide">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 pb-3 flex items-center gap-3 sm:gap-6 overflow-x-auto scrollbar-hide -webkit-overflow-scrolling-touch">
           {tabs.map((tab) => (
             <button
               key={tab}

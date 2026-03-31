@@ -21,7 +21,7 @@ const Shop = () => {
 
   if (visible === null) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-[100svh] bg-background flex items-center justify-center">
         <div className="w-5 h-5 border border-foreground/30 border-t-foreground animate-spin" />
       </div>
     );
@@ -29,8 +29,8 @@ const Shop = () => {
 
   if (!visible) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6">
-        <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase">
+      <div className="min-h-[100svh] bg-background flex flex-col items-center justify-center gap-6 px-4">
+        <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase text-center">
           Shop is currently unavailable
         </p>
         <button
@@ -44,9 +44,8 @@ const Shop = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-border">
+    <div className="min-h-[100svh] bg-background flex flex-col">
+      <header className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border">
         <button
           onClick={() => navigate("/")}
           className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground font-display tracking-[0.2em] uppercase transition-colors"
@@ -57,8 +56,7 @@ const Shop = () => {
         <div className="w-16" />
       </header>
 
-      {/* Content placeholder */}
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center px-4">
         <p className="text-sm text-muted-foreground/60 font-display tracking-[0.2em] uppercase">
           Coming soon
         </p>

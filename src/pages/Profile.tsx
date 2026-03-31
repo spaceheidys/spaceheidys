@@ -12,14 +12,12 @@ const Profile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (profile?.username) {
-      setUsername(profile.username);
-    }
+    if (profile?.username) setUsername(profile.username);
   }, [profile?.username]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-[100svh] bg-background flex items-center justify-center">
         <Loader2 className="animate-spin text-muted-foreground" size={28} />
       </div>
     );
@@ -27,7 +25,7 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-4">
+      <div className="min-h-[100svh] bg-background flex flex-col items-center justify-center gap-4 px-4">
         <p className="text-muted-foreground text-sm tracking-widest font-display uppercase">
           Not authenticated
         </p>
@@ -54,7 +52,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-[100svh] bg-background flex items-center justify-center px-4 py-8">
       <motion.div
         className="w-full max-w-sm"
         initial={{ opacity: 0, y: 20 }}
@@ -70,7 +68,7 @@ const Profile = () => {
             <label className="text-muted-foreground text-xs tracking-widest font-display uppercase block mb-1.5">
               Email
             </label>
-            <p className="text-foreground text-sm tracking-widest font-display bg-secondary border border-border px-4 py-3">
+            <p className="text-foreground text-sm tracking-widest font-display bg-secondary border border-border px-4 py-3 break-all">
               {profile?.email || user.email || "—"}
             </p>
           </div>
@@ -81,25 +79,20 @@ const Profile = () => {
             </label>
             <input
               value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                setEdited(true);
-              }}
+              onChange={(e) => { setUsername(e.target.value); setEdited(true); }}
               className="w-full bg-secondary border border-border text-foreground text-sm tracking-widest font-display px-4 py-3 outline-none focus:border-foreground/40 transition-colors placeholder:text-muted-foreground"
               placeholder="username"
             />
           </div>
 
           {error && (
-            <p className="text-destructive text-xs tracking-wider font-display">
-              {error}
-            </p>
+            <p className="text-destructive text-xs tracking-wider font-display">{error}</p>
           )}
 
           <button
             onClick={handleSave}
             disabled={saving || !edited || !username.trim()}
-            className="bg-foreground text-background font-display text-xs tracking-[0.3em] uppercase py-3 hover:opacity-90 transition-opacity disabled:opacity-40"
+            className="bg-foreground text-background font-display text-xs tracking-[0.3em] uppercase py-3 hover:opacity-90 transition-opacity disabled:opacity-40 active:scale-[0.98]"
           >
             {saving ? "Saving..." : "Save"}
           </button>
