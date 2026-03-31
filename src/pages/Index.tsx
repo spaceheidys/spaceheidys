@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,18 +21,16 @@ import HeroSection from "@/pages/IndexPage/HeroSection";
 import MainTextSection from "@/pages/IndexPage/MainTextSection";
 import PortfolioSection from "@/pages/IndexPage/PortfolioSection";
 
+const DEFAULT_BG_OPTIONS = [lostInTime01, lostInTime02, lostInTime03];
+
 const Index = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(() => {
-    if (sessionStorage.getItem('loaded')) return false;
-    return true;
-  });
+  const [loading, setLoading] = useState(() => !sessionStorage.getItem("loaded"));
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
-  const defaultBgOptions = [lostInTime01, lostInTime02, lostInTime03];
-  const [bgOptions, setBgOptions] = useState<string[]>(defaultBgOptions);
-  const [bgImage, setBgImage] = useState(() => defaultBgOptions[Math.floor(Math.random() * defaultBgOptions.length)]);
+  const [bgOptions, setBgOptions] = useState<string[]>(DEFAULT_BG_OPTIONS);
+  const [bgImage, setBgImage] = useState(() => DEFAULT_BG_OPTIONS[Math.floor(Math.random() * DEFAULT_BG_OPTIONS.length)]);
   const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainTextRef = useRef<HTMLDivElement | null>(null);
@@ -66,9 +64,7 @@ const Index = () => {
     const handleScroll = () => {
       if (!portfolioRef.current) return;
       const rect = portfolioRef.current.getBoundingClientRect();
-      const inPortfolio = rect.top < window.innerHeight * 0.5;
-      const notAtTop = window.scrollY > 200;
-      setShowScrollTop(inPortfolio && notAtTop);
+      setShowScrollTop(rect.top < window.innerHeight * 0.5 && window.scrollY > 200);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -112,8 +108,8 @@ const Index = () => {
     const fetchBgs = async () => {
       const { data } = await supabase.from("page_backgrounds").select("*").order("sort_order");
       if (data && data.length > 0) {
-        const mainBgs = data.filter((b: any) => b.section === "main" && b.is_active !== false).map((b: any) => b.image_url);
-        const portfolioBgs = data.filter((b: any) => b.section === "portfolio" && b.is_active !== false).map((b: any) => b.image_url);
+        const mainBgs = data.filter((b) => b.section === "main" && b.is_active !== false).map((b) => b.image_url);
+        const portfolioBgs = data.filter((b) => b.section === "portfolio" && b.is_active !== false).map((b) => b.image_url);
         if (mainBgs.length > 0) {
           setBgOptions(mainBgs);
           setBgImage(mainBgs[Math.floor(Math.random() * mainBgs.length)]);
@@ -124,8 +120,8 @@ const Index = () => {
     fetchBgs();
   }, []);
 
-  // Section click handler (about / contact / shop)
-  const handleSectionClick = (section: "about" | "contact" | "shop") => {
+  // Section click handler
+  const handleSectionClick = useCallback((section: "about" | "contact" | "shop") => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
     setActiveSection(section);
     setTimeout(() => mainTextRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
@@ -143,15 +139,14 @@ const Index = () => {
         setActiveSection((prev) => (prev === section ? null : prev));
       }, maxDuration * 1000);
     }
-  };
+  }, [getDuration]);
 
-  const handleAboutClick = () => handleSectionClick("about");
-  const handleContactClick = () => handleSectionClick("contact");
+  const handleAboutClick = useCallback(() => handleSectionClick("about"), [handleSectionClick]);
+  const handleContactClick = useCallback(() => handleSectionClick("contact"), [handleSectionClick]);
 
   // Background music
   useEffect(() => {
-    if (contentLoading) return;
-    if (!siteMusicEnabled) return;
+    if (contentLoading || !siteMusicEnabled) return;
     if (getContent("audio_main_music_muted") === "true") return;
 
     const audio = new Audio(getContent("audio_main_music") || "/audio/main_buddhist.mp3");
@@ -196,11 +191,30 @@ const Index = () => {
     if (audioRef.current) audioRef.current.muted = muted;
   }, [muted]);
 
+  const scrollToPortfolio = useCallback(() => {
+    portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, []);
+
+  const openSecretDoor = useCallback(() => setSecretDoorOpen(true), []);
+  const closeSecretDoor = useCallback(() => setSecretDoorOpen(false), []);
+  const goToShop = useCallback(() => navigate("/shop"), [navigate]);
+  const goToGallery = useCallback(() => navigate("/gallery"), [navigate]);
+
+  const actionMap = useMemo<Record<string, () => void>>(() => ({
+    about: handleAboutClick,
+    portfolio: scrollToPortfolio,
+    gallery: goToGallery,
+    contacts: handleContactClick,
+  }), [handleAboutClick, scrollToPortfolio, goToGallery, handleContactClick]);
+
+  const bellSoundMuted = getContent("audio_bell_sound_muted") === "true";
+  const bellSoundUrl = getContent("audio_bell_sound") || undefined;
+
   return (
     <>
       <AnimatePresence>
         {loading && (
-          <LoadingScreen onComplete={() => { sessionStorage.setItem('loaded', '1'); setLoading(false); }} />
+          <LoadingScreen onComplete={() => { sessionStorage.setItem("loaded", "1"); setLoading(false); }} />
         )}
       </AnimatePresence>
 
@@ -218,16 +232,19 @@ const Index = () => {
           ビコ・ク
         </span>
         <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-          {["Secret Door", "Shop"].map((item, i) => (
+          {[
+            { label: "Secret Door", action: openSecretDoor },
+            { label: "Shop", action: goToShop },
+          ].map((item, i) => (
             <motion.a
-              key={item}
-              onClick={item === "Secret Door" ? () => setSecretDoorOpen(true) : () => navigate("/shop")}
+              key={item.label}
+              onClick={item.action}
               className="text-xs tracking-[0.25em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 font-display cursor-pointer"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.1 }}
             >
-              {item}
+              {item.label}
             </motion.a>
           ))}
           <motion.div
@@ -239,38 +256,32 @@ const Index = () => {
             {bgOptions.map((bg, i) => (
               <div
                 key={i}
-                className={`cursor-pointer transition-all duration-300 ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
-                style={{ width: "18.24px", height: "18.24px", backgroundColor: "white" }}
+                className={`cursor-pointer transition-all duration-300 w-[18px] h-[18px] bg-foreground ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
                 onClick={() => setBgImage(bg)}
               />
             ))}
             {siteMusicEnabled && (
-              <div
+              <button
                 className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
                 onClick={toggleMute}
                 aria-label={muted ? "Unmute sound" : "Mute sound"}
               >
                 {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </div>
+              </button>
             )}
           </motion.div>
         </nav>
         <MobileNav
-          onSecretDoor={() => setSecretDoorOpen(true)}
-          onShop={() => navigate("/shop")}
+          onSecretDoor={openSecretDoor}
+          onShop={goToShop}
           navButtons={navButtons}
-          actionMap={{
-            about: handleAboutClick,
-            portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
-            gallery: () => navigate("/gallery"),
-            contacts: handleContactClick,
-          }}
+          actionMap={actionMap}
           bgOptions={bgOptions}
           bgImage={bgImage}
           onBgChange={setBgImage}
           siteMusicEnabled={siteMusicEnabled}
-          bellSoundUrl={getContent("audio_bell_sound") || undefined}
-          bellSoundMuted={getContent("audio_bell_sound_muted") === "true"}
+          bellSoundUrl={bellSoundUrl}
+          bellSoundMuted={bellSoundMuted}
         />
       </motion.header>
 
@@ -288,35 +299,26 @@ const Index = () => {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.4 }}
           >
-            {(() => {
-              const actionMap: Record<string, () => void> = {
-                about: handleAboutClick,
-                portfolio: () => portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }),
-                gallery: () => navigate("/gallery"),
-                contacts: handleContactClick,
-              };
-              return navButtons
-                .filter((b) => b.is_visible)
-                .map((b) => ({ jp: b.label_jp, en: b.label, action: actionMap[b.key] }));
-            })().map((item, i) => (
-              <motion.a
-                key={item.en}
-                href={item.action ? undefined : `#${item.en.toLowerCase()}`}
-                onClick={() => {
-                  if (!muted && siteMusicEnabled && getContent("audio_bell_sound_muted") !== "true") {
-                    new Audio(getContent("audio_bell_sound") || "/audio/bell-sounds.mp3").play().catch(() => {});
-                  }
-                  item.action?.();
-                }}
-                className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <span className="font-jp text-xs tracking-widest">{item.jp}</span>
-                <span className="text-[10px] tracking-[0.3em] font-display">{item.en}</span>
-              </motion.a>
-            ))}
+            {navButtons
+              .filter((b) => b.is_visible)
+              .map((b, i) => (
+                <motion.a
+                  key={b.id}
+                  onClick={() => {
+                    if (!muted && siteMusicEnabled && !bellSoundMuted) {
+                      new Audio(bellSoundUrl || "/audio/bell-sounds.mp3").play().catch(() => {});
+                    }
+                    actionMap[b.key]?.();
+                  }}
+                  className="group flex flex-col gap-1 text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <span className="font-jp text-xs tracking-widest">{b.label_jp}</span>
+                  <span className="text-[10px] tracking-[0.3em] font-display">{b.label}</span>
+                </motion.a>
+              ))}
           </motion.nav>
         )}
       </AnimatePresence>
@@ -355,7 +357,7 @@ const Index = () => {
 
       <SecretDoorOverlay
         isOpen={secretDoorOpen}
-        onClose={() => setSecretDoorOpen(false)}
+        onClose={closeSecretDoor}
         secretDoorSoundUrl={
           getContent("audio_secret_door_muted") !== "true"
             ? getContent("audio_secret_door") || undefined
