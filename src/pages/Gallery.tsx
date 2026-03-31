@@ -217,7 +217,7 @@ const Gallery = () => {
   }, [goLightbox]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-[100svh] bg-background text-foreground">
       {/* Header */}
       <motion.header
         className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border/30"
