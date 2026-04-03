@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSecretDoorSettings } from "@/hooks/useSecretDoorSettings";
+import { useSecretDoorSettings, verifySecretCode } from "@/hooks/useSecretDoorSettings";
 
 interface SecretDoorOverlayProps {
   isOpen: boolean;
@@ -110,13 +110,14 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
     setDenied(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (code === settings.secret_code) {
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && code.length > 0) {
+      const valid = await verifySecretCode(code);
+      if (valid) {
         if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
         if (cyberpunkAudioRef.current) cyberpunkAudioRef.current.pause();
         setTimeout(() => { onClose(); window.location.href = "/secret"; }, 300);
-      } else if (code.length > 0) {
+      } else {
         setDenied(true);
         setCode("");
       }

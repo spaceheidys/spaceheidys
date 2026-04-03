@@ -2,14 +2,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface SecretDoorSettings {
-  secret_code: string;
   timer_seconds: number;
   background_url: string | null;
   music_enabled: boolean;
 }
 
 const DEFAULTS: SecretDoorSettings = {
-  secret_code: "Letmein",
   timer_seconds: 60,
   background_url: null,
   music_enabled: true,
@@ -22,7 +20,7 @@ export function useSecretDoorSettings() {
   useEffect(() => {
     supabase
       .from("secret_door_settings" as any)
-      .select("secret_code, timer_seconds, background_url, music_enabled")
+      .select("timer_seconds, background_url, music_enabled")
       .limit(1)
       .single()
       .then(({ data }) => {
@@ -32,6 +30,18 @@ export function useSecretDoorSettings() {
   }, []);
 
   return { settings, loading };
+}
+
+export async function verifySecretCode(code: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.functions.invoke("verify-secret-code", {
+      body: { code },
+    });
+    if (error) return false;
+    return data?.valid === true;
+  } catch {
+    return false;
+  }
 }
 
 export function useSecretDoorFiles() {
