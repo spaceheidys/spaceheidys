@@ -112,11 +112,17 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && code.length > 0) {
-      const valid = await verifySecretCode(code);
-      if (valid) {
+      const result = await verifySecretCode(code);
+      if (result.valid) {
         if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
         if (cyberpunkAudioRef.current) cyberpunkAudioRef.current.pause();
-        setTimeout(() => { onClose(); window.location.href = "/secret"; }, 300);
+        // Navigate with files in state so SecretPage can display signed URLs
+        setTimeout(() => {
+          onClose();
+          // Use window.__SECRET_FILES to pass data since we can't use react-router navigate here
+          (window as any).__SECRET_FILES = result.files || [];
+          window.location.href = "/secret";
+        }, 300);
       } else {
         setDenied(true);
         setCode("");

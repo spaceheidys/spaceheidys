@@ -119,18 +119,19 @@ const AdminSecretDoor = () => {
     if (!file || !settings) return;
     setUploading(true);
     const ext = file.name.split(".").pop();
-    const path = `secret-door/bg-${Date.now()}.${ext}`;
-    const { error: upErr } = await supabase.storage.from("portfolio-images").upload(path, file);
+    const path = `bg-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("secret-door-private").upload(path, file);
     if (upErr) { toast.error("Upload failed"); setUploading(false); return; }
-    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    // Store the storage reference URL (private bucket, not publicly accessible)
+    const storageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/secret-door-private/${path}`;
     const { error } = await supabase
       .from("secret_door_settings" as any)
-      .update({ background_url: urlData.publicUrl, updated_at: new Date().toISOString() } as any)
+      .update({ background_url: storageUrl, updated_at: new Date().toISOString() } as any)
       .eq("id", settings.id);
     if (error) toast.error("Failed to save");
     else {
       toast.success("Background updated");
-      setSettings((s) => s ? { ...s, background_url: urlData.publicUrl } : s);
+      setSettings((s) => s ? { ...s, background_url: storageUrl } : s);
     }
     setUploading(false);
     if (bgInputRef.current) bgInputRef.current.value = "";
@@ -158,13 +159,14 @@ const AdminSecretDoor = () => {
     }
     setUploading(true);
     const ext = file.name.split(".").pop();
-    const path = `secret-door/files/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const { error: upErr } = await supabase.storage.from("portfolio-images").upload(path, file);
+    const path = `files/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("secret-door-private").upload(path, file);
     if (upErr) { toast.error("Upload failed"); setUploading(false); return; }
-    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    // Store the storage path (not a public URL) since the bucket is private
+    const storageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/secret-door-private/${path}`;
     const { error } = await supabase
       .from("secret_door_files" as any)
-      .insert({ file_name: file.name, file_url: urlData.publicUrl, file_size: file.size, sort_order: files.length } as any);
+      .insert({ file_name: file.name, file_url: storageUrl, file_size: file.size, sort_order: files.length } as any);
     if (error) toast.error("Failed to save file");
     else {
       toast.success("File uploaded");

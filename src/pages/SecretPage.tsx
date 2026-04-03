@@ -1,11 +1,24 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Download, Loader2 } from "lucide-react";
-import { useSecretDoorFiles } from "@/hooks/useSecretDoorSettings";
+import { useState, useEffect } from "react";
+import type { SecretDoorFile } from "@/hooks/useSecretDoorSettings";
 
 const SecretPage = () => {
   const navigate = useNavigate();
-  const { files, loading } = useSecretDoorFiles();
+  const [files, setFiles] = useState<SecretDoorFile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Files are passed via window.__SECRET_FILES from the secret door overlay after successful verification
+    const stateFiles = (window as any).__SECRET_FILES;
+    if (stateFiles && Array.isArray(stateFiles)) {
+      setFiles(stateFiles.filter((f: SecretDoorFile) => f.file_url));
+      // Clean up after reading
+      delete (window as any).__SECRET_FILES;
+    }
+    setLoading(false);
+  }, []);
 
   const formatSize = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -34,7 +47,7 @@ const SecretPage = () => {
             {files.map((f, i) => (
               <motion.a
                 key={f.id}
-                href={f.file_url}
+                href={f.file_url!}
                 download={f.file_name}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -56,7 +69,9 @@ const SecretPage = () => {
               </motion.a>
             ))}
           </div>
-        ) : null}
+        ) : (
+          <p className="text-xs text-muted-foreground">No files available. Access may have expired.</p>
+        )}
 
         <button
           onClick={() => navigate("/")}
