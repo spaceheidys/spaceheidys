@@ -388,7 +388,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      secret_door_public_settings: {
+        Row: {
+          background_url: string | null
+          id: string | null
+          music_enabled: boolean | null
+          timer_seconds: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          background_url?: string | null
+          id?: string | null
+          music_enabled?: boolean | null
+          timer_seconds?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          background_url?: string | null
+          id?: string | null
+          music_enabled?: boolean | null
+          timer_seconds?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
