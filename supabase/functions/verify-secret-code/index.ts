@@ -5,9 +5,34 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Simple in-memory rate limiting per IP
+const attempts = new Map<string, { count: number; resetAt: number }>();
+const MAX_ATTEMPTS = 5;
+const WINDOW_MS = 60_000; // 1 minute
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = attempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    attempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > MAX_ATTEMPTS;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+
+  // Rate limiting
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (isRateLimited(ip)) {
+    return new Response(
+      JSON.stringify({ valid: false, error: "Too many attempts. Try again later." }),
+      { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" } }
+    );
   }
 
   try {
@@ -16,7 +41,7 @@ Deno.serve(async (req) => {
 
     if (!code || code.length > 500) {
       return new Response(
-        JSON.stringify({ valid: false, error: "Code is required" }),
+        JSON.stringify({ valid: false }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -35,11 +60,14 @@ Deno.serve(async (req) => {
     if (settingsError || !settings) {
       return new Response(
         JSON.stringify({ valid: false }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const valid = settings.secret_code === code;
+    // Constant-time-ish comparison to avoid timing attacks
+    const expected = settings.secret_code;
+    const valid = code.length === expected.length && 
+      code.split("").every((c, i) => c === expected[i]);
 
     if (!valid) {
       return new Response(
@@ -57,27 +85,17 @@ Deno.serve(async (req) => {
     const signedFiles = [];
     if (files) {
       for (const f of files) {
-        // Extract storage path from the public URL or use as-is
-        // file_url may be a full public URL or a storage path
         const bucketPath = extractStoragePath(f.file_url);
         if (bucketPath) {
           const { data: signedData } = await supabaseAdmin.storage
             .from(bucketPath.bucket)
-            .createSignedUrl(bucketPath.path, 3600); // 1 hour expiry
+            .createSignedUrl(bucketPath.path, 600); // 10 minute expiry
 
           signedFiles.push({
             id: f.id,
             file_name: f.file_name,
             file_size: f.file_size,
             file_url: signedData?.signedUrl || null,
-          });
-        } else {
-          // Fallback: file_url doesn't match known pattern, skip
-          signedFiles.push({
-            id: f.id,
-            file_name: f.file_name,
-            file_size: f.file_size,
-            file_url: null,
           });
         }
       }
@@ -89,26 +107,21 @@ Deno.serve(async (req) => {
     );
   } catch {
     return new Response(
-      JSON.stringify({ valid: false, error: "Invalid request" }),
+      JSON.stringify({ valid: false }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
 
 function extractStoragePath(url: string): { bucket: string; path: string } | null {
-  // Match URLs like .../storage/v1/object/public/bucket-name/path/to/file
-  const publicMatch = url.match(/\/storage\/v1\/object\/(?:public|sign)\/([^/]+)\/(.+)/);
-  if (publicMatch) {
-    return { bucket: publicMatch[1], path: publicMatch[2] };
+  // Match URLs like .../storage/v1/object/public/bucket-name/path or .../storage/v1/object/bucket-name/path
+  const match = url.match(/\/storage\/v1\/object\/(?:public\/)?([^/]+)\/(.+)/);
+  if (match) {
+    return { bucket: match[1], path: match[2] };
   }
-  // If it's just a relative path like "secret-door/files/abc.pdf", assume portfolio-images bucket
+  // Relative path fallback
   if (!url.startsWith("http")) {
-    return { bucket: "portfolio-images", path: url };
-  }
-  // For secret-door-private bucket URLs
-  const privateMatch = url.match(/\/storage\/v1\/object\/([^/]+)\/(.+)/);
-  if (privateMatch) {
-    return { bucket: privateMatch[1], path: privateMatch[2] };
+    return { bucket: "secret-door-private", path: url };
   }
   return null;
 }
