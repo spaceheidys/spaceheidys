@@ -19,7 +19,7 @@ export function useSecretDoorSettings() {
 
   useEffect(() => {
     supabase
-      .from("secret_door_settings" as any)
+      .from("secret_door_public_settings" as any)
       .select("timer_seconds, background_url, music_enabled")
       .limit(1)
       .single()
