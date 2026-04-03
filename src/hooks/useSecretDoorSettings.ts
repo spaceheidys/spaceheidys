@@ -32,32 +32,24 @@ export function useSecretDoorSettings() {
   return { settings, loading };
 }
 
-export async function verifySecretCode(code: string): Promise<boolean> {
+export interface SecretDoorFile {
+  id: string;
+  file_name: string;
+  file_url: string | null;
+  file_size: number;
+}
+
+export async function verifySecretCode(code: string): Promise<{ valid: boolean; files?: SecretDoorFile[] }> {
   try {
     const { data, error } = await supabase.functions.invoke("verify-secret-code", {
       body: { code },
     });
-    if (error) return false;
-    return data?.valid === true;
+    if (error) return { valid: false };
+    if (data?.valid === true) {
+      return { valid: true, files: data.files || [] };
+    }
+    return { valid: false };
   } catch {
-    return false;
+    return { valid: false };
   }
-}
-
-export function useSecretDoorFiles() {
-  const [files, setFiles] = useState<{ id: string; file_name: string; file_url: string; file_size: number }[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase
-      .from("secret_door_files" as any)
-      .select("id, file_name, file_url, file_size")
-      .order("sort_order")
-      .then(({ data }) => {
-        if (data) setFiles(data as any);
-        setLoading(false);
-      });
-  }, []);
-
-  return { files, loading };
 }
