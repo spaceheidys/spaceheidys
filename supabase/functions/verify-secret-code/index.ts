@@ -51,25 +51,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { data: settings, error: settingsError } = await supabaseAdmin
-      .from("secret_door_settings")
-      .select("secret_code")
-      .limit(1)
-      .single();
+    // Verify the code server-side via bcrypt-backed RPC. The plaintext
+    // hash never leaves the database.
+    const { data: isValid, error: verifyError } = await supabaseAdmin
+      .rpc("verify_secret_door_code", { _code: code });
 
-    if (settingsError || !settings) {
-      return new Response(
-        JSON.stringify({ valid: false }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Constant-time-ish comparison to avoid timing attacks
-    const expected = settings.secret_code;
-    const valid = code.length === expected.length && 
-      code.split("").every((c, i) => c === expected[i]);
-
-    if (!valid) {
+    if (verifyError || isValid !== true) {
       return new Response(
         JSON.stringify({ valid: false }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
