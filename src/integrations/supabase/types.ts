@@ -229,7 +229,7 @@ export type Database = {
           background_url: string | null
           id: string
           music_enabled: boolean
-          secret_code: string
+          secret_code_hash: string | null
           timer_seconds: number
           updated_at: string
         }
@@ -237,7 +237,7 @@ export type Database = {
           background_url?: string | null
           id?: string
           music_enabled?: boolean
-          secret_code?: string
+          secret_code_hash?: string | null
           timer_seconds?: number
           updated_at?: string
         }
@@ -245,7 +245,7 @@ export type Database = {
           background_url?: string | null
           id?: string
           music_enabled?: boolean
-          secret_code?: string
+          secret_code_hash?: string | null
           timer_seconds?: number
           updated_at?: string
         }
@@ -396,24 +396,20 @@ export type Database = {
           timer_seconds: number | null
           updated_at: string | null
         }
-        Insert: {
-          background_url?: string | null
-          id?: string | null
-          music_enabled?: boolean | null
-          timer_seconds?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          background_url?: string | null
-          id?: string | null
-          music_enabled?: boolean | null
-          timer_seconds?: number | null
-          updated_at?: string | null
-        }
         Relationships: []
       }
     }
     Functions: {
+      get_secret_door_public_settings: {
+        Args: never
+        Returns: {
+          background_url: string
+          id: string
+          music_enabled: boolean
+          timer_seconds: number
+          updated_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -421,6 +417,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      set_secret_door_code: { Args: { _new_code: string }; Returns: undefined }
+      verify_secret_door_code: { Args: { _code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
