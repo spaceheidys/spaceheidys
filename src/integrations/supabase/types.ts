@@ -305,6 +305,33 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_settings: {
+        Row: {
+          description: string
+          id: string
+          og_image_url: string
+          page_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          description?: string
+          id?: string
+          og_image_url?: string
+          page_key: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          description?: string
+          id?: string
+          og_image_url?: string
+          page_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       skills: {
         Row: {
           created_at: string

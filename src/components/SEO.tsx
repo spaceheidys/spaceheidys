@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useSeo } from "@/hooks/useSeo";
 
 interface SEOProps {
   title?: string;
@@ -7,6 +8,11 @@ interface SEOProps {
   image?: string;
   type?: "website" | "article" | "profile";
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** If provided, looks up SEO settings from the CMS (seo_settings table). */
+  pageKey?: string;
+  /** Used when CMS has no value or while loading. */
+  fallbackTitle?: string;
+  fallbackDescription?: string;
 }
 
 const SITE_URL = "https://spaceheidys.com";
@@ -20,10 +26,26 @@ const SEO = ({
   image = DEFAULT_IMAGE,
   type = "website",
   jsonLd,
+  pageKey,
+  fallbackTitle,
+  fallbackDescription,
 }: SEOProps) => {
+  const { seo } = useSeo(pageKey ?? "");
+
+  const resolvedTitle =
+    (pageKey && seo?.title) || fallbackTitle || title;
+  const resolvedDescription =
+    (pageKey && seo?.description) || fallbackDescription || description;
+  const resolvedImage =
+    (pageKey && seo?.og_image_url) || image || DEFAULT_IMAGE;
+
   const canonical = `${SITE_URL}${path}`;
-  const finalTitle = title.length > 60 ? title.slice(0, 57) + "…" : title;
-  const finalDesc = description.length > 160 ? description.slice(0, 157) + "…" : description;
+  const finalTitle =
+    resolvedTitle.length > 60 ? resolvedTitle.slice(0, 57) + "…" : resolvedTitle;
+  const finalDesc =
+    resolvedDescription.length > 160
+      ? resolvedDescription.slice(0, 157) + "…"
+      : resolvedDescription;
 
   return (
     <Helmet>
@@ -35,12 +57,12 @@ const SEO = ({
       <meta property="og:title" content={finalTitle} />
       <meta property="og:description" content={finalDesc} />
       <meta property="og:url" content={canonical} />
-      <meta property="og:image" content={image} />
+      <meta property="og:image" content={resolvedImage} />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={finalTitle} />
       <meta name="twitter:description" content={finalDesc} />
-      <meta name="twitter:image" content={image} />
+      <meta name="twitter:image" content={resolvedImage} />
 
       {jsonLd && (
         <script type="application/ld+json">

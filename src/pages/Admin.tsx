@@ -632,6 +632,13 @@ const Admin = () => {
           >
             Secret Door
           </button>
+          <span className="text-muted-foreground/40">|</span>
+          <button
+            onClick={() => navigate("/admin/seo")}
+            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+          >
+            SEO
+          </button>
         </div>
         <div className="flex items-center gap-4">
           <button
