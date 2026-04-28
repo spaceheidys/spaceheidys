@@ -226,8 +226,12 @@ const Index = () => {
         transition={{ duration: 0.6 }}
       >
         <span
-          className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 cursor-pointer hover:text-foreground transition-colors duration-300"
-          onClick={() => setShowNav((prev) => !prev)}
+          className="font-jp text-xs sm:text-sm tracking-widest text-foreground/70 md:cursor-pointer md:hover:text-foreground transition-colors duration-300"
+          onClick={() => {
+            if (typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches) {
+              setShowNav((prev) => !prev);
+            }
+          }}
         >
           ビコ・ク
         </span>
