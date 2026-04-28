@@ -47,8 +47,9 @@ const Shop = () => {
   return (
     <div className="min-h-[100svh] bg-background flex flex-col">
       <SEO
-        title="Shop — BIKO KU"
-        description="Shop original prints and illustrations by Viktor Ku."
+        pageKey="shop"
+        fallbackTitle="Shop — BIKO KU"
+        fallbackDescription="Shop original prints and illustrations by Viktor Ku."
         path="/shop"
       />
       <header className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border">

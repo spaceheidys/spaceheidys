@@ -220,8 +220,9 @@ const Gallery = () => {
   return (
     <div className="min-h-[100svh] bg-background text-foreground">
       <SEO
-        title="Gallery — BIKO KU"
-        description="Browse the full illustration gallery by Viktor Ku — manga-inspired black & white artwork."
+        pageKey="gallery"
+        fallbackTitle="Gallery — BIKO KU"
+        fallbackDescription="Browse the full illustration gallery by Viktor Ku — manga-inspired black & white artwork."
         path="/gallery"
       />
       {/* Header */}

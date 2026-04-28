@@ -214,8 +214,9 @@ const Index = () => {
   return (
     <>
       <SEO
-        title="BIKO KU — Creative Portfolio"
-        description="Illustration portfolio by Viktor Ku. Black & white manga-inspired creative work."
+        pageKey="home"
+        fallbackTitle="BIKO KU — Creative Portfolio"
+        fallbackDescription="Illustration portfolio by Viktor Ku. Black & white manga-inspired creative work."
         path="/"
         jsonLd={{
           "@context": "https://schema.org",
