@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import SEO from "@/components/SEO";
 
 interface GalleryItem {
   id: string;
