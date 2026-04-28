@@ -18,6 +18,10 @@ export const useSeo = (pageKey: string) => {
 
   useEffect(() => {
     let cancelled = false;
+    if (!pageKey) {
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       const { data } = await supabase
         .from("seo_settings")
