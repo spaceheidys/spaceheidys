@@ -20,6 +20,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import HeroSection from "@/pages/IndexPage/HeroSection";
 import MainTextSection from "@/pages/IndexPage/MainTextSection";
 import PortfolioSection from "@/pages/IndexPage/PortfolioSection";
+import SEO from "@/components/SEO";
 
 const DEFAULT_BG_OPTIONS = [lostInTime01, lostInTime02, lostInTime03];
 
@@ -212,6 +213,19 @@ const Index = () => {
 
   return (
     <>
+      <SEO
+        title="BIKO KU — Creative Portfolio"
+        description="Illustration portfolio by Viktor Ku. Black & white manga-inspired creative work."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: "Viktor Ku",
+          alternateName: "BIKO KU",
+          url: "https://spaceheidys.com",
+          jobTitle: "Illustrator",
+        }}
+      />
       <AnimatePresence>
         {loading && (
           <LoadingScreen onComplete={() => { sessionStorage.setItem("loaded", "1"); setLoading(false); }} />

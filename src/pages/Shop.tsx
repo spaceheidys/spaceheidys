@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const Shop = () => {
   const navigate = useNavigate();
@@ -45,6 +46,11 @@ const Shop = () => {
 
   return (
     <div className="min-h-[100svh] bg-background flex flex-col">
+      <SEO
+        title="Shop — BIKO KU"
+        description="Shop original prints and illustrations by Viktor Ku."
+        path="/shop"
+      />
       <header className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border">
         <button
           onClick={() => navigate("/")}

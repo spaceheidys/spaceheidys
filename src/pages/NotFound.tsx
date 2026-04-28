@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import SEO from "@/components/SEO";
 
 const NotFound = () => {
   const location = useLocation();
@@ -12,6 +13,7 @@ const NotFound = () => {
 
   return (
     <div className="flex min-h-[100svh] items-center justify-center bg-background px-4">
+      <SEO title="404 — Page Not Found | BIKO KU" description="The page you are looking for does not exist." path={location.pathname} />
       <motion.div
         className="text-center"
         initial={{ opacity: 0, y: 20 }}
