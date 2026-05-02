@@ -428,7 +428,14 @@ const AdminShop = () => {
       .select("*")
       .order("category", { ascending: true })
       .order("sort_order", { ascending: true });
-    if (!error && data) setItems(data as ShopItem[]);
+    if (!error && data) {
+      setItems(
+        data.map((d: any) => ({
+          ...d,
+          variants: Array.isArray(d.variants) ? d.variants : [],
+        })) as ShopItem[]
+      );
+    }
     setLoading(false);
   };
 
