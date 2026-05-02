@@ -533,6 +533,7 @@ const AdminShop = () => {
     images: [],
     sort_order: 0,
     visible: true,
+    variants: [],
   });
 
   if (authLoading) {
