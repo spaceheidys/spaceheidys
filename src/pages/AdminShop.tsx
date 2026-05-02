@@ -86,7 +86,19 @@ const SortableRow = ({
       <div className="flex-1 min-w-0">
         <p className="text-xs font-display tracking-wider uppercase text-foreground truncate">{item.title || <span className="text-muted-foreground/40">(untitled)</span>}</p>
         <p className="text-[10px] text-muted-foreground font-body">
-          {item.price !== null ? `${item.currency} ${Number(item.price).toFixed(2)}` : "—"}
+          {(() => {
+            const prices = (item.variants || [])
+              .map((v) => v.price)
+              .filter((p): p is number => p !== null && p !== undefined && !isNaN(Number(p)));
+            if (prices.length > 0) {
+              const min = Math.min(...prices);
+              const max = Math.max(...prices);
+              return min === max
+                ? `${item.currency} ${min.toFixed(2)} · ${prices.length} opt`
+                : `${item.currency} ${min.toFixed(2)}–${max.toFixed(2)} · ${prices.length} opt`;
+            }
+            return item.price !== null ? `${item.currency} ${Number(item.price).toFixed(2)}` : "—";
+          })()}
         </p>
       </div>
       <button
