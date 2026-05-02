@@ -138,6 +138,13 @@ const AdminSEO = () => {
           </button>
           <span className="text-muted-foreground/40">|</span>
           <h1 className="font-display text-sm tracking-[0.3em] uppercase">SEO</h1>
+          <span className="text-muted-foreground/40">|</span>
+          <button
+            onClick={() => navigate("/admin/shop")}
+            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Shop
+          </button>
         </div>
         <button
           onClick={() => navigate("/")}

@@ -332,6 +332,51 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_items: {
+        Row: {
+          category: Database["public"]["Enums"]["shop_category"]
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          images: string[]
+          main_image: string | null
+          price: number | null
+          sort_order: number
+          title: string
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["shop_category"]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: string[]
+          main_image?: string | null
+          price?: number | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["shop_category"]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: string[]
+          main_image?: string | null
+          price?: number | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
       skills: {
         Row: {
           created_at: string
@@ -449,6 +494,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      shop_category: "prints" | "merch"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -577,6 +623,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      shop_category: ["prints", "merch"],
     },
   },
 } as const
