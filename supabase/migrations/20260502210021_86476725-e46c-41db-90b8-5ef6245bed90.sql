@@ -1,0 +1,1 @@
+ALTER TABLE public.shop_items ADD COLUMN IF NOT EXISTS variants jsonb NOT NULL DEFAULT '[]'::jsonb;
