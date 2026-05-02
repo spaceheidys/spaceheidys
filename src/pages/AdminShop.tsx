@@ -185,7 +185,7 @@ const ItemEditor = ({
     if (item.id === "__new__") {
       const { error: e } = await supabase
         .from("shop_items")
-        .insert({ ...payload, sort_order: Date.now() });
+        .insert({ ...payload, sort_order: Math.floor(Date.now() / 1000) });
       error = e;
     } else {
       const { error: e } = await supabase
