@@ -14,6 +14,11 @@ import { CSS } from "@dnd-kit/utilities";
 
 type Category = "prints" | "merch";
 
+interface Variant {
+  label: string;
+  price: number | null;
+}
+
 interface ShopItem {
   id: string;
   category: Category;
@@ -25,11 +30,22 @@ interface ShopItem {
   images: string[];
   sort_order: number;
   visible: boolean;
+  variants: Variant[];
 }
 
 const CATEGORY_LABELS: Record<Category, string> = {
   prints: "Prints & Originals",
   merch: "Merch",
+};
+
+const VARIANT_LABEL: Record<Category, string> = {
+  prints: "Paper size",
+  merch: "T-shirt size",
+};
+
+const VARIANT_PRESETS: Record<Category, string[]> = {
+  prints: ["A5", "A4", "A3", "A2", "Original"],
+  merch: ["XS", "S", "M", "L", "XL", "XXL"],
 };
 
 const SortableRow = ({
@@ -70,7 +86,19 @@ const SortableRow = ({
       <div className="flex-1 min-w-0">
         <p className="text-xs font-display tracking-wider uppercase text-foreground truncate">{item.title || <span className="text-muted-foreground/40">(untitled)</span>}</p>
         <p className="text-[10px] text-muted-foreground font-body">
-          {item.price !== null ? `${item.currency} ${Number(item.price).toFixed(2)}` : "—"}
+          {(() => {
+            const prices = (item.variants || [])
+              .map((v) => v.price)
+              .filter((p): p is number => p !== null && p !== undefined && !isNaN(Number(p)));
+            if (prices.length > 0) {
+              const min = Math.min(...prices);
+              const max = Math.max(...prices);
+              return min === max
+                ? `${item.currency} ${min.toFixed(2)} · ${prices.length} opt`
+                : `${item.currency} ${min.toFixed(2)}–${max.toFixed(2)} · ${prices.length} opt`;
+            }
+            return item.price !== null ? `${item.currency} ${Number(item.price).toFixed(2)}` : "—";
+          })()}
         </p>
       </div>
       <button
@@ -180,6 +208,12 @@ const ItemEditor = ({
       main_image: draft.main_image,
       images: draft.images,
       visible: draft.visible,
+      variants: (draft.variants || [])
+        .map((v) => ({
+          label: (v.label || "").trim(),
+          price: v.price === null || v.price === undefined || isNaN(Number(v.price)) ? null : Number(v.price),
+        }))
+        .filter((v) => v.label !== ""),
     };
     let error;
     if (item.id === "__new__") {
@@ -260,7 +294,9 @@ const ItemEditor = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[10px] font-display tracking-widest uppercase text-muted-foreground mb-1">Price</label>
+            <label className="block text-[10px] font-display tracking-widest uppercase text-muted-foreground mb-1">
+              Base price {draft.variants.length > 0 && <span className="text-muted-foreground/50">(fallback)</span>}
+            </label>
             <input
               type="number"
               step="0.01"
@@ -282,6 +318,94 @@ const ItemEditor = ({
               <option value="GBP">GBP</option>
             </select>
           </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-[10px] font-display tracking-widest uppercase text-muted-foreground">
+              {VARIANT_LABEL[draft.category]} options ({draft.variants.length})
+            </label>
+            <div className="flex items-center gap-1 flex-wrap">
+              {VARIANT_PRESETS[draft.category].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() =>
+                    setDraft({
+                      ...draft,
+                      variants: [...draft.variants, { label: p, price: draft.price ?? null }],
+                    })
+                  }
+                  className="text-[9px] font-display tracking-widest uppercase px-1.5 py-0.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground/40"
+                >
+                  + {p}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  setDraft({
+                    ...draft,
+                    variants: [...draft.variants, { label: "", price: draft.price ?? null }],
+                  })
+                }
+                className="text-[9px] font-display tracking-widest uppercase px-1.5 py-0.5 border border-foreground text-foreground"
+              >
+                + Custom
+              </button>
+            </div>
+          </div>
+          {draft.variants.length === 0 ? (
+            <p className="text-[10px] text-muted-foreground/60 font-body italic">
+              No options. Add sizes above and set a price for each.
+            </p>
+          ) : (
+            <div className="space-y-1.5">
+              {draft.variants.map((v, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <input
+                    value={v.label}
+                    onChange={(e) => {
+                      const next = [...draft.variants];
+                      next[idx] = { ...next[idx], label: e.target.value };
+                      setDraft({ ...draft, variants: next });
+                    }}
+                    placeholder="Size / label"
+                    maxLength={40}
+                    className="flex-1 bg-transparent border border-border px-2 py-1 text-xs text-foreground outline-none focus:border-foreground"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={v.price ?? ""}
+                    onChange={(e) => {
+                      const next = [...draft.variants];
+                      next[idx] = {
+                        ...next[idx],
+                        price: e.target.value === "" ? null : Number(e.target.value),
+                      };
+                      setDraft({ ...draft, variants: next });
+                    }}
+                    placeholder="Price"
+                    className="w-24 bg-transparent border border-border px-2 py-1 text-xs text-foreground outline-none focus:border-foreground"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDraft({
+                        ...draft,
+                        variants: draft.variants.filter((_, i) => i !== idx),
+                      })
+                    }
+                    className="p-1 border border-border text-muted-foreground hover:text-foreground"
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
@@ -412,7 +536,14 @@ const AdminShop = () => {
       .select("*")
       .order("category", { ascending: true })
       .order("sort_order", { ascending: true });
-    if (!error && data) setItems(data as ShopItem[]);
+    if (!error && data) {
+      setItems(
+        data.map((d: any) => ({
+          ...d,
+          variants: Array.isArray(d.variants) ? d.variants : [],
+        })) as ShopItem[]
+      );
+    }
     setLoading(false);
   };
 
@@ -510,6 +641,7 @@ const AdminShop = () => {
     images: [],
     sort_order: 0,
     visible: true,
+    variants: [],
   });
 
   if (authLoading) {

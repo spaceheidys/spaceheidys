@@ -345,6 +345,7 @@ export type Database = {
           sort_order: number
           title: string
           updated_at: string
+          variants: Json
           visible: boolean
         }
         Insert: {
@@ -359,6 +360,7 @@ export type Database = {
           sort_order?: number
           title: string
           updated_at?: string
+          variants?: Json
           visible?: boolean
         }
         Update: {
@@ -373,6 +375,7 @@ export type Database = {
           sort_order?: number
           title?: string
           updated_at?: string
+          variants?: Json
           visible?: boolean
         }
         Relationships: []
