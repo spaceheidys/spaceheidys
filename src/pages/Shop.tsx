@@ -309,9 +309,46 @@ const Shop = () => {
                 <h3 className="text-xl font-display tracking-wider uppercase text-foreground">
                   {selected.title}
                 </h3>
-                <p className="text-lg font-display tracking-wider text-foreground">
-                  {formatPrice(selected)}
-                </p>
+                {(() => {
+                  const variants = selected.variants || [];
+                  const activeVariant = variants[selectedVariantIdx];
+                  const activePrice =
+                    variants.length > 0 && activeVariant && activeVariant.price !== null
+                      ? fmt(selected.currency, Number(activeVariant.price))
+                      : formatPrice(selected);
+                  return (
+                    <>
+                      <p className="text-lg font-display tracking-wider text-foreground">{activePrice}</p>
+                      {variants.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-display tracking-[0.25em] uppercase text-muted-foreground mb-2">
+                            {VARIANT_LABEL[selected.category] || "Option"}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {variants.map((v, i) => (
+                              <button
+                                key={i}
+                                onClick={() => setSelectedVariantIdx(i)}
+                                className={`text-[10px] font-display tracking-widest uppercase px-3 py-1.5 border transition-colors ${
+                                  i === selectedVariantIdx
+                                    ? "border-foreground text-foreground"
+                                    : "border-border text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                {v.label}
+                                {v.price !== null && (
+                                  <span className="ml-1.5 text-muted-foreground/70">
+                                    {fmt(selected.currency, Number(v.price))}
+                                  </span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
                 {selected.description && (
                   <p className="text-sm font-body text-muted-foreground leading-relaxed whitespace-pre-line">
                     {selected.description}
