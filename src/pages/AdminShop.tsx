@@ -282,7 +282,9 @@ const ItemEditor = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[10px] font-display tracking-widest uppercase text-muted-foreground mb-1">Price</label>
+            <label className="block text-[10px] font-display tracking-widest uppercase text-muted-foreground mb-1">
+              Base price {draft.variants.length > 0 && <span className="text-muted-foreground/50">(fallback)</span>}
+            </label>
             <input
               type="number"
               step="0.01"
@@ -304,6 +306,94 @@ const ItemEditor = ({
               <option value="GBP">GBP</option>
             </select>
           </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-[10px] font-display tracking-widest uppercase text-muted-foreground">
+              {VARIANT_LABEL[draft.category]} options ({draft.variants.length})
+            </label>
+            <div className="flex items-center gap-1 flex-wrap">
+              {VARIANT_PRESETS[draft.category].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() =>
+                    setDraft({
+                      ...draft,
+                      variants: [...draft.variants, { label: p, price: draft.price ?? null }],
+                    })
+                  }
+                  className="text-[9px] font-display tracking-widest uppercase px-1.5 py-0.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground/40"
+                >
+                  + {p}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  setDraft({
+                    ...draft,
+                    variants: [...draft.variants, { label: "", price: draft.price ?? null }],
+                  })
+                }
+                className="text-[9px] font-display tracking-widest uppercase px-1.5 py-0.5 border border-foreground text-foreground"
+              >
+                + Custom
+              </button>
+            </div>
+          </div>
+          {draft.variants.length === 0 ? (
+            <p className="text-[10px] text-muted-foreground/60 font-body italic">
+              No options. Add sizes above and set a price for each.
+            </p>
+          ) : (
+            <div className="space-y-1.5">
+              {draft.variants.map((v, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <input
+                    value={v.label}
+                    onChange={(e) => {
+                      const next = [...draft.variants];
+                      next[idx] = { ...next[idx], label: e.target.value };
+                      setDraft({ ...draft, variants: next });
+                    }}
+                    placeholder="Size / label"
+                    maxLength={40}
+                    className="flex-1 bg-transparent border border-border px-2 py-1 text-xs text-foreground outline-none focus:border-foreground"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={v.price ?? ""}
+                    onChange={(e) => {
+                      const next = [...draft.variants];
+                      next[idx] = {
+                        ...next[idx],
+                        price: e.target.value === "" ? null : Number(e.target.value),
+                      };
+                      setDraft({ ...draft, variants: next });
+                    }}
+                    placeholder="Price"
+                    className="w-24 bg-transparent border border-border px-2 py-1 text-xs text-foreground outline-none focus:border-foreground"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDraft({
+                        ...draft,
+                        variants: draft.variants.filter((_, i) => i !== idx),
+                      })
+                    }
+                    className="p-1 border border-border text-muted-foreground hover:text-foreground"
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
