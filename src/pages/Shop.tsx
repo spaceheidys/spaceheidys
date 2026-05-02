@@ -4,6 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
 import SEO from "@/components/SEO";
 
+interface Variant {
+  label: string;
+  price: number | null;
+}
+
 interface ShopItem {
   id: string;
   category: "prints" | "merch";
@@ -14,11 +19,17 @@ interface ShopItem {
   main_image: string | null;
   images: string[];
   sort_order: number;
+  variants: Variant[];
 }
 
 const CATEGORY_LABELS: Record<string, { en: string; jp: string }> = {
   prints: { en: "Prints & Originals", jp: "プリント" },
   merch: { en: "Merch", jp: "グッズ" },
+};
+
+const VARIANT_LABEL: Record<string, string> = {
+  prints: "Paper size",
+  merch: "Size",
 };
 
 const Shop = () => {
@@ -29,6 +40,7 @@ const Shop = () => {
   const [activeCategory, setActiveCategory] = useState<"all" | "prints" | "merch">("all");
   const [selected, setSelected] = useState<ShopItem | null>(null);
   const [imgIndex, setImgIndex] = useState(0);
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState<number>(0);
 
   useEffect(() => {
     const check = async () => {
@@ -52,16 +64,35 @@ const Shop = () => {
         .eq("visible", true)
         .order("category", { ascending: true })
         .order("sort_order", { ascending: true });
-      if (!error && data) setItems(data as ShopItem[]);
+      if (!error && data) {
+        setItems(
+          data.map((d: any) => ({
+            ...d,
+            variants: Array.isArray(d.variants) ? d.variants : [],
+          })) as ShopItem[]
+        );
+      }
       setLoading(false);
     };
     fetchItems();
   }, [visible]);
 
+  const symbolFor = (cur: string) =>
+    cur === "EUR" ? "€" : cur === "USD" ? "$" : cur === "GBP" ? "£" : cur;
+
+  const fmt = (cur: string, n: number) => `${symbolFor(cur)}${Number(n).toFixed(0)}`;
+
   const formatPrice = (item: ShopItem) => {
+    const prices = (item.variants || [])
+      .map((v) => v.price)
+      .filter((p): p is number => p !== null && p !== undefined && !isNaN(Number(p)));
+    if (prices.length > 0) {
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      return min === max ? fmt(item.currency, min) : `${fmt(item.currency, min)}–${fmt(item.currency, max)}`;
+    }
     if (item.price === null || item.price === undefined) return "—";
-    const symbol = item.currency === "EUR" ? "€" : item.currency === "USD" ? "$" : item.currency;
-    return `${symbol}${Number(item.price).toFixed(0)}`;
+    return fmt(item.currency, Number(item.price));
   };
 
   const filteredItems =
@@ -75,6 +106,7 @@ const Shop = () => {
   const openItem = (item: ShopItem) => {
     setSelected(item);
     setImgIndex(0);
+    setSelectedVariantIdx(0);
   };
 
   const allImages = (item: ShopItem) => {
