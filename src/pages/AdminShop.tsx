@@ -196,6 +196,12 @@ const ItemEditor = ({
       main_image: draft.main_image,
       images: draft.images,
       visible: draft.visible,
+      variants: (draft.variants || [])
+        .map((v) => ({
+          label: (v.label || "").trim(),
+          price: v.price === null || v.price === undefined || isNaN(Number(v.price)) ? null : Number(v.price),
+        }))
+        .filter((v) => v.label !== ""),
     };
     let error;
     if (item.id === "__new__") {
