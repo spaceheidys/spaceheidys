@@ -14,6 +14,11 @@ import { CSS } from "@dnd-kit/utilities";
 
 type Category = "prints" | "merch";
 
+interface Variant {
+  label: string;
+  price: number | null;
+}
+
 interface ShopItem {
   id: string;
   category: Category;
@@ -25,11 +30,22 @@ interface ShopItem {
   images: string[];
   sort_order: number;
   visible: boolean;
+  variants: Variant[];
 }
 
 const CATEGORY_LABELS: Record<Category, string> = {
   prints: "Prints & Originals",
   merch: "Merch",
+};
+
+const VARIANT_LABEL: Record<Category, string> = {
+  prints: "Paper size",
+  merch: "T-shirt size",
+};
+
+const VARIANT_PRESETS: Record<Category, string[]> = {
+  prints: ["A5", "A4", "A3", "A2", "Original"],
+  merch: ["XS", "S", "M", "L", "XL", "XXL"],
 };
 
 const SortableRow = ({
