@@ -294,6 +294,35 @@ const AdminMain = () => {
     }
   };
 
+  // Drag-and-drop reorder of all active backgrounds in the current section
+  const handleBgDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const items = backgrounds
+      .filter((b) => b.section === activeSection)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const oldIdx = items.findIndex((b) => b.id === active.id);
+    const newIdx = items.findIndex((b) => b.id === over.id);
+    if (oldIdx === -1 || newIdx === -1) return;
+    const reordered = arrayMove(items, oldIdx, newIdx);
+    // Optimistic update
+    setBackgrounds((prev) =>
+      prev.map((b) => {
+        const idx = reordered.findIndex((r) => r.id === b.id);
+        return idx === -1 ? b : { ...b, sort_order: idx };
+      })
+    );
+    const updates = await Promise.all(
+      reordered.map((b, idx) =>
+        supabase.from("page_backgrounds").update({ sort_order: idx }).eq("id", b.id)
+      )
+    );
+    if (updates.some((u) => u.error)) {
+      toast.error("Reorder failed");
+      fetchBackgrounds();
+    }
+  };
+
   if (loading || !user || !isAdmin) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
