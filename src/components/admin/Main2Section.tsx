@@ -37,6 +37,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [frontImage, setFrontImage] = useState("");
   const [frontImages, setFrontImages] = useState<{url: string; text: string}[]>([]);
   const [backImage, setBackImage] = useState("");
+  const [backImages, setBackImages] = useState<{url: string; weight: number}[]>([]);
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
   const [bgWallpaper, setBgWallpaper] = useState("");
@@ -55,6 +56,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const frontRef = useRef<HTMLInputElement>(null);
   const frontMultiRef = useRef<HTMLInputElement>(null);
   const backRef = useRef<HTMLInputElement>(null);
+  const backMultiRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
   const wallpaperRef = useRef<HTMLInputElement>(null);
 
@@ -109,6 +111,12 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
       }
     } catch { setFrontImages([]); }
     setBackImage(get("card_back_image"));
+    try {
+      const parsed = JSON.parse(get("card_back_images") || "[]");
+      if (Array.isArray(parsed)) {
+        setBackImages(parsed.map((item: any) => typeof item === "string" ? { url: item, weight: 1 } : { url: item.url, weight: Number(item.weight) || 1 }));
+      }
+    } catch { setBackImages([]); }
     setBgType(get("card_bg_type") || "polygon");
     setBgVideo(get("card_bg_video"));
     setBgWallpaper(get("card_bg_wallpaper"));
@@ -165,6 +173,34 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     const updated = frontImages.map((item, i) => i === index ? { ...item, text } : item);
     setFrontImages(updated);
     await update("card_front_images", JSON.stringify(updated));
+  };
+
+  const handleAddBackImage = async (file: File) => {
+    setUploading("card_back_images");
+    const ext = file.name.split(".").pop();
+    const path = `cards/back_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    const updated = [...backImages, { url, weight: 1 }];
+    setBackImages(updated);
+    await update("card_back_images", JSON.stringify(updated));
+    toast.success("Back image added");
+    setUploading(null);
+  };
+
+  const handleRemoveBackImage = async (index: number) => {
+    const updated = backImages.filter((_, i) => i !== index);
+    setBackImages(updated);
+    await update("card_back_images", JSON.stringify(updated));
+    toast.success("Image removed");
+  };
+
+  const handleUpdateBackImageWeight = async (index: number, weight: number) => {
+    const updated = backImages.map((item, i) => i === index ? { ...item, weight } : item);
+    setBackImages(updated);
+    await update("card_back_images", JSON.stringify(updated));
   };
 
   const handleVideoUpload = async (file: File) => {
@@ -234,9 +270,14 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm === "upload_card_back_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_back_image");
     else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
     else if (confirm === "upload_card_front_multi" && pendingFile) await handleAddFrontImage(pendingFile.file);
+    else if (confirm === "upload_card_back_multi" && pendingFile) await handleAddBackImage(pendingFile.file);
     else if (confirm?.startsWith("remove_front_")) {
       const idx = parseInt(confirm.replace("remove_front_", ""), 10);
       if (!isNaN(idx)) await handleRemoveFrontImage(idx);
+    }
+    else if (confirm?.startsWith("remove_back_")) {
+      const idx = parseInt(confirm.replace("remove_back_", ""), 10);
+      if (!isNaN(idx)) await handleRemoveBackImage(idx);
     }
     setConfirm(null);
     setPendingFile(null);
