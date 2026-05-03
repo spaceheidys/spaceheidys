@@ -347,6 +347,10 @@ const AdminMain = () => {
               {!item.isDefault && (
                 <>
                   <button onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)} title="Swap" className={`absolute top-2 left-2 p-1 transition-opacity ${swapTarget === item.id ? "bg-primary text-primary-foreground opacity-100" : "bg-background/80 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"}`}><ArrowUpDown size={14} /></button>
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => moveBackground(item.id, -1)} title="Move left/up" className="p-1 bg-background/80 text-muted-foreground hover:text-foreground"><ArrowUp size={14} /></button>
+                    <button onClick={() => moveBackground(item.id, 1)} title="Move right/down" className="p-1 bg-background/80 text-muted-foreground hover:text-foreground"><ArrowDown size={14} /></button>
+                  </div>
                   {confirmBg?.action === "toggle" && confirmBg.id === item.id ? (
                     <span className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
                       <button onClick={async () => { const bg = backgrounds.find(b => b.id === item.id); if (!bg) return; const { error } = await supabase.from("page_backgrounds").update({ is_active: !bg.is_active }).eq("id", item.id); if (!error) { setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b)); toast.success(bg.is_active ? "Hidden" : "Visible"); } setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>
