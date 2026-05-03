@@ -15,6 +15,7 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
+  rectSortingStrategy,
   arrayMove,
   useSortable,
 } from "@dnd-kit/sortable";
@@ -65,6 +66,16 @@ const SortableMainSection = ({ id, label, collapsed, onToggleCollapse, children 
         </button>
       </div>
       {!collapsed && children}
+    </div>
+  );
+};
+
+const SortableBgCard = ({ id, children }: { id: string; children: (handleProps: { attributes: any; listeners: any }) => React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1, zIndex: isDragging ? 10 : undefined };
+  return (
+    <div ref={setNodeRef} style={style}>
+      {children({ attributes, listeners })}
     </div>
   );
 };
@@ -293,6 +304,35 @@ const AdminMain = () => {
     }
   };
 
+  // Drag-and-drop reorder of all active backgrounds in the current section
+  const handleBgDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const items = backgrounds
+      .filter((b) => b.section === activeSection)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const oldIdx = items.findIndex((b) => b.id === active.id);
+    const newIdx = items.findIndex((b) => b.id === over.id);
+    if (oldIdx === -1 || newIdx === -1) return;
+    const reordered = arrayMove(items, oldIdx, newIdx);
+    // Optimistic update
+    setBackgrounds((prev) =>
+      prev.map((b) => {
+        const idx = reordered.findIndex((r) => r.id === b.id);
+        return idx === -1 ? b : { ...b, sort_order: idx };
+      })
+    );
+    const updates = await Promise.all(
+      reordered.map((b, idx) =>
+        supabase.from("page_backgrounds").update({ sort_order: idx }).eq("id", b.id)
+      )
+    );
+    if (updates.some((u) => u.error)) {
+      toast.error("Reorder failed");
+      fetchBackgrounds();
+    }
+  };
+
   if (loading || !user || !isAdmin) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -330,53 +370,66 @@ const AdminMain = () => {
       {fetching ? (
         <div className="flex justify-center py-12"><Loader2 className="animate-spin text-muted-foreground" size={20} /></div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {(sectionItems.length > 0
-            ? sectionItems.map((item) => ({ src: item.image_url, id: item.id, isDefault: false }))
-            : activeSection === "main"
-              ? [lostInTime01, lostInTime02, lostInTime03].map((src, i) => ({ src, id: `default-${i}`, isDefault: true }))
-              : []
-          ).map((item) => (
-            <div key={item.id} className={`group relative border aspect-video overflow-hidden transition-all ${swapTarget === item.id ? "border-primary ring-2 ring-primary/30" : "border-border"} ${!item.isDefault && backgrounds.find(b => b.id === item.id)?.is_active === false ? "opacity-40" : ""}`}>
-              {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(item.src) ? (
-                <video src={item.src} muted className="w-full h-full object-cover" />
-              ) : (
-                <img src={item.src} alt="Background" className="w-full h-full object-cover" />
-              )}
-              {item.isDefault && <span className="absolute bottom-2 left-2 text-[9px] font-display tracking-widest uppercase text-foreground/60 bg-background/70 px-1.5 py-0.5">Default</span>}
-              {!item.isDefault && (
-                <>
-                  <button onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)} title="Swap" className={`absolute top-2 left-2 p-1 transition-opacity ${swapTarget === item.id ? "bg-primary text-primary-foreground opacity-100" : "bg-background/80 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"}`}><ArrowUpDown size={14} /></button>
-                  <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => moveBackground(item.id, -1)} title="Move left/up" className="p-1 bg-background/80 text-muted-foreground hover:text-foreground"><ArrowUp size={14} /></button>
-                    <button onClick={() => moveBackground(item.id, 1)} title="Move right/down" className="p-1 bg-background/80 text-muted-foreground hover:text-foreground"><ArrowDown size={14} /></button>
+        <DndContext sensors={mainSensors} collisionDetection={closestCenter} onDragEnd={handleBgDragEnd}>
+          <SortableContext items={sectionItems.map((i) => i.id)} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {(sectionItems.length > 0
+                ? sectionItems.map((item) => ({ src: item.image_url, id: item.id, isDefault: false }))
+                : activeSection === "main"
+                  ? [lostInTime01, lostInTime02, lostInTime03].map((src, i) => ({ src, id: `default-${i}`, isDefault: true }))
+                  : []
+              ).map((item) => {
+                const cardInner = (handleProps?: { attributes: any; listeners: any }) => (
+                  <div className={`group relative border aspect-video overflow-hidden transition-all ${swapTarget === item.id ? "border-primary ring-2 ring-primary/30" : "border-border"} ${!item.isDefault && backgrounds.find(b => b.id === item.id)?.is_active === false ? "opacity-40" : ""}`}>
+                    {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(item.src) ? (
+                      <video src={item.src} muted className="w-full h-full object-cover pointer-events-none" />
+                    ) : (
+                      <img src={item.src} alt="Background" className="w-full h-full object-cover pointer-events-none" draggable={false} />
+                    )}
+                    {item.isDefault && <span className="absolute bottom-2 left-2 text-[9px] font-display tracking-widest uppercase text-foreground/60 bg-background/70 px-1.5 py-0.5">Default</span>}
+                    {!item.isDefault && handleProps && (
+                      <>
+                        <button {...handleProps.attributes} {...handleProps.listeners} title="Drag to reorder" className="absolute inset-x-0 top-0 h-8 flex items-center justify-center bg-background/0 hover:bg-background/40 text-muted-foreground/0 hover:text-foreground transition-colors cursor-grab active:cursor-grabbing touch-none">
+                          <GripVertical size={16} />
+                        </button>
+                        <button onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)} title="Swap" className={`absolute top-2 left-2 p-1 transition-opacity ${swapTarget === item.id ? "bg-primary text-primary-foreground opacity-100" : "bg-background/80 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"}`}><ArrowUpDown size={14} /></button>
+                        {confirmBg?.action === "toggle" && confirmBg.id === item.id ? (
+                          <span className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                            <button onClick={async () => { const bg = backgrounds.find(b => b.id === item.id); if (!bg) return; const { error } = await supabase.from("page_backgrounds").update({ is_active: !bg.is_active }).eq("id", item.id); if (!error) { setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b)); toast.success(bg.is_active ? "Hidden" : "Visible"); } setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>
+                            <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors"><X size={9} /> NO</button>
+                          </span>
+                        ) : (
+                          <button onClick={() => setConfirmBg({ action: "toggle", id: item.id })} className={`absolute bottom-2 left-2 p-1 transition-opacity ${backgrounds.find(b => b.id === item.id)?.is_active === false ? "bg-background/80 text-muted-foreground/40 opacity-100" : "bg-background/80 text-foreground opacity-0 group-hover:opacity-100"}`}>
+                            {backgrounds.find(b => b.id === item.id)?.is_active === false ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        )}
+                        {confirmBg?.action === "delete" && confirmBg.id === item.id ? (
+                          <span className="absolute top-2 right-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
+                            <button onClick={() => { handleDelete(item.id); setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>
+                            <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors"><X size={9} /> NO</button>
+                          </span>
+                        ) : (
+                          <button onClick={() => setConfirmBg({ action: "delete", id: item.id })} className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={14} /></button>
+                        )}
+                      </>
+                    )}
                   </div>
-                  {confirmBg?.action === "toggle" && confirmBg.id === item.id ? (
-                    <span className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
-                      <button onClick={async () => { const bg = backgrounds.find(b => b.id === item.id); if (!bg) return; const { error } = await supabase.from("page_backgrounds").update({ is_active: !bg.is_active }).eq("id", item.id); if (!error) { setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b)); toast.success(bg.is_active ? "Hidden" : "Visible"); } setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>
-                      <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors"><X size={9} /> NO</button>
-                    </span>
-                  ) : (
-                    <button onClick={() => setConfirmBg({ action: "toggle", id: item.id })} className={`absolute bottom-2 left-2 p-1 transition-opacity ${backgrounds.find(b => b.id === item.id)?.is_active === false ? "bg-background/80 text-muted-foreground/40 opacity-100" : "bg-background/80 text-foreground opacity-0 group-hover:opacity-100"}`}>
-                      {backgrounds.find(b => b.id === item.id)?.is_active === false ? <EyeOff size={14} /> : <Eye size={14} />}
-                    </button>
-                  )}
-                  {confirmBg?.action === "delete" && confirmBg.id === item.id ? (
-                    <span className="absolute top-2 right-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
-                      <button onClick={() => { handleDelete(item.id); setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>
-                      <button onClick={() => setConfirmBg(null)} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-border text-muted-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:text-foreground hover:border-foreground transition-colors"><X size={9} /> NO</button>
-                    </span>
-                  ) : (
-                    <button onClick={() => setConfirmBg({ action: "delete", id: item.id })} className="absolute top-2 right-2 p-1 bg-background/80 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={14} /></button>
-                  )}
-                </>
+                );
+                if (item.isDefault) {
+                  return <div key={item.id}>{cardInner()}</div>;
+                }
+                return (
+                  <SortableBgCard key={item.id} id={item.id}>
+                    {(handleProps) => cardInner(handleProps)}
+                  </SortableBgCard>
+                );
+              })}
+              {sectionItems.length === 0 && activeSection !== "main" && (
+                <p className="text-muted-foreground text-sm col-span-full text-center py-8">No backgrounds yet. Upload one to get started.</p>
               )}
             </div>
-          ))}
-          {sectionItems.length === 0 && activeSection !== "main" && (
-            <p className="text-muted-foreground text-sm col-span-full text-center py-8">No backgrounds yet. Upload one to get started.</p>
-          )}
-        </div>
+          </SortableContext>
+        </DndContext>
       )}
     </>
   );
