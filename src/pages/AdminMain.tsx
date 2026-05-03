@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -262,6 +262,35 @@ const AdminMain = () => {
       toast.error("Swap failed");
     }
     setSwapTarget(null);
+  };
+
+  // Reorder active background within its section by swapping sort_order with neighbor
+  const moveBackground = async (id: string, direction: -1 | 1) => {
+    const item = backgrounds.find((b) => b.id === id);
+    if (!item) return;
+    const siblings = backgrounds
+      .filter((b) => b.section === item.section)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const idx = siblings.findIndex((b) => b.id === id);
+    const targetIdx = idx + direction;
+    if (targetIdx < 0 || targetIdx >= siblings.length) return;
+    const neighbor = siblings[targetIdx];
+    // Optimistic
+    setBackgrounds((prev) =>
+      prev.map((b) => {
+        if (b.id === item.id) return { ...b, sort_order: neighbor.sort_order };
+        if (b.id === neighbor.id) return { ...b, sort_order: item.sort_order };
+        return b;
+      })
+    );
+    const [{ error: e1 }, { error: e2 }] = await Promise.all([
+      supabase.from("page_backgrounds").update({ sort_order: neighbor.sort_order }).eq("id", item.id),
+      supabase.from("page_backgrounds").update({ sort_order: item.sort_order }).eq("id", neighbor.id),
+    ]);
+    if (e1 || e2) {
+      toast.error("Reorder failed");
+      fetchBackgrounds();
+    }
   };
 
   if (loading || !user || !isAdmin) {
