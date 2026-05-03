@@ -15,6 +15,7 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
+  rectSortingStrategy,
   arrayMove,
   useSortable,
 } from "@dnd-kit/sortable";
