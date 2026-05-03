@@ -637,6 +637,91 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             </div>
           </div>
         </div>
+
+        {/* Multiple back images — random by weight on each flip */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground font-display tracking-widest uppercase">
+              Back images — random on flip ({backImages.length})
+            </span>
+          </div>
+          <p className="text-[10px] text-muted-foreground/60 font-display tracking-wider">
+            Each flip to back picks a random image. The weight (%) controls how often each one appears.
+          </p>
+          {backImages.length > 0 && (() => {
+            const total = backImages.reduce((s, b) => s + (Number(b.weight) || 0), 0);
+            return (
+              <p className="text-[10px] text-muted-foreground/40 font-display tracking-wider">
+                Total weight: {total}{total === 0 ? " (all equal)" : ""}
+              </p>
+            );
+          })()}
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {backImages.map((item, i) => {
+              const total = backImages.reduce((s, b) => s + (Number(b.weight) || 0), 0);
+              const pct = total > 0 ? Math.round(((Number(item.weight) || 0) / total) * 100) : Math.round(100 / backImages.length);
+              return (
+                <div key={i} className="flex flex-col gap-1">
+                  <div className="relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10">
+                    <img src={item.url} alt={`Back ${i + 1}`} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                      {confirm === `remove_back_${i}` ? (
+                        <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                      ) : (
+                        <button
+                          onClick={() => askConfirm(`remove_back_${i}`)}
+                          className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                    <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{pct}%</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={item.weight}
+                      onChange={(e) => handleUpdateBackImageWeight(i, Math.max(0, parseInt(e.target.value || "0", 10)))}
+                      className="w-full bg-transparent border border-border px-1.5 py-1 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-foreground transition-colors"
+                    />
+                    <span className="text-[8px] text-muted-foreground/50 font-display">wt</span>
+                  </div>
+                </div>
+              );
+            })}
+            {/* Add new */}
+            <div className="border border-dashed border-border aspect-[2/3] overflow-hidden">
+              {confirm === "upload_card_back_multi" && pendingPreviewUrl ? (
+                <div className="relative w-full h-full">
+                  <img src={pendingPreviewUrl} alt="Preview" className="w-full h-full object-cover ring-2 ring-primary/50" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-muted-foreground/40 hover:text-muted-foreground hover:border-foreground transition-colors">
+                  {uploading === "card_back_images" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                  <span className="text-[8px] font-display tracking-wider mt-1">ADD</span>
+                  <input
+                    ref={backMultiRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleFileSelect(f, "card_back_multi", "upload_card_back_multi");
+                      if (backMultiRef.current) backMultiRef.current.value = "";
+                    }}
+                    disabled={!!uploading}
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     ),
   };
