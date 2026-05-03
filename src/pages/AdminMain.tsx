@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -264,6 +264,35 @@ const AdminMain = () => {
     setSwapTarget(null);
   };
 
+  // Reorder active background within its section by swapping sort_order with neighbor
+  const moveBackground = async (id: string, direction: -1 | 1) => {
+    const item = backgrounds.find((b) => b.id === id);
+    if (!item) return;
+    const siblings = backgrounds
+      .filter((b) => b.section === item.section)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const idx = siblings.findIndex((b) => b.id === id);
+    const targetIdx = idx + direction;
+    if (targetIdx < 0 || targetIdx >= siblings.length) return;
+    const neighbor = siblings[targetIdx];
+    // Optimistic
+    setBackgrounds((prev) =>
+      prev.map((b) => {
+        if (b.id === item.id) return { ...b, sort_order: neighbor.sort_order };
+        if (b.id === neighbor.id) return { ...b, sort_order: item.sort_order };
+        return b;
+      })
+    );
+    const [{ error: e1 }, { error: e2 }] = await Promise.all([
+      supabase.from("page_backgrounds").update({ sort_order: neighbor.sort_order }).eq("id", item.id),
+      supabase.from("page_backgrounds").update({ sort_order: item.sort_order }).eq("id", neighbor.id),
+    ]);
+    if (e1 || e2) {
+      toast.error("Reorder failed");
+      fetchBackgrounds();
+    }
+  };
+
   if (loading || !user || !isAdmin) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -318,6 +347,10 @@ const AdminMain = () => {
               {!item.isDefault && (
                 <>
                   <button onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)} title="Swap" className={`absolute top-2 left-2 p-1 transition-opacity ${swapTarget === item.id ? "bg-primary text-primary-foreground opacity-100" : "bg-background/80 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"}`}><ArrowUpDown size={14} /></button>
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => moveBackground(item.id, -1)} title="Move left/up" className="p-1 bg-background/80 text-muted-foreground hover:text-foreground"><ArrowUp size={14} /></button>
+                    <button onClick={() => moveBackground(item.id, 1)} title="Move right/down" className="p-1 bg-background/80 text-muted-foreground hover:text-foreground"><ArrowDown size={14} /></button>
+                  </div>
                   {confirmBg?.action === "toggle" && confirmBg.id === item.id ? (
                     <span className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
                       <button onClick={async () => { const bg = backgrounds.find(b => b.id === item.id); if (!bg) return; const { error } = await supabase.from("page_backgrounds").update({ is_active: !bg.is_active }).eq("id", item.id); if (!error) { setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b)); toast.success(bg.is_active ? "Hidden" : "Visible"); } setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>
