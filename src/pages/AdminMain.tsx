@@ -70,6 +70,16 @@ const SortableMainSection = ({ id, label, collapsed, onToggleCollapse, children 
   );
 };
 
+const SortableBgCard = ({ id, children }: { id: string; children: (handleProps: { attributes: any; listeners: any }) => React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1, zIndex: isDragging ? 10 : undefined };
+  return (
+    <div ref={setNodeRef} style={style}>
+      {children({ attributes, listeners })}
+    </div>
+  );
+};
+
 const AdminMain = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
