@@ -74,6 +74,17 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
       }
     };
 
+    const parseBackImages = () => {
+      try {
+        const p = JSON.parse(getContent("card_back_images") || "[]");
+        if (Array.isArray(p) && p.length > 0)
+          return p.map((item: any) => (typeof item === "string" ? { url: item, weight: 1 } : { url: item.url, weight: Number(item.weight) || 1 }));
+        return undefined;
+      } catch {
+        return undefined;
+      }
+    };
+
     const bgOpacity = parseInt(getContent("card_bg_video_opacity") || "40", 10) / 100;
 
     return (
@@ -201,6 +212,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                           frontImage={getContent("card_front_image") || taro01Img}
                           frontImages={parseFrontImages()}
                           backImage={getContent("card_back_image") || taroEyeImg}
+                          backImages={parseBackImages()}
                           flipSoundUrl={
                             getContent("audio_flipcard_sound_muted") !== "true"
                               ? getContent("audio_flipcard_sound") || undefined

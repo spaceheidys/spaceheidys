@@ -8,12 +8,18 @@ export interface FrontImageItem {
   text?: string;
 }
 
+export interface BackImageItem {
+  url: string;
+  weight?: number;
+}
+
 interface PortfolioCardProps {
   name: string;
   flipAxis?: "x" | "y-right" | "y-center";
   frontImage?: string;
   frontImages?: FrontImageItem[];
   backImage?: string;
+  backImages?: BackImageItem[];
   width?: number;
   height?: number;
   flipped?: boolean;
@@ -22,12 +28,26 @@ interface PortfolioCardProps {
   flipSoundUrl?: string;
 }
 
-const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, width, height, flipped: controlledFlipped, onFlip, onFrontTextChange, flipSoundUrl }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, backImages, width, height, flipped: controlledFlipped, onFlip, onFrontTextChange, flipSoundUrl }: PortfolioCardProps) => {
   const [internalFlipped, setInternalFlipped] = useState(true);
   const flipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped;
   const { muted, siteMusicEnabled } = useSoundContext();
   const frontIndexRef = useRef(0);
   const [currentFrontImage, setCurrentFrontImage] = useState(frontImage);
+  const allBackItems = backImages && backImages.length > 0 ? backImages : (backImage ? [{ url: backImage, weight: 1 }] : []);
+  const pickWeightedBack = () => {
+    if (allBackItems.length === 0) return undefined;
+    const weights = allBackItems.map(b => Math.max(0, Number(b.weight) || 0));
+    const total = weights.reduce((s, w) => s + w, 0);
+    if (total <= 0) return allBackItems[Math.floor(Math.random() * allBackItems.length)].url;
+    let r = Math.random() * total;
+    for (let i = 0; i < allBackItems.length; i++) {
+      r -= weights[i];
+      if (r <= 0) return allBackItems[i].url;
+    }
+    return allBackItems[allBackItems.length - 1].url;
+  };
+  const [currentBackImage, setCurrentBackImage] = useState<string | undefined>(() => allBackItems[0]?.url);
 
   // Determine which front image to show
   const allFrontItems = frontImages && frontImages.length > 0 ? frontImages : (frontImage ? [{ url: frontImage }] : []);
@@ -45,6 +65,11 @@ const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, wid
       setCurrentFrontImage(allFrontItems[frontIndexRef.current].url);
       onFrontTextChange?.(allFrontItems[frontIndexRef.current].text || "");
     }
+    // When flipping to back, pick a weighted-random back image
+    if (next && allBackItems.length > 1) {
+      const picked = pickWeightedBack();
+      if (picked) setCurrentBackImage(picked);
+    }
     
     setInternalFlipped(next);
     onFlip?.(next);
@@ -54,6 +79,9 @@ const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, wid
   const displayFrontImage = allFrontUrls.length > 1 
     ? (currentFrontImage || allFrontUrls[0])
     : frontImage;
+  const displayBackImage = allBackItems.length > 1
+    ? (currentBackImage || allBackItems[0].url)
+    : backImage;
 
   if (!flipAxis) {
     return (
@@ -103,7 +131,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, wid
           className="absolute inset-0 flex items-center justify-center"
           style={{ backfaceVisibility: "hidden", transform: backTransform }}>
           
-          <img src={backImage || taroBackside} alt={`${name} back`} className="w-full h-full object-cover" />
+          <img src={displayBackImage || taroBackside} alt={`${name} back`} className="w-full h-full object-cover" />
         </div>
       </motion.div>
     </div>);
