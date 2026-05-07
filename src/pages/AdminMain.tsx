@@ -652,6 +652,26 @@ const AdminMain = () => {
           <div className="py-4">
             <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase mb-4">CUBE — 6 faces</p>
             <CubeFacesSection />
+            <div className="relative mt-8">
+              <button
+                onClick={() => toggleSectionCollapse("cube_backgrounds")}
+                className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors mb-2"
+              >
+                {collapsedSections.has("cube_backgrounds") ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+                Active Backgrounds
+              </button>
+              {!collapsedSections.has("cube_backgrounds") && renderActiveBackgrounds()}
+            </div>
+            <div className="relative mt-4">
+              <button
+                onClick={() => toggleSectionCollapse("cube_library")}
+                className="flex items-center gap-1.5 text-[9px] text-muted-foreground/50 font-display tracking-[0.3em] uppercase hover:text-muted-foreground transition-colors mb-2"
+              >
+                {collapsedSections.has("cube_library") ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
+                Library
+              </button>
+              {!collapsedSections.has("cube_library") && renderLibrarySection()}
+            </div>
           </div>
         ) : (
           <>
