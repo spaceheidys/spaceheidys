@@ -19,6 +19,7 @@ import {
   ChevronsUp,
   ChevronsDown,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ICONS = {
   none: null,
@@ -184,20 +185,40 @@ const RotatingCube = () => {
   useEffect(() => () => cancelInertia(), []);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length === 6) setFaces(parsed);
-      }
-    } catch {}
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.from("cube_faces").select("*").order("id");
+      if (cancelled || !data || data.length === 0) return;
+      const mapped: FaceContent[] = data.map((row: any, i: number) => ({
+        title: row.title || FACE_NAMES[i],
+        text: row.text || "",
+        icon: (row.icon || "none") as IconKey,
+        image: row.image_url || null,
+        imageScale: row.image_scale ?? 1,
+        imageX: row.image_x ?? 0,
+        imageY: row.image_y ?? 0,
+      }));
+      setFaces(mapped);
+    })();
+    const channel = supabase
+      .channel("cube_faces_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "cube_faces" }, () => {
+        supabase.from("cube_faces").select("*").order("id").then(({ data }) => {
+          if (!data) return;
+          setFaces(data.map((row: any, i: number) => ({
+            title: row.title || FACE_NAMES[i],
+            text: row.text || "",
+            icon: (row.icon || "none") as IconKey,
+            image: row.image_url || null,
+            imageScale: row.image_scale ?? 1,
+            imageX: row.image_x ?? 0,
+            imageY: row.image_y ?? 0,
+          })));
+        });
+      })
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(channel); };
   }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(faces));
-    } catch {}
-  }, [faces]);
 
   const yaw = Math.round(yawDeg / 90);
   const pitch = Math.round(pitchDeg / 90);
