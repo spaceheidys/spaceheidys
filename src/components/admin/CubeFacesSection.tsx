@@ -23,6 +23,18 @@ const CubeFacesSection = () => {
   const [uploadingId, setUploadingId] = useState<number | null>(null);
   const [adjustOpen, setAdjustOpen] = useState<Record<number, boolean>>({});
   const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const liveChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  useEffect(() => {
+    const ch = supabase.channel("cube_faces_live", { config: { broadcast: { self: false } } });
+    ch.subscribe();
+    liveChannelRef.current = ch;
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
+  const broadcastLive = (id: number, patch: Partial<CubeFace>) => {
+    liveChannelRef.current?.send({ type: "broadcast", event: "face_preview", payload: { id, patch } });
+  };
 
   const fetchFaces = async () => {
     setLoading(true);
