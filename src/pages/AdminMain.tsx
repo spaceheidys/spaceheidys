@@ -398,20 +398,22 @@ const AdminMain = () => {
                             {activeSection === "cube" && (() => {
                               const bg = backgrounds.find((b) => b.id === item.id);
                               const current = bg?.time_of_day || "any";
+                              const labels: Record<string,string> = { any: "ANY", morning: "MORN", day: "DAY", evening: "EVE", night: "NIGHT" };
                               return (
-                                <div className="absolute inset-x-0 bottom-8 flex justify-center gap-0.5 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute inset-x-0 bottom-0 flex justify-center gap-0.5 px-1 py-1 bg-background/85 backdrop-blur-sm">
                                   {(["any","morning","day","evening","night"] as const).map((t) => (
                                     <button
                                       key={t}
-                                      onClick={async () => {
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
                                         const { error } = await supabase.from("page_backgrounds").update({ time_of_day: t }).eq("id", item.id);
                                         if (error) { toast.error("Save failed"); return; }
                                         setBackgrounds((prev) => prev.map((b) => b.id === item.id ? { ...b, time_of_day: t } : b));
                                         toast.success(`Tagged: ${t}`);
                                       }}
-                                      className={`px-1 py-0.5 text-[8px] font-display tracking-[0.1em] uppercase border ${current === t ? "bg-foreground text-background border-foreground" : "bg-background/80 text-muted-foreground border-border hover:text-foreground"}`}
+                                      className={`flex-1 px-1 py-1 text-[9px] font-display tracking-[0.1em] uppercase border ${current === t ? "bg-foreground text-background border-foreground" : "bg-background/90 text-muted-foreground border-border hover:text-foreground hover:border-foreground"}`}
                                     >
-                                      {t === "any" ? "ANY" : t[0].toUpperCase()}
+                                      {labels[t]}
                                     </button>
                                   ))}
                                 </div>
