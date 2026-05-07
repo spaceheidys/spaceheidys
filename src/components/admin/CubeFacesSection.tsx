@@ -171,6 +171,7 @@ const CubeFacesSection = () => {
                         const nx = Math.max(-1, Math.min(1, startVX - dx * 2));
                         const ny = Math.max(-1, Math.min(1, startVY - dy * 2));
                         updateLocal(face.id, { image_x: nx, image_y: ny });
+                        broadcastLive(face.id, { image_x: nx, image_y: ny });
                         persist(face.id, { image_x: nx, image_y: ny }, true);
                       };
                       const up = () => {
@@ -185,6 +186,7 @@ const CubeFacesSection = () => {
                       const cur = face.image_scale ?? 1;
                       const next = Math.max(0.5, Math.min(3, cur - e.deltaY * 0.002));
                       updateLocal(face.id, { image_scale: next });
+                      broadcastLive(face.id, { image_scale: next });
                       persist(face.id, { image_scale: next }, true);
                     }}
                   >
