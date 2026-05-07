@@ -206,19 +206,19 @@ const CubeFacesSection = () => {
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">Zoom</span>
                       <input type="range" min={0.5} max={3} step={0.05} value={face.image_scale} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_scale: v }); persist(face.id, { image_scale: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_scale: v }); broadcastLive(face.id, { image_scale: v }); persist(face.id, { image_scale: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_scale ?? 1).toFixed(2)}</span>
                     </label>
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">X</span>
                       <input type="range" min={-1} max={1} step={0.05} value={face.image_x} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_x: v }); persist(face.id, { image_x: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_x: v }); broadcastLive(face.id, { image_x: v }); persist(face.id, { image_x: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_x ?? 0).toFixed(2)}</span>
                     </label>
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">Y</span>
                       <input type="range" min={-1} max={1} step={0.05} value={face.image_y} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_y: v }); persist(face.id, { image_y: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_y: v }); broadcastLive(face.id, { image_y: v }); persist(face.id, { image_y: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_y ?? 0).toFixed(2)}</span>
                     </label>
                   </div>
