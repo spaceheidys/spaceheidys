@@ -130,6 +130,7 @@ export type Database = {
           is_active: boolean
           section: string
           sort_order: number
+          time_of_day: string
         }
         Insert: {
           created_at?: string
@@ -138,6 +139,7 @@ export type Database = {
           is_active?: boolean
           section: string
           sort_order?: number
+          time_of_day?: string
         }
         Update: {
           created_at?: string
@@ -146,6 +148,7 @@ export type Database = {
           is_active?: boolean
           section?: string
           sort_order?: number
+          time_of_day?: string
         }
         Relationships: []
       }
