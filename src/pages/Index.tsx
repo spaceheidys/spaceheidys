@@ -20,6 +20,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import HeroSection from "@/pages/IndexPage/HeroSection";
 import MainTextSection from "@/pages/IndexPage/MainTextSection";
 import PortfolioSection from "@/pages/IndexPage/PortfolioSection";
+import CubeSection from "@/pages/IndexPage/CubeSection";
 import SEO from "@/components/SEO";
 
 const DEFAULT_BG_OPTIONS = [lostInTime01, lostInTime02, lostInTime03];
@@ -36,6 +37,7 @@ const Index = () => {
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainTextRef = useRef<HTMLDivElement | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
+  const cubeRef = useRef<HTMLDivElement | null>(null);
   const [secretDoorOpen, setSecretDoorOpen] = useState(false);
   const [thirdCardFlipped, setThirdCardFlipped] = useState(true);
   const [flipCount, setFlipCount] = useState(0);
@@ -196,6 +198,10 @@ const Index = () => {
     portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
+  const scrollToCube = useCallback(() => {
+    cubeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
   const openSecretDoor = useCallback(() => setSecretDoorOpen(true), []);
   const closeSecretDoor = useCallback(() => setSecretDoorOpen(false), []);
   const goToShop = useCallback(() => navigate("/shop"), [navigate]);
@@ -205,8 +211,9 @@ const Index = () => {
     about: handleAboutClick,
     portfolio: scrollToPortfolio,
     gallery: goToGallery,
+    cube: scrollToCube,
     contacts: handleContactClick,
-  }), [handleAboutClick, scrollToPortfolio, goToGallery, handleContactClick]);
+  }), [handleAboutClick, scrollToPortfolio, goToGallery, scrollToCube, handleContactClick]);
 
   const bellSoundMuted = getContent("audio_bell_sound_muted") === "true";
   const bellSoundUrl = getContent("audio_bell_sound") || undefined;
@@ -376,6 +383,9 @@ const Index = () => {
         favoritesCount={favoritesCount}
         footerText={getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."}
       />
+
+      {/* === CUBE === */}
+      <CubeSection ref={cubeRef} footerText={getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."} />
 
       <SecretDoorOverlay
         isOpen={secretDoorOpen}
