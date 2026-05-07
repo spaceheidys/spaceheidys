@@ -107,23 +107,34 @@ const Index = () => {
     };
   }, [thirdCardFlipped, muted, activePortfolioKey, isClosingSection]);
 
-  // Fetch dynamic backgrounds
+  // Fetch dynamic backgrounds + realtime updates
   useEffect(() => {
+    let isFirst = true;
     const fetchBgs = async () => {
       const { data } = await supabase.from("page_backgrounds").select("*").order("sort_order");
-      if (data && data.length > 0) {
+      if (data) {
         const mainBgs = data.filter((b) => b.section === "main" && b.is_active !== false).map((b) => b.image_url);
         const portfolioBgs = data.filter((b) => b.section === "portfolio" && b.is_active !== false).map((b) => b.image_url);
         const cubeBgs = data.filter((b) => b.section === "cube" && b.is_active !== false).map((b) => b.image_url);
         if (mainBgs.length > 0) {
           setBgOptions(mainBgs);
-          setBgImage(mainBgs[Math.floor(Math.random() * mainBgs.length)]);
+          if (isFirst) setBgImage(mainBgs[Math.floor(Math.random() * mainBgs.length)]);
         }
-        if (portfolioBgs.length > 0) setPortfolioBg(portfolioBgs[0]);
-        if (cubeBgs.length > 0) setCubeBg(cubeBgs[0]);
+        setPortfolioBg(portfolioBgs[0] ?? null);
+        setCubeBg(cubeBgs[0] ?? null);
+        isFirst = false;
       }
     };
     fetchBgs();
+    const channel = supabase
+      .channel("page_backgrounds_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "page_backgrounds" }, () => {
+        fetchBgs();
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Section click handler
