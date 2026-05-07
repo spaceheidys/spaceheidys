@@ -34,6 +34,7 @@ const Index = () => {
   const [bgOptions, setBgOptions] = useState<string[]>(DEFAULT_BG_OPTIONS);
   const [bgImage, setBgImage] = useState(() => DEFAULT_BG_OPTIONS[Math.floor(Math.random() * DEFAULT_BG_OPTIONS.length)]);
   const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
+  const [cubeBg, setCubeBg] = useState<string | null>(null);
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainTextRef = useRef<HTMLDivElement | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
@@ -113,11 +114,13 @@ const Index = () => {
       if (data && data.length > 0) {
         const mainBgs = data.filter((b) => b.section === "main" && b.is_active !== false).map((b) => b.image_url);
         const portfolioBgs = data.filter((b) => b.section === "portfolio" && b.is_active !== false).map((b) => b.image_url);
+        const cubeBgs = data.filter((b) => b.section === "cube" && b.is_active !== false).map((b) => b.image_url);
         if (mainBgs.length > 0) {
           setBgOptions(mainBgs);
           setBgImage(mainBgs[Math.floor(Math.random() * mainBgs.length)]);
         }
         if (portfolioBgs.length > 0) setPortfolioBg(portfolioBgs[0]);
+        if (cubeBgs.length > 0) setCubeBg(cubeBgs[0]);
       }
     };
     fetchBgs();
@@ -385,7 +388,7 @@ const Index = () => {
       />
 
       {/* === CUBE === */}
-      <CubeSection ref={cubeRef} footerText={getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."} />
+      <CubeSection ref={cubeRef} backgroundUrl={cubeBg} footerText={getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."} />
 
       <SecretDoorOverlay
         isOpen={secretDoorOpen}
