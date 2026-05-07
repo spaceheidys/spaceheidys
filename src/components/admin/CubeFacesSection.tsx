@@ -165,18 +165,34 @@ const CubeFacesSection = () => {
                       const startVX = face.image_x ?? 0;
                       const startVY = face.image_y ?? 0;
                       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      let pending: { x: number; y: number } | null = null;
+                      let rafId: number | null = null;
+                      const flush = () => {
+                        rafId = null;
+                        if (!pending) return;
+                        const { x, y } = pending;
+                        broadcastLive(face.id, { image_x: x, image_y: y });
+                        persist(face.id, { image_x: x, image_y: y }, true);
+                      };
                       const move = (ev: PointerEvent) => {
                         const dx = (ev.clientX - startX) / rect.width;
                         const dy = (ev.clientY - startY) / rect.height;
                         const nx = Math.max(-1, Math.min(1, startVX - dx * 2));
                         const ny = Math.max(-1, Math.min(1, startVY - dy * 2));
+                        // 1) instant admin preview
                         updateLocal(face.id, { image_x: nx, image_y: ny });
-                        broadcastLive(face.id, { image_x: nx, image_y: ny });
-                        persist(face.id, { image_x: nx, image_y: ny }, true);
+                        // 2) throttle network broadcast + save
+                        pending = { x: nx, y: ny };
+                        if (rafId == null) rafId = requestAnimationFrame(flush);
                       };
                       const up = () => {
                         window.removeEventListener("pointermove", move);
                         window.removeEventListener("pointerup", up);
+                        if (rafId != null) cancelAnimationFrame(rafId);
+                        if (pending) {
+                          broadcastLive(face.id, { image_x: pending.x, image_y: pending.y });
+                          persist(face.id, { image_x: pending.x, image_y: pending.y }, true);
+                        }
                       };
                       window.addEventListener("pointermove", move);
                       window.addEventListener("pointerup", up);
