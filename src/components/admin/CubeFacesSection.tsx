@@ -23,6 +23,18 @@ const CubeFacesSection = () => {
   const [uploadingId, setUploadingId] = useState<number | null>(null);
   const [adjustOpen, setAdjustOpen] = useState<Record<number, boolean>>({});
   const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const liveChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  useEffect(() => {
+    const ch = supabase.channel("cube_faces_live", { config: { broadcast: { self: false } } });
+    ch.subscribe();
+    liveChannelRef.current = ch;
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
+  const broadcastLive = (id: number, patch: Partial<CubeFace>) => {
+    liveChannelRef.current?.send({ type: "broadcast", event: "face_preview", payload: { id, patch } });
+  };
 
   const fetchFaces = async () => {
     setLoading(true);
@@ -159,6 +171,7 @@ const CubeFacesSection = () => {
                         const nx = Math.max(-1, Math.min(1, startVX - dx * 2));
                         const ny = Math.max(-1, Math.min(1, startVY - dy * 2));
                         updateLocal(face.id, { image_x: nx, image_y: ny });
+                        broadcastLive(face.id, { image_x: nx, image_y: ny });
                         persist(face.id, { image_x: nx, image_y: ny }, true);
                       };
                       const up = () => {
@@ -173,6 +186,7 @@ const CubeFacesSection = () => {
                       const cur = face.image_scale ?? 1;
                       const next = Math.max(0.5, Math.min(3, cur - e.deltaY * 0.002));
                       updateLocal(face.id, { image_scale: next });
+                      broadcastLive(face.id, { image_scale: next });
                       persist(face.id, { image_scale: next }, true);
                     }}
                   >
@@ -192,19 +206,19 @@ const CubeFacesSection = () => {
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">Zoom</span>
                       <input type="range" min={0.5} max={3} step={0.05} value={face.image_scale} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_scale: v }); persist(face.id, { image_scale: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_scale: v }); broadcastLive(face.id, { image_scale: v }); persist(face.id, { image_scale: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_scale ?? 1).toFixed(2)}</span>
                     </label>
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">X</span>
                       <input type="range" min={-1} max={1} step={0.05} value={face.image_x} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_x: v }); persist(face.id, { image_x: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_x: v }); broadcastLive(face.id, { image_x: v }); persist(face.id, { image_x: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_x ?? 0).toFixed(2)}</span>
                     </label>
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">Y</span>
                       <input type="range" min={-1} max={1} step={0.05} value={face.image_y} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_y: v }); persist(face.id, { image_y: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_y: v }); broadcastLive(face.id, { image_y: v }); persist(face.id, { image_y: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_y ?? 0).toFixed(2)}</span>
                     </label>
                   </div>
