@@ -287,16 +287,6 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <div className="w-full bg-black flex flex-col">
-          <div className="w-full h-px bg-white/10" />
-          <div className="w-full h-12 sm:h-16 items-center justify-center flex flex-row">
-            <span className="text-[9px] sm:text-[10px] tracking-widest text-white/40 font-display">
-              {footerText}
-            </span>
-          </div>
-        </div>
       </>
     );
   }
