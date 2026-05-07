@@ -39,6 +39,7 @@ interface BackgroundItem {
   image_url: string;
   sort_order: number;
   is_active: boolean;
+  time_of_day?: string;
 }
 
 const SECTIONS = ["main", "main2", "portfolio", "cube", "shop"] as const;
@@ -394,6 +395,28 @@ const AdminMain = () => {
                           <GripVertical size={16} />
                         </button>
                         <button onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)} title="Swap" className={`absolute top-2 left-2 p-1 transition-opacity ${swapTarget === item.id ? "bg-primary text-primary-foreground opacity-100" : "bg-background/80 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"}`}><ArrowUpDown size={14} /></button>
+                            {activeSection === "cube" && (() => {
+                              const bg = backgrounds.find((b) => b.id === item.id);
+                              const current = bg?.time_of_day || "any";
+                              return (
+                                <div className="absolute inset-x-0 bottom-8 flex justify-center gap-0.5 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  {(["any","morning","day","evening","night"] as const).map((t) => (
+                                    <button
+                                      key={t}
+                                      onClick={async () => {
+                                        const { error } = await supabase.from("page_backgrounds").update({ time_of_day: t }).eq("id", item.id);
+                                        if (error) { toast.error("Save failed"); return; }
+                                        setBackgrounds((prev) => prev.map((b) => b.id === item.id ? { ...b, time_of_day: t } : b));
+                                        toast.success(`Tagged: ${t}`);
+                                      }}
+                                      className={`px-1 py-0.5 text-[8px] font-display tracking-[0.1em] uppercase border ${current === t ? "bg-foreground text-background border-foreground" : "bg-background/80 text-muted-foreground border-border hover:text-foreground"}`}
+                                    >
+                                      {t === "any" ? "ANY" : t[0].toUpperCase()}
+                                    </button>
+                                  ))}
+                                </div>
+                              );
+                            })()}
                         {confirmBg?.action === "toggle" && confirmBg.id === item.id ? (
                           <span className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/90 px-1 py-0.5">
                             <button onClick={async () => { const bg = backgrounds.find(b => b.id === item.id); if (!bg) return; const { error } = await supabase.from("page_backgrounds").update({ is_active: !bg.is_active }).eq("id", item.id); if (!error) { setBackgrounds(prev => prev.map(b => b.id === item.id ? { ...b, is_active: !b.is_active } : b)); toast.success(bg.is_active ? "Hidden" : "Visible"); } setConfirmBg(null); }} className="flex items-center gap-0.5 px-1.5 py-0.5 border border-foreground text-foreground text-[9px] font-display tracking-[0.15em] uppercase hover:bg-foreground hover:text-background transition-colors"><Check size={9} /> YES</button>

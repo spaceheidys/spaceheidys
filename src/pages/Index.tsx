@@ -25,6 +25,15 @@ import SEO from "@/components/SEO";
 
 const DEFAULT_BG_OPTIONS = [lostInTime01, lostInTime02, lostInTime03];
 
+type TimeOfDay = "morning" | "day" | "evening" | "night";
+const getTimeOfDay = (date = new Date()): TimeOfDay => {
+  const h = date.getHours();
+  if (h >= 5 && h < 11) return "morning";
+  if (h >= 11 && h < 17) return "day";
+  if (h >= 17 && h < 21) return "evening";
+  return "night";
+};
+
 const Index = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(() => !sessionStorage.getItem("loaded"));
@@ -35,6 +44,8 @@ const Index = () => {
   const [bgImage, setBgImage] = useState(() => DEFAULT_BG_OPTIONS[Math.floor(Math.random() * DEFAULT_BG_OPTIONS.length)]);
   const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
   const [cubeBg, setCubeBg] = useState<string | null>(null);
+  const [cubeBgPool, setCubeBgPool] = useState<Array<{ image_url: string; time_of_day: string }>>([]);
+  const [tod, setTod] = useState<TimeOfDay>(() => getTimeOfDay());
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainTextRef = useRef<HTMLDivElement | null>(null);
   const portfolioRef = useRef<HTMLDivElement | null>(null);
@@ -115,13 +126,15 @@ const Index = () => {
       if (data) {
         const mainBgs = data.filter((b) => b.section === "main" && b.is_active !== false).map((b) => b.image_url);
         const portfolioBgs = data.filter((b) => b.section === "portfolio" && b.is_active !== false).map((b) => b.image_url);
-        const cubeBgs = data.filter((b) => b.section === "cube" && b.is_active !== false).map((b) => b.image_url);
+        const cubeBgs = data
+          .filter((b) => b.section === "cube" && b.is_active !== false)
+          .map((b: any) => ({ image_url: b.image_url, time_of_day: b.time_of_day || "any" }));
         if (mainBgs.length > 0) {
           setBgOptions(mainBgs);
           if (isFirst) setBgImage(mainBgs[Math.floor(Math.random() * mainBgs.length)]);
         }
         setPortfolioBg(portfolioBgs[0] ?? null);
-        setCubeBg(cubeBgs[0] ?? null);
+        setCubeBgPool(cubeBgs);
         isFirst = false;
       }
     };
@@ -136,6 +149,21 @@ const Index = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Update time-of-day bucket every minute (covers boundaries)
+  useEffect(() => {
+    const id = setInterval(() => setTod(getTimeOfDay()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Pick cube background matching current time-of-day (fallback to "any", then first)
+  useEffect(() => {
+    if (cubeBgPool.length === 0) { setCubeBg(null); return; }
+    const matches = cubeBgPool.filter((b) => b.time_of_day === tod);
+    const anyOnes = cubeBgPool.filter((b) => b.time_of_day === "any");
+    const pool = matches.length > 0 ? matches : (anyOnes.length > 0 ? anyOnes : cubeBgPool);
+    setCubeBg(pool[0].image_url);
+  }, [cubeBgPool, tod]);
 
   // Section click handler
   const handleSectionClick = useCallback((section: "about" | "contact" | "shop") => {
