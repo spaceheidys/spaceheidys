@@ -3,9 +3,11 @@ import RotatingCube from "@/components/RotatingCube";
 
 interface CubeSectionProps {
   footerText?: string;
+  backgroundUrl?: string | null;
 }
 
-const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText }, ref) => {
+const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, backgroundUrl }, ref) => {
+  const isVideo = backgroundUrl ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(backgroundUrl) : false;
   return (
     <>
       {/* divider */}
@@ -15,6 +17,24 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText }
         ref={ref}
         className="relative w-full bg-black flex flex-col items-center justify-center overflow-hidden min-h-[100svh] py-20"
       >
+        {backgroundUrl && (
+          isVideo ? (
+            <video
+              src={backgroundUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover opacity-60"
+            />
+          ) : (
+            <img
+              src={backgroundUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-60"
+            />
+          )
+        )}
         <div className="relative z-10 w-full flex items-center justify-center px-6">
           <RotatingCube />
         </div>
