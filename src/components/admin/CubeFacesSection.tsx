@@ -144,17 +144,49 @@ const CubeFacesSection = () => {
               {adjustOpen[face.id] && (
                 <div className="flex gap-3 pt-2 border-t border-border">
                   {/* Live preview as it appears on a cube face */}
-                  <div className="shrink-0 w-24 h-24 border border-border overflow-hidden bg-black relative">
+                  <div
+                    className="shrink-0 w-24 h-24 border border-border overflow-hidden bg-black relative cursor-move touch-none select-none"
+                    onPointerDown={(e) => {
+                      (e.target as Element).setPointerCapture?.(e.pointerId);
+                      const startX = e.clientX;
+                      const startY = e.clientY;
+                      const startVX = face.image_x ?? 0;
+                      const startVY = face.image_y ?? 0;
+                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      const move = (ev: PointerEvent) => {
+                        const dx = (ev.clientX - startX) / rect.width;
+                        const dy = (ev.clientY - startY) / rect.height;
+                        const nx = Math.max(-1, Math.min(1, startVX - dx * 2));
+                        const ny = Math.max(-1, Math.min(1, startVY - dy * 2));
+                        updateLocal(face.id, { image_x: nx, image_y: ny });
+                        persist(face.id, { image_x: nx, image_y: ny }, true);
+                      };
+                      const up = () => {
+                        window.removeEventListener("pointermove", move);
+                        window.removeEventListener("pointerup", up);
+                      };
+                      window.addEventListener("pointermove", move);
+                      window.addEventListener("pointerup", up);
+                    }}
+                    onWheel={(e) => {
+                      e.preventDefault();
+                      const cur = face.image_scale ?? 1;
+                      const next = Math.max(0.5, Math.min(3, cur - e.deltaY * 0.002));
+                      updateLocal(face.id, { image_scale: next });
+                      persist(face.id, { image_scale: next }, true);
+                    }}
+                  >
                     <img
                       src={face.image_url}
                       alt=""
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
                       style={{
                         objectPosition: `${50 + (face.image_x ?? 0) * 50}% ${50 + (face.image_y ?? 0) * 50}%`,
                         transform: `scale(${face.image_scale ?? 1})`,
                       }}
+                      draggable={false}
                     />
-                    <span className="absolute bottom-1 left-1 text-[8px] font-display tracking-widest uppercase text-white/60">Live</span>
+                    <span className="absolute bottom-1 left-1 text-[8px] font-display tracking-widest uppercase text-white/60 pointer-events-none">Drag · Scroll</span>
                   </div>
                   <div className="flex-1 grid grid-cols-1 gap-2">
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
