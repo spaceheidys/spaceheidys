@@ -648,6 +648,11 @@ const AdminMain = () => {
           </div>
         ) : activeSection === "main2" ? (
           <Main2Section get={getContent} update={updateContent} />
+        ) : activeSection === "cube" ? (
+          <div className="py-4">
+            <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase mb-4">CUBE — 6 faces</p>
+            <CubeFacesSection />
+          </div>
         ) : (
           <>
             {activeSection === "main" && (
@@ -745,7 +750,7 @@ const AdminMain = () => {
         )}
 
         {/* For non-main tabs, show backgrounds and library inline */}
-        {activeSection !== "main" && activeSection !== "main2" && activeSection !== "shop" && (
+        {activeSection !== "main" && activeSection !== "main2" && activeSection !== "shop" && activeSection !== "cube" && (
           <>
             <div className="relative mt-4">
               <button
