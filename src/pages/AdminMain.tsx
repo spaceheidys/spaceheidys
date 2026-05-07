@@ -39,6 +39,7 @@ interface BackgroundItem {
   image_url: string;
   sort_order: number;
   is_active: boolean;
+  time_of_day?: string;
 }
 
 const SECTIONS = ["main", "main2", "portfolio", "cube", "shop"] as const;
