@@ -712,7 +712,7 @@ const AdminMain = () => {
                 </SortableContext>
               </DndContext>
             )}
-            {activeSection !== "main" && (
+            {activeSection !== "main" && activeSection !== "cube" && (
               <>
                 <div className="relative mt-4">
                   <button
