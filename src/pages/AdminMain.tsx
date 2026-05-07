@@ -31,6 +31,7 @@ import ContentSection from "@/components/admin/ContentSection";
 import Main2Section from "@/components/admin/Main2Section";
 import SocialSection from "@/components/admin/SocialSection";
 import SoundConfigSection from "@/components/admin/SoundConfigSection";
+import CubeFacesSection from "@/components/admin/CubeFacesSection";
 
 interface BackgroundItem {
   id: string;
@@ -40,7 +41,7 @@ interface BackgroundItem {
   is_active: boolean;
 }
 
-const SECTIONS = ["main", "main2", "portfolio", "shop"] as const;
+const SECTIONS = ["main", "main2", "portfolio", "cube", "shop"] as const;
 
 const SortableMainSection = ({ id, label, collapsed, onToggleCollapse, children }: { id: string; label: string; collapsed: boolean; onToggleCollapse: () => void; children: React.ReactNode }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -647,6 +648,11 @@ const AdminMain = () => {
           </div>
         ) : activeSection === "main2" ? (
           <Main2Section get={getContent} update={updateContent} />
+        ) : activeSection === "cube" ? (
+          <div className="py-4">
+            <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase mb-4">CUBE — 6 faces</p>
+            <CubeFacesSection />
+          </div>
         ) : (
           <>
             {activeSection === "main" && (
@@ -706,7 +712,7 @@ const AdminMain = () => {
                 </SortableContext>
               </DndContext>
             )}
-            {activeSection !== "main" && (
+            {activeSection !== "main" && activeSection !== "cube" && (
               <>
                 <div className="relative mt-4">
                   <button
@@ -744,7 +750,7 @@ const AdminMain = () => {
         )}
 
         {/* For non-main tabs, show backgrounds and library inline */}
-        {activeSection !== "main" && activeSection !== "main2" && activeSection !== "shop" && (
+        {activeSection !== "main" && activeSection !== "main2" && activeSection !== "shop" && activeSection !== "cube" && (
           <>
             <div className="relative mt-4">
               <button

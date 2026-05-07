@@ -56,6 +56,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cube_faces: {
+        Row: {
+          icon: string
+          id: number
+          image_scale: number
+          image_url: string | null
+          image_x: number
+          image_y: number
+          text: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          icon?: string
+          id: number
+          image_scale?: number
+          image_url?: string | null
+          image_x?: number
+          image_y?: number
+          text?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          icon?: string
+          id?: number
+          image_scale?: number
+          image_url?: string | null
+          image_x?: number
+          image_y?: number
+          text?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nav_buttons: {
         Row: {
           id: string
