@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import RotatingCube from "@/components/RotatingCube";
 
 interface CubeSectionProps {
   footerText?: string;
@@ -12,16 +13,10 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText }
 
       <div
         ref={ref}
-        className="relative w-full bg-black flex flex-col items-center justify-center overflow-hidden min-h-[100svh]"
+        className="relative w-full bg-black flex flex-col items-center justify-center overflow-hidden min-h-[100svh] py-20"
       >
-        <div className="flex flex-col items-center justify-center gap-4 relative z-10 px-6 text-center">
-          <span className="font-jp text-sm tracking-widest text-white/40">キューブ</span>
-          <h2 className="text-3xl sm:text-5xl tracking-[0.3em] uppercase font-display text-white/80">
-            CUBE
-          </h2>
-          <p className="text-xs sm:text-sm tracking-[0.2em] uppercase text-white/40 font-display">
-            Coming soon
-          </p>
+        <div className="relative z-10 w-full flex items-center justify-center px-6">
+          <RotatingCube />
         </div>
 
         {footerText && (
