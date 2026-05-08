@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, Eye, EyeOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import NotesButton from "@/components/admin/NotesButton";
+import AdminTopNav from "@/components/admin/AdminTopNav";
 
 interface SecretDoorSettings {
   id: string;
