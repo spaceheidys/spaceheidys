@@ -22,7 +22,7 @@ const AdminTopNav = ({ current, userId, rightExtra }: Props) => {
   const navigate = useNavigate();
 
   return (
-    <header className="border-b border-border">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       {/* Top row: Notes (left) — Site / extras (right) */}
       <div className="flex items-center justify-between gap-2 px-3 sm:px-8 py-3">
         <div className="flex items-center gap-3 min-w-0">
