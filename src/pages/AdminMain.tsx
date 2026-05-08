@@ -166,7 +166,7 @@ const AdminMain = () => {
         const missing = MAIN_SECTION_KEYS.filter((k) => !valid.includes(k));
         return [...valid, ...missing];
       }
-    } catch {}
+    } catch { /* ignore */ }
     return [...MAIN_SECTION_KEYS];
   });
 
@@ -174,7 +174,7 @@ const AdminMain = () => {
     try {
       const saved = localStorage.getItem("admin_main_collapsed_sections");
       if (saved) return new Set(JSON.parse(saved));
-    } catch {}
+    } catch { /* ignore */ }
     return new Set();
   });
 

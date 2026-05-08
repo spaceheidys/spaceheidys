@@ -193,7 +193,7 @@ const SkillsSection = () => {
         if (match) {
           await supabase.storage.from("portfolio-images").remove([match[1]]);
         }
-      } catch {}
+      } catch { /* ignore */ }
     }
     const { error } = await supabase.from("skills").delete().eq("id", id);
     if (error) {
