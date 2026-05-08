@@ -35,14 +35,14 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     return () => { cancelled = true; };
   }, []);
 
-  const formatted = visits != null ? String(visits).padStart(7, "0") : null;
+  const formatted = visits != null ? visits.toLocaleString("en-US") : null;
   return (
     <>
       {/* divider with visit counter */}
       <div className="w-full h-8 bg-black flex items-center justify-center">
         {formatted && (
-          <span className="font-display text-[10px] tracking-[0.4em] text-white/30 tabular-nums select-none">
-            №&nbsp;{formatted}
+          <span className="font-display text-[10px] tracking-[0.3em] text-white/30 tabular-nums select-none">
+            {formatted}
           </span>
         )}
       </div>
