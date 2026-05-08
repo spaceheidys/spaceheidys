@@ -1,0 +1,2 @@
+ALTER TABLE public.page_backgrounds ADD COLUMN IF NOT EXISTS time_of_days text[] NOT NULL DEFAULT ARRAY['any']::text[];
+UPDATE public.page_backgrounds SET time_of_days = ARRAY[COALESCE(NULLIF(time_of_day, ''), 'any')] WHERE time_of_days = ARRAY['any']::text[] AND time_of_day IS NOT NULL AND time_of_day <> 'any';
