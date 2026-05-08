@@ -72,9 +72,6 @@ const PRESET_ICONS: { key: string; label: string; svg: string }[] = [
 const svgToDataUrl = (svg: string) =>
   `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 
-/** Detect if icon_url is a preset SVG data URI */
-const isPreset = (url: string) => url.startsWith("data:image/svg+xml");
-
 // ─── Icon Picker popup ─────────────────────────────────────────────────────────
 const IconPicker = ({
   onSelect,

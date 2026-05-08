@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2, Image as ImageIcon, Sliders, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp } from "lucide-react";
 
 const ICON_KEYS = ["none", "star", "heart", "sparkles", "sun", "moon", "cloud", "zap"] as const;
 const FACE_LABELS = ["01 · Front", "02 · Right", "03 · Back", "04 · Left", "05 · Top", "06 · Bottom"];
