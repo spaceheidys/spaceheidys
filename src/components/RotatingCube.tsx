@@ -69,6 +69,7 @@ const HALF = SIZE / 2;
 const RotatingCube = () => {
   const [yawDeg, setYawDeg] = useState(-30);
   const [pitchDeg, setPitchDeg] = useState(25);
+  const [rollDeg, setRollDeg] = useState(0);
   const [dragging, setDragging] = useState(false);
   const dragRef = useRef<{
     x: number;
@@ -77,6 +78,8 @@ const RotatingCube = () => {
     pitch: number;
     samples: { x: number; y: number; t: number }[];
   } | null>(null);
+  const pinchRef = useRef<{ startAngle: number; startRoll: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const inertiaRef = useRef<number | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [faces, setFaces] = useState<FaceContent[]>(DEFAULT_FACES);
@@ -184,6 +187,59 @@ const RotatingCube = () => {
 
   useEffect(() => () => cancelInertia(), []);
 
+  // Two-finger rotation (roll around Z axis) for touch devices
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const angleBetween = (touches: TouchList) => {
+      const dx = touches[1].clientX - touches[0].clientX;
+      const dy = touches[1].clientY - touches[0].clientY;
+      return (Math.atan2(dy, dx) * 180) / Math.PI;
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        cancelInertia();
+        // cancel single-pointer drag if active
+        dragRef.current = null;
+        setDragging(false);
+        pinchRef.current = {
+          startAngle: angleBetween(e.touches),
+          startRoll: rollDeg,
+        };
+        e.preventDefault();
+      }
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchRef.current) {
+        const cur = angleBetween(e.touches);
+        const delta = cur - pinchRef.current.startAngle;
+        setRollDeg(pinchRef.current.startRoll + delta);
+        e.preventDefault();
+      }
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2 && pinchRef.current) {
+        if (!freeSpinRef.current) {
+          setRollDeg((r) => Math.round(r / 90) * 90);
+        }
+        pinchRef.current = null;
+      }
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: false });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    el.addEventListener("touchcancel", onTouchEnd);
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [rollDeg]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -263,6 +319,7 @@ const RotatingCube = () => {
           </button>
 
           <div
+            ref={containerRef}
             className={`relative touch-none select-none ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
             style={{ width: SIZE, height: SIZE, perspective: 1200 }}
             onPointerDown={onPointerDown}
@@ -274,7 +331,7 @@ const RotatingCube = () => {
               className="relative w-full h-full"
               style={{
                 transformStyle: "preserve-3d",
-                transform: `translateZ(-${HALF}px) rotateX(${pitchDeg}deg) rotateY(${-yawDeg}deg)`,
+                transform: `translateZ(-${HALF}px) rotateZ(${rollDeg}deg) rotateX(${pitchDeg}deg) rotateY(${-yawDeg}deg)`,
                 transition: dragging ? "none" : "transform 0.5s ease-out",
               }}
             >
