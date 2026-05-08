@@ -94,18 +94,8 @@ const MobileNav = ({
               Shop
             </button>
 
-            {/* BG switcher + mute */}
+            {/* Mute */}
             <div className="flex items-center gap-3 mt-4">
-              {bgOptions.map((bg, i) => (
-                <div
-                  key={i}
-                  className={`cursor-pointer transition-all duration-300 ${
-                    bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 rounded-none"
-                  }`}
-                  style={{ width: 18, height: 18, backgroundColor: "white" }}
-                  onClick={() => onBgChange(bg)}
-                />
-              ))}
               {siteMusicEnabled && (
                 <button
                   className="ml-2 text-foreground/60 hover:text-foreground transition-colors"
