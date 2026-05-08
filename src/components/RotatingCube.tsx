@@ -240,7 +240,7 @@ const RotatingCube = () => {
       <header className="text-center space-y-2">
         <p className="text-xs uppercase tracking-[0.3em] text-white/40 font-display">Cube</p>
         <h1 className="text-2xl font-light">
-          Face {LABELS[activeIndex]} · {active.title}
+          {active.title}
         </h1>
       </header>
 
