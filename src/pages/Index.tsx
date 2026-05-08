@@ -44,7 +44,7 @@ const Index = () => {
   const [bgImage, setBgImage] = useState(() => DEFAULT_BG_OPTIONS[Math.floor(Math.random() * DEFAULT_BG_OPTIONS.length)]);
   const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
   const [cubeBg, setCubeBg] = useState<string | null>(null);
-  const [cubeBgPool, setCubeBgPool] = useState<Array<{ image_url: string; time_of_day: string }>>([]);
+  const [cubeBgPool, setCubeBgPool] = useState<Array<{ image_url: string; time_of_days: string[] }>>([]);
   const [tod, setTod] = useState<TimeOfDay>(() => getTimeOfDay());
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainTextRef = useRef<HTMLDivElement | null>(null);
@@ -128,7 +128,12 @@ const Index = () => {
         const portfolioBgs = data.filter((b) => b.section === "portfolio" && b.is_active !== false).map((b) => b.image_url);
         const cubeBgs = data
           .filter((b) => b.section === "cube" && b.is_active !== false)
-          .map((b: any) => ({ image_url: b.image_url, time_of_day: b.time_of_day || "any" }));
+          .map((b: any) => {
+            const tods: string[] = Array.isArray(b.time_of_days) && b.time_of_days.length > 0
+              ? b.time_of_days
+              : [b.time_of_day || "any"];
+            return { image_url: b.image_url, time_of_days: tods };
+          });
         if (mainBgs.length > 0) {
           setBgOptions(mainBgs);
           if (isFirst) setBgImage(mainBgs[Math.floor(Math.random() * mainBgs.length)]);
@@ -159,8 +164,8 @@ const Index = () => {
   // Pick cube background matching current time-of-day (fallback to "any", then first)
   useEffect(() => {
     if (cubeBgPool.length === 0) { setCubeBg(null); return; }
-    const matches = cubeBgPool.filter((b) => b.time_of_day === tod);
-    const anyOnes = cubeBgPool.filter((b) => b.time_of_day === "any");
+    const matches = cubeBgPool.filter((b) => b.time_of_days.includes(tod));
+    const anyOnes = cubeBgPool.filter((b) => b.time_of_days.includes("any"));
     const pool = matches.length > 0 ? matches : (anyOnes.length > 0 ? anyOnes : cubeBgPool);
     setCubeBg(pool[0].image_url);
   }, [cubeBgPool, tod]);

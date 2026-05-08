@@ -40,6 +40,7 @@ interface BackgroundItem {
   sort_order: number;
   is_active: boolean;
   time_of_day?: string;
+  time_of_days?: string[];
 }
 
 const SECTIONS = ["main", "main2", "portfolio", "cube", "shop"] as const;
@@ -397,7 +398,9 @@ const AdminMain = () => {
                         <button onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)} title="Swap" className={`absolute top-2 left-2 p-1 transition-opacity ${swapTarget === item.id ? "bg-primary text-primary-foreground opacity-100" : "bg-background/80 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"}`}><ArrowUpDown size={14} /></button>
                             {activeSection === "cube" && (() => {
                               const bg = backgrounds.find((b) => b.id === item.id);
-                              const current = bg?.time_of_day || "any";
+                              const current: string[] = Array.isArray(bg?.time_of_days) && bg!.time_of_days!.length > 0
+                                ? bg!.time_of_days!
+                                : [bg?.time_of_day || "any"];
                               const labels: Record<string,string> = { any: "ANY", morning: "MORN", day: "DAY", evening: "EVE", night: "NIGHT" };
                               return (
                                 <div className="absolute inset-x-0 bottom-0 flex justify-center gap-0.5 px-1 py-1 bg-background/85 backdrop-blur-sm">
@@ -406,12 +409,19 @@ const AdminMain = () => {
                                       key={t}
                                       onClick={async (e) => {
                                         e.stopPropagation();
-                                        const { error } = await supabase.from("page_backgrounds").update({ time_of_day: t }).eq("id", item.id);
+                                        let next: string[];
+                                        if (t === "any") {
+                                          next = ["any"];
+                                        } else {
+                                          const without = current.filter((x) => x !== "any");
+                                          next = without.includes(t) ? without.filter((x) => x !== t) : [...without, t];
+                                          if (next.length === 0) next = ["any"];
+                                        }
+                                        const { error } = await supabase.from("page_backgrounds").update({ time_of_days: next, time_of_day: next[0] } as any).eq("id", item.id);
                                         if (error) { toast.error("Save failed"); return; }
-                                        setBackgrounds((prev) => prev.map((b) => b.id === item.id ? { ...b, time_of_day: t } : b));
-                                        toast.success(`Tagged: ${t}`);
+                                        setBackgrounds((prev) => prev.map((b) => b.id === item.id ? { ...b, time_of_days: next, time_of_day: next[0] } : b));
                                       }}
-                                      className={`flex-1 px-1 py-1 text-[9px] font-display tracking-[0.1em] uppercase border ${current === t ? "bg-foreground text-background border-foreground" : "bg-background/90 text-muted-foreground border-border hover:text-foreground hover:border-foreground"}`}
+                                      className={`flex-1 px-1 py-1 text-[9px] font-display tracking-[0.1em] uppercase border ${current.includes(t) ? "bg-foreground text-background border-foreground" : "bg-background/90 text-muted-foreground border-border hover:text-foreground hover:border-foreground"}`}
                                     >
                                       {labels[t]}
                                     </button>

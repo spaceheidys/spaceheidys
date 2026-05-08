@@ -131,6 +131,7 @@ export type Database = {
           section: string
           sort_order: number
           time_of_day: string
+          time_of_days: string[]
         }
         Insert: {
           created_at?: string
@@ -140,6 +141,7 @@ export type Database = {
           section: string
           sort_order?: number
           time_of_day?: string
+          time_of_days?: string[]
         }
         Update: {
           created_at?: string
@@ -149,6 +151,7 @@ export type Database = {
           section?: string
           sort_order?: number
           time_of_day?: string
+          time_of_days?: string[]
         }
         Relationships: []
       }
