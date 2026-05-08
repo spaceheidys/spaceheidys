@@ -422,6 +422,24 @@ export type Database = {
         }
         Relationships: []
       }
+      site_visits: {
+        Row: {
+          count: number
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       skills: {
         Row: {
           created_at: string
@@ -534,6 +552,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_site_visits: { Args: never; Returns: number }
       set_secret_door_code: { Args: { _new_code: string }; Returns: undefined }
       verify_secret_door_code: { Args: { _code: string }; Returns: boolean }
     }
