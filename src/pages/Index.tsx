@@ -65,6 +65,7 @@ const Index = () => {
   const { get: getContent, getDuration, loading: contentLoading } = useSectionContent();
   const { count: favoritesCount } = useFavorites();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [inHero, setInHero] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const siteMusicEnabled = !contentLoading && getContent("site_music_enabled") !== "false";
@@ -80,6 +81,8 @@ const Index = () => {
       if (!portfolioRef.current) return;
       const rect = portfolioRef.current.getBoundingClientRect();
       setShowScrollTop(rect.top < window.innerHeight * 0.5 && window.scrollY > 200);
+      // Hero is "active" while portfolio top is still below the middle of the viewport
+      setInHero(rect.top > window.innerHeight * 0.5);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -329,7 +332,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            {bgOptions.map((bg, i) => (
+            {inHero && bgOptions.map((bg, i) => (
               <div
                 key={i}
                 className={`cursor-pointer transition-all duration-300 w-[18px] h-[18px] bg-foreground ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
