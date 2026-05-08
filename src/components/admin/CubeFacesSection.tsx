@@ -23,18 +23,6 @@ const CubeFacesSection = () => {
   const [uploadingId, setUploadingId] = useState<number | null>(null);
   const [adjustOpen, setAdjustOpen] = useState<Record<number, boolean>>({});
   const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
-  const liveChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-
-  useEffect(() => {
-    const ch = supabase.channel("cube_faces_live", { config: { broadcast: { self: false } } });
-    ch.subscribe();
-    liveChannelRef.current = ch;
-    return () => { supabase.removeChannel(ch); };
-  }, []);
-
-  const broadcastLive = (id: number, patch: Partial<CubeFace>) => {
-    liveChannelRef.current?.send({ type: "broadcast", event: "face_preview", payload: { id, patch } });
-  };
 
   const fetchFaces = async () => {
     setLoading(true);
@@ -156,85 +144,35 @@ const CubeFacesSection = () => {
               {adjustOpen[face.id] && (
                 <div className="flex gap-3 pt-2 border-t border-border">
                   {/* Live preview as it appears on a cube face */}
-                  <div
-                    className="shrink-0 w-24 h-24 border border-border overflow-hidden bg-black relative cursor-move touch-none select-none"
-                    onPointerDown={(e) => {
-                      (e.target as Element).setPointerCapture?.(e.pointerId);
-                      const startX = e.clientX;
-                      const startY = e.clientY;
-                      const startVX = face.image_x ?? 0;
-                      const startVY = face.image_y ?? 0;
-                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                      let pending: { x: number; y: number } | null = null;
-                      let rafId: number | null = null;
-                      const flush = () => {
-                        rafId = null;
-                        if (!pending) return;
-                        const { x, y } = pending;
-                        broadcastLive(face.id, { image_x: x, image_y: y });
-                        persist(face.id, { image_x: x, image_y: y }, true);
-                      };
-                      const move = (ev: PointerEvent) => {
-                        const dx = (ev.clientX - startX) / rect.width;
-                        const dy = (ev.clientY - startY) / rect.height;
-                        const nx = Math.max(-1, Math.min(1, startVX - dx * 2));
-                        const ny = Math.max(-1, Math.min(1, startVY - dy * 2));
-                        // 1) instant admin preview
-                        updateLocal(face.id, { image_x: nx, image_y: ny });
-                        // 2) throttle network broadcast + save
-                        pending = { x: nx, y: ny };
-                        if (rafId == null) rafId = requestAnimationFrame(flush);
-                      };
-                      const up = () => {
-                        window.removeEventListener("pointermove", move);
-                        window.removeEventListener("pointerup", up);
-                        if (rafId != null) cancelAnimationFrame(rafId);
-                        if (pending) {
-                          broadcastLive(face.id, { image_x: pending.x, image_y: pending.y });
-                          persist(face.id, { image_x: pending.x, image_y: pending.y }, true);
-                        }
-                      };
-                      window.addEventListener("pointermove", move);
-                      window.addEventListener("pointerup", up);
-                    }}
-                    onWheel={(e) => {
-                      e.preventDefault();
-                      const cur = face.image_scale ?? 1;
-                      const next = Math.max(0.5, Math.min(3, cur - e.deltaY * 0.002));
-                      updateLocal(face.id, { image_scale: next });
-                      broadcastLive(face.id, { image_scale: next });
-                      persist(face.id, { image_scale: next }, true);
-                    }}
-                  >
+                  <div className="shrink-0 w-24 h-24 border border-border overflow-hidden bg-black relative">
                     <img
                       src={face.image_url}
                       alt=""
-                      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                      className="absolute inset-0 w-full h-full object-cover"
                       style={{
                         objectPosition: `${50 + (face.image_x ?? 0) * 50}% ${50 + (face.image_y ?? 0) * 50}%`,
                         transform: `scale(${face.image_scale ?? 1})`,
                       }}
-                      draggable={false}
                     />
-                    <span className="absolute bottom-1 left-1 text-[8px] font-display tracking-widest uppercase text-white/60 pointer-events-none">Drag · Scroll</span>
+                    <span className="absolute bottom-1 left-1 text-[8px] font-display tracking-widest uppercase text-white/60">Live</span>
                   </div>
                   <div className="flex-1 grid grid-cols-1 gap-2">
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">Zoom</span>
                       <input type="range" min={0.5} max={3} step={0.05} value={face.image_scale} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_scale: v }); broadcastLive(face.id, { image_scale: v }); persist(face.id, { image_scale: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_scale: v }); persist(face.id, { image_scale: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_scale ?? 1).toFixed(2)}</span>
                     </label>
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">X</span>
                       <input type="range" min={-1} max={1} step={0.05} value={face.image_x} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_x: v }); broadcastLive(face.id, { image_x: v }); persist(face.id, { image_x: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_x: v }); persist(face.id, { image_x: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_x ?? 0).toFixed(2)}</span>
                     </label>
                     <label className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-2">
                       <span className="w-10">Y</span>
                       <input type="range" min={-1} max={1} step={0.05} value={face.image_y} className="flex-1"
-                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_y: v }); broadcastLive(face.id, { image_y: v }); persist(face.id, { image_y: v }, true); }} />
+                        onChange={(e) => { const v = parseFloat(e.target.value); updateLocal(face.id, { image_y: v }); persist(face.id, { image_y: v }, true); }} />
                       <span className="w-8 text-right tabular-nums">{(face.image_y ?? 0).toFixed(2)}</span>
                     </label>
                   </div>

@@ -217,24 +217,7 @@ const RotatingCube = () => {
         });
       })
       .subscribe();
-    const liveCh = supabase
-      .channel("cube_faces_live")
-      .on("broadcast", { event: "face_preview" }, (msg: any) => {
-        const { id, patch } = msg.payload || {};
-        if (typeof id !== "number" || !patch) return;
-        setFaces((prev) => prev.map((f, i) => i === id ? {
-          ...f,
-          ...(patch.image_url !== undefined ? { image: patch.image_url } : {}),
-          ...(patch.image_scale !== undefined ? { imageScale: patch.image_scale } : {}),
-          ...(patch.image_x !== undefined ? { imageX: patch.image_x } : {}),
-          ...(patch.image_y !== undefined ? { imageY: patch.image_y } : {}),
-          ...(patch.title !== undefined ? { title: patch.title } : {}),
-          ...(patch.text !== undefined ? { text: patch.text } : {}),
-          ...(patch.icon !== undefined ? { icon: patch.icon as IconKey } : {}),
-        } : f));
-      })
-      .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(channel); supabase.removeChannel(liveCh); };
+    return () => { cancelled = true; supabase.removeChannel(channel); };
   }, []);
 
   const yaw = Math.round(yawDeg / 90);
