@@ -656,23 +656,7 @@ const AdminShop = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="relative flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border gap-2">
-        <div className="flex items-center gap-4">
-          {user && <NotesButton userId={user.id} />}
-        </div>
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 flex-wrap justify-center">
-          <button onClick={() => navigate("/admin/main")} className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground">Main Page CMS</button>
-          <span className="text-muted-foreground/40">|</span>
-          <button onClick={() => navigate("/admin")} className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground">Portfolio CMS</button>
-          <span className="text-muted-foreground/40">|</span>
-          <button onClick={() => navigate("/admin/secret-door")} className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground">Secret Door</button>
-          <span className="text-muted-foreground/40">|</span>
-          <button onClick={() => navigate("/admin/seo")} className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground">SEO</button>
-          <span className="text-muted-foreground/40">|</span>
-          <h1 className="font-display text-sm tracking-[0.3em] uppercase">Shop</h1>
-        </div>
-        <button onClick={() => navigate("/")} className="ml-auto text-muted-foreground text-[10px] tracking-widest hover:text-foreground font-display uppercase">← SITE</button>
-      </header>
+      <AdminTopNav current="shop" userId={user?.id} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-8 py-8 space-y-6">
         <div className="flex items-center justify-between border border-border p-3">
