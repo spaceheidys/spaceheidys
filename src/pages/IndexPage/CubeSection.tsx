@@ -1,5 +1,6 @@
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import RotatingCube from "@/components/RotatingCube";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CubeSectionProps {
   footerText?: string;
@@ -8,10 +9,43 @@ interface CubeSectionProps {
 
 const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, backgroundUrl }, ref) => {
   const isVideo = backgroundUrl ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(backgroundUrl) : false;
+  const [visits, setVisits] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      const already = sessionStorage.getItem("visit_counted") === "1";
+      if (already) {
+        const { data } = await supabase.from("site_visits").select("count").eq("id", 1).maybeSingle();
+        if (!cancelled && data) setVisits(Number(data.count));
+      } else {
+        const { data, error } = await supabase.rpc("increment_site_visits");
+        if (!cancelled) {
+          if (!error && data != null) {
+            sessionStorage.setItem("visit_counted", "1");
+            setVisits(Number(data));
+          } else {
+            const { data: r } = await supabase.from("site_visits").select("count").eq("id", 1).maybeSingle();
+            if (r) setVisits(Number(r.count));
+          }
+        }
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  const formatted = visits != null ? String(visits).padStart(7, "0") : null;
   return (
     <>
-      {/* divider */}
-      <div className="w-full h-8 bg-black" />
+      {/* divider with visit counter */}
+      <div className="w-full h-8 bg-black flex items-center justify-center">
+        {formatted && (
+          <span className="font-display text-[10px] tracking-[0.4em] text-white/30 tabular-nums select-none">
+            №&nbsp;{formatted}
+          </span>
+        )}
+      </div>
 
       <div
         ref={ref}
