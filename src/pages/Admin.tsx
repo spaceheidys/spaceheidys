@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, Pencil } from "lucide-react";
 import NotesButton from "@/components/admin/NotesButton";
+import AdminTopNav from "@/components/admin/AdminTopNav";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import {
   DndContext,
@@ -615,50 +616,12 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="relative flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
-        <div className="flex items-center gap-4">
-          {user && <NotesButton userId={user.id} />}
-        </div>
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 flex-wrap justify-center">
-          <button
-            onClick={() => navigate("/admin/main")}
-            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Main Page CMS
-          </button>
-          <span className="text-muted-foreground/40">|</span>
-          <h1 className="font-display text-sm tracking-[0.3em] uppercase">Portfolio CMS</h1>
-          <span className="text-muted-foreground/40">|</span>
-          <button
-            onClick={() => navigate("/admin/secret-door")}
-            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Secret Door
-          </button>
-          <span className="text-muted-foreground/40">|</span>
-          <button
-            onClick={() => navigate("/admin/seo")}
-            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            SEO
-          </button>
-          <span className="text-muted-foreground/40">|</span>
-          <button
-            onClick={() => navigate("/admin/shop")}
-            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Shop
-          </button>
-        </div>
-        <div className="ml-auto flex items-center gap-4">
-          <button
-            onClick={() => navigate("/")}
-            className="text-muted-foreground text-[10px] tracking-widest hover:text-foreground transition-colors font-display uppercase"
-          >
-            ← SITE
-          </button>
-
-          {confirmSave ? (
+      <AdminTopNav
+        current="portfolio"
+        userId={user?.id}
+        rightExtra={
+          <>
+            {confirmSave ? (
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { setConfirmSave(false); window.location.reload(); }}
@@ -681,18 +644,19 @@ const Admin = () => {
               SAVE
             </button>
           )}
-
-          <span className="text-muted-foreground text-xs font-display tracking-wider hidden sm:block">
-            {user.email}
-          </span>
-          <button
-            onClick={() => { signOut(); navigate("/"); }}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <LogOut size={16} />
-          </button>
-        </div>
-      </header>
+            <span className="text-muted-foreground text-xs font-display tracking-wider hidden md:block">
+              {user.email}
+            </span>
+            <button
+              onClick={() => { signOut(); navigate("/"); }}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Logout"
+            >
+              <LogOut size={16} />
+            </button>
+          </>
+        }
+      />
 
       <div className="px-4 sm:px-8 py-6 max-w-5xl mx-auto">
         {/* Section tabs - draggable */}
