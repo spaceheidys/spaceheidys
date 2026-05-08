@@ -33,6 +33,51 @@ import SocialSection from "@/components/admin/SocialSection";
 import SoundConfigSection from "@/components/admin/SoundConfigSection";
 import CubeFacesSection from "@/components/admin/CubeFacesSection";
 
+const VisitCounterBlock = () => {
+  const [count, setCount] = useState<number | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const load = async () => {
+    const { data } = await supabase.from("site_visits").select("count").eq("id", 1).maybeSingle();
+    if (data) setCount(Number(data.count));
+  };
+  useEffect(() => { load(); }, []);
+
+  const reset = async () => {
+    setBusy(true);
+    const { error } = await supabase.rpc("reset_site_visits");
+    setBusy(false);
+    if (error) { toast.error("Reset failed"); return; }
+    setCount(0);
+    setConfirming(false);
+    toast.success("Visit counter reset");
+  };
+
+  return (
+    <div className="border border-border p-3 mb-4 flex items-center justify-between gap-3">
+      <div>
+        <p className="text-[9px] font-display tracking-[0.3em] uppercase text-muted-foreground">Visit counter</p>
+        <p className="text-sm font-display tabular-nums mt-1">{count ?? "—"}</p>
+      </div>
+      {!confirming ? (
+        <button
+          onClick={() => setConfirming(true)}
+          className="text-[9px] font-display tracking-[0.3em] uppercase border border-border px-3 py-1.5 hover:border-foreground transition-colors"
+        >
+          Reset
+        </button>
+      ) : (
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] font-display tracking-[0.2em] uppercase text-muted-foreground">Reset to 0?</span>
+          <button disabled={busy} onClick={reset} className="text-[9px] font-display tracking-[0.3em] uppercase border border-foreground px-2 py-1 hover:bg-foreground hover:text-background transition-colors disabled:opacity-50">Yes</button>
+          <button disabled={busy} onClick={() => setConfirming(false)} className="text-[9px] font-display tracking-[0.3em] uppercase border border-border px-2 py-1 hover:border-foreground transition-colors">No</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 interface BackgroundItem {
   id: string;
   section: string;
@@ -711,6 +756,7 @@ const AdminMain = () => {
           <Main2Section get={getContent} update={updateContent} />
         ) : activeSection === "cube" ? (
           <div className="py-4">
+            <VisitCounterBlock />
             <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase mb-4">CUBE — 6 faces</p>
             <CubeFacesSection />
             <div className="relative mt-8">
