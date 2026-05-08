@@ -647,7 +647,7 @@ const Admin = () => {
             Shop
           </button>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-4">
           <button
             onClick={() => navigate("/")}
             className="text-muted-foreground text-[10px] tracking-widest hover:text-foreground transition-colors font-display uppercase"
