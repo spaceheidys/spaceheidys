@@ -615,8 +615,8 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
-        <div className="flex items-center gap-4">
+      <header className="relative flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 flex-wrap justify-center">
           <button
             onClick={() => navigate("/admin/main")}
             className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
