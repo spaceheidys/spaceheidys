@@ -711,6 +711,7 @@ const AdminMain = () => {
           <Main2Section get={getContent} update={updateContent} />
         ) : activeSection === "cube" ? (
           <div className="py-4">
+            <VisitCounterBlock />
             <p className="text-xs text-muted-foreground font-display tracking-[0.3em] uppercase mb-4">CUBE — 6 faces</p>
             <CubeFacesSection />
             <div className="relative mt-8">
