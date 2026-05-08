@@ -44,7 +44,7 @@ const Index = () => {
   const [bgImage, setBgImage] = useState(() => DEFAULT_BG_OPTIONS[Math.floor(Math.random() * DEFAULT_BG_OPTIONS.length)]);
   const [portfolioBg, setPortfolioBg] = useState<string | null>(null);
   const [cubeBg, setCubeBg] = useState<string | null>(null);
-  const [cubeBgPool, setCubeBgPool] = useState<Array<{ image_url: string; time_of_day: string }>>([]);
+  const [cubeBgPool, setCubeBgPool] = useState<Array<{ image_url: string; time_of_days: string[] }>>([]);
   const [tod, setTod] = useState<TimeOfDay>(() => getTimeOfDay());
   const aboutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainTextRef = useRef<HTMLDivElement | null>(null);
