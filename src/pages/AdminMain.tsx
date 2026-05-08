@@ -20,7 +20,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import NotesButton from "@/components/admin/NotesButton";
+import AdminTopNav from "@/components/admin/AdminTopNav";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
@@ -644,64 +644,26 @@ const AdminMain = () => {
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       {/* Header */}
-      <header className="relative flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
-        <div className="flex items-center gap-4">
-          {user && <NotesButton userId={user.id} />}
-        </div>
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 flex-wrap justify-center">
-          <h1 className="font-display text-sm tracking-[0.3em] uppercase">Main Page CMS</h1>
-          <span className="text-muted-foreground/40">|</span>
-          <button
-            onClick={() => navigate("/admin")}
-            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Portfolio CMS
-          </button>
-          <span className="text-muted-foreground/40">|</span>
-          <button
-            onClick={() => navigate("/admin/secret-door")}
-            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Secret Door
-          </button>
-          <span className="text-muted-foreground/40">|</span>
-          <button
-            onClick={() => navigate("/admin/seo")}
-            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            SEO
-          </button>
-          <span className="text-muted-foreground/40">|</span>
-          <button
-            onClick={() => navigate("/admin/shop")}
-            className="font-display text-sm tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Shop
-          </button>
-        </div>
-        <div className="ml-auto flex items-center gap-4">
-          <button
-            onClick={() => navigate("/")}
-            className="text-muted-foreground text-[10px] tracking-widest hover:text-foreground transition-colors font-display uppercase"
-          >
-            ← SITE
-          </button>
+      <AdminTopNav
+        current="main"
+        userId={user?.id}
+        rightExtra={
           <button
             onClick={signOut}
             className="flex items-center gap-1.5 text-muted-foreground text-[10px] tracking-widest hover:text-foreground transition-colors font-display uppercase"
           >
             <LogOut size={10} /> LOGOUT
           </button>
-        </div>
-      </header>
+        }
+      />
 
       {/* Section tabs */}
-      <div className="flex items-center justify-center gap-1 px-4 sm:px-8 py-3 border-b border-border">
+      <div className="flex items-center justify-center gap-1 px-3 sm:px-8 py-3 border-b border-border flex-wrap">
         {SECTIONS.map((s) => (
           <button
             key={s}
             onClick={() => { setActiveSection(s); setSwapTarget(null); }}
-            className={`px-3 py-1.5 text-xs font-display tracking-[0.2em] uppercase transition-colors ${
+            className={`px-2 sm:px-3 py-1.5 text-[11px] sm:text-xs font-display tracking-[0.2em] uppercase transition-colors ${
               activeSection === s
                 ? "border border-foreground text-foreground"
                 : "border border-transparent text-muted-foreground hover:text-foreground"
