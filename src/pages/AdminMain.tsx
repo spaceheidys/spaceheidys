@@ -645,7 +645,7 @@ const AdminMain = () => {
     <div className="min-h-screen bg-background text-foreground font-body">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
-        <div className="flex-1 flex items-center justify-center gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
           <h1 className="font-display text-sm tracking-[0.3em] uppercase">Main Page CMS</h1>
           <span className="text-muted-foreground/40">|</span>
           <button
