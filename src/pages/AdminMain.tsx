@@ -645,7 +645,7 @@ const AdminMain = () => {
     <div className="min-h-screen bg-background text-foreground font-body">
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
-        <div className="flex-1 flex items-center justify-center gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
           <h1 className="font-display text-sm tracking-[0.3em] uppercase">Main Page CMS</h1>
           <span className="text-muted-foreground/40">|</span>
           <button
@@ -694,7 +694,7 @@ const AdminMain = () => {
       </header>
 
       {/* Section tabs */}
-      <div className="flex items-center gap-1 px-4 sm:px-8 py-3 border-b border-border">
+      <div className="flex items-center justify-center gap-1 px-4 sm:px-8 py-3 border-b border-border">
         {SECTIONS.map((s) => (
           <button
             key={s}
@@ -711,7 +711,7 @@ const AdminMain = () => {
       </div>
 
       {/* Content */}
-      <div className="px-4 sm:px-8 py-6">
+      <div className="px-4 sm:px-8 py-6 max-w-5xl mx-auto">
         {activeSection === "shop" ? (
           <div className="py-8">
             <div className="flex items-center justify-between mb-6">
