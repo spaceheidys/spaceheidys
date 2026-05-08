@@ -40,6 +40,7 @@ interface BackgroundItem {
   sort_order: number;
   is_active: boolean;
   time_of_day?: string;
+  time_of_days?: string[];
 }
 
 const SECTIONS = ["main", "main2", "portfolio", "cube", "shop"] as const;
