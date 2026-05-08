@@ -350,18 +350,27 @@ const Index = () => {
             )}
           </motion.div>
         </nav>
-        <MobileNav
-          onSecretDoor={openSecretDoor}
-          onShop={goToShop}
-          navButtons={navButtons}
-          actionMap={actionMap}
-          bgOptions={bgOptions}
-          bgImage={bgImage}
-          onBgChange={setBgImage}
-          siteMusicEnabled={siteMusicEnabled}
-          bellSoundUrl={bellSoundUrl}
-          bellSoundMuted={bellSoundMuted}
-        />
+        <div className="md:hidden flex items-center gap-2">
+          {inHero && bgOptions.map((bg, i) => (
+            <div
+              key={i}
+              className={`cursor-pointer transition-all duration-300 w-[18px] h-[18px] bg-foreground ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
+              onClick={() => setBgImage(bg)}
+            />
+          ))}
+          <MobileNav
+            onSecretDoor={openSecretDoor}
+            onShop={goToShop}
+            navButtons={navButtons}
+            actionMap={actionMap}
+            bgOptions={bgOptions}
+            bgImage={bgImage}
+            onBgChange={setBgImage}
+            siteMusicEnabled={siteMusicEnabled}
+            bellSoundUrl={bellSoundUrl}
+            bellSoundMuted={bellSoundMuted}
+          />
+        </div>
       </motion.header>
 
       {/* === MAIN Hero === */}
