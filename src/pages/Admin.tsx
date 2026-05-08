@@ -307,7 +307,7 @@ const Admin = () => {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editLabelJp, setEditLabelJp] = useState("");
-  const { get: getContent, update: updateContent, loading: contentLoading } = useSectionContent();
+  const { get: getContent, update: updateContent } = useSectionContent();
   const { subs: gallerySubs, save: saveGallerySubs } = useGallerySubs();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
