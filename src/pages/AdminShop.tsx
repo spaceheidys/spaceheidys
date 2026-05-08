@@ -11,6 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import NotesButton from "@/components/admin/NotesButton";
 
 type Category = "prints" | "merch";
 
