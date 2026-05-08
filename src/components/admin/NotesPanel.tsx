@@ -27,6 +27,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [confirmImageAction, setConfirmImageAction] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [, setExpandedImages] = useState<Set<string>>(new Set());
   const [overlayImage, setOverlayImage] = useState<{ url: string; noteId: string } | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirmResetScore, setConfirmResetScore] = useState(false);
