@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
@@ -50,7 +50,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     try {
       const saved = localStorage.getItem("admin_main2_collapsed");
       if (saved) return new Set(JSON.parse(saved));
-    } catch {}
+    } catch { /* ignore */ }
     return new Set();
   });
   const frontRef = useRef<HTMLInputElement>(null);
@@ -71,7 +71,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
         defaults.forEach(k => { if (!valid.includes(k)) valid.push(k); });
         return valid;
       }
-    } catch {}
+    } catch { /* ignore */ }
     return ["text", "cards", "card_images"];
   });
 

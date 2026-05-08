@@ -27,7 +27,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const [confirmImageAction, setConfirmImageAction] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
-  const [expandedImages, setExpandedImages] = useState<Set<string>>(new Set());
+  const [, setExpandedImages] = useState<Set<string>>(new Set());
   const [overlayImage, setOverlayImage] = useState<{ url: string; noteId: string } | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirmResetScore, setConfirmResetScore] = useState(false);
@@ -155,19 +155,6 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") confirmEdit();
     if (e.key === "Escape") cancelEdit();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") addNote();
-  };
-
-  const toggleImage = (id: string) => {
-    setExpandedImages((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
   };
 
   const triggerImageUpload = (noteId: string) => {

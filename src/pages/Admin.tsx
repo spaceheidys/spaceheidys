@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, Pencil } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import {
@@ -307,7 +307,7 @@ const Admin = () => {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editLabelJp, setEditLabelJp] = useState("");
-  const { get: getContent, update: updateContent, loading: contentLoading } = useSectionContent();
+  const { get: getContent, update: updateContent } = useSectionContent();
   const { subs: gallerySubs, save: saveGallerySubs } = useGallerySubs();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
@@ -552,31 +552,6 @@ const Admin = () => {
   const handleVisibilityChange = async (id: string, visible: boolean) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, is_visible: visible } as any : i)));
     await supabase.from("portfolio_items").update({ is_visible: visible } as any).eq("id", id);
-  };
-
-  const handleHtmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.name.endsWith(".html") && !file.name.endsWith(".htm")) {
-      toast.error("Only .html files are accepted");
-      e.target.value = "";
-      return;
-    }
-    setUploading(true);
-    const fileName = `projects/html/${Date.now()}-${Math.random().toString(36).slice(2)}.html`;
-    const { error: uploadError } = await supabase.storage
-      .from("portfolio-images")
-      .upload(fileName, file, { contentType: "text/html" });
-    if (uploadError) {
-      toast.error("HTML upload failed");
-    } else {
-      const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(fileName);
-      // Copy URL to clipboard and notify
-      navigator.clipboard.writeText(urlData.publicUrl).catch(() => {});
-      toast.success("HTML uploaded! URL copied to clipboard. Paste it into a card's URL field.");
-    }
-    setUploading(false);
-    e.target.value = "";
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -1099,7 +1074,8 @@ const Admin = () => {
                           <div
                             onClick={() => {
                               const next = new Set(selectedIds);
-                              next.has(item.id) ? next.delete(item.id) : next.add(item.id);
+                              if (next.has(item.id)) next.delete(item.id);
+                              else next.add(item.id);
                               setSelectedIds(next);
                             }}
                             className="absolute inset-0 z-30 cursor-pointer flex items-center justify-center"
