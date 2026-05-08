@@ -1099,7 +1099,8 @@ const Admin = () => {
                           <div
                             onClick={() => {
                               const next = new Set(selectedIds);
-                              next.has(item.id) ? next.delete(item.id) : next.add(item.id);
+                              if (next.has(item.id)) next.delete(item.id);
+                              else next.add(item.id);
                               setSelectedIds(next);
                             }}
                             className="absolute inset-0 z-30 cursor-pointer flex items-center justify-center"
