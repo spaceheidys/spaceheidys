@@ -397,6 +397,32 @@ const AdminMain = () => {
                         </button>
                         <button onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)} title="Swap" className={`absolute top-2 left-2 p-1 transition-opacity ${swapTarget === item.id ? "bg-primary text-primary-foreground opacity-100" : "bg-background/80 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"}`}><ArrowUpDown size={14} /></button>
                             {activeSection === "cube" && (() => {
+                              const cubeItems = backgrounds
+                                .filter((b) => b.section === "cube")
+                                .sort((a, b) => a.sort_order - b.sort_order);
+                              const idx = cubeItems.findIndex((b) => b.id === item.id);
+                              return (
+                                <>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); moveBackground(item.id, -1); }}
+                                    disabled={idx <= 0}
+                                    title="Move left"
+                                    className="absolute top-1/2 left-1 -translate-y-1/2 p-1.5 bg-background/85 text-foreground border border-border hover:border-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                  >
+                                    <ArrowUp size={14} className="-rotate-90" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); moveBackground(item.id, 1); }}
+                                    disabled={idx === -1 || idx >= cubeItems.length - 1}
+                                    title="Move right"
+                                    className="absolute top-1/2 right-1 -translate-y-1/2 p-1.5 bg-background/85 text-foreground border border-border hover:border-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                  >
+                                    <ArrowDown size={14} className="-rotate-90" />
+                                  </button>
+                                </>
+                              );
+                            })()}
+                            {activeSection === "cube" && (() => {
                               const bg = backgrounds.find((b) => b.id === item.id);
                               const current: string[] = Array.isArray(bg?.time_of_days) && bg!.time_of_days!.length > 0
                                 ? bg!.time_of_days!
