@@ -122,6 +122,7 @@ const RotatingCube = () => {
     setDragging(true);
   };
   const onPointerMove = (e: React.PointerEvent) => {
+    if (pinchRef.current) return;
     const d = dragRef.current;
     if (!d) return;
     const t = performance.now();
@@ -133,6 +134,11 @@ const RotatingCube = () => {
     setPitchDeg(d.pitch + dy * 0.4);
   };
   const onPointerUp = () => {
+    if (pinchRef.current) {
+      dragRef.current = null;
+      setDragging(false);
+      return;
+    }
     const d = dragRef.current;
     if (!d) return;
     const last = d.samples[d.samples.length - 1];
