@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAllSeo, type SeoSetting } from "@/hooks/useSeo";
 import { toast } from "sonner";
 import { Loader2, Upload, X, Check } from "lucide-react";
+import NotesButton from "@/components/admin/NotesButton";
 
 const PAGE_LABELS: Record<string, string> = {
   default: "Default (fallback for all pages)",
@@ -115,6 +116,9 @@ const AdminSEO = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="relative flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
+        <div className="flex items-center gap-4">
+          {user && <NotesButton userId={user.id} />}
+        </div>
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 flex-wrap justify-center">
           <button
             onClick={() => navigate("/admin/main")}
