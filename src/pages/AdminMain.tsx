@@ -20,7 +20,6 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import NotesButton from "@/components/admin/NotesButton";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";

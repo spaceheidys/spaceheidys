@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAllSeo, type SeoSetting } from "@/hooks/useSeo";
 import { toast } from "sonner";
 import { Loader2, Upload, X, Check } from "lucide-react";
-import NotesButton from "@/components/admin/NotesButton";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 
 const PAGE_LABELS: Record<string, string> = {
