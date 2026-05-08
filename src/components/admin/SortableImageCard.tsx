@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Eye, EyeOff } from "lucide-react";
-import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, RefreshCw, Edit2, Upload, Loader2 } from "lucide-react";
+import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, Edit2, Upload, Loader2 } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -86,18 +86,11 @@ const SortableImageCard = ({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [confirmDeleteUrl, setConfirmDeleteUrl] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
-  const [isEditingUrl, setIsEditingUrl] = useState(false);
-  const [editUrl, setEditUrl] = useState(project_url || "");
-  const [confirmUrlChange, setConfirmUrlChange] = useState(false);
-  const [isEditingDesc, setIsEditingDesc] = useState(false);
-  const [editDesc, setEditDesc] = useState(description || "");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [replacingImage, setReplacingImage] = useState(false);
   const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
   const [pendingReplacePreview, setPendingReplacePreview] = useState<string | null>(null);
   const [uploadingReplace, setUploadingReplace] = useState(false);
