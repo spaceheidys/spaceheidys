@@ -230,10 +230,10 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                   </AnimatePresence>
                 </div>
 
-                {/* Menu positioned below card without affecting layout */}
+                {/* Menu positioned below card without affecting layout (only when no active section) */}
                 <div
                   className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max transition-opacity duration-300 ${
-                    activePortfolioKey ? "sm:hidden" : ""
+                    activePortfolioKey ? "hidden" : ""
                   } ${lightboxOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                 >
                   <PortfolioMenu
@@ -269,10 +269,10 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             )}
           </AnimatePresence>
 
-          {/* Menu at bottom position when section is active (desktop only) */}
+          {/* Menu at bottom position when section is active (mobile + desktop) */}
           {activePortfolioKey && (
             <div
-              className={`hidden sm:flex relative z-10 items-center justify-center pb-4 transition-opacity duration-300 ${
+              className={`relative z-20 flex items-center justify-center pb-6 pt-4 transition-opacity duration-300 ${
                 lightboxOpen ? "opacity-0 pointer-events-none" : "opacity-100"
               }`}
             >
