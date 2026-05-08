@@ -644,8 +644,8 @@ const AdminMain = () => {
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
-        <div className="flex items-center gap-4">
+      <header className="relative flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 flex-wrap justify-center">
           <h1 className="font-display text-sm tracking-[0.3em] uppercase">Main Page CMS</h1>
           <span className="text-muted-foreground/40">|</span>
           <button
@@ -676,7 +676,7 @@ const AdminMain = () => {
             Shop
           </button>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-4">
           {user && <NotesButton userId={user.id} />}
           <button
             onClick={() => navigate("/")}
