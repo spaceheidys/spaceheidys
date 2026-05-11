@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ReactNode } from "react";
 import NotesButton from "./NotesButton";
 
-export type AdminPageKey = "main" | "portfolio" | "secret-door" | "seo" | "shop";
+export type AdminPageKey = "main" | "portfolio" | "secret-door" | "seo" | "shop" | "visits";
 
 const LINKS: { key: AdminPageKey; label: string; path: string }[] = [
   { key: "main", label: "Main Page CMS", path: "/admin/main" },
@@ -10,6 +10,7 @@ const LINKS: { key: AdminPageKey; label: string; path: string }[] = [
   { key: "secret-door", label: "Secret Door", path: "/admin/secret-door" },
   { key: "seo", label: "SEO", path: "/admin/seo" },
   { key: "shop", label: "Shop", path: "/admin/shop" },
+  { key: "visits", label: "Visits", path: "/admin/visits" },
 ];
 
 interface Props {
