@@ -16,6 +16,7 @@ const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminSecretDoor = lazy(() => import("./pages/AdminSecretDoor"));
 const AdminSEO = lazy(() => import("./pages/AdminSEO"));
 const AdminShop = lazy(() => import("./pages/AdminShop"));
+const AdminVisits = lazy(() => import("./pages/AdminVisits"));
 const Shop = lazy(() => import("./pages/Shop"));
 const Profile = lazy(() => import("./pages/Profile"));
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/admin/secret-door" element={<AdminSecretDoor />} />
               <Route path="/admin/seo" element={<AdminSEO />} />
               <Route path="/admin/shop" element={<AdminShop />} />
+              <Route path="/admin/visits" element={<AdminVisits />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
