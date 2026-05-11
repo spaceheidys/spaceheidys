@@ -521,6 +521,51 @@ export type Database = {
         }
         Relationships: []
       }
+      visit_logs: {
+        Row: {
+          browser: string | null
+          city: string | null
+          country: string | null
+          country_name: string | null
+          created_at: string
+          device: string | null
+          id: string
+          os: string | null
+          path: string | null
+          referrer: string | null
+          region: string | null
+          visitor_hash: string
+        }
+        Insert: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          country_name?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          os?: string | null
+          path?: string | null
+          referrer?: string | null
+          region?: string | null
+          visitor_hash: string
+        }
+        Update: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          country_name?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          os?: string | null
+          path?: string | null
+          referrer?: string | null
+          region?: string | null
+          visitor_hash?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       secret_door_public_settings: {
