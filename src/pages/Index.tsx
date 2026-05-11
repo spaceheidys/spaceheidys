@@ -239,6 +239,17 @@ const Index = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
 
+  // Log visit (anonymous, GDPR-friendly) — once per session
+  useEffect(() => {
+    if (sessionStorage.getItem("visit_logged") === "1") return;
+    sessionStorage.setItem("visit_logged", "1");
+    supabase.functions
+      .invoke("log-visit", {
+        body: { path: window.location.pathname, referrer: document.referrer || null },
+      })
+      .catch(() => { /* silent */ });
+  }, []);
+
   // Mute/unmute background audio
   useEffect(() => {
     if (audioRef.current) audioRef.current.muted = muted;
