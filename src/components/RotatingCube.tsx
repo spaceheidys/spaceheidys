@@ -301,9 +301,7 @@ const RotatingCube = () => {
     <div className="flex flex-col items-center gap-8 text-white">
       <header className="text-center space-y-2">
         <p className="text-xs uppercase tracking-[0.3em] text-white/40 font-display">Cube</p>
-        <h1 className="text-2xl font-light">
-          {active.title}
-        </h1>
+        <GlitchTitle text={active.title} triggerKey={activeIndex} />
       </header>
 
       <div className="flex items-center gap-4">
