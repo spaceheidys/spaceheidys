@@ -21,6 +21,48 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
+const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#________";
+
+const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number }) => {
+  const [display, setDisplay] = useState(text);
+  useEffect(() => {
+    let frame = 0;
+    const duration = 22; // frames
+    const id = setInterval(() => {
+      frame++;
+      const progress = frame / duration;
+      const out = text
+        .split("")
+        .map((ch, i) => {
+          if (ch === " ") return " ";
+          if (i / text.length < progress) return text[i];
+          return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+        })
+        .join("");
+      setDisplay(out);
+      if (frame >= duration) {
+        setDisplay(text);
+        clearInterval(id);
+      }
+    }, 35);
+    return () => clearInterval(id);
+  }, [text, triggerKey]);
+
+  return (
+    <h1
+      key={triggerKey}
+      className="text-2xl font-light font-mono relative inline-block"
+      style={{
+        textShadow:
+          "2px 0 rgba(255,255,255,0.35), -2px 0 rgba(255,255,255,0.25)",
+        animation: "cube-glitch 0.6s steps(2) 1",
+      }}
+    >
+      {display}
+    </h1>
+  );
+};
+
 const ICONS = {
   none: null,
   star: Star,
@@ -301,9 +343,7 @@ const RotatingCube = () => {
     <div className="flex flex-col items-center gap-8 text-white">
       <header className="text-center space-y-2">
         <p className="text-xs uppercase tracking-[0.3em] text-white/40 font-display">Cube</p>
-        <h1 className="text-2xl font-light">
-          {active.title}
-        </h1>
+        <GlitchTitle text={active.title} triggerKey={activeIndex} />
       </header>
 
       <div className="flex items-center gap-4">
