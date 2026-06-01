@@ -21,11 +21,22 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#________";
+const GLITCH_CHARS =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!<>-_\\/[]{}—=+*^?#@%&$~";
+
+const randomGlitchChar = (avoid?: string) => {
+  let ch = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+  let guard = 0;
+  while (avoid && ch === avoid && guard++ < 8) {
+    ch = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+  }
+  return ch;
+};
 
 const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number }) => {
   const [display, setDisplay] = useState(text);
   const [glitchKey, setGlitchKey] = useState(0);
+  const prevRef = useRef<string[]>([]);
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | null = null;
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -35,25 +46,21 @@ const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number })
     const runGlitch = (mode: "in" | "out", onDone: () => void) => {
       let frame = 0;
       setGlitchKey((k) => k + 1);
+      prevRef.current = [];
       intervalId = setInterval(() => {
         if (cancelled) return;
         frame++;
         const progress = frame / duration;
-        const out = text
-          .split("")
-          .map((ch, i) => {
-            if (ch === " ") return " ";
-            const ratio = i / text.length;
-            if (mode === "in") {
-              if (ratio < progress) return text[i];
-              return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-            } else {
-              if (ratio < progress) return " ";
-              return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-            }
-          })
-          .join("");
-        setDisplay(out);
+        const chars = text.split("").map((ch, i) => {
+          if (ch === " ") return " ";
+          const ratio = i / text.length;
+          if (mode === "in" && ratio < progress) return text[i];
+          if (mode === "out" && ratio < progress) return " ";
+          const next = randomGlitchChar(prevRef.current[i]);
+          prevRef.current[i] = next;
+          return next;
+        });
+        setDisplay(chars.join(""));
         if (frame >= duration) {
           if (intervalId) clearInterval(intervalId);
           intervalId = null;
@@ -63,22 +70,13 @@ const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number })
       }, 35);
     };
 
-    const loop = () => {
-      runGlitch("in", () => {
+    runGlitch("in", () => {
+      if (cancelled) return;
+      timeoutId = setTimeout(() => {
         if (cancelled) return;
-        timeoutId = setTimeout(() => {
-          if (cancelled) return;
-          runGlitch("out", () => {
-            if (cancelled) return;
-            timeoutId = setTimeout(() => {
-              if (!cancelled) loop();
-            }, 900);
-          });
-        }, 1500);
-      });
-    };
-
-    loop();
+        runGlitch("out", () => {});
+      }, 1500);
+    });
     return () => {
       cancelled = true;
       if (intervalId) clearInterval(intervalId);
