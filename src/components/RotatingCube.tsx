@@ -25,37 +25,76 @@ const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#________";
 
 const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number }) => {
   const [display, setDisplay] = useState(text);
+  const [glitchKey, setGlitchKey] = useState(0);
   useEffect(() => {
-    let frame = 0;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
     const duration = 22; // frames
-    const id = setInterval(() => {
-      frame++;
-      const progress = frame / duration;
-      const out = text
-        .split("")
-        .map((ch, i) => {
-          if (ch === " ") return " ";
-          if (i / text.length < progress) return text[i];
-          return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-        })
-        .join("");
-      setDisplay(out);
-      if (frame >= duration) {
-        setDisplay(text);
-        clearInterval(id);
-      }
-    }, 35);
-    return () => clearInterval(id);
+
+    const runGlitch = (mode: "in" | "out", onDone: () => void) => {
+      let frame = 0;
+      setGlitchKey((k) => k + 1);
+      intervalId = setInterval(() => {
+        if (cancelled) return;
+        frame++;
+        const progress = frame / duration;
+        const out = text
+          .split("")
+          .map((ch, i) => {
+            if (ch === " ") return " ";
+            const ratio = i / text.length;
+            if (mode === "in") {
+              if (ratio < progress) return text[i];
+              return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+            } else {
+              if (ratio < progress) return " ";
+              return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+            }
+          })
+          .join("");
+        setDisplay(out);
+        if (frame >= duration) {
+          if (intervalId) clearInterval(intervalId);
+          intervalId = null;
+          setDisplay(mode === "in" ? text : "");
+          onDone();
+        }
+      }, 35);
+    };
+
+    const loop = () => {
+      runGlitch("in", () => {
+        if (cancelled) return;
+        timeoutId = setTimeout(() => {
+          if (cancelled) return;
+          runGlitch("out", () => {
+            if (cancelled) return;
+            timeoutId = setTimeout(() => {
+              if (!cancelled) loop();
+            }, 900);
+          });
+        }, 1500);
+      });
+    };
+
+    loop();
+    return () => {
+      cancelled = true;
+      if (intervalId) clearInterval(intervalId);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [text, triggerKey]);
 
   return (
     <h1
-      key={triggerKey}
+      key={`${triggerKey}-${glitchKey}`}
       className="text-2xl font-light font-mono relative inline-block"
       style={{
         textShadow:
           "2px 0 rgba(255,255,255,0.35), -2px 0 rgba(255,255,255,0.25)",
         animation: "cube-glitch 0.6s steps(2) 1",
+        minHeight: "1.5em",
       }}
     >
       {display}
