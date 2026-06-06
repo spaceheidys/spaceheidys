@@ -36,6 +36,7 @@ const randomGlitchChar = (avoid?: string) => {
 const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number }) => {
   const [display, setDisplay] = useState(text);
   const [glitchKey, setGlitchKey] = useState(0);
+  const [fx, setFx] = useState({ tx: 0, ty: 0, skew: 0, clipTop: 0, clipBot: 0, clipTop2: 0, clipBot2: 0, splitR: 0, splitG: 0, hidden: false });
   const prevRef = useRef<string[]>([]);
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -61,10 +62,25 @@ const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number })
           return next;
         });
         setDisplay(chars.join(""));
+        // random "real" glitch fx per frame
+        const r = Math.random;
+        setFx({
+          tx: (r() - 0.5) * 8,
+          ty: (r() - 0.5) * 4,
+          skew: (r() - 0.5) * 14,
+          clipTop: r() * 70,
+          clipBot: r() * 70,
+          clipTop2: r() * 70,
+          clipBot2: r() * 70,
+          splitR: (r() - 0.5) * 10,
+          splitG: (r() - 0.5) * 10,
+          hidden: r() < 0.12,
+        });
         if (frame >= duration) {
           if (intervalId) clearInterval(intervalId);
           intervalId = null;
           setDisplay(mode === "in" ? text : "");
+          setFx({ tx: 0, ty: 0, skew: 0, clipTop: 0, clipBot: 0, clipTop2: 0, clipBot2: 0, splitR: 0, splitG: 0, hidden: false });
           onDone();
         }
       }, 35);
@@ -87,15 +103,17 @@ const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number })
   return (
     <h1
       key={`${triggerKey}-${glitchKey}`}
-      className="text-2xl font-light font-mono relative inline-block"
+      className="text-2xl font-light font-mono relative inline-block leading-none"
       style={{
-        textShadow:
-          "2px 0 rgba(255,255,255,0.35), -2px 0 rgba(255,255,255,0.25)",
-        animation: "cube-glitch 0.6s steps(2) 1",
         minHeight: "1.5em",
+        transform: `translate(${fx.tx}px, ${fx.ty}px) skewX(${fx.skew}deg)`,
+        opacity: fx.hidden ? 0.2 : 1,
       }}
     >
-      {display}
+      <span aria-hidden className="absolute inset-0 pointer-events-none" style={{ color: "#ff003c", transform: `translate(${fx.splitR}px, 0)`, mixBlendMode: "screen", opacity: 0.85 }}>{display}</span>
+      <span aria-hidden className="absolute inset-0 pointer-events-none" style={{ color: "#00f0ff", transform: `translate(${fx.splitG}px, 0)`, mixBlendMode: "screen", opacity: 0.85 }}>{display}</span>
+      <span className="relative" style={{ clipPath: `inset(${fx.clipTop}% 0 ${fx.clipBot}% 0)` }}>{display}</span>
+      <span aria-hidden className="absolute inset-0 pointer-events-none" style={{ clipPath: `inset(${fx.clipTop2}% 0 ${fx.clipBot2}% 0)`, transform: `translate(${-fx.splitR}px, 1px)` }}>{display}</span>
     </h1>
   );
 };
