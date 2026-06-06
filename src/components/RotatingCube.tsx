@@ -24,20 +24,38 @@ import { supabase } from "@/integrations/supabase/client";
 const GLITCH_CHARS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!<>-_\\/[]{}—=+*^?#@%&$~";
 
-const randomGlitchChar = (avoid?: string) => {
-  let ch = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-  let guard = 0;
-  while (avoid && ch === avoid && guard++ < 8) {
-    ch = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+// Pick a char never used yet at this position in the current cycle.
+const pickUniqueChar = (used: Set<string>) => {
+  const pool = GLITCH_CHARS.split("").filter((c) => !used.has(c));
+  if (pool.length === 0) {
+    used.clear();
+    return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
   }
+  const ch = pool[Math.floor(Math.random() * pool.length)];
+  used.add(ch);
   return ch;
+};
+
+// Pick a numeric value not yet used in this cycle (quantised to avoid endless space).
+const pickUniqueNum = (used: Set<number>, min: number, max: number, step = 0.5) => {
+  const buckets = Math.max(1, Math.floor((max - min) / step));
+  for (let i = 0; i < 40; i++) {
+    const b = Math.floor(Math.random() * buckets);
+    if (!used.has(b)) {
+      used.add(b);
+      return min + b * step;
+    }
+  }
+  used.clear();
+  return min + Math.random() * (max - min);
 };
 
 const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number }) => {
   const [display, setDisplay] = useState(text);
   const [glitchKey, setGlitchKey] = useState(0);
   const [fx, setFx] = useState({ tx: 0, ty: 0, skew: 0, clipTop: 0, clipBot: 0, clipTop2: 0, clipBot2: 0, splitR: 0, splitG: 0, hidden: false });
-  const prevRef = useRef<string[]>([]);
+  const usedCharsRef = useRef<Map<number, Set<string>>>(new Map());
+  const usedFxRef = useRef<Record<string, Set<number>>>({});
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | null = null;
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -47,7 +65,13 @@ const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number })
     const runGlitch = (mode: "in" | "out", onDone: () => void) => {
       let frame = 0;
       setGlitchKey((k) => k + 1);
-      prevRef.current = [];
+      usedCharsRef.current = new Map();
+      usedFxRef.current = {
+        tx: new Set(), ty: new Set(), skew: new Set(),
+        clipTop: new Set(), clipBot: new Set(),
+        clipTop2: new Set(), clipBot2: new Set(),
+        splitR: new Set(), splitG: new Set(),
+      };
       intervalId = setInterval(() => {
         if (cancelled) return;
         frame++;
@@ -57,24 +81,23 @@ const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number })
           const ratio = i / text.length;
           if (mode === "in" && ratio < progress) return text[i];
           if (mode === "out" && ratio < progress) return " ";
-          const next = randomGlitchChar(prevRef.current[i]);
-          prevRef.current[i] = next;
-          return next;
+          let used = usedCharsRef.current.get(i);
+          if (!used) { used = new Set(); usedCharsRef.current.set(i, used); }
+          return pickUniqueChar(used);
         });
         setDisplay(chars.join(""));
-        // random "real" glitch fx per frame
-        const r = Math.random;
+        const u = usedFxRef.current;
         setFx({
-          tx: (r() - 0.5) * 8,
-          ty: (r() - 0.5) * 4,
-          skew: (r() - 0.5) * 14,
-          clipTop: r() * 70,
-          clipBot: r() * 70,
-          clipTop2: r() * 70,
-          clipBot2: r() * 70,
-          splitR: (r() - 0.5) * 10,
-          splitG: (r() - 0.5) * 10,
-          hidden: r() < 0.12,
+          tx: pickUniqueNum(u.tx, -4, 4, 0.5),
+          ty: pickUniqueNum(u.ty, -2, 2, 0.5),
+          skew: pickUniqueNum(u.skew, -7, 7, 0.5),
+          clipTop: pickUniqueNum(u.clipTop, 0, 70, 2),
+          clipBot: pickUniqueNum(u.clipBot, 0, 70, 2),
+          clipTop2: pickUniqueNum(u.clipTop2, 0, 70, 2),
+          clipBot2: pickUniqueNum(u.clipBot2, 0, 70, 2),
+          splitR: pickUniqueNum(u.splitR, -5, 5, 0.5),
+          splitG: pickUniqueNum(u.splitG, -5, 5, 0.5),
+          hidden: Math.random() < 0.12,
         });
         if (frame >= duration) {
           if (intervalId) clearInterval(intervalId);
