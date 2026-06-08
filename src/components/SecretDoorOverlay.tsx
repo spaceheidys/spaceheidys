@@ -15,6 +15,7 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
   const [secondsLeft, setSecondsLeft] = useState(60);
   const [denied, setDenied] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [screenGlitch, setScreenGlitch] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const cyberpunkAudioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -73,6 +74,15 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
         currentSeconds -= 1;
         setSecondsLeft(currentSeconds);
         setProgress(((duration - currentSeconds) / duration) * 100);
+        if (currentSeconds === 5) {
+          // Trigger full-screen glitch effect on body
+          document.body.classList.add("screen-glitch-active");
+          setScreenGlitch(true);
+          setTimeout(() => {
+            document.body.classList.remove("screen-glitch-active");
+            setScreenGlitch(false);
+          }, 5000);
+        }
         if (currentSeconds <= 0) {
           if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
           // Fade out audio
@@ -102,6 +112,7 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
     return () => {
       if (cyberpunkAudioRef.current) { cyberpunkAudioRef.current.pause(); cyberpunkAudioRef.current.currentTime = 0; }
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      document.body.classList.remove("screen-glitch-active");
     };
   }, [isOpen, onClose, settings.timer_seconds]);
 
@@ -160,6 +171,8 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
       ) : (
         <div className="absolute inset-0 bg-black/90" />
       )}
+
+      {screenGlitch && <div className="screen-glitch-overlay" />}
 
       {/* Corner squares */}
       <motion.div className={`absolute bottom-4 left-4 w-2.5 h-2.5 ${secondsLeft <= 10 ? 'bg-red-500' : 'bg-white/80'}`} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1, rotate: secondsLeft <= 10 ? 360 : 0 }} transition={{ opacity: { duration: 0.3 }, scale: { duration: 0.3 }, rotate: secondsLeft <= 10 ? { duration: 1, repeat: Infinity, ease: "linear" } : {} }} />
