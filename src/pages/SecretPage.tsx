@@ -25,19 +25,27 @@ const SecretPage = () => {
             <span className="absolute top-3 left-3 text-[10px] font-display tracking-[0.3em] text-muted-foreground">
               {q.label}
             </span>
-            <span className="text-xs font-display tracking-[0.3em] text-muted-foreground/60">
-              EMPTY
-            </span>
+            {q.id === "br" ? (
+              <div className="flex flex-col items-center gap-4">
+                <p className="text-[10px] font-display tracking-[0.2em] text-muted-foreground/50 text-center leading-relaxed max-w-[80%]">
+                  ACCESS GRANTED<br />
+                  WELCOME TO THE HIDDEN SECTOR
+                </p>
+                <button
+                  onClick={() => navigate("/")}
+                  className="text-[10px] tracking-[0.3em] uppercase text-foreground/40 hover:text-foreground transition-colors"
+                >
+                  ← Back
+                </button>
+              </div>
+            ) : (
+              <span className="text-xs font-display tracking-[0.3em] text-muted-foreground/60">
+                EMPTY
+              </span>
+            )}
           </motion.section>
         ))}
       </div>
-
-      <button
-        onClick={() => navigate("/")}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.3em] uppercase text-foreground/40 hover:text-foreground transition-colors z-10"
-      >
-        ← Back
-      </button>
     </div>
   );
 };
