@@ -8,6 +8,44 @@ interface SecretDoorOverlayProps {
   secretDoorSoundUrl?: string;
 }
 
+const GLITCH_WORDS = [
+  "ERROR", "SYSTEM FAILURE", "0xDEAD", "ACCESS DENIED", "FATAL", "SEGFAULT",
+  "NULL", "0xFF00A1", "PANIC", "CORRUPTED", "BREACH", "OVERFLOW", "404",
+  "SIGKILL", "STACK TRACE", "MEMORY LEAK", "UNDEFINED", "REBOOT", "ABORT",
+  "/dev/null", "EXCEPTION", "KERNEL_PANIC", "TIMEOUT", "0x00", "DISCONNECT",
+];
+
+const GlitchErrorLabels = () => {
+  const labels = Array.from({ length: 14 }).map((_, i) => {
+    const word = GLITCH_WORDS[Math.floor(Math.random() * GLITCH_WORDS.length)];
+    const top = Math.random() * 90;
+    const left = Math.random() * 80;
+    const size = 10 + Math.random() * 22;
+    const rot = (Math.random() - 0.5) * 12;
+    const delay = Math.random() * 0.4;
+    return (
+      <span
+        key={i}
+        className="glitch-error-label"
+        style={{
+          top: `${top}%`,
+          left: `${left}%`,
+          fontSize: `${size}px`,
+          transform: `rotate(${rot}deg)`,
+          animationDelay: `${delay}s`,
+        }}
+      >
+        {word}
+      </span>
+    );
+  });
+  return (
+    <div className="fixed inset-0 z-[9998] pointer-events-none overflow-hidden">
+      {labels}
+    </div>
+  );
+};
+
 const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOverlayProps) => {
   const { settings } = useSecretDoorSettings();
   const [code, setCode] = useState("");
