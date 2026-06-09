@@ -75,11 +75,9 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
         setSecondsLeft(currentSeconds);
         setProgress(((duration - currentSeconds) / duration) * 100);
         if (currentSeconds === 5) {
-          // Trigger full-screen glitch effect on body
-          document.body.classList.add("screen-glitch-active");
+          // Trigger per-quadrant glitch overlay
           setScreenGlitch(true);
           setTimeout(() => {
-            document.body.classList.remove("screen-glitch-active");
             setScreenGlitch(false);
           }, 5000);
         }
@@ -112,7 +110,6 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
     return () => {
       if (cyberpunkAudioRef.current) { cyberpunkAudioRef.current.pause(); cyberpunkAudioRef.current.currentTime = 0; }
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-      document.body.classList.remove("screen-glitch-active");
     };
   }, [isOpen, onClose, settings.timer_seconds]);
 
@@ -172,7 +169,11 @@ const SecretDoorOverlay = ({ isOpen, onClose, secretDoorSoundUrl }: SecretDoorOv
         <div className="absolute inset-0 bg-black/90" />
       )}
 
-      {screenGlitch && <div className="screen-glitch-overlay" />}
+      {screenGlitch && (
+        <div className="screen-glitch-quadrants">
+          <span /><span /><span /><span />
+        </div>
+      )}
 
       {/* Corner squares */}
       <motion.div className={`absolute bottom-4 left-4 w-2.5 h-2.5 ${secondsLeft <= 10 ? 'bg-red-500' : 'bg-white/80'}`} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1, rotate: secondsLeft <= 10 ? 360 : 0 }} transition={{ opacity: { duration: 0.3 }, scale: { duration: 0.3 }, rotate: secondsLeft <= 10 ? { duration: 1, repeat: Infinity, ease: "linear" } : {} }} />
