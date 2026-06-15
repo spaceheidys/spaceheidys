@@ -69,13 +69,19 @@ const SecretPage = () => {
               transition={{ duration: 0.25, ease: "easeOut" }}
               className="relative h-full w-full border border-border bg-background overflow-hidden"
             >
+              <div className="absolute inset-0 pointer-events-none">
+                <div
+                  className="absolute w-2 h-2 rounded-full bg-foreground shadow-[0_0_8px_rgba(255,255,255,0.6)]"
+                  style={{ animation: "perimeter-run 2s linear infinite" }}
+                />
+              </div>
               <span className="absolute top-4 left-4 text-[10px] font-display tracking-[0.3em] text-muted-foreground">
                 {quadrants.find((q) => q.id === expanded)?.label}
               </span>
               <button
                 onClick={() => setExpanded(null)}
                 aria-label="Close"
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors border border-border hover:border-foreground/60"
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors border border-border hover:border-foreground/60 z-10"
               >
                 <span className="text-sm leading-none">×</span>
               </button>
