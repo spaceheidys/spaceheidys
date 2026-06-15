@@ -413,6 +413,46 @@ const AdminSecretDoor = () => {
             </div>
           )}
         </section>
+
+        {/* SECRET ROOM QUADRANTS */}
+        <section className="border border-border p-4 space-y-4">
+          <div>
+            <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+              Secret Room — Quadrants
+            </p>
+            <p className="text-[10px] text-muted-foreground/60 mt-1">
+              Manage content for the 4 blocks shown after entering the Secret Room. Functionality will be added later.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { id: "tl", label: "01 — Top Left" },
+              { id: "tr", label: "02 — Top Right" },
+              { id: "bl", label: "03 — Bottom Left" },
+              { id: "br", label: "04 — Bottom Right" },
+            ].map((q) => (
+              <div
+                key={q.id}
+                className="border border-border aspect-video p-3 flex flex-col justify-between hover:border-foreground/60 transition-colors"
+              >
+                <p className="text-[10px] font-display tracking-[0.3em] uppercase text-muted-foreground">
+                  {q.label}
+                </p>
+                <div className="flex-1 flex items-center justify-center">
+                  <span className="text-[10px] font-display tracking-[0.3em] text-muted-foreground/40">
+                    EMPTY
+                  </span>
+                </div>
+                <button
+                  disabled
+                  className="self-end px-2 py-1 text-[10px] font-display tracking-[0.2em] uppercase border border-border text-muted-foreground/50 cursor-not-allowed"
+                >
+                  Edit
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
