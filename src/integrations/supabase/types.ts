@@ -271,6 +271,8 @@ export type Database = {
           background_url: string | null
           id: string
           impulse_color: string
+          impulse_enabled: boolean
+          impulse_mode: string
           impulse_speed: number
           music_enabled: boolean
           secret_code_hash: string | null
@@ -281,6 +283,8 @@ export type Database = {
           background_url?: string | null
           id?: string
           impulse_color?: string
+          impulse_enabled?: boolean
+          impulse_mode?: string
           impulse_speed?: number
           music_enabled?: boolean
           secret_code_hash?: string | null
@@ -291,6 +295,8 @@ export type Database = {
           background_url?: string | null
           id?: string
           impulse_color?: string
+          impulse_enabled?: boolean
+          impulse_mode?: string
           impulse_speed?: number
           music_enabled?: boolean
           secret_code_hash?: string | null
@@ -579,6 +585,8 @@ export type Database = {
           background_url: string | null
           id: string | null
           impulse_color: string | null
+          impulse_enabled: boolean | null
+          impulse_mode: string | null
           impulse_speed: number | null
           music_enabled: boolean | null
           timer_seconds: number | null
@@ -594,6 +602,8 @@ export type Database = {
           background_url: string
           id: string
           impulse_color: string
+          impulse_enabled: boolean
+          impulse_mode: string
           impulse_speed: number
           music_enabled: boolean
           timer_seconds: number
