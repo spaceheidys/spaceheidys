@@ -324,6 +324,84 @@ const AdminSecretDoor = () => {
           <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
             Secret Door Background
           </p>
+        </section>
+
+        {/* IMPULSE — speed & color */}
+        <section className="border border-border p-4 space-y-3">
+          <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+            Quadrant Impulse (Perimeter Animation)
+          </p>
+          <div className="flex flex-wrap items-end gap-6">
+            <label className="flex flex-col gap-1">
+              <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">Speed (sec / loop)</span>
+              <input
+                type="number"
+                step="0.5"
+                min={0.5}
+                max={20}
+                value={draftImpulseSpeed}
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value) || 0;
+                  setDraftImpulseSpeed(v);
+                  setImpulseDirty(v !== settings?.impulse_speed || draftImpulseColor !== settings?.impulse_color);
+                }}
+                className="w-24 p-2 bg-transparent border border-border text-sm font-body text-foreground outline-none focus:border-foreground transition-colors"
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">Color</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={draftImpulseColor}
+                  onChange={(e) => {
+                    setDraftImpulseColor(e.target.value);
+                    setImpulseDirty(e.target.value !== settings?.impulse_color || draftImpulseSpeed !== settings?.impulse_speed);
+                  }}
+                  className="w-10 h-10 bg-transparent border border-border cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={draftImpulseColor}
+                  onChange={(e) => {
+                    setDraftImpulseColor(e.target.value);
+                    setImpulseDirty(e.target.value !== settings?.impulse_color || draftImpulseSpeed !== settings?.impulse_speed);
+                  }}
+                  className="w-28 p-2 bg-transparent border border-border text-sm font-body text-foreground outline-none focus:border-foreground transition-colors"
+                />
+              </div>
+            </label>
+          </div>
+          <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+            Higher seconds = slower. Impulse eases in/out at every corner automatically.
+          </p>
+          {impulseDirty && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={saveImpulse}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+              >
+                <Check size={10} /> YES
+              </button>
+              <button
+                onClick={() => {
+                  setDraftImpulseSpeed(Number(settings?.impulse_speed ?? 4));
+                  setDraftImpulseColor(settings?.impulse_color ?? "#ffffff");
+                  setImpulseDirty(false);
+                }}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={10} /> NO
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* BACKGROUND (image) */}
+        <section className="border border-border p-4 space-y-3">
+          <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+            Secret Door Background Image
+          </p>
           {settings?.background_url ? (
             <div className="relative w-full max-w-md aspect-video border border-border overflow-hidden group">
               <img src={settings.background_url} alt="Secret Door BG" className="w-full h-full object-cover" />
