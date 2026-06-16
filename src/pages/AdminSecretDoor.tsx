@@ -12,6 +12,8 @@ interface SecretDoorSettings {
   timer_seconds: number;
   background_url: string | null;
   music_enabled: boolean;
+  impulse_speed: number;
+  impulse_color: string;
 }
 
 interface SecretDoorFile {
@@ -37,6 +39,10 @@ const AdminSecretDoor = () => {
   const [codeDirty, setCodeDirty] = useState(false);
   const [timerDirty, setTimerDirty] = useState(false);
   const [showCode, setShowCode] = useState(false);
+
+  const [draftImpulseSpeed, setDraftImpulseSpeed] = useState(4);
+  const [draftImpulseColor, setDraftImpulseColor] = useState("#ffffff");
+  const [impulseDirty, setImpulseDirty] = useState(false);
 
   // Confirm states
   const [confirmCodeSave, setConfirmCodeSave] = useState(false);
@@ -73,6 +79,9 @@ const AdminSecretDoor = () => {
       setSettings(s);
       setDraftCode("");
       setDraftTimer(s.timer_seconds);
+      setDraftImpulseSpeed(Number(s.impulse_speed ?? 4));
+      setDraftImpulseColor(s.impulse_color ?? "#ffffff");
+      setImpulseDirty(false);
     }
     if (filesRes.data) {
       setFiles(filesRes.data as any as SecretDoorFile[]);
@@ -106,6 +115,22 @@ const AdminSecretDoor = () => {
       setSettings((s) => s ? { ...s, timer_seconds: val } : s);
       setDraftTimer(val);
       setTimerDirty(false);
+    }
+  };
+
+  const saveImpulse = async () => {
+    if (!settings) return;
+    const speed = Math.max(0.5, Math.min(20, Number(draftImpulseSpeed) || 4));
+    const color = /^#([0-9a-fA-F]{6})$/.test(draftImpulseColor) ? draftImpulseColor : "#ffffff";
+    const { error } = await supabase
+      .from("secret_door_settings" as any)
+      .update({ impulse_speed: speed, impulse_color: color, updated_at: new Date().toISOString() } as any)
+      .eq("id", settings.id);
+    if (error) toast.error("Failed to save impulse");
+    else {
+      toast.success("Impulse updated");
+      setSettings((s) => s ? { ...s, impulse_speed: speed, impulse_color: color } : s);
+      setImpulseDirty(false);
     }
   };
 
