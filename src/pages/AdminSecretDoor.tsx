@@ -323,9 +323,69 @@ const AdminSecretDoor = () => {
 
         {/* IMPULSE — speed & color */}
         <section className="border border-border p-4 space-y-3">
-          <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
-            Quadrant Impulse (Perimeter Animation)
-          </p>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+              Quadrant Impulse (Perimeter Animation)
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">
+                {settings?.impulse_enabled ? "ON" : "OFF"}
+              </span>
+              <Switch
+                checked={settings?.impulse_enabled ?? true}
+                onCheckedChange={async (checked) => {
+                  if (!settings) return;
+                  const { error } = await supabase
+                    .from("secret_door_settings" as any)
+                    .update({ impulse_enabled: checked, updated_at: new Date().toISOString() } as any)
+                    .eq("id", settings.id);
+                  if (!error) {
+                    setSettings((s) => s ? { ...s, impulse_enabled: checked } : s);
+                    toast.success(checked ? "Impulse enabled" : "Impulse disabled");
+                  } else {
+                    toast.error("Failed to update");
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <span className="block text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">Behavior</span>
+            <div className="flex flex-wrap gap-2">
+              {(["smooth", "linear", "pulse"] as const).map((mode) => {
+                const active = settings?.impulse_mode === mode;
+                return (
+                  <button
+                    key={mode}
+                    onClick={async () => {
+                      if (!settings || active) return;
+                      const { error } = await supabase
+                        .from("secret_door_settings" as any)
+                        .update({ impulse_mode: mode, updated_at: new Date().toISOString() } as any)
+                        .eq("id", settings.id);
+                      if (!error) {
+                        setSettings((s) => s ? { ...s, impulse_mode: mode } : s);
+                        toast.success(`Mode: ${mode}`);
+                      } else toast.error("Failed to update");
+                    }}
+                    className={`px-3 py-1.5 text-[10px] font-display tracking-[0.2em] uppercase border transition-colors ${
+                      active
+                        ? "border-foreground text-foreground bg-foreground/10"
+                        : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+                    }`}
+                  >
+                    {mode}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+              <strong>smooth</strong>: eases in/out at every corner. <strong>linear</strong>: constant speed.
+              <strong> pulse</strong>: linear motion with breathing scale & opacity.
+            </p>
+          </div>
+
           <div className="flex flex-wrap items-end gap-6">
             <label className="flex flex-col gap-1">
               <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">Speed (sec / loop)</span>
