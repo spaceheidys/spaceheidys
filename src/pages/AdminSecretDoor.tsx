@@ -12,6 +12,8 @@ interface SecretDoorSettings {
   timer_seconds: number;
   background_url: string | null;
   music_enabled: boolean;
+  impulse_speed: number;
+  impulse_color: string;
 }
 
 interface SecretDoorFile {
@@ -37,6 +39,10 @@ const AdminSecretDoor = () => {
   const [codeDirty, setCodeDirty] = useState(false);
   const [timerDirty, setTimerDirty] = useState(false);
   const [showCode, setShowCode] = useState(false);
+
+  const [draftImpulseSpeed, setDraftImpulseSpeed] = useState(4);
+  const [draftImpulseColor, setDraftImpulseColor] = useState("#ffffff");
+  const [impulseDirty, setImpulseDirty] = useState(false);
 
   // Confirm states
   const [confirmCodeSave, setConfirmCodeSave] = useState(false);
@@ -65,7 +71,7 @@ const AdminSecretDoor = () => {
   const fetchAll = async () => {
     setFetching(true);
     const [settingsRes, filesRes] = await Promise.all([
-      supabase.from("secret_door_settings" as any).select("id, timer_seconds, background_url, music_enabled").limit(1).single(),
+      supabase.from("secret_door_settings" as any).select("id, timer_seconds, background_url, music_enabled, impulse_speed, impulse_color").limit(1).single(),
       supabase.from("secret_door_files" as any).select("*").order("sort_order"),
     ]);
     if (settingsRes.data) {
@@ -73,6 +79,9 @@ const AdminSecretDoor = () => {
       setSettings(s);
       setDraftCode("");
       setDraftTimer(s.timer_seconds);
+      setDraftImpulseSpeed(Number(s.impulse_speed ?? 4));
+      setDraftImpulseColor(s.impulse_color ?? "#ffffff");
+      setImpulseDirty(false);
     }
     if (filesRes.data) {
       setFiles(filesRes.data as any as SecretDoorFile[]);
@@ -106,6 +115,22 @@ const AdminSecretDoor = () => {
       setSettings((s) => s ? { ...s, timer_seconds: val } : s);
       setDraftTimer(val);
       setTimerDirty(false);
+    }
+  };
+
+  const saveImpulse = async () => {
+    if (!settings) return;
+    const speed = Math.max(0.5, Math.min(20, Number(draftImpulseSpeed) || 4));
+    const color = /^#([0-9a-fA-F]{6})$/.test(draftImpulseColor) ? draftImpulseColor : "#ffffff";
+    const { error } = await supabase
+      .from("secret_door_settings" as any)
+      .update({ impulse_speed: speed, impulse_color: color, updated_at: new Date().toISOString() } as any)
+      .eq("id", settings.id);
+    if (error) toast.error("Failed to save impulse");
+    else {
+      toast.success("Impulse updated");
+      setSettings((s) => s ? { ...s, impulse_speed: speed, impulse_color: color } : s);
+      setImpulseDirty(false);
     }
   };
 
@@ -294,10 +319,81 @@ const AdminSecretDoor = () => {
           )}
         </section>
 
-        {/* BACKGROUND */}
+        {/* IMPULSE — speed & color */}
         <section className="border border-border p-4 space-y-3">
           <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
-            Secret Door Background
+            Quadrant Impulse (Perimeter Animation)
+          </p>
+          <div className="flex flex-wrap items-end gap-6">
+            <label className="flex flex-col gap-1">
+              <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">Speed (sec / loop)</span>
+              <input
+                type="number"
+                step="0.5"
+                min={0.5}
+                max={20}
+                value={draftImpulseSpeed}
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value) || 0;
+                  setDraftImpulseSpeed(v);
+                  setImpulseDirty(v !== settings?.impulse_speed || draftImpulseColor !== settings?.impulse_color);
+                }}
+                className="w-24 p-2 bg-transparent border border-border text-sm font-body text-foreground outline-none focus:border-foreground transition-colors"
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">Color</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={draftImpulseColor}
+                  onChange={(e) => {
+                    setDraftImpulseColor(e.target.value);
+                    setImpulseDirty(e.target.value !== settings?.impulse_color || draftImpulseSpeed !== settings?.impulse_speed);
+                  }}
+                  className="w-10 h-10 bg-transparent border border-border cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={draftImpulseColor}
+                  onChange={(e) => {
+                    setDraftImpulseColor(e.target.value);
+                    setImpulseDirty(e.target.value !== settings?.impulse_color || draftImpulseSpeed !== settings?.impulse_speed);
+                  }}
+                  className="w-28 p-2 bg-transparent border border-border text-sm font-body text-foreground outline-none focus:border-foreground transition-colors"
+                />
+              </div>
+            </label>
+          </div>
+          <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+            Higher seconds = slower. Impulse eases in/out at every corner automatically.
+          </p>
+          {impulseDirty && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={saveImpulse}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+              >
+                <Check size={10} /> YES
+              </button>
+              <button
+                onClick={() => {
+                  setDraftImpulseSpeed(Number(settings?.impulse_speed ?? 4));
+                  setDraftImpulseColor(settings?.impulse_color ?? "#ffffff");
+                  setImpulseDirty(false);
+                }}
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-widest border border-border text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={10} /> NO
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* BACKGROUND (image) */}
+        <section className="border border-border p-4 space-y-3">
+          <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+            Secret Door Background Image
           </p>
           {settings?.background_url ? (
             <div className="relative w-full max-w-md aspect-video border border-border overflow-hidden group">

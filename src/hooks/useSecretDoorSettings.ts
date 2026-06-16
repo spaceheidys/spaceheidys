@@ -5,12 +5,16 @@ export interface SecretDoorSettings {
   timer_seconds: number;
   background_url: string | null;
   music_enabled: boolean;
+  impulse_speed: number;
+  impulse_color: string;
 }
 
 const DEFAULTS: SecretDoorSettings = {
   timer_seconds: 60,
   background_url: null,
   music_enabled: true,
+  impulse_speed: 4,
+  impulse_color: "#ffffff",
 };
 
 export function useSecretDoorSettings() {
@@ -20,11 +24,20 @@ export function useSecretDoorSettings() {
   useEffect(() => {
     supabase
       .from("secret_door_public_settings" as any)
-      .select("timer_seconds, background_url, music_enabled")
+      .select("timer_seconds, background_url, music_enabled, impulse_speed, impulse_color")
       .limit(1)
       .single()
       .then(({ data }) => {
-        if (data) setSettings(data as any as SecretDoorSettings);
+        if (data) {
+          const d = data as any;
+          setSettings({
+            timer_seconds: d.timer_seconds ?? DEFAULTS.timer_seconds,
+            background_url: d.background_url ?? null,
+            music_enabled: d.music_enabled ?? true,
+            impulse_speed: Number(d.impulse_speed ?? DEFAULTS.impulse_speed),
+            impulse_color: d.impulse_color ?? DEFAULTS.impulse_color,
+          });
+        }
         setLoading(false);
       });
   }, []);
