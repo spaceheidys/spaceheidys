@@ -270,6 +270,8 @@ export type Database = {
         Row: {
           background_url: string | null
           id: string
+          impulse_color: string
+          impulse_speed: number
           music_enabled: boolean
           secret_code_hash: string | null
           timer_seconds: number
@@ -278,6 +280,8 @@ export type Database = {
         Insert: {
           background_url?: string | null
           id?: string
+          impulse_color?: string
+          impulse_speed?: number
           music_enabled?: boolean
           secret_code_hash?: string | null
           timer_seconds?: number
@@ -286,6 +290,8 @@ export type Database = {
         Update: {
           background_url?: string | null
           id?: string
+          impulse_color?: string
+          impulse_speed?: number
           music_enabled?: boolean
           secret_code_hash?: string | null
           timer_seconds?: number
