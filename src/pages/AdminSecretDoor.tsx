@@ -71,7 +71,7 @@ const AdminSecretDoor = () => {
   const fetchAll = async () => {
     setFetching(true);
     const [settingsRes, filesRes] = await Promise.all([
-      supabase.from("secret_door_settings" as any).select("id, timer_seconds, background_url, music_enabled").limit(1).single(),
+      supabase.from("secret_door_settings" as any).select("id, timer_seconds, background_url, music_enabled, impulse_speed, impulse_color").limit(1).single(),
       supabase.from("secret_door_files" as any).select("*").order("sort_order"),
     ]);
     if (settingsRes.data) {
