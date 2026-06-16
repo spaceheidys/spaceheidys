@@ -19,16 +19,20 @@ const SecretPage = () => {
   // JS-driven perimeter impulse that eases in/out at every corner.
   useEffect(() => {
     if (!expanded) return;
+    if (!settings.impulse_enabled) return;
     const el = impulseRef.current;
     if (!el) return;
     const duration = Math.max(1, settings.impulse_speed) * 1000;
-    const ease = (t: number) => 0.5 - 0.5 * Math.cos(Math.PI * t); // ease-in-out sine
+    const mode = settings.impulse_mode;
+    const easeSmooth = (t: number) => 0.5 - 0.5 * Math.cos(Math.PI * t); // ease-in-out sine (slow at corners)
+    const easeLinear = (t: number) => t;
     let raf = 0;
     const start = performance.now();
     const tick = (now: number) => {
       const t = ((now - start) % duration) / duration; // 0..1 around loop
       const side = Math.floor(t * 4); // 0..3
-      const local = ease((t * 4) - side); // 0..1 eased
+      const localRaw = (t * 4) - side;
+      const local = mode === "linear" || mode === "pulse" ? easeLinear(localRaw) : easeSmooth(localRaw);
       let x = 0, y = 0;
       if (side === 0) { x = local * 100; y = 0; }           // top L->R
       else if (side === 1) { x = 100; y = local * 100; }    // right T->B
@@ -36,11 +40,22 @@ const SecretPage = () => {
       else { x = 0; y = (1 - local) * 100; }                // left B->T
       el.style.left = `${x}%`;
       el.style.top = `${y}%`;
+      if (mode === "pulse") {
+        // breathe scale + opacity twice per side
+        const phase = (localRaw * Math.PI * 2);
+        const s = 0.7 + 0.6 * (0.5 + 0.5 * Math.sin(phase));
+        const o = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(phase));
+        el.style.transform = `translate(-50%, -50%) scale(${s.toFixed(3)})`;
+        el.style.opacity = o.toFixed(3);
+      } else {
+        el.style.transform = "translate(-50%, -50%)";
+        el.style.opacity = "1";
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [expanded, settings.impulse_speed]);
+  }, [expanded, settings.impulse_speed, settings.impulse_enabled, settings.impulse_mode]);
 
   return (
     <div className="relative h-[100svh] w-screen bg-background overflow-hidden">
@@ -99,7 +114,7 @@ const SecretPage = () => {
               className="relative h-full w-full border border-border bg-background overflow-hidden"
             >
               <div className="absolute inset-0 pointer-events-none">
-                <div
+                {settings.impulse_enabled && <div
                   ref={impulseRef}
                   className="absolute w-2 h-2 rounded-full"
                   style={{
@@ -109,7 +124,7 @@ const SecretPage = () => {
                     left: 0,
                     top: 0,
                   }}
-                />
+                />}
               </div>
               <span className="absolute top-4 left-4 text-[10px] font-display tracking-[0.3em] text-muted-foreground">
                 {quadrants.find((q) => q.id === expanded)?.label}
