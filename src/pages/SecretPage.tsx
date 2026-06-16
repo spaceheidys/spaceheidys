@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSecretDoorSettings } from "@/hooks/useSecretDoorSettings";
 
 const quadrants = [
   { id: "tl", label: "01" },
@@ -12,6 +13,34 @@ const quadrants = [
 const SecretPage = () => {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState<string | null>(null);
+  const { settings } = useSecretDoorSettings();
+  const impulseRef = useRef<HTMLDivElement | null>(null);
+
+  // JS-driven perimeter impulse that eases in/out at every corner.
+  useEffect(() => {
+    if (!expanded) return;
+    const el = impulseRef.current;
+    if (!el) return;
+    const duration = Math.max(1, settings.impulse_speed) * 1000;
+    const ease = (t: number) => 0.5 - 0.5 * Math.cos(Math.PI * t); // ease-in-out sine
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = ((now - start) % duration) / duration; // 0..1 around loop
+      const side = Math.floor(t * 4); // 0..3
+      const local = ease((t * 4) - side); // 0..1 eased
+      let x = 0, y = 0;
+      if (side === 0) { x = local * 100; y = 0; }           // top L->R
+      else if (side === 1) { x = 100; y = local * 100; }    // right T->B
+      else if (side === 2) { x = (1 - local) * 100; y = 100; } // bottom R->L
+      else { x = 0; y = (1 - local) * 100; }                // left B->T
+      el.style.left = `${x}%`;
+      el.style.top = `${y}%`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [expanded, settings.impulse_speed]);
 
   return (
     <div className="relative h-[100svh] w-screen bg-background overflow-hidden">
@@ -71,8 +100,15 @@ const SecretPage = () => {
             >
               <div className="absolute inset-0 pointer-events-none">
                 <div
-                  className="absolute w-2 h-2 rounded-full bg-foreground shadow-[0_0_8px_rgba(255,255,255,0.6)]"
-                  style={{ animation: "perimeter-run 2s linear infinite" }}
+                  ref={impulseRef}
+                  className="absolute w-2 h-2 rounded-full"
+                  style={{
+                    backgroundColor: settings.impulse_color,
+                    boxShadow: `0 0 8px ${settings.impulse_color}99`,
+                    transform: "translate(-50%, -50%)",
+                    left: 0,
+                    top: 0,
+                  }}
                 />
               </div>
               <span className="absolute top-4 left-4 text-[10px] font-display tracking-[0.3em] text-muted-foreground">
