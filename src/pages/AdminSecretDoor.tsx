@@ -14,6 +14,8 @@ interface SecretDoorSettings {
   music_enabled: boolean;
   impulse_speed: number;
   impulse_color: string;
+  impulse_enabled: boolean;
+  impulse_mode: "smooth" | "linear" | "pulse";
 }
 
 interface SecretDoorFile {
