@@ -319,13 +319,6 @@ const AdminSecretDoor = () => {
           )}
         </section>
 
-        {/* BACKGROUND */}
-        <section className="border border-border p-4 space-y-3">
-          <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
-            Secret Door Background
-          </p>
-        </section>
-
         {/* IMPULSE — speed & color */}
         <section className="border border-border p-4 space-y-3">
           <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
