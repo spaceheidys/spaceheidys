@@ -7,6 +7,8 @@ export interface SecretDoorSettings {
   music_enabled: boolean;
   impulse_speed: number;
   impulse_color: string;
+  impulse_enabled: boolean;
+  impulse_mode: "smooth" | "linear" | "pulse";
 }
 
 const DEFAULTS: SecretDoorSettings = {
@@ -15,6 +17,8 @@ const DEFAULTS: SecretDoorSettings = {
   music_enabled: true,
   impulse_speed: 4,
   impulse_color: "#ffffff",
+  impulse_enabled: true,
+  impulse_mode: "smooth",
 };
 
 export function useSecretDoorSettings() {
@@ -24,7 +28,7 @@ export function useSecretDoorSettings() {
   useEffect(() => {
     supabase
       .from("secret_door_public_settings" as any)
-      .select("timer_seconds, background_url, music_enabled, impulse_speed, impulse_color")
+      .select("timer_seconds, background_url, music_enabled, impulse_speed, impulse_color, impulse_enabled, impulse_mode")
       .limit(1)
       .single()
       .then(({ data }) => {
@@ -36,6 +40,8 @@ export function useSecretDoorSettings() {
             music_enabled: d.music_enabled ?? true,
             impulse_speed: Number(d.impulse_speed ?? DEFAULTS.impulse_speed),
             impulse_color: d.impulse_color ?? DEFAULTS.impulse_color,
+            impulse_enabled: d.impulse_enabled ?? true,
+            impulse_mode: (d.impulse_mode as any) ?? DEFAULTS.impulse_mode,
           });
         }
         setLoading(false);
