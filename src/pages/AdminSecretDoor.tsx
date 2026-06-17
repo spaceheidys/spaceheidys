@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, Eye, EyeOff } from "lucide-react";
+import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, Eye, EyeOff, ArrowLeft, Code2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 
@@ -26,6 +26,19 @@ interface SecretDoorFile {
   sort_order: number;
 }
 
+interface QuadrantRow {
+  id: string;
+  html_content: string | null;
+  file_name: string | null;
+}
+
+const QUAD_LABELS: Record<string, string> = {
+  tl: "01 — Top Left",
+  tr: "02 — Top Right",
+  bl: "03 — Bottom Left",
+  br: "04 — Bottom Right",
+};
+
 const AdminSecretDoor = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -45,6 +58,15 @@ const AdminSecretDoor = () => {
   const [draftImpulseSpeed, setDraftImpulseSpeed] = useState(4);
   const [draftImpulseColor, setDraftImpulseColor] = useState("#ffffff");
   const [impulseDirty, setImpulseDirty] = useState(false);
+
+  // Quadrants
+  const [quadrants, setQuadrants] = useState<Record<string, QuadrantRow>>({});
+  const [editingQuadrant, setEditingQuadrant] = useState<string | null>(null);
+  const [draftHtml, setDraftHtml] = useState("");
+  const [draftFileName, setDraftFileName] = useState<string | null>(null);
+  const [quadDirty, setQuadDirty] = useState(false);
+  const [quadSaving, setQuadSaving] = useState(false);
+  const quadFileInputRef = useRef<HTMLInputElement>(null);
 
   // Confirm states
   const [confirmCodeSave, setConfirmCodeSave] = useState(false);
@@ -72,9 +94,10 @@ const AdminSecretDoor = () => {
 
   const fetchAll = async () => {
     setFetching(true);
-    const [settingsRes, filesRes] = await Promise.all([
+    const [settingsRes, filesRes, quadRes] = await Promise.all([
       supabase.from("secret_door_settings" as any).select("id, timer_seconds, background_url, music_enabled, impulse_speed, impulse_color, impulse_enabled, impulse_mode").limit(1).single(),
       supabase.from("secret_door_files" as any).select("*").order("sort_order"),
+      supabase.from("secret_door_quadrants" as any).select("id, html_content, file_name"),
     ]);
     if (settingsRes.data) {
       const s = settingsRes.data as any as SecretDoorSettings;
@@ -87,6 +110,11 @@ const AdminSecretDoor = () => {
     }
     if (filesRes.data) {
       setFiles(filesRes.data as any as SecretDoorFile[]);
+    }
+    if (quadRes.data) {
+      const map: Record<string, QuadrantRow> = {};
+      (quadRes.data as any[]).forEach((q) => { map[q.id] = q; });
+      setQuadrants(map);
     }
     setFetching(false);
   };
