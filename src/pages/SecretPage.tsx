@@ -190,7 +190,7 @@ const SecretPage = () => {
                   <iframe
                     title={`Quadrant ${expanded}`}
                     srcDoc={buildSandboxedDoc(quadHtml[expanded] || "")}
-                    sandbox="allow-scripts allow-pointer-lock"
+                    sandbox="allow-scripts"
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     className="w-full h-full border-0 bg-background"
