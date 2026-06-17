@@ -18,6 +18,25 @@ const SecretPage = () => {
   const impulseRef = useRef<HTMLDivElement | null>(null);
   const [quadHtml, setQuadHtml] = useState<Record<string, string | null>>({});
 
+  // Wrap user HTML with a strict CSP that blocks all network access.
+  // Combined with a restrictive iframe sandbox this isolates the content.
+  const buildSandboxedDoc = (html: string) => {
+    const csp = [
+      "default-src 'none'",
+      "script-src 'unsafe-inline'",
+      "style-src 'unsafe-inline'",
+      "img-src data: blob:",
+      "media-src data: blob:",
+      "font-src data:",
+      "connect-src 'none'",
+      "frame-src 'none'",
+      "object-src 'none'",
+      "base-uri 'none'",
+      "form-action 'none'",
+    ].join("; ");
+    return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${csp}"><base target="_self"></head><body style="margin:0;background:transparent;color:inherit;">${html}</body></html>`;
+  };
+
   useEffect(() => {
     supabase
       .from("secret_door_quadrants" as any)
@@ -101,7 +120,7 @@ const SecretPage = () => {
               </div>
             ) : (
               <span className="text-xs font-display tracking-[0.3em] text-muted-foreground/60">
-                EMPTY
+                {quadHtml[q.id] ? "READY" : "EMPTY"}
               </span>
             )}
           </motion.section>
@@ -154,8 +173,10 @@ const SecretPage = () => {
                 {quadHtml[expanded] ? (
                   <iframe
                     title={`Quadrant ${expanded}`}
-                    srcDoc={quadHtml[expanded] || ""}
+                    srcDoc={buildSandboxedDoc(quadHtml[expanded] || "")}
                     sandbox="allow-scripts allow-pointer-lock"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
                     className="w-full h-full border-0 bg-background"
                   />
                 ) : (
