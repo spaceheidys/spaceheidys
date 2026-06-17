@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, Eye, EyeOff } from "lucide-react";
+import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, Eye, EyeOff, ArrowLeft, Code2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 
@@ -26,6 +26,19 @@ interface SecretDoorFile {
   sort_order: number;
 }
 
+interface QuadrantRow {
+  id: string;
+  html_content: string | null;
+  file_name: string | null;
+}
+
+const QUAD_LABELS: Record<string, string> = {
+  tl: "01 — Top Left",
+  tr: "02 — Top Right",
+  bl: "03 — Bottom Left",
+  br: "04 — Bottom Right",
+};
+
 const AdminSecretDoor = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -45,6 +58,15 @@ const AdminSecretDoor = () => {
   const [draftImpulseSpeed, setDraftImpulseSpeed] = useState(4);
   const [draftImpulseColor, setDraftImpulseColor] = useState("#ffffff");
   const [impulseDirty, setImpulseDirty] = useState(false);
+
+  // Quadrants
+  const [quadrants, setQuadrants] = useState<Record<string, QuadrantRow>>({});
+  const [editingQuadrant, setEditingQuadrant] = useState<string | null>(null);
+  const [draftHtml, setDraftHtml] = useState("");
+  const [draftFileName, setDraftFileName] = useState<string | null>(null);
+  const [quadDirty, setQuadDirty] = useState(false);
+  const [quadSaving, setQuadSaving] = useState(false);
+  const quadFileInputRef = useRef<HTMLInputElement>(null);
 
   // Confirm states
   const [confirmCodeSave, setConfirmCodeSave] = useState(false);
@@ -72,9 +94,10 @@ const AdminSecretDoor = () => {
 
   const fetchAll = async () => {
     setFetching(true);
-    const [settingsRes, filesRes] = await Promise.all([
+    const [settingsRes, filesRes, quadRes] = await Promise.all([
       supabase.from("secret_door_settings" as any).select("id, timer_seconds, background_url, music_enabled, impulse_speed, impulse_color, impulse_enabled, impulse_mode").limit(1).single(),
       supabase.from("secret_door_files" as any).select("*").order("sort_order"),
+      supabase.from("secret_door_quadrants" as any).select("id, html_content, file_name"),
     ]);
     if (settingsRes.data) {
       const s = settingsRes.data as any as SecretDoorSettings;
@@ -87,6 +110,11 @@ const AdminSecretDoor = () => {
     }
     if (filesRes.data) {
       setFiles(filesRes.data as any as SecretDoorFile[]);
+    }
+    if (quadRes.data) {
+      const map: Record<string, QuadrantRow> = {};
+      (quadRes.data as any[]).forEach((q) => { map[q.id] = q; });
+      setQuadrants(map);
     }
     setFetching(false);
   };
@@ -210,6 +238,65 @@ const AdminSecretDoor = () => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const openQuadrantEditor = (id: string) => {
+    const q = quadrants[id];
+    setEditingQuadrant(id);
+    setDraftHtml(q?.html_content ?? "");
+    setDraftFileName(q?.file_name ?? null);
+    setQuadDirty(false);
+  };
+
+  const closeQuadrantEditor = () => {
+    if (quadDirty && !window.confirm("Discard unsaved changes?")) return;
+    setEditingQuadrant(null);
+    setDraftHtml("");
+    setDraftFileName(null);
+    setQuadDirty(false);
+    if (quadFileInputRef.current) quadFileInputRef.current.value = "";
+  };
+
+  const onUploadQuadrantHtml = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!/\.html?$/i.test(file.name)) {
+      toast.error("Only .html files are allowed");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Max .html size is 5MB");
+      return;
+    }
+    const text = await file.text();
+    setDraftHtml(text);
+    setDraftFileName(file.name);
+    setQuadDirty(true);
+  };
+
+  const saveQuadrant = async () => {
+    if (!editingQuadrant) return;
+    setQuadSaving(true);
+    const { error } = await supabase
+      .from("secret_door_quadrants" as any)
+      .update({ html_content: draftHtml, file_name: draftFileName, updated_at: new Date().toISOString() } as any)
+      .eq("id", editingQuadrant);
+    setQuadSaving(false);
+    if (error) { toast.error("Failed to save"); return; }
+    toast.success("Quadrant updated");
+    setQuadrants((prev) => ({
+      ...prev,
+      [editingQuadrant]: { id: editingQuadrant, html_content: draftHtml, file_name: draftFileName },
+    }));
+    setQuadDirty(false);
+  };
+
+  const clearQuadrant = async () => {
+    if (!editingQuadrant) return;
+    if (!window.confirm("Remove HTML content from this quadrant?")) return;
+    setDraftHtml("");
+    setDraftFileName(null);
+    setQuadDirty(true);
   };
 
   if (loading || fetching) {
@@ -579,7 +666,7 @@ const AdminSecretDoor = () => {
               Secret Room — Quadrants
             </p>
             <p className="text-[10px] text-muted-foreground/60 mt-1">
-              Manage content for the 4 blocks shown after entering the Secret Room. Functionality will be added later.
+              Upload an interactive .html page per quadrant. It will play inside a sandboxed frame when a visitor opens that quadrant.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -597,13 +684,22 @@ const AdminSecretDoor = () => {
                   {q.label}
                 </p>
                 <div className="flex-1 flex items-center justify-center">
-                  <span className="text-[10px] font-display tracking-[0.3em] text-muted-foreground/40">
-                    EMPTY
-                  </span>
+                  {quadrants[q.id]?.html_content ? (
+                    <div className="flex flex-col items-center gap-1 text-center">
+                      <Code2 size={14} className="text-foreground/60" />
+                      <span className="text-[9px] font-display tracking-[0.2em] uppercase text-muted-foreground truncate max-w-[140px]">
+                        {quadrants[q.id]?.file_name || "HTML loaded"}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] font-display tracking-[0.3em] text-muted-foreground/40">
+                      EMPTY
+                    </span>
+                  )}
                 </div>
                 <button
-                  disabled
-                  className="self-end px-2 py-1 text-[10px] font-display tracking-[0.2em] uppercase border border-border text-muted-foreground/50 cursor-not-allowed"
+                  onClick={() => openQuadrantEditor(q.id)}
+                  className="self-end px-2 py-1 text-[10px] font-display tracking-[0.2em] uppercase border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
                 >
                   Edit
                 </button>
@@ -612,6 +708,100 @@ const AdminSecretDoor = () => {
           </div>
         </section>
       </div>
+
+      {/* QUADRANT EDIT OVERLAY */}
+      {editingQuadrant && (
+        <div
+          className="fixed inset-0 z-[200] bg-background/95 backdrop-blur-sm"
+          style={{ padding: 40 }}
+        >
+          <div className="relative h-full w-full border border-border bg-background flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border shrink-0">
+              <button
+                onClick={closeQuadrantEditor}
+                className="flex items-center gap-2 text-[10px] font-display tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft size={14} /> Back
+              </button>
+              <p className="text-[10px] font-display tracking-[0.3em] uppercase text-foreground">
+                Edit Quadrant — {QUAD_LABELS[editingQuadrant]}
+              </p>
+              <div className="flex items-center gap-2">
+                {draftHtml && (
+                  <button
+                    onClick={clearQuadrant}
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-display tracking-[0.2em] uppercase border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                  >
+                    <Trash2 size={10} /> Clear
+                  </button>
+                )}
+                <button
+                  onClick={saveQuadrant}
+                  disabled={!quadDirty || quadSaving}
+                  className="flex items-center gap-1 px-3 py-1 text-[10px] font-display tracking-[0.2em] uppercase border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {quadSaving ? <Loader2 size={10} className="animate-spin" /> : <Check size={10} />} Save
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+              {/* Left: source / upload */}
+              <div className="flex flex-col border-r border-border min-h-0">
+                <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border shrink-0">
+                  <span className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+                    HTML Source {draftFileName ? `· ${draftFileName}` : ""}
+                  </span>
+                  <label className="inline-flex items-center gap-1.5 px-2 py-1 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-[10px] font-display tracking-[0.2em] uppercase">
+                    <Upload size={10} /> Upload .html
+                    <input
+                      ref={quadFileInputRef}
+                      type="file"
+                      accept=".html,.htm,text/html"
+                      className="hidden"
+                      onChange={onUploadQuadrantHtml}
+                    />
+                  </label>
+                </div>
+                <textarea
+                  value={draftHtml}
+                  onChange={(e) => { setDraftHtml(e.target.value); setQuadDirty(true); }}
+                  placeholder="<!doctype html>&#10;<html>…</html>"
+                  spellCheck={false}
+                  className="flex-1 w-full p-3 bg-transparent text-xs font-mono text-foreground outline-none resize-none"
+                />
+              </div>
+
+              {/* Right: preview */}
+              <div className="flex flex-col min-h-0">
+                <div className="px-4 py-2 border-b border-border shrink-0">
+                  <span className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+                    Live Preview (sandboxed)
+                  </span>
+                </div>
+                <div className="flex-1 bg-background overflow-hidden">
+                  {draftHtml ? (
+                    <iframe
+                      title="Quadrant Preview"
+                      srcDoc={draftHtml}
+                      sandbox="allow-scripts allow-pointer-lock"
+                      className="w-full h-full border-0 bg-white"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center">
+                      <span className="text-[10px] font-display tracking-[0.3em] text-muted-foreground/50">
+                        EMPTY — Upload an .html file or paste source on the left
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -266,6 +266,27 @@ export type Database = {
         }
         Relationships: []
       }
+      secret_door_quadrants: {
+        Row: {
+          file_name: string | null
+          html_content: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          file_name?: string | null
+          html_content?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          file_name?: string | null
+          html_content?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       secret_door_settings: {
         Row: {
           background_url: string | null
