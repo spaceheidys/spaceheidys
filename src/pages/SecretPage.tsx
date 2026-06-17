@@ -18,8 +18,8 @@ const SecretPage = () => {
   const impulseRef = useRef<HTMLDivElement | null>(null);
   const [quadHtml, setQuadHtml] = useState<Record<string, string | null>>({});
 
-  // Wrap user HTML with a strict CSP that blocks all network access.
-  // Combined with a restrictive iframe sandbox this isolates the content.
+  // Wrap user HTML with a strict CSP + runtime lockdown so absolutely no
+  // network requests or navigation can escape the iframe.
   const buildSandboxedDoc = (html: string) => {
     const csp = [
       "default-src 'none'",
@@ -27,14 +27,30 @@ const SecretPage = () => {
       "style-src 'unsafe-inline'",
       "img-src data: blob:",
       "media-src data: blob:",
-      "font-src data:",
+      "font-src data: blob:",
       "connect-src 'none'",
       "frame-src 'none'",
       "object-src 'none'",
       "base-uri 'none'",
       "form-action 'none'",
+      "upgrade-insecure-requests",
     ].join("; ");
-    return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${csp}"><base target="_self"></head><body style="margin:0;background:transparent;color:inherit;">${html}</body></html>`;
+
+    const lockdown = `<script>(function(){
+      var nop=function(){return null};
+      window.fetch=nop;
+      window.XMLHttpRequest=function(){};
+      window.WebSocket=nop;
+      window.EventSource=nop;
+      if(window.navigator&&navigator.sendBeacon)navigator.sendBeacon=nop;
+      window.open=nop;
+      var loc=window.location;
+      Object.defineProperty(window,'location',{configurable:false,get:function(){return loc},set:function(){}});
+      document.addEventListener('click',function(e){var a=e.target.closest('a');if(a)e.preventDefault()},true);
+      document.addEventListener('submit',function(e){e.preventDefault()},true);
+    })()</script>`;
+
+    return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${csp}"><base target="_self"></head><body style="margin:0;background:transparent;color:inherit;">${lockdown}${html}</body></html>`;
   };
 
   useEffect(() => {
@@ -174,7 +190,7 @@ const SecretPage = () => {
                   <iframe
                     title={`Quadrant ${expanded}`}
                     srcDoc={buildSandboxedDoc(quadHtml[expanded] || "")}
-                    sandbox="allow-scripts allow-pointer-lock"
+                    sandbox="allow-scripts"
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     className="w-full h-full border-0 bg-background"
