@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSecretDoorSettings } from "@/hooks/useSecretDoorSettings";
+import { supabase } from "@/integrations/supabase/client";
 
 const quadrants = [
   { id: "tl", label: "01" },
@@ -15,6 +16,19 @@ const SecretPage = () => {
   const [expanded, setExpanded] = useState<string | null>(null);
   const { settings } = useSecretDoorSettings();
   const impulseRef = useRef<HTMLDivElement | null>(null);
+  const [quadHtml, setQuadHtml] = useState<Record<string, string | null>>({});
+
+  useEffect(() => {
+    supabase
+      .from("secret_door_quadrants" as any)
+      .select("id, html_content")
+      .then(({ data }) => {
+        if (!data) return;
+        const map: Record<string, string | null> = {};
+        (data as any[]).forEach((q) => { map[q.id] = q.html_content; });
+        setQuadHtml(map);
+      });
+  }, []);
 
   // JS-driven perimeter impulse that eases in/out at every corner.
   useEffect(() => {
@@ -136,10 +150,21 @@ const SecretPage = () => {
               >
                 <span className="text-sm leading-none">×</span>
               </button>
-              <div className="h-full w-full flex items-center justify-center">
-                <span className="text-xs font-display tracking-[0.3em] text-muted-foreground/60">
-                  EMPTY
-                </span>
+              <div className="h-full w-full">
+                {quadHtml[expanded] ? (
+                  <iframe
+                    title={`Quadrant ${expanded}`}
+                    srcDoc={quadHtml[expanded] || ""}
+                    sandbox="allow-scripts allow-pointer-lock"
+                    className="w-full h-full border-0 bg-background"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center">
+                    <span className="text-xs font-display tracking-[0.3em] text-muted-foreground/60">
+                      EMPTY
+                    </span>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
