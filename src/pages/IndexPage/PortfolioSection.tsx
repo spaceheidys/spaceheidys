@@ -90,7 +90,11 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
     return (
       <>
         {/* 2nd dimension divider */}
-        <div className="w-full h-8 bg-black" />
+        <div className="relative w-full h-8 bg-black overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none px-4 sm:px-8 md:px-16 flex items-center">
+            <MusicEqualizer height={28} color="hsl(0 0% 100%)" />
+          </div>
+        </div>
 
         {/* Portfolio section */}
         <div ref={ref} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100svh]">
