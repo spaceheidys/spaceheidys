@@ -21,8 +21,8 @@ const MainTextSection = memo(
     ({ activeSection, sectionVisibility, getContent }, ref) => {
       return (
         <div ref={ref} className="relative w-full bg-background h-[320px] sm:h-[380px] md:h-[420px]">
-          <div className="absolute top-0 left-0 right-0 pointer-events-none px-4 sm:px-8 md:px-16 pt-3">
-            <MusicEqualizer height={40} />
+          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none px-4 sm:px-8 md:px-16">
+            <MusicEqualizer height={64} />
           </div>
           <AnimatePresence mode="wait">
             {activeSection === "about" && (
