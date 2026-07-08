@@ -95,9 +95,9 @@ const MusicEqualizer = ({
       let vals: number[] = new Array(bars).fill(0);
       if (analyser) {
         if (!dataRef.current || dataRef.current.length !== analyser.frequencyBinCount) {
-          dataRef.current = new Uint8Array(analyser.frequencyBinCount);
+          dataRef.current = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount));
         }
-        analyser.getByteFrequencyData(dataRef.current);
+        analyser.getByteFrequencyData(dataRef.current as unknown as Uint8Array<ArrayBuffer>);
         const data = dataRef.current;
         // Log-ish bucket mapping over lower ~70% of spectrum
         const usable = Math.floor(data.length * 0.75);
