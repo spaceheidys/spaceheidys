@@ -1,7 +1,6 @@
 import { forwardRef, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { SectionVisibility } from "@/hooks/useSectionSettings";
-import MusicEqualizer from "@/components/MusicEqualizer";
 
 interface MainTextSectionProps {
   activeSection: "about" | "contact" | "shop" | null;
@@ -21,9 +20,6 @@ const MainTextSection = memo(
     ({ activeSection, sectionVisibility, getContent }, ref) => {
       return (
         <div ref={ref} className="relative w-full bg-background h-[320px] sm:h-[380px] md:h-[420px]">
-          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none px-4 sm:px-8 md:px-16">
-            <MusicEqualizer height={64} />
-          </div>
           <AnimatePresence mode="wait">
             {activeSection === "about" && (
               <motion.div key="about" className="absolute inset-0 flex items-center justify-center px-6 sm:px-8 md:px-16" {...sectionAnimation}>
