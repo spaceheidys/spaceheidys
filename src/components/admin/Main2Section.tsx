@@ -41,6 +41,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
   const [bgWallpaper, setBgWallpaper] = useState("");
+  const [bgWallpapers, setBgWallpapers] = useState<string[]>([]);
   const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<string | null>(null);
@@ -59,6 +60,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const backMultiRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
   const wallpaperRef = useRef<HTMLInputElement>(null);
+  const wallpaperMultiRef = useRef<HTMLInputElement>(null);
 
   const [sectionOrder, setSectionOrder] = useState<string[]>(() => {
     try {
@@ -120,6 +122,12 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setBgType(get("card_bg_type") || "polygon");
     setBgVideo(get("card_bg_video"));
     setBgWallpaper(get("card_bg_wallpaper"));
+    try {
+      const parsed = JSON.parse(get("card_bg_wallpapers") || "[]");
+      if (Array.isArray(parsed)) {
+        setBgWallpapers(parsed.map((it: any) => (typeof it === "string" ? it : it?.url)).filter((u: any) => typeof u === "string" && u.length > 0));
+      }
+    } catch { setBgWallpapers([]); }
     setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
   }, [get]);
 
@@ -242,6 +250,28 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setBgWallpaper(url);
     toast.success("Wallpaper uploaded");
     setUploading(null);
+  };
+
+  const handleAddWallpaper = async (file: File) => {
+    setUploading("card_bg_wallpapers");
+    const ext = file.name.split(".").pop();
+    const path = `cards/bg_wallpaper_extra_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    const updated = [...bgWallpapers, url];
+    setBgWallpapers(updated);
+    await update("card_bg_wallpapers", JSON.stringify(updated));
+    toast.success("Wallpaper added to rotation");
+    setUploading(null);
+  };
+
+  const handleRemoveWallpaper = async (index: number) => {
+    const updated = bgWallpapers.filter((_, i) => i !== index);
+    setBgWallpapers(updated);
+    await update("card_bg_wallpapers", JSON.stringify(updated));
+    toast.success("Wallpaper removed");
   };
 
   const handleBgTypeChange = async (type: string) => {
