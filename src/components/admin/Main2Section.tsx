@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
+import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical, Plus } from "lucide-react";
 import taroBackside from "@/assets/Taro_backside.png";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
@@ -486,6 +486,60 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
                 className="flex-1 h-1 appearance-none bg-border rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground"
               />
               <span className="text-[10px] text-muted-foreground font-display w-8 text-right">{bgOpacity}%</span>
+            </div>
+
+            {/* Additional wallpapers — shown randomly on refresh / page load */}
+            <div className="space-y-2 pt-3 border-t border-border/40">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">
+                  Random rotation ({bgWallpapers.length})
+                </span>
+                {confirm === "upload_card_bg_wallpapers" ? (
+                  <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                ) : (
+                  <label className="flex items-center gap-1 px-2 py-1 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-[10px] font-display tracking-widest uppercase">
+                    {uploading === "card_bg_wallpapers" ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+                    Add
+                    <input
+                      ref={wallpaperMultiRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleFileSelect(f, "card_bg_wallpapers", "upload_card_bg_wallpapers");
+                        if (wallpaperMultiRef.current) wallpaperMultiRef.current.value = "";
+                      }}
+                      disabled={!!uploading}
+                    />
+                  </label>
+                )}
+              </div>
+              <p className="text-[10px] text-muted-foreground/60 font-display tracking-wider">
+                On each page refresh, one wallpaper is chosen at random from the list (the main wallpaper above is included).
+              </p>
+              {bgWallpapers.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {bgWallpapers.map((url, i) => (
+                    <div key={i} className="relative group border border-border aspect-video overflow-hidden bg-muted/10">
+                      <img src={url} alt={`Wallpaper ${i + 1}`} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                        {confirm === `remove_wallpaper_${i}` ? (
+                          <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                        ) : (
+                          <button
+                            onClick={() => askConfirm(`remove_wallpaper_${i}`)}
+                            className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                      <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{i + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
