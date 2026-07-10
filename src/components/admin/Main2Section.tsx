@@ -296,6 +296,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm === "bg_wallpaper") await handleBgTypeChange("wallpaper");
     else if (confirm === "upload_card_bg_wallpaper" && pendingFile) await handleWallpaperUpload(pendingFile.file);
     else if (confirm === "clear_card_bg_wallpaper") await handleClear("card_bg_wallpaper");
+    else if (confirm === "upload_card_bg_wallpapers" && pendingFile) await handleAddWallpaper(pendingFile.file);
     else if (confirm === "upload_card_front_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_front_image");
     else if (confirm === "upload_card_back_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_back_image");
     else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
@@ -308,6 +309,10 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm?.startsWith("remove_back_")) {
       const idx = parseInt(confirm.replace("remove_back_", ""), 10);
       if (!isNaN(idx)) await handleRemoveBackImage(idx);
+    }
+    else if (confirm?.startsWith("remove_wallpaper_")) {
+      const idx = parseInt(confirm.replace("remove_wallpaper_", ""), 10);
+      if (!isNaN(idx)) await handleRemoveWallpaper(idx);
     }
     setConfirm(null);
     setPendingFile(null);
