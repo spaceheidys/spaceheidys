@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
+import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical, Plus } from "lucide-react";
 import taroBackside from "@/assets/Taro_backside.png";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
@@ -41,6 +41,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
   const [bgWallpaper, setBgWallpaper] = useState("");
+  const [bgWallpapers, setBgWallpapers] = useState<string[]>([]);
   const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<string | null>(null);
@@ -59,6 +60,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const backMultiRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
   const wallpaperRef = useRef<HTMLInputElement>(null);
+  const wallpaperMultiRef = useRef<HTMLInputElement>(null);
 
   const [sectionOrder, setSectionOrder] = useState<string[]>(() => {
     try {
@@ -120,6 +122,12 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setBgType(get("card_bg_type") || "polygon");
     setBgVideo(get("card_bg_video"));
     setBgWallpaper(get("card_bg_wallpaper"));
+    try {
+      const parsed = JSON.parse(get("card_bg_wallpapers") || "[]");
+      if (Array.isArray(parsed)) {
+        setBgWallpapers(parsed.map((it: any) => (typeof it === "string" ? it : it?.url)).filter((u: any) => typeof u === "string" && u.length > 0));
+      }
+    } catch { setBgWallpapers([]); }
     setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
   }, [get]);
 
@@ -244,6 +252,28 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setUploading(null);
   };
 
+  const handleAddWallpaper = async (file: File) => {
+    setUploading("card_bg_wallpapers");
+    const ext = file.name.split(".").pop();
+    const path = `cards/bg_wallpaper_extra_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    const updated = [...bgWallpapers, url];
+    setBgWallpapers(updated);
+    await update("card_bg_wallpapers", JSON.stringify(updated));
+    toast.success("Wallpaper added to rotation");
+    setUploading(null);
+  };
+
+  const handleRemoveWallpaper = async (index: number) => {
+    const updated = bgWallpapers.filter((_, i) => i !== index);
+    setBgWallpapers(updated);
+    await update("card_bg_wallpapers", JSON.stringify(updated));
+    toast.success("Wallpaper removed");
+  };
+
   const handleBgTypeChange = async (type: string) => {
     setBgType(type);
     await update("card_bg_type", type);
@@ -266,6 +296,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm === "bg_wallpaper") await handleBgTypeChange("wallpaper");
     else if (confirm === "upload_card_bg_wallpaper" && pendingFile) await handleWallpaperUpload(pendingFile.file);
     else if (confirm === "clear_card_bg_wallpaper") await handleClear("card_bg_wallpaper");
+    else if (confirm === "upload_card_bg_wallpapers" && pendingFile) await handleAddWallpaper(pendingFile.file);
     else if (confirm === "upload_card_front_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_front_image");
     else if (confirm === "upload_card_back_image" && pendingFile) await handleImageUpload(pendingFile.file, "card_back_image");
     else if (confirm === "upload_card_bg_video" && pendingFile) await handleVideoUpload(pendingFile.file);
@@ -278,6 +309,10 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm?.startsWith("remove_back_")) {
       const idx = parseInt(confirm.replace("remove_back_", ""), 10);
       if (!isNaN(idx)) await handleRemoveBackImage(idx);
+    }
+    else if (confirm?.startsWith("remove_wallpaper_")) {
+      const idx = parseInt(confirm.replace("remove_wallpaper_", ""), 10);
+      if (!isNaN(idx)) await handleRemoveWallpaper(idx);
     }
     setConfirm(null);
     setPendingFile(null);
@@ -382,7 +417,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <div className="space-y-2">
             {bgWallpaper ? (
               <div className="relative group border border-border aspect-video overflow-hidden">
-                <img src={bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover" />
+                <img src={bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover transition-opacity" style={{ opacity: bgOpacity / 100 }} />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
                   {confirm === "upload_card_bg_wallpaper" ? (
                     <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
@@ -451,6 +486,60 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
                 className="flex-1 h-1 appearance-none bg-border rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground"
               />
               <span className="text-[10px] text-muted-foreground font-display w-8 text-right">{bgOpacity}%</span>
+            </div>
+
+            {/* Additional wallpapers — shown randomly on refresh / page load */}
+            <div className="space-y-2 pt-3 border-t border-border/40">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">
+                  Random rotation ({bgWallpapers.length})
+                </span>
+                {confirm === "upload_card_bg_wallpapers" ? (
+                  <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                ) : (
+                  <label className="flex items-center gap-1 px-2 py-1 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer text-[10px] font-display tracking-widest uppercase">
+                    {uploading === "card_bg_wallpapers" ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+                    Add
+                    <input
+                      ref={wallpaperMultiRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleFileSelect(f, "card_bg_wallpapers", "upload_card_bg_wallpapers");
+                        if (wallpaperMultiRef.current) wallpaperMultiRef.current.value = "";
+                      }}
+                      disabled={!!uploading}
+                    />
+                  </label>
+                )}
+              </div>
+              <p className="text-[10px] text-muted-foreground/60 font-display tracking-wider">
+                On each page refresh, one wallpaper is chosen at random from the list (the main wallpaper above is included).
+              </p>
+              {bgWallpapers.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {bgWallpapers.map((url, i) => (
+                    <div key={i} className="relative group border border-border aspect-video overflow-hidden bg-muted/10">
+                      <img src={url} alt={`Wallpaper ${i + 1}`} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                        {confirm === `remove_wallpaper_${i}` ? (
+                          <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                        ) : (
+                          <button
+                            onClick={() => askConfirm(`remove_wallpaper_${i}`)}
+                            className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                      <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{i + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import taro01Img from "@/assets/TARO_01.png";
@@ -88,6 +88,25 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
 
     const bgOpacity = parseInt(getContent("card_bg_video_opacity") || "40", 10) / 100;
 
+    // Wallpaper: pick a random one from the list (fallback to single wallpaper).
+    // Recomputes per mount (= per page load / refresh) and when the list changes.
+    const wallpapersJson = getContent("card_bg_wallpapers") || "";
+    const singleWallpaper = getContent("card_bg_wallpaper") || "";
+    const activeWallpaper = useMemo(() => {
+      let list: string[] = [];
+      try {
+        const parsed = JSON.parse(wallpapersJson || "[]");
+        if (Array.isArray(parsed)) {
+          list = parsed
+            .map((it: any) => (typeof it === "string" ? it : it?.url))
+            .filter((u: any): u is string => typeof u === "string" && u.length > 0);
+        }
+      } catch { /* ignore */ }
+      if (singleWallpaper) list = [singleWallpaper, ...list.filter(u => u !== singleWallpaper)];
+      if (list.length === 0) return "";
+      return list[Math.floor(Math.random() * list.length)];
+    }, [wallpapersJson, singleWallpaper]);
+
     return (
       <>
         {/* 2nd dimension divider */}
@@ -118,9 +137,9 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
               muted
               playsInline
             />
-          ) : getContent("card_bg_type") === "wallpaper" && getContent("card_bg_wallpaper") ? (
+          ) : getContent("card_bg_type") === "wallpaper" && activeWallpaper ? (
             <img
-              src={getContent("card_bg_wallpaper")}
+              src={activeWallpaper}
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               style={{ opacity: bgOpacity }}
