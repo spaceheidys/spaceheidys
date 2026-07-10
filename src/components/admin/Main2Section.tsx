@@ -417,7 +417,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <div className="space-y-2">
             {bgWallpaper ? (
               <div className="relative group border border-border aspect-video overflow-hidden">
-                <img src={bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover" />
+                <img src={bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover transition-opacity" style={{ opacity: bgOpacity / 100 }} />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
                   {confirm === "upload_card_bg_wallpaper" ? (
                     <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
