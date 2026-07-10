@@ -92,7 +92,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
       <>
         {/* 2nd dimension divider */}
         <div className="relative w-full h-8 bg-black overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none px-4 sm:px-8 md:px-16 flex items-center">
+          <div className="absolute inset-y-0 left-[calc(4rem+1rem)] sm:left-[calc(6rem+1rem)] md:left-[calc(8rem+1rem)] right-4 sm:right-8 md:right-16 pointer-events-none flex items-center">
             <MusicEqualizer height={28} color="hsl(0 0% 100%)" />
           </div>
         </div>
