@@ -41,7 +41,8 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
   const [bgWallpaper, setBgWallpaper] = useState("");
-  const [bgWallpapers, setBgWallpapers] = useState<string[]>([]);
+  const [bgWallpapers, setBgWallpapers] = useState<{ url: string; weight: number }[]>([]);
+  const [textRevealAnimation, setTextRevealAnimation] = useState(true);
   const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<string | null>(null);
@@ -125,10 +126,19 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     try {
       const parsed = JSON.parse(get("card_bg_wallpapers") || "[]");
       if (Array.isArray(parsed)) {
-        setBgWallpapers(parsed.map((it: any) => (typeof it === "string" ? it : it?.url)).filter((u: any) => typeof u === "string" && u.length > 0));
+        setBgWallpapers(
+          parsed
+            .map((it: any) =>
+              typeof it === "string"
+                ? { url: it, weight: 1 }
+                : { url: it?.url, weight: Number(it?.weight) || 1 }
+            )
+            .filter((it) => typeof it.url === "string" && it.url.length > 0)
+        );
       }
     } catch { setBgWallpapers([]); }
     setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
+    setTextRevealAnimation(get("text_reveal_animation") !== "off");
   }, [get]);
 
   const handleSave = async () => {
@@ -260,7 +270,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     if (error) { toast.error("Upload failed"); setUploading(null); return; }
     const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
     const url = urlData.publicUrl;
-    const updated = [...bgWallpapers, url];
+    const updated = [...bgWallpapers, { url, weight: 1 }];
     setBgWallpapers(updated);
     await update("card_bg_wallpapers", JSON.stringify(updated));
     toast.success("Wallpaper added to rotation");
@@ -273,6 +283,32 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     await update("card_bg_wallpapers", JSON.stringify(updated));
     toast.success("Wallpaper removed");
   };
+
+  const handleUpdateWallpaperWeight = async (index: number, weight: number) => {
+    const updated = bgWallpapers.map((item, i) => (i === index ? { ...item, weight } : item));
+    setBgWallpapers(updated);
+    await update("card_bg_wallpapers", JSON.stringify(updated));
+  };
+
+  const handleToggleTextReveal = async () => {
+    const next = !textRevealAnimation;
+    setTextRevealAnimation(next);
+    await update("text_reveal_animation", next ? "on" : "off");
+    toast.success(next ? "Animated reveal enabled" : "Animated reveal disabled");
+  };
+
+  // Preview wallpaper: if rotation has items, show a random one; otherwise the single main wallpaper
+  const previewWallpaper = useMemo(() => {
+    if (bgWallpapers.length === 0) return bgWallpaper;
+    const total = bgWallpapers.reduce((s, w) => s + Math.max(0, Number(w.weight) || 0), 0);
+    if (total <= 0) return bgWallpapers[Math.floor(Math.random() * bgWallpapers.length)].url;
+    let r = Math.random() * total;
+    for (const w of bgWallpapers) {
+      r -= Math.max(0, Number(w.weight) || 0);
+      if (r <= 0) return w.url;
+    }
+    return bgWallpapers[bgWallpapers.length - 1].url;
+  }, [bgWallpapers, bgWallpaper]);
 
   const handleBgTypeChange = async (type: string) => {
     setBgType(type);
