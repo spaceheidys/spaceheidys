@@ -173,11 +173,28 @@ const Index = () => {
     setCubeBg(pool[0].image_url);
   }, [cubeBgPool, tod]);
 
+  // Smooth, slower scroll (easeInOutCubic) to a target element
+  const slowScrollTo = useCallback((el: HTMLElement | null, duration = 1400) => {
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const targetY = window.scrollY + rect.top - (window.innerHeight - rect.height) / 2;
+    const startY = window.scrollY;
+    const diff = targetY - startY;
+    const startTime = performance.now();
+    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const step = (now: number) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      window.scrollTo(0, startY + diff * easeInOutCubic(t));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, []);
+
   // Section click handler
   const handleSectionClick = useCallback((section: "about" | "contact" | "shop") => {
     if (aboutTimerRef.current) clearTimeout(aboutTimerRef.current);
     setActiveSection(section);
-    setTimeout(() => mainTextRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+    setTimeout(() => slowScrollTo(mainTextRef.current, 1400), 30);
     const sectionKeys: Record<string, string[]> = {
       about: ["about"],
       contact: ["contact_title", "contact_body", "contact_email"],
@@ -192,7 +209,7 @@ const Index = () => {
         setActiveSection((prev) => (prev === section ? null : prev));
       }, maxDuration * 1000);
     }
-  }, [getDuration]);
+  }, [getDuration, slowScrollTo]);
 
   const handleAboutClick = useCallback(() => handleSectionClick("about"), [handleSectionClick]);
   const handleContactClick = useCallback(() => handleSectionClick("contact"), [handleSectionClick]);
@@ -429,6 +446,7 @@ const Index = () => {
         activeSection={activeSection}
         sectionVisibility={sectionVisibility}
         getContent={getContent}
+        animateReveal={getContent("text_reveal_animation") !== "off"}
       />
 
       {/* === PORTFOLIO + FOOTER === */}

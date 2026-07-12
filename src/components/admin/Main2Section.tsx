@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical, Plus } from "lucide-react";
@@ -41,7 +41,8 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [bgType, setBgType] = useState("polygon");
   const [bgVideo, setBgVideo] = useState("");
   const [bgWallpaper, setBgWallpaper] = useState("");
-  const [bgWallpapers, setBgWallpapers] = useState<string[]>([]);
+  const [bgWallpapers, setBgWallpapers] = useState<{ url: string; weight: number }[]>([]);
+  const [textRevealAnimation, setTextRevealAnimation] = useState(true);
   const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<string | null>(null);
@@ -125,10 +126,19 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     try {
       const parsed = JSON.parse(get("card_bg_wallpapers") || "[]");
       if (Array.isArray(parsed)) {
-        setBgWallpapers(parsed.map((it: any) => (typeof it === "string" ? it : it?.url)).filter((u: any) => typeof u === "string" && u.length > 0));
+        setBgWallpapers(
+          parsed
+            .map((it: any) =>
+              typeof it === "string"
+                ? { url: it, weight: 1 }
+                : { url: it?.url, weight: Number(it?.weight) || 1 }
+            )
+            .filter((it) => typeof it.url === "string" && it.url.length > 0)
+        );
       }
     } catch { setBgWallpapers([]); }
     setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
+    setTextRevealAnimation(get("text_reveal_animation") !== "off");
   }, [get]);
 
   const handleSave = async () => {
@@ -260,7 +270,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     if (error) { toast.error("Upload failed"); setUploading(null); return; }
     const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
     const url = urlData.publicUrl;
-    const updated = [...bgWallpapers, url];
+    const updated = [...bgWallpapers, { url, weight: 1 }];
     setBgWallpapers(updated);
     await update("card_bg_wallpapers", JSON.stringify(updated));
     toast.success("Wallpaper added to rotation");
@@ -273,6 +283,32 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     await update("card_bg_wallpapers", JSON.stringify(updated));
     toast.success("Wallpaper removed");
   };
+
+  const handleUpdateWallpaperWeight = async (index: number, weight: number) => {
+    const updated = bgWallpapers.map((item, i) => (i === index ? { ...item, weight } : item));
+    setBgWallpapers(updated);
+    await update("card_bg_wallpapers", JSON.stringify(updated));
+  };
+
+  const handleToggleTextReveal = async () => {
+    const next = !textRevealAnimation;
+    setTextRevealAnimation(next);
+    await update("text_reveal_animation", next ? "on" : "off");
+    toast.success(next ? "Animated reveal enabled" : "Animated reveal disabled");
+  };
+
+  // Preview wallpaper: if rotation has items, show a random one; otherwise the single main wallpaper
+  const previewWallpaper = useMemo(() => {
+    if (bgWallpapers.length === 0) return bgWallpaper;
+    const total = bgWallpapers.reduce((s, w) => s + Math.max(0, Number(w.weight) || 0), 0);
+    if (total <= 0) return bgWallpapers[Math.floor(Math.random() * bgWallpapers.length)].url;
+    let r = Math.random() * total;
+    for (const w of bgWallpapers) {
+      r -= Math.max(0, Number(w.weight) || 0);
+      if (r <= 0) return w.url;
+    }
+    return bgWallpapers[bgWallpapers.length - 1].url;
+  }, [bgWallpapers, bgWallpaper]);
 
   const handleBgTypeChange = async (type: string) => {
     setBgType(type);
@@ -358,6 +394,26 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             </button>
           )}
         </div>
+        <div className="flex items-center justify-between pt-2 border-t border-border/40 mt-2">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">
+              Animated text reveal
+            </span>
+            <span className="text-[9px] text-muted-foreground/60 font-display tracking-wider">
+              Blinking frame draws around ABOUT / CONTACT text before it appears.
+            </span>
+          </div>
+          <button
+            onClick={handleToggleTextReveal}
+            className={`px-3 py-1 text-[10px] font-display tracking-[0.2em] uppercase transition-colors border ${
+              textRevealAnimation
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {textRevealAnimation ? "On" : "Off"}
+          </button>
+        </div>
       </div>
     ),
     cards: (
@@ -415,9 +471,9 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
 
         {bgType === "wallpaper" && (
           <div className="space-y-2">
-            {bgWallpaper ? (
+            {(previewWallpaper || bgWallpaper) ? (
               <div className="relative group border border-border aspect-video overflow-hidden">
-                <img src={bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover transition-opacity" style={{ opacity: bgOpacity / 100 }} />
+                <img src={previewWallpaper || bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover transition-opacity" style={{ opacity: bgOpacity / 100 }} />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
                   {confirm === "upload_card_bg_wallpaper" ? (
                     <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
@@ -518,28 +574,49 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
               <p className="text-[10px] text-muted-foreground/60 font-display tracking-wider">
                 On each page refresh, one wallpaper is chosen at random from the list (the main wallpaper above is included).
               </p>
-              {bgWallpapers.length > 0 && (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  {bgWallpapers.map((url, i) => (
-                    <div key={i} className="relative group border border-border aspect-video overflow-hidden bg-muted/10">
-                      <img src={url} alt={`Wallpaper ${i + 1}`} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
-                        {confirm === `remove_wallpaper_${i}` ? (
-                          <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                        ) : (
-                          <button
-                            onClick={() => askConfirm(`remove_wallpaper_${i}`)}
-                            className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                      </div>
-                      <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{i + 1}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {bgWallpapers.length > 0 && (() => {
+                const totalW = bgWallpapers.reduce((s, w) => s + (Number(w.weight) || 0), 0);
+                return (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    {bgWallpapers.map((item, i) => {
+                      const pct = totalW > 0
+                        ? Math.round(((Number(item.weight) || 0) / totalW) * 100)
+                        : Math.round(100 / bgWallpapers.length);
+                      return (
+                        <div key={i} className="flex flex-col gap-1">
+                          <div className="relative group border border-border aspect-video overflow-hidden bg-muted/10">
+                            <img src={item.url} alt={`Wallpaper ${i + 1}`} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                              {confirm === `remove_wallpaper_${i}` ? (
+                                <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                              ) : (
+                                <button
+                                  onClick={() => askConfirm(`remove_wallpaper_${i}`)}
+                                  className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              )}
+                            </div>
+                            <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{pct}%</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              min={0}
+                              step={1}
+                              value={item.weight}
+                              onChange={(e) => handleUpdateWallpaperWeight(i, Math.max(0, parseInt(e.target.value || "0", 10)))}
+                              className="w-full bg-transparent border border-border px-1.5 py-1 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-foreground transition-colors"
+                            />
+                            <span className="text-[8px] text-muted-foreground/50 font-display">wt</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
