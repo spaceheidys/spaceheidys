@@ -451,9 +451,9 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
 
         {bgType === "wallpaper" && (
           <div className="space-y-2">
-            {bgWallpaper ? (
+            {(previewWallpaper || bgWallpaper) ? (
               <div className="relative group border border-border aspect-video overflow-hidden">
-                <img src={bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover transition-opacity" style={{ opacity: bgOpacity / 100 }} />
+                <img src={previewWallpaper || bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover transition-opacity" style={{ opacity: bgOpacity / 100 }} />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
                   {confirm === "upload_card_bg_wallpaper" ? (
                     <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
@@ -554,28 +554,49 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
               <p className="text-[10px] text-muted-foreground/60 font-display tracking-wider">
                 On each page refresh, one wallpaper is chosen at random from the list (the main wallpaper above is included).
               </p>
-              {bgWallpapers.length > 0 && (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  {bgWallpapers.map((url, i) => (
-                    <div key={i} className="relative group border border-border aspect-video overflow-hidden bg-muted/10">
-                      <img src={url} alt={`Wallpaper ${i + 1}`} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
-                        {confirm === `remove_wallpaper_${i}` ? (
-                          <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                        ) : (
-                          <button
-                            onClick={() => askConfirm(`remove_wallpaper_${i}`)}
-                            className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                      </div>
-                      <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{i + 1}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {bgWallpapers.length > 0 && (() => {
+                const totalW = bgWallpapers.reduce((s, w) => s + (Number(w.weight) || 0), 0);
+                return (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    {bgWallpapers.map((item, i) => {
+                      const pct = totalW > 0
+                        ? Math.round(((Number(item.weight) || 0) / totalW) * 100)
+                        : Math.round(100 / bgWallpapers.length);
+                      return (
+                        <div key={i} className="flex flex-col gap-1">
+                          <div className="relative group border border-border aspect-video overflow-hidden bg-muted/10">
+                            <img src={item.url} alt={`Wallpaper ${i + 1}`} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                              {confirm === `remove_wallpaper_${i}` ? (
+                                <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
+                              ) : (
+                                <button
+                                  onClick={() => askConfirm(`remove_wallpaper_${i}`)}
+                                  className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              )}
+                            </div>
+                            <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{pct}%</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              min={0}
+                              step={1}
+                              value={item.weight}
+                              onChange={(e) => handleUpdateWallpaperWeight(i, Math.max(0, parseInt(e.target.value || "0", 10)))}
+                              className="w-full bg-transparent border border-border px-1.5 py-1 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-foreground transition-colors"
+                            />
+                            <span className="text-[8px] text-muted-foreground/50 font-display">wt</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
