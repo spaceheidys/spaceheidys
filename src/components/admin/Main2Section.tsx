@@ -394,6 +394,26 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             </button>
           )}
         </div>
+        <div className="flex items-center justify-between pt-2 border-t border-border/40 mt-2">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">
+              Animated text reveal
+            </span>
+            <span className="text-[9px] text-muted-foreground/60 font-display tracking-wider">
+              Blinking frame draws around ABOUT / CONTACT text before it appears.
+            </span>
+          </div>
+          <button
+            onClick={handleToggleTextReveal}
+            className={`px-3 py-1 text-[10px] font-display tracking-[0.2em] uppercase transition-colors border ${
+              textRevealAnimation
+                ? "border-foreground text-foreground"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {textRevealAnimation ? "On" : "Off"}
+          </button>
+        </div>
       </div>
     ),
     cards: (
