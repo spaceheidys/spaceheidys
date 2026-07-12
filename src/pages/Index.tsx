@@ -446,6 +446,7 @@ const Index = () => {
         activeSection={activeSection}
         sectionVisibility={sectionVisibility}
         getContent={getContent}
+        animateReveal={getContent("text_reveal_animation") !== "off"}
       />
 
       {/* === PORTFOLIO + FOOTER === */}
