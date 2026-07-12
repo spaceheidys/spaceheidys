@@ -93,18 +93,31 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
     const wallpapersJson = getContent("card_bg_wallpapers") || "";
     const singleWallpaper = getContent("card_bg_wallpaper") || "";
     const activeWallpaper = useMemo(() => {
-      let list: string[] = [];
+      let list: { url: string; weight: number }[] = [];
       try {
         const parsed = JSON.parse(wallpapersJson || "[]");
         if (Array.isArray(parsed)) {
           list = parsed
-            .map((it: any) => (typeof it === "string" ? it : it?.url))
-            .filter((u: any): u is string => typeof u === "string" && u.length > 0);
+            .map((it: any) =>
+              typeof it === "string"
+                ? { url: it, weight: 1 }
+                : { url: it?.url, weight: Number(it?.weight) || 1 }
+            )
+            .filter((it) => typeof it.url === "string" && it.url.length > 0);
         }
       } catch { /* ignore */ }
-      if (singleWallpaper) list = [singleWallpaper, ...list.filter(u => u !== singleWallpaper)];
+      if (singleWallpaper && !list.some((it) => it.url === singleWallpaper)) {
+        list = [{ url: singleWallpaper, weight: 1 }, ...list];
+      }
       if (list.length === 0) return "";
-      return list[Math.floor(Math.random() * list.length)];
+      const total = list.reduce((s, w) => s + Math.max(0, Number(w.weight) || 0), 0);
+      if (total <= 0) return list[Math.floor(Math.random() * list.length)].url;
+      let r = Math.random() * total;
+      for (const w of list) {
+        r -= Math.max(0, Number(w.weight) || 0);
+        if (r <= 0) return w.url;
+      }
+      return list[list.length - 1].url;
     }, [wallpapersJson, singleWallpaper]);
 
     return (
