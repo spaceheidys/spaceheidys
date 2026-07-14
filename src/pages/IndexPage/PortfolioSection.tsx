@@ -68,7 +68,9 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
       try {
         const p = JSON.parse(getContent("card_front_images") || "[]");
         if (Array.isArray(p) && p.length > 0)
-          return p.map((item: any) => (typeof item === "string" ? { url: item, text: "" } : item));
+          return p
+            .map((item: any) => (typeof item === "string" ? { url: item, text: "" } : item))
+            .filter((item: any) => !item?.hidden);
         return undefined;
       } catch {
         return undefined;

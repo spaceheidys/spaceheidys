@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical, Plus } from "lucide-react";
+import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical, Plus, Eye, EyeOff, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 import taroBackside from "@/assets/Taro_backside.png";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
@@ -35,7 +35,7 @@ function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }
 const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [wisdomText, setWisdomText] = useState("");
   const [frontImage, setFrontImage] = useState("");
-  const [frontImages, setFrontImages] = useState<{url: string; text: string}[]>([]);
+  const [frontImages, setFrontImages] = useState<{url: string; text: string; hidden?: boolean}[]>([]);
   const [backImage, setBackImage] = useState("");
   const [backImages, setBackImages] = useState<{url: string; weight: number}[]>([]);
   const [bgType, setBgType] = useState("polygon");
@@ -59,6 +59,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   });
   const frontRef = useRef<HTMLInputElement>(null);
   const frontMultiRef = useRef<HTMLInputElement>(null);
+  const frontReplaceRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const backRef = useRef<HTMLInputElement>(null);
   const backMultiRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -195,6 +196,36 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     const updated = frontImages.map((item, i) => i === index ? { ...item, text } : item);
     setFrontImages(updated);
     await update("card_front_images", JSON.stringify(updated));
+  };
+
+  const handleToggleFrontHidden = async (index: number) => {
+    const updated = frontImages.map((item, i) => i === index ? { ...item, hidden: !item.hidden } : item);
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
+    toast.success(updated[index].hidden ? "Card hidden" : "Card shown");
+  };
+
+  const handleMoveFrontImage = async (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= frontImages.length) return;
+    const updated = [...frontImages];
+    [updated[index], updated[target]] = [updated[target], updated[index]];
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
+  };
+
+  const handleReplaceFrontImage = async (index: number, file: File) => {
+    setUploading(`front_replace_${index}`);
+    const ext = file.name.split(".").pop();
+    const path = `cards/front_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const updated = frontImages.map((item, i) => i === index ? { ...item, url: urlData.publicUrl } : item);
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
+    setUploading(null);
+    toast.success("Card replaced");
   };
 
   const handleAddBackImage = async (file: File) => {
@@ -770,18 +801,66 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {frontImages.map((item, i) => (
               <div key={i} className="flex flex-col gap-1">
-                <div className="relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10">
+                <div className={`relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10 ${item.hidden ? "opacity-40" : ""}`}>
                   <img src={item.url} alt={`Front ${i + 1}`} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+                  {/* Reorder arrows — always visible on hover */}
+                  <div className="absolute top-1 left-1 right-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleMoveFrontImage(i, -1)}
+                      disabled={i === 0}
+                      className="p-0.5 rounded bg-background/70 border border-border text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                      title="Move left"
+                    >
+                      <ArrowLeft size={10} />
+                    </button>
+                    <button
+                      onClick={() => handleMoveFrontImage(i, 1)}
+                      disabled={i === frontImages.length - 1}
+                      className="p-0.5 rounded bg-background/70 border border-border text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                      title="Move right"
+                    >
+                      <ArrowRight size={10} />
+                    </button>
+                  </div>
+                  {/* Action buttons */}
+                  <div className="absolute inset-0 flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
                     {confirm === `remove_front_${i}` ? (
                       <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
                     ) : (
-                      <button
-                        onClick={() => askConfirm(`remove_front_${i}`)}
-                        className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      <>
+                        <button
+                          onClick={() => frontReplaceRefs.current[i]?.click()}
+                          className="p-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                          title="Replace card"
+                        >
+                          {uploading === `front_replace_${i}` ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+                        </button>
+                        <input
+                          ref={(el) => { frontReplaceRefs.current[i] = el; }}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleReplaceFrontImage(i, f);
+                            e.target.value = "";
+                          }}
+                        />
+                        <button
+                          onClick={() => handleToggleFrontHidden(i)}
+                          className="p-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                          title={item.hidden ? "Show card" : "Hide card"}
+                        >
+                          {item.hidden ? <EyeOff size={12} className="text-destructive/80" /> : <Eye size={12} />}
+                        </button>
+                        <button
+                          onClick={() => askConfirm(`remove_front_${i}`)}
+                          className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </>
                     )}
                   </div>
                   <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{i + 1}</span>
