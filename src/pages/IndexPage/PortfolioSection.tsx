@@ -175,12 +175,18 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
               playsInline
             />
           ) : getContent("card_bg_type") === "wallpaper" && activeWallpaper ? (
-            <img
-              src={activeWallpaper}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ opacity: bgOpacity }}
-            />
+            <AnimatePresence mode="sync">
+              <motion.img
+                key={activeWallpaper}
+                src={activeWallpaper}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: bgOpacity }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              />
+            </AnimatePresence>
           ) : (
             <PolygonBackground triggerKey={flipCount} />
           )}
