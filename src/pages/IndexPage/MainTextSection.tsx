@@ -141,7 +141,7 @@ const MainTextSection = memo(
       // Bounds match the equalizer bar (which sits above), inset a bit so the
       // frame is visibly narrower than the equalizer.
       const boundClasses =
-        "absolute inset-y-0 left-[calc(4rem+2rem)] right-8 sm:left-[calc(6rem+2rem)] sm:right-12 md:left-[calc(8rem+2rem)] md:right-20";
+        "absolute inset-y-0 left-4 right-4 sm:left-[calc(6rem+2rem)] sm:right-12 md:left-[calc(8rem+2rem)] md:right-20";
 
       return (
         <div ref={ref} className="relative w-full bg-background h-[320px] sm:h-[380px] md:h-[420px]">
