@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, FolderInput } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, FolderInput, Edit2, ImagePlus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Input as UIInput } from "@/components/ui/input";
+import { Textarea as UITextarea } from "@/components/ui/textarea";
+import { Label as UILabel } from "@/components/ui/label";
+import { Button as UIButton } from "@/components/ui/button";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import {
@@ -562,6 +567,53 @@ const Admin = () => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, is_visible: visible } as any : i)));
     await supabase.from("portfolio_items").update({ is_visible: visible } as any).eq("id", id);
   };
+
+  // Group-level actions
+  const handleGroupAddImage = async (groupId: string, file: File) => {
+    if (!file.type.startsWith("image/")) { toast.error("Not an image"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Exceeds 5MB"); return; }
+    setUploading(true);
+    const sample = items.find((i) => i.group_id === groupId);
+    const ext = file.name.split(".").pop();
+    const path = `${activeSection}/${sample?.subsection || activeSub || "general"}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (upErr) { toast.error("Upload failed"); setUploading(false); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const insertData: any = {
+      section: sample?.section || activeSection,
+      subsection: sample?.subsection ?? (activeSection === "gallery" ? activeSub : null),
+      title: file.name.replace(/\.[^.]+$/, ""),
+      image_url: urlData.publicUrl,
+      sort_order: items.length,
+      created_by: user?.id,
+      group_id: groupId,
+      description: (sample as any)?.description ?? null,
+    };
+    const { error } = await supabase.from("portfolio_items").insert(insertData);
+    setUploading(false);
+    if (error) toast.error("Add failed");
+    else { toast.success("Added to folder"); fetchItems(); }
+  };
+
+  const handleGroupToggleVisibility = async (groupId: string) => {
+    const groupItems = items.filter((i) => i.group_id === groupId);
+    const anyVisible = groupItems.some((i) => (i as any).is_visible !== false);
+    const newVisible = !anyVisible;
+    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, is_visible: newVisible } as any) : i));
+    const { error } = await supabase.from("portfolio_items").update({ is_visible: newVisible } as any).eq("group_id", groupId);
+    if (error) toast.error("Update failed");
+    else toast.success(newVisible ? "Folder shown" : "Folder hidden");
+  };
+
+  const handleGroupRename = async (groupId: string, title: string, description: string) => {
+    const { error } = await supabase.from("portfolio_items").update({ title, description } as any).eq("group_id", groupId);
+    if (error) { toast.error("Rename failed"); return; }
+    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title, description } as any) : i));
+    toast.success("Folder updated");
+  };
+
+  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string; description: string } | null>(null);
+  const groupAddFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
