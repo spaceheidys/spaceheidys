@@ -1314,7 +1314,7 @@ const Admin = () => {
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle>Rename folder</DialogTitle>
-            <DialogDescription>Updates the title and description for every image in this folder.</DialogDescription>
+            <DialogDescription>Renames the folder for every image in it. Per-image "About Project" is edited separately on each image.</DialogDescription>
           </DialogHeader>
           {renameGroup && (
             <div className="grid gap-4 py-2">
@@ -1327,16 +1327,6 @@ const Admin = () => {
                   placeholder="Folder title"
                 />
               </div>
-              <div className="grid gap-2">
-                <UILabel htmlFor="rename-desc">Description / project info</UILabel>
-                <UITextarea
-                  id="rename-desc"
-                  value={renameGroup.description}
-                  onChange={(e) => setRenameGroup({ ...renameGroup, description: e.target.value })}
-                  rows={5}
-                  placeholder="About this project…"
-                />
-              </div>
             </div>
           )}
           <DialogFooter>
@@ -1344,7 +1334,7 @@ const Admin = () => {
             <UIButton
               onClick={async () => {
                 if (!renameGroup) return;
-                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim(), renameGroup.description);
+                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim());
                 setRenameGroup(null);
               }}
             >Save</UIButton>
