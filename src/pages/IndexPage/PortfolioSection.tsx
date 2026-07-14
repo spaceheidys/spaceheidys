@@ -90,7 +90,6 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
 
     // Build the wallpaper pool (single + rotation), weighted.
     const wallpapersJson = getContent("card_bg_wallpapers") || "";
-    const singleWallpaper = getContent("card_bg_wallpaper") || "";
     const wallpaperPool = useMemo(() => {
       let list: { url: string; weight: number }[] = [];
       try {
@@ -105,11 +104,8 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             .filter((it) => typeof it.url === "string" && it.url.length > 0);
         }
       } catch { /* ignore */ }
-      if (singleWallpaper && !list.some((it) => it.url === singleWallpaper)) {
-        list = [{ url: singleWallpaper, weight: 1 }, ...list];
-      }
       return list;
-    }, [wallpapersJson, singleWallpaper]);
+    }, [wallpapersJson]);
 
     const pickWallpaper = (list: { url: string; weight: number }[], exclude?: string) => {
       if (list.length === 0) return "";
