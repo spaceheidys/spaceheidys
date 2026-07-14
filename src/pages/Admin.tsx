@@ -878,6 +878,14 @@ const Admin = () => {
               </div>
             </div>
           )}
+        </div>
+        <textarea
+          value={groupDescription}
+          onChange={(e) => setGroupDescription(e.target.value)}
+          placeholder="Optional description applied to all images in the new group…"
+          rows={2}
+          className="w-full bg-transparent text-xs font-display tracking-wider text-foreground placeholder:text-muted-foreground/50 outline-none border border-dashed border-border focus:border-foreground/40 transition-colors resize-y px-2 py-1.5"
+        />
         </div>)}
 
         {/* Bulk select toolbar */}
