@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from "react";
+import { forwardRef, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import taro01Img from "@/assets/TARO_01.png";
@@ -88,11 +88,10 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
 
     const bgOpacity = parseInt(getContent("card_bg_video_opacity") || "40", 10) / 100;
 
-    // Wallpaper: pick a random one from the list (fallback to single wallpaper).
-    // Recomputes per mount (= per page load / refresh) and when the list changes.
+    // Build the wallpaper pool (single + rotation), weighted.
     const wallpapersJson = getContent("card_bg_wallpapers") || "";
     const singleWallpaper = getContent("card_bg_wallpaper") || "";
-    const activeWallpaper = useMemo(() => {
+    const wallpaperPool = useMemo(() => {
       let list: { url: string; weight: number }[] = [];
       try {
         const parsed = JSON.parse(wallpapersJson || "[]");
@@ -109,16 +108,41 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
       if (singleWallpaper && !list.some((it) => it.url === singleWallpaper)) {
         list = [{ url: singleWallpaper, weight: 1 }, ...list];
       }
+      return list;
+    }, [wallpapersJson, singleWallpaper]);
+
+    const pickWallpaper = (list: { url: string; weight: number }[], exclude?: string) => {
       if (list.length === 0) return "";
-      const total = list.reduce((s, w) => s + Math.max(0, Number(w.weight) || 0), 0);
-      if (total <= 0) return list[Math.floor(Math.random() * list.length)].url;
+      let pool = list;
+      if (exclude && list.length > 1) pool = list.filter((w) => w.url !== exclude);
+      const total = pool.reduce((s, w) => s + Math.max(0, Number(w.weight) || 0), 0);
+      if (total <= 0) return pool[Math.floor(Math.random() * pool.length)].url;
       let r = Math.random() * total;
-      for (const w of list) {
+      for (const w of pool) {
         r -= Math.max(0, Number(w.weight) || 0);
         if (r <= 0) return w.url;
       }
-      return list[list.length - 1].url;
-    }, [wallpapersJson, singleWallpaper]);
+      return pool[pool.length - 1].url;
+    };
+
+    const rotateEnabled = getContent("card_bg_wallpaper_rotate") === "on";
+    const rotateInterval = Math.max(5, parseInt(getContent("card_bg_wallpaper_rotate_interval") || "60", 10) || 60);
+
+    const [activeWallpaper, setActiveWallpaper] = useState<string>(() => pickWallpaper(wallpaperPool));
+
+    // Re-seed when pool changes
+    useEffect(() => {
+      setActiveWallpaper((cur) => (wallpaperPool.some((w) => w.url === cur) ? cur : pickWallpaper(wallpaperPool)));
+    }, [wallpaperPool]);
+
+    // Timed rotation
+    useEffect(() => {
+      if (!rotateEnabled || wallpaperPool.length < 2) return;
+      const id = setInterval(() => {
+        setActiveWallpaper((cur) => pickWallpaper(wallpaperPool, cur));
+      }, rotateInterval * 1000);
+      return () => clearInterval(id);
+    }, [rotateEnabled, rotateInterval, wallpaperPool]);
 
     return (
       <>
@@ -151,12 +175,18 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
               playsInline
             />
           ) : getContent("card_bg_type") === "wallpaper" && activeWallpaper ? (
-            <img
-              src={activeWallpaper}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ opacity: bgOpacity }}
-            />
+            <AnimatePresence mode="sync">
+              <motion.img
+                key={activeWallpaper}
+                src={activeWallpaper}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: bgOpacity }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              />
+            </AnimatePresence>
           ) : (
             <PolygonBackground triggerKey={flipCount} />
           )}
