@@ -591,6 +591,38 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
               <p className="text-[10px] text-muted-foreground/60 font-display tracking-wider">
                 On each page refresh, one wallpaper is chosen at random from the list (the main wallpaper above is included).
               </p>
+              <div className="flex items-center justify-between gap-2 py-2 border-t border-border/40">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">
+                    Auto rotate
+                  </span>
+                  <span className="text-[9px] text-muted-foreground/60 font-display tracking-wider">
+                    Cycles wallpapers on a timer while the page is open.
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <input
+                    type="number"
+                    min={5}
+                    step={1}
+                    value={rotateInterval}
+                    onChange={(e) => setRotateInterval(Math.max(5, parseInt(e.target.value || "60", 10) || 60))}
+                    onBlur={handleSaveRotateInterval}
+                    className="w-16 bg-transparent border border-border px-2 py-1 text-[10px] text-foreground focus:outline-none focus:border-foreground transition-colors"
+                  />
+                  <span className="text-[9px] text-muted-foreground/60 font-display">sec</span>
+                  <button
+                    onClick={handleToggleRotate}
+                    className={`px-3 py-1 text-[10px] font-display tracking-[0.2em] uppercase transition-colors border ${
+                      rotateOn
+                        ? "border-foreground text-foreground"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {rotateOn ? "On" : "Off"}
+                  </button>
+                </div>
+              </div>
               {bgWallpapers.length > 0 && (() => {
                 const totalW = bgWallpapers.reduce((s, w) => s + (Number(w.weight) || 0), 0);
                 return (
