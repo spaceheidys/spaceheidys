@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Eye, EyeOff } from "lucide-react";
-import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, Edit2, Upload, Loader2 } from "lucide-react";
+import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, Edit2, Upload, Loader2, FolderInput } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +38,7 @@ interface SortableImageCardProps {
   onProjectDateChange?: (date: string) => void;
   onImageReplace?: (newUrl: string) => void;
   onVisibilityChange?: (visible: boolean) => void;
+  onMoveToGroup?: (targetGroupId: string | null, targetSection?: string, targetSub?: string | null) => void | Promise<void>;
 }
 
 const GROUP_COLORS = [
@@ -82,6 +83,7 @@ const SortableImageCard = ({
   onProjectDateChange,
   onImageReplace,
   onVisibilityChange,
+  onMoveToGroup,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
@@ -94,6 +96,9 @@ const SortableImageCard = ({
   const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
   const [pendingReplacePreview, setPendingReplacePreview] = useState<string | null>(null);
   const [uploadingReplace, setUploadingReplace] = useState(false);
+  const [isMoveOpen, setIsMoveOpen] = useState(false);
+  const [availableGroups, setAvailableGroups] = useState<Array<{ group_id: string; section: string; subsection: string | null; count: number; preview: string; sampleTitle: string; description?: string }>>([]);
+  const [loadingGroups, setLoadingGroups] = useState(false);
   const replaceFileRef = useRef<HTMLInputElement>(null);
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
