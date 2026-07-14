@@ -1138,7 +1138,12 @@ const Admin = () => {
                                 }}
                                 className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] cursor-pointer hover:bg-black/30 transition-colors"
                               >
-                                <span className="text-[10px] font-display tracking-widest text-white/90 uppercase mb-1">
+                                {item.title && (
+                                  <span className="text-[11px] font-display tracking-widest text-white uppercase mb-1 px-3 text-center line-clamp-2">
+                                    {item.title}
+                                  </span>
+                                )}
+                                <span className="text-[9px] font-display tracking-widest text-white/60 uppercase mb-1">
                                   GROUP · {groupCount} IMG
                                 </span>
                                 <ChevronDown size={16} className="text-white/70" />
