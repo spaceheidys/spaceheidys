@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, FolderInput, Edit2, ImagePlus } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, Move, FolderInput, Edit2, ImagePlus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input as UIInput } from "@/components/ui/input";
 import { Textarea as UITextarea } from "@/components/ui/textarea";
@@ -68,7 +68,7 @@ const SortableSectionTab = ({ sec, isActive, isVisible, isEditing, editLabel, ed
         className="px-1 py-1.5 text-muted-foreground/40 hover:text-muted-foreground cursor-grab active:cursor-grabbing"
         title="Drag to reorder"
       >
-        <GripVertical size={10} />
+        <Move size={10} />
       </button>
       {isEditing ? (
         <div className="flex items-center gap-1 px-2 py-0.5 border border-foreground">

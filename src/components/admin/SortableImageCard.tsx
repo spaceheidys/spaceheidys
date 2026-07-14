@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Eye, EyeOff } from "lucide-react";
-import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, Edit2, Upload, Loader2, FolderInput } from "lucide-react";
+import { Trash2, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, Edit2, Upload, Loader2, FolderInput } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -201,7 +201,7 @@ const SortableImageCard = ({
         {...listeners}
         className="absolute top-1 left-1 z-10 p-1 bg-black/50 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
       >
-        <GripVertical size={14} className="text-foreground/70" />
+        <Move size={14} className="text-foreground/70" />
       </div>
 
       {/* Zoom slider – top center */}

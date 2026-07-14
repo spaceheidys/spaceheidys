@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, GripVertical, Minus, FolderOpen, Image, RotateCcw, ArrowRightLeft, X, Download, Upload } from "lucide-react";
+import { Plus, Trash2, Loader2, ImagePlus, ChevronDown, ChevronUp, Pencil, Star, Move, Minus, FolderOpen, Image, RotateCcw, ArrowRightLeft, X, Download, Upload } from "lucide-react";
 
 interface Note {
   id: string;
@@ -338,7 +338,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       onDragEnd={handleDragEnd}
     >
       <div className="flex items-center gap-1.5 py-2">
-        <GripVertical size={10} className="flex-shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing" />
+        <Move size={10} className="flex-shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing" />
         <div className="h-[1px] flex-1 bg-border" />
         {editingId === note.id ? (
           <div className="flex items-center gap-1">
@@ -412,7 +412,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       onDragEnd={handleDragEnd}
     >
       <div className="flex items-start gap-1.5 px-1.5 py-1.5 rounded hover:bg-secondary/50 transition-colors">
-        <GripVertical size={10} className="mt-1 flex-shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing" />
+        <Move size={10} className="mt-1 flex-shrink-0 text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing" />
         <button
           onClick={() => toggleStar(note)}
           className={`mt-0.5 flex-shrink-0 transition-colors ${

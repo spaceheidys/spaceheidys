@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import { Upload, Trash2, LogOut, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Eye, EyeOff, Check, X, ChevronUp, ChevronDown, Move } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -103,7 +103,7 @@ const SortableMainSection = ({ id, label, collapsed, onToggleCollapse, children 
           className="text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
           title="Drag to reorder"
         >
-          <GripVertical size={14} />
+          <Move size={14} />
         </button>
         <button
           onClick={onToggleCollapse}
@@ -438,7 +438,7 @@ const AdminMain = () => {
                     {!item.isDefault && handleProps && (
                       <>
                         <button {...handleProps.attributes} {...handleProps.listeners} title="Drag to reorder" className="absolute inset-x-0 top-0 h-8 flex items-center justify-center bg-background/0 hover:bg-background/40 text-muted-foreground/0 hover:text-foreground transition-colors cursor-grab active:cursor-grabbing touch-none">
-                          <GripVertical size={16} />
+                          <Move size={16} />
                         </button>
                         <button onClick={() => setSwapTarget(swapTarget === item.id ? null : item.id)} title="Swap" className={`absolute top-2 left-2 p-1 transition-opacity ${swapTarget === item.id ? "bg-primary text-primary-foreground opacity-100" : "bg-background/80 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"}`}><ArrowUpDown size={14} /></button>
                             {activeSection === "cube" && (() => {

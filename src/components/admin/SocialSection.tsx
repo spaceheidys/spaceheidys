@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff, Trash2, Plus, Loader2, Upload, Check, X, GripVertical } from "lucide-react";
+import { Eye, EyeOff, Trash2, Plus, Loader2, Upload, Check, X, Move } from "lucide-react";
 import { invalidateSocialLinksCache } from "@/hooks/useSocialLinks";
 import {
   DndContext,
@@ -126,7 +126,7 @@ const SortableSocialRow = ({
       {/* Drag handle */}
       <button {...attributes} {...listeners}
         className="text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none shrink-0">
-        <GripVertical size={14} />
+        <Move size={14} />
       </button>
 
       {/* Icon picker */}

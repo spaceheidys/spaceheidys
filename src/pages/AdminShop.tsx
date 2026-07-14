@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
-  Loader2, Plus, Trash2, X, Check, Eye, EyeOff, Upload, GripVertical, Pencil,
+  Loader2, Plus, Trash2, X, Check, Eye, EyeOff, Upload, Move, Pencil,
 } from "lucide-react";
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent,
@@ -75,7 +75,7 @@ const SortableRow = ({
         {...listeners}
         className="text-muted-foreground/40 hover:text-muted-foreground cursor-grab active:cursor-grabbing"
       >
-        <GripVertical size={14} />
+        <Move size={14} />
       </button>
       <div className="w-12 h-12 bg-muted border border-border shrink-0 overflow-hidden">
         {item.main_image ? (

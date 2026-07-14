@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Trash2, Loader2, GripVertical, Eye, EyeOff } from "lucide-react";
+import { Upload, Trash2, Loader2, Move, Eye, EyeOff } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -57,7 +57,7 @@ const SortableSkillRow = ({
       className="flex items-center gap-3 border border-border px-3 py-2 group"
     >
       <div {...attributes} {...listeners} className="cursor-grab text-muted-foreground/40 hover:text-muted-foreground">
-        <GripVertical size={14} />
+        <Move size={14} />
       </div>
 
       {/* Icon preview + upload */}
