@@ -605,14 +605,16 @@ const Admin = () => {
     else toast.success(newVisible ? "Folder shown" : "Folder hidden");
   };
 
-  const handleGroupRename = async (groupId: string, title: string, description: string) => {
-    const { error } = await supabase.from("portfolio_items").update({ title, description } as any).eq("group_id", groupId);
+  // Renames the folder title for all group members. Per-image "About Project"
+  // (description) is intentionally NOT touched here — that field is per image.
+  const handleGroupRename = async (groupId: string, title: string) => {
+    const { error } = await supabase.from("portfolio_items").update({ title } as any).eq("group_id", groupId);
     if (error) { toast.error("Rename failed"); return; }
-    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title, description } as any) : i));
-    toast.success("Folder updated");
+    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title } as any) : i));
+    toast.success("Folder renamed");
   };
 
-  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string; description: string } | null>(null);
+  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string } | null>(null);
   const groupAddFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -1182,7 +1184,7 @@ const Admin = () => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const sample = groupItemsAll[0] as any;
-                                    setRenameGroup({ groupId: gid, title: sample?.title || "", description: sample?.description || "" });
+                                    setRenameGroup({ groupId: gid, title: sample?.title || "" });
                                   }}
                                   className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
                                   title="Rename folder / edit info"
