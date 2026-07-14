@@ -43,6 +43,8 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [bgWallpaper, setBgWallpaper] = useState("");
   const [bgWallpapers, setBgWallpapers] = useState<{ url: string; weight: number }[]>([]);
   const [textRevealAnimation, setTextRevealAnimation] = useState(true);
+  const [rotateOn, setRotateOn] = useState(false);
+  const [rotateInterval, setRotateInterval] = useState(60);
   const [bgOpacity, setBgOpacity] = useState(40);
   const [uploading, setUploading] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<string | null>(null);
@@ -139,6 +141,8 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     } catch { setBgWallpapers([]); }
     setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
     setTextRevealAnimation(get("text_reveal_animation") !== "off");
+    setRotateOn(get("card_bg_wallpaper_rotate") === "on");
+    setRotateInterval(Math.max(5, parseInt(get("card_bg_wallpaper_rotate_interval") || "60", 10) || 60));
   }, [get]);
 
   const handleSave = async () => {
@@ -295,6 +299,19 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setTextRevealAnimation(next);
     await update("text_reveal_animation", next ? "on" : "off");
     toast.success(next ? "Animated reveal enabled" : "Animated reveal disabled");
+  };
+
+  const handleToggleRotate = async () => {
+    const next = !rotateOn;
+    setRotateOn(next);
+    await update("card_bg_wallpaper_rotate", next ? "on" : "off");
+    toast.success(next ? "Wallpaper rotation enabled" : "Wallpaper rotation disabled");
+  };
+
+  const handleSaveRotateInterval = async () => {
+    const v = Math.max(5, Math.round(rotateInterval) || 60);
+    setRotateInterval(v);
+    await update("card_bg_wallpaper_rotate_interval", String(v));
   };
 
   // Preview wallpaper: if rotation has items, show a random one; otherwise the single main wallpaper
