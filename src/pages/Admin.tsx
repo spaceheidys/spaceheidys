@@ -1297,23 +1297,29 @@ const Admin = () => {
 
             {/* CMS Pagination */}
             {items.length > 0 && (
-              <div className="flex items-center justify-center gap-4 mt-6">
+              <div className="flex items-center justify-center gap-3 mt-6 pb-4">
                 <button
+                  type="button"
+                  aria-label="Previous CMS page"
+                  title="Previous page"
                   onClick={() => setCmsPage((p) => Math.max(0, p - 1))}
                   disabled={cmsPage === 0}
-                  className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                  className="flex h-8 w-8 items-center justify-center border border-border bg-secondary/70 text-foreground hover:border-foreground hover:bg-muted disabled:opacity-40 disabled:hover:border-border disabled:hover:bg-secondary/70 transition-colors"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
                 </button>
-                <span className="text-[10px] font-display tracking-widest text-muted-foreground">
+                <span className="min-w-16 text-center text-[11px] font-display tracking-widest text-foreground">
                   {cmsPage + 1} / {totalCmsPages}
                 </span>
                 <button
+                  type="button"
+                  aria-label="Next CMS page"
+                  title="Next page"
                   onClick={() => setCmsPage((p) => Math.min(totalCmsPages - 1, p + 1))}
                   disabled={cmsPage >= totalCmsPages - 1}
-                  className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+                  className="flex h-8 w-8 items-center justify-center border border-border bg-secondary/70 text-foreground hover:border-foreground hover:bg-muted disabled:opacity-40 disabled:hover:border-border disabled:hover:bg-secondary/70 transition-colors"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
                 </button>
               </div>
             )}
