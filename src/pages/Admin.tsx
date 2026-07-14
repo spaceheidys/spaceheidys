@@ -1284,21 +1284,21 @@ const Admin = () => {
             </DndContext>
 
             {/* CMS Pagination */}
-            {items.length > CMS_ITEMS_PER_PAGE && (
+            {items.length > 0 && (
               <div className="flex items-center justify-center gap-4 mt-6">
                 <button
                   onClick={() => setCmsPage((p) => Math.max(0, p - 1))}
-                  disabled={cmsPage === 0}
+                  disabled={cmsPage === 0 || items.length <= CMS_ITEMS_PER_PAGE}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <span className="text-[10px] font-display tracking-widest text-muted-foreground">
-                  {cmsPage + 1} / {Math.ceil(items.length / CMS_ITEMS_PER_PAGE)}
+                  {items.length <= CMS_ITEMS_PER_PAGE ? 1 : cmsPage + 1} / {Math.max(1, Math.ceil(items.length / CMS_ITEMS_PER_PAGE))}
                 </span>
                 <button
                   onClick={() => setCmsPage((p) => Math.min(Math.ceil(items.length / CMS_ITEMS_PER_PAGE) - 1, p + 1))}
-                  disabled={cmsPage >= Math.ceil(items.length / CMS_ITEMS_PER_PAGE) - 1}
+                  disabled={cmsPage >= Math.ceil(items.length / CMS_ITEMS_PER_PAGE) - 1 || items.length <= CMS_ITEMS_PER_PAGE}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
                 >
                   <ChevronRight className="w-5 h-5" />
