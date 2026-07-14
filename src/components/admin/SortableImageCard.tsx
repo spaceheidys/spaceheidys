@@ -536,20 +536,20 @@ const SortableImageCard = ({
 
           <div className="grid gap-4 py-2">
             <div className="grid gap-2">
-              <Label htmlFor="edit-desc">About Project</Label>
-              <Textarea
-                id="edit-desc"
-                value={modalData.description}
-                onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
-                rows={4}
-              />
-            </div>
-            <div className="grid gap-2">
               <Label htmlFor="edit-title">Title</Label>
               <Input
                 id="edit-title"
                 value={modalData.title}
                 onChange={(e) => setModalData({ ...modalData, title: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-desc">About Project <span className="text-[10px] text-muted-foreground/70 font-normal">(per-image caption — shown under this image)</span></Label>
+              <Textarea
+                id="edit-desc"
+                value={modalData.description}
+                onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
+                rows={4}
               />
             </div>
             {showProjectUrl && (
@@ -564,21 +564,21 @@ const SortableImageCard = ({
               </div>
             )}
             <div className="grid gap-2">
-              <Label htmlFor="edit-tags">Tags (comma separated)</Label>
-              <Input
-                id="edit-tags"
-                value={modalData.tags}
-                onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
-                placeholder="tag1, tag2..."
-              />
-            </div>
-            <div className="grid gap-2">
               <Label htmlFor="edit-date">Date / Year</Label>
               <Input
                 id="edit-date"
                 value={modalData.project_date}
                 onChange={(e) => setModalData({ ...modalData, project_date: e.target.value })}
                 placeholder="e.g. 2024"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-tags">Tags (comma separated)</Label>
+              <Input
+                id="edit-tags"
+                value={modalData.tags}
+                onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
+                placeholder="tag1, tag2..."
               />
             </div>
           </div>
