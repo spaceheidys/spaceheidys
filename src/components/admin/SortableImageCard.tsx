@@ -595,6 +595,52 @@ const SortableImageCard = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Move to Group Dialog */}
+      <Dialog open={isMoveOpen} onOpenChange={setIsMoveOpen}>
+        <DialogContent className="sm:max-w-[560px] max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>Move image to another group</DialogTitle>
+            <DialogDescription>Pick a target group. The image will be moved (and its section will update if needed).</DialogDescription>
+          </DialogHeader>
+          {loadingGroups ? (
+            <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 max-h-[55vh] overflow-y-auto pr-1">
+              {group_id && (
+                <button
+                  onClick={async () => { await onMoveToGroup?.(null); setIsMoveOpen(false); }}
+                  className="col-span-2 flex items-center gap-2 border border-dashed border-border p-2 hover:border-foreground/50 transition-colors text-left"
+                >
+                  <X size={14} className="text-muted-foreground" />
+                  <span className="text-[11px] font-display tracking-widest uppercase text-muted-foreground">Remove from current group</span>
+                </button>
+              )}
+              {availableGroups.filter(g => g.group_id !== group_id).map((g) => (
+                <button
+                  key={g.group_id}
+                  onClick={async () => { await onMoveToGroup?.(g.group_id, g.section, g.subsection); setIsMoveOpen(false); }}
+                  className="flex items-center gap-2 border border-border p-2 hover:border-foreground transition-colors text-left"
+                >
+                  <img src={g.preview} alt="" className="w-12 h-12 object-cover flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-display tracking-widest uppercase text-foreground truncate">{g.sampleTitle}</div>
+                    <div className="text-[9px] font-display tracking-widest uppercase text-muted-foreground truncate">
+                      {g.section}{g.subsection ? ` · ${g.subsection}` : ""} · {g.count} img
+                    </div>
+                  </div>
+                </button>
+              ))}
+              {availableGroups.filter(g => g.group_id !== group_id).length === 0 && !group_id && (
+                <p className="col-span-2 text-center text-xs text-muted-foreground py-8 font-display tracking-widest">No other groups yet</p>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsMoveOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
