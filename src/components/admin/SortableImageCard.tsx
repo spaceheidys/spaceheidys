@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Eye, EyeOff } from "lucide-react";
-import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, Edit2, Upload, Loader2 } from "lucide-react";
+import { Trash2, GripVertical, Move, ZoomIn, ZoomOut, AlignLeft, AlignCenter, AlignRight, Link, Check, X, Edit2, Upload, Loader2, FolderInput } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +38,7 @@ interface SortableImageCardProps {
   onProjectDateChange?: (date: string) => void;
   onImageReplace?: (newUrl: string) => void;
   onVisibilityChange?: (visible: boolean) => void;
+  onMoveToGroup?: (targetGroupId: string | null, targetSection?: string, targetSub?: string | null) => void | Promise<void>;
 }
 
 const GROUP_COLORS = [
@@ -82,6 +83,7 @@ const SortableImageCard = ({
   onProjectDateChange,
   onImageReplace,
   onVisibilityChange,
+  onMoveToGroup,
 }: SortableImageCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const [isPanning, setIsPanning] = useState(false);
@@ -94,6 +96,9 @@ const SortableImageCard = ({
   const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
   const [pendingReplacePreview, setPendingReplacePreview] = useState<string | null>(null);
   const [uploadingReplace, setUploadingReplace] = useState(false);
+  const [isMoveOpen, setIsMoveOpen] = useState(false);
+  const [availableGroups, setAvailableGroups] = useState<Array<{ group_id: string; section: string; subsection: string | null; count: number; preview: string; sampleTitle: string; description?: string }>>([]);
+  const [loadingGroups, setLoadingGroups] = useState(false);
   const replaceFileRef = useRef<HTMLInputElement>(null);
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -258,6 +263,46 @@ const SortableImageCard = ({
       >
         {is_visible ? <Eye size={14} className="text-foreground/70" /> : <EyeOff size={14} className="text-destructive/70" />}
       </div>
+
+      {/* Move to Group Button */}
+      {onMoveToGroup && (
+        <div
+          onClick={async (e) => {
+            e.stopPropagation();
+            setIsMoveOpen(true);
+            setLoadingGroups(true);
+            const { data } = await supabase
+              .from("portfolio_items")
+              .select("group_id, section, subsection, image_url, title, description")
+              .not("group_id", "is", null)
+              .order("created_at", { ascending: true });
+            const map = new Map<string, { group_id: string; section: string; subsection: string | null; count: number; preview: string; sampleTitle: string; description?: string }>();
+            (data || []).forEach((row: any) => {
+              if (!row.group_id) return;
+              const existing = map.get(row.group_id);
+              if (existing) {
+                existing.count += 1;
+              } else {
+                map.set(row.group_id, {
+                  group_id: row.group_id,
+                  section: row.section,
+                  subsection: row.subsection,
+                  count: 1,
+                  preview: row.image_url,
+                  sampleTitle: row.title,
+                  description: row.description,
+                });
+              }
+            });
+            setAvailableGroups(Array.from(map.values()));
+            setLoadingGroups(false);
+          }}
+          className="absolute top-[116px] right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
+          title="Move to another group"
+        >
+          <FolderInput size={14} className="text-foreground/70" />
+        </div>
+      )}
 
       {/* Delete confirmation overlay */}
       {confirmDelete && (
@@ -547,6 +592,52 @@ const SortableImageCard = ({
               if (showProjectUrl && onProjectUrlChange) onProjectUrlChange(modalData.project_url.trim());
               setIsEditModalOpen(false);
             }}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Move to Group Dialog */}
+      <Dialog open={isMoveOpen} onOpenChange={setIsMoveOpen}>
+        <DialogContent className="sm:max-w-[560px] max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>Move image to another group</DialogTitle>
+            <DialogDescription>Pick a target group. The image will be moved (and its section will update if needed).</DialogDescription>
+          </DialogHeader>
+          {loadingGroups ? (
+            <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 max-h-[55vh] overflow-y-auto pr-1">
+              {group_id && (
+                <button
+                  onClick={async () => { await onMoveToGroup?.(null); setIsMoveOpen(false); }}
+                  className="col-span-2 flex items-center gap-2 border border-dashed border-border p-2 hover:border-foreground/50 transition-colors text-left"
+                >
+                  <X size={14} className="text-muted-foreground" />
+                  <span className="text-[11px] font-display tracking-widest uppercase text-muted-foreground">Remove from current group</span>
+                </button>
+              )}
+              {availableGroups.filter(g => g.group_id !== group_id).map((g) => (
+                <button
+                  key={g.group_id}
+                  onClick={async () => { await onMoveToGroup?.(g.group_id, g.section, g.subsection); setIsMoveOpen(false); }}
+                  className="flex items-center gap-2 border border-border p-2 hover:border-foreground transition-colors text-left"
+                >
+                  <img src={g.preview} alt="" className="w-12 h-12 object-cover flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-display tracking-widest uppercase text-foreground truncate">{g.sampleTitle}</div>
+                    <div className="text-[9px] font-display tracking-widest uppercase text-muted-foreground truncate">
+                      {g.section}{g.subsection ? ` · ${g.subsection}` : ""} · {g.count} img
+                    </div>
+                  </div>
+                </button>
+              ))}
+              {availableGroups.filter(g => g.group_id !== group_id).length === 0 && !group_id && (
+                <p className="col-span-2 text-center text-xs text-muted-foreground py-8 font-display tracking-widest">No other groups yet</p>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsMoveOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

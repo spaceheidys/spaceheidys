@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, GripVertical, FolderInput } from "lucide-react";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import {
@@ -321,6 +321,7 @@ const Admin = () => {
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [cmsPage, setCmsPage] = useState(0);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [groupDescription, setGroupDescription] = useState("");
   const [cmsPageSize, setCmsPageSize] = useState<number>(() => {
     const v = parseInt(localStorage.getItem("admin_cms_page_size") || "12", 10);
     return [12, 24, 36].includes(v) ? v : 12;
@@ -370,7 +371,7 @@ const Admin = () => {
     setCmsPage(0);
   }, [activeSection, activeSub, user, isAdmin]);
 
-  const uploadFiles = async (files: File[], grouped: boolean) => {
+  const uploadFiles = async (files: File[], grouped: boolean, groupDesc?: string) => {
     setUploading(true);
     const uploadedItems: PortfolioItem[] = [];
     const groupId = grouped ? crypto.randomUUID() : null;
@@ -410,6 +411,9 @@ const Admin = () => {
         created_by: user?.id,
       };
       if (groupId) insertData.group_id = groupId;
+      if (groupId && groupDesc && groupDesc.trim()) {
+        insertData.description = groupDesc.trim();
+      }
 
       const { data, error } = await supabase
         .from("portfolio_items")
@@ -444,7 +448,8 @@ const Admin = () => {
       e.target.value = "";
       return;
     }
-    await uploadFiles(Array.from(files), true);
+    await uploadFiles(Array.from(files), true, groupDescription);
+    setGroupDescription("");
     e.target.value = "";
   };
 
@@ -698,7 +703,8 @@ const Admin = () => {
         )}
 
         {/* Upload area */}
-        {activeSection !== "share" && activeSection !== "skills" && (<div className="flex gap-3 mb-6">
+        {activeSection !== "share" && activeSection !== "skills" && (<div className="flex flex-col gap-2 mb-6">
+        <div className="flex gap-3">
           <label className="flex-1 flex items-center justify-center gap-2 border border-dashed border-border hover:border-foreground/30 transition-colors py-6 cursor-pointer">
             {uploading ? (
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
@@ -872,6 +878,14 @@ const Admin = () => {
               </div>
             </div>
           )}
+        </div>
+        <textarea
+          value={groupDescription}
+          onChange={(e) => setGroupDescription(e.target.value)}
+          placeholder="Optional description applied to all images in the new group…"
+          rows={2}
+          className="w-full bg-transparent text-xs font-display tracking-wider text-foreground placeholder:text-muted-foreground/50 outline-none border border-dashed border-border focus:border-foreground/40 transition-colors resize-y px-2 py-1.5"
+        />
         </div>)}
 
         {/* Bulk select toolbar */}
@@ -1142,6 +1156,18 @@ const Admin = () => {
                             const { error } = await supabase.from("portfolio_items").update({ image_url: newUrl }).eq("id", item.id);
                             if (!error) {
                               setItems(prev => prev.map(i => i.id === item.id ? { ...i, image_url: newUrl } : i));
+                            }
+                          }}
+                          onMoveToGroup={async (targetGroupId, targetSection, targetSub) => {
+                            const updateData: any = { group_id: targetGroupId };
+                            if (targetSection) updateData.section = targetSection;
+                            if (targetSection === "gallery") updateData.subsection = targetSub ?? null;
+                            const { error } = await supabase.from("portfolio_items").update(updateData).eq("id", item.id);
+                            if (error) {
+                              toast.error("Move failed");
+                            } else {
+                              toast.success(targetGroupId ? "Moved to group" : "Removed from group");
+                              fetchItems();
                             }
                           }}
                         />
