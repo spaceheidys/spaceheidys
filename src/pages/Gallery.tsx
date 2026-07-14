@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useGallerySubs } from "@/hooks/useGallerySubs";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, X, ChevronLeft, ChevronRight, Heart, Copy } from "lucide-react";
+import { ArrowLeft, ArrowUp, X, ChevronLeft, ChevronRight, Heart, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
@@ -112,6 +112,27 @@ const Gallery = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const { toggle, isFavorite } = useFavorites();
   const touchStartX = useRef<number | null>(null);
+  const groupScrollRef = useRef<HTMLDivElement | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // When lightbox opens for a group, reset scroll-top state
+  useEffect(() => {
+    setShowScrollTop(false);
+  }, [selectedEntry?.id]);
+
+  const handleGroupScroll = useCallback(() => {
+    const el = groupScrollRef.current;
+    if (!el) return;
+    // "close X" appears in view when we're near the bottom of the scroll container
+    const remaining = el.scrollHeight - (el.scrollTop + el.clientHeight);
+    setShowScrollTop(remaining < 120);
+  }, []);
+
+  const scrollGroupToTop = useCallback(() => {
+    const el = groupScrollRef.current;
+    if (!el) return;
+    el.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
   const { visibility } = useSectionSettings();
   const shareVisible = visibility.share;
 
@@ -355,6 +376,8 @@ const Gallery = () => {
 
             <motion.div
               key={selectedEntry.id}
+              ref={isGroup ? groupScrollRef : undefined}
+              onScroll={isGroup ? handleGroupScroll : undefined}
               className={`relative ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -364,15 +387,35 @@ const Gallery = () => {
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
             >
-              {/* Back button */}
-              <button
-                onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
-                className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-200 text-[9px] font-display tracking-[0.2em] uppercase"
-                aria-label="Back"
-              >
-                <ArrowLeft className="w-3 h-3" />
-                <span className="hidden sm:inline">Back</span>
-              </button>
+              {/* Back button — sticky on mobile inside group scroller so it follows the scroll */}
+              {isGroup ? (
+                <div className="sticky top-3 left-3 z-20 self-start pointer-events-none">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (showScrollTop) scrollGroupToTop();
+                      else setSelectedEntry(null);
+                    }}
+                    className="pointer-events-auto ml-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-all duration-500 text-[9px] font-display tracking-[0.2em] uppercase backdrop-blur-sm"
+                    aria-label={showScrollTop ? "Scroll to top" : "Back"}
+                  >
+                    <span className="relative w-3 h-3 flex items-center justify-center">
+                      <ArrowLeft className={`w-3 h-3 absolute transition-all duration-500 ${showScrollTop ? "opacity-0 -rotate-90" : "opacity-100 rotate-0"}`} />
+                      <ArrowUp className={`w-3 h-3 absolute transition-all duration-500 ${showScrollTop ? "opacity-100 rotate-0" : "opacity-0 rotate-90"}`} />
+                    </span>
+                    <span className="hidden sm:inline">{showScrollTop ? "Top" : "Back"}</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
+                  className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-200 text-[9px] font-display tracking-[0.2em] uppercase"
+                  aria-label="Back"
+                >
+                  <ArrowLeft className="w-3 h-3" />
+                  <span className="hidden sm:inline">Back</span>
+                </button>
+              )}
 
               {isGroup ? (
                 <div className="flex flex-col gap-6">
