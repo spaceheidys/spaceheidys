@@ -264,6 +264,46 @@ const SortableImageCard = ({
         {is_visible ? <Eye size={14} className="text-foreground/70" /> : <EyeOff size={14} className="text-destructive/70" />}
       </div>
 
+      {/* Move to Group Button */}
+      {onMoveToGroup && (
+        <div
+          onClick={async (e) => {
+            e.stopPropagation();
+            setIsMoveOpen(true);
+            setLoadingGroups(true);
+            const { data } = await supabase
+              .from("portfolio_items")
+              .select("group_id, section, subsection, image_url, title, description")
+              .not("group_id", "is", null)
+              .order("created_at", { ascending: true });
+            const map = new Map<string, { group_id: string; section: string; subsection: string | null; count: number; preview: string; sampleTitle: string; description?: string }>();
+            (data || []).forEach((row: any) => {
+              if (!row.group_id) return;
+              const existing = map.get(row.group_id);
+              if (existing) {
+                existing.count += 1;
+              } else {
+                map.set(row.group_id, {
+                  group_id: row.group_id,
+                  section: row.section,
+                  subsection: row.subsection,
+                  count: 1,
+                  preview: row.image_url,
+                  sampleTitle: row.title,
+                  description: row.description,
+                });
+              }
+            });
+            setAvailableGroups(Array.from(map.values()));
+            setLoadingGroups(false);
+          }}
+          className="absolute top-[116px] right-1 z-10 p-1 rounded bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-black/70"
+          title="Move to another group"
+        >
+          <FolderInput size={14} className="text-foreground/70" />
+        </div>
+      )}
+
       {/* Delete confirmation overlay */}
       {confirmDelete && (
         <div className="absolute inset-0 z-20 bg-black/60 flex items-center justify-center">
