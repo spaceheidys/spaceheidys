@@ -1302,6 +1302,49 @@ const Admin = () => {
         ))}
       </div>
 
+      {/* Rename folder / group info dialog */}
+      <Dialog open={!!renameGroup} onOpenChange={(o) => { if (!o) setRenameGroup(null); }}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle>Rename folder</DialogTitle>
+            <DialogDescription>Updates the title and description for every image in this folder.</DialogDescription>
+          </DialogHeader>
+          {renameGroup && (
+            <div className="grid gap-4 py-2">
+              <div className="grid gap-2">
+                <UILabel htmlFor="rename-title">Title</UILabel>
+                <UIInput
+                  id="rename-title"
+                  value={renameGroup.title}
+                  onChange={(e) => setRenameGroup({ ...renameGroup, title: e.target.value })}
+                  placeholder="Folder title"
+                />
+              </div>
+              <div className="grid gap-2">
+                <UILabel htmlFor="rename-desc">Description / project info</UILabel>
+                <UITextarea
+                  id="rename-desc"
+                  value={renameGroup.description}
+                  onChange={(e) => setRenameGroup({ ...renameGroup, description: e.target.value })}
+                  rows={5}
+                  placeholder="About this project…"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <UIButton variant="outline" onClick={() => setRenameGroup(null)}>Cancel</UIButton>
+            <UIButton
+              onClick={async () => {
+                if (!renameGroup) return;
+                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim(), renameGroup.description);
+                setRenameGroup(null);
+              }}
+            >Save</UIButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };
