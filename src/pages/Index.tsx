@@ -37,6 +37,7 @@ const getTimeOfDay = (date = new Date()): TimeOfDay => {
 const Index = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(() => !sessionStorage.getItem("loaded"));
+  const [loadProgress, setLoadProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
@@ -163,6 +164,69 @@ const Index = () => {
     const id = setInterval(() => setTod(getTimeOfDay()), 60_000);
     return () => clearInterval(id);
   }, []);
+
+  // Preload all site imagery before dismissing the loading screen
+  useEffect(() => {
+    if (!loading) return;
+    if (contentLoading) return;
+    let cancelled = false;
+
+    const gather = async () => {
+      const urls = new Set<string>();
+      DEFAULT_BG_OPTIONS.forEach((u) => urls.add(u));
+      // Backgrounds
+      try {
+        const { data } = await supabase.from("page_backgrounds").select("image_url,is_active");
+        (data || []).forEach((b: any) => { if (b.is_active !== false && b.image_url) urls.add(b.image_url); });
+      } catch { /* ignore */ }
+      // Card + wallpapers from section_content
+      const contentKeys = ["card_front_image", "card_back_image", "card_bg_wallpaper", "card_bg_video"];
+      contentKeys.forEach((k) => { const v = getContent(k); if (v && !v.endsWith(".mp4") && !v.endsWith(".webm")) urls.add(v); });
+      try {
+        const front = JSON.parse(getContent("card_front_images") || "[]");
+        if (Array.isArray(front)) front.forEach((it: any) => { const u = typeof it === "string" ? it : it?.url; if (u) urls.add(u); });
+      } catch { /* ignore */ }
+      try {
+        const back = JSON.parse(getContent("card_back_images") || "[]");
+        if (Array.isArray(back)) back.forEach((it: any) => { const u = typeof it === "string" ? it : it?.url; if (u) urls.add(u); });
+      } catch { /* ignore */ }
+      try {
+        const walls = JSON.parse(getContent("card_bg_wallpapers") || "[]");
+        if (Array.isArray(walls)) walls.forEach((it: any) => { const u = typeof it === "string" ? it : it?.url; if (u) urls.add(u); });
+      } catch { /* ignore */ }
+
+      const list = [...urls].filter((u) => /^https?:|^\//.test(u));
+      if (list.length === 0) {
+        if (!cancelled) { setLoadProgress(1); setTimeout(() => { if (!cancelled) { sessionStorage.setItem("loaded", "1"); setLoading(false); } }, 250); }
+        return;
+      }
+      let done = 0;
+      const total = list.length;
+      const bump = () => {
+        done += 1;
+        if (!cancelled) setLoadProgress(done / total);
+      };
+      // hard cap so slow/broken images can't block forever
+      const timeout = new Promise<void>((resolve) => setTimeout(resolve, 12000));
+      const preloads = list.map((url) =>
+        new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => { bump(); resolve(); };
+          img.onerror = () => { bump(); resolve(); };
+          img.src = url;
+        })
+      );
+      await Promise.race([Promise.all(preloads), timeout]);
+      if (!cancelled) {
+        setLoadProgress(1);
+        setTimeout(() => {
+          if (!cancelled) { sessionStorage.setItem("loaded", "1"); setLoading(false); }
+        }, 250);
+      }
+    };
+    gather();
+    return () => { cancelled = true; };
+  }, [loading, contentLoading, getContent]);
 
   // Pick cube background matching current time-of-day (fallback to "any", then first)
   useEffect(() => {
@@ -315,7 +379,7 @@ const Index = () => {
       />
       <AnimatePresence>
         {loading && (
-          <LoadingScreen onComplete={() => { sessionStorage.setItem("loaded", "1"); setLoading(false); }} />
+          <LoadingScreen progress={loadProgress} />
         )}
       </AnimatePresence>
 

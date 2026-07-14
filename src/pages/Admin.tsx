@@ -321,7 +321,11 @@ const Admin = () => {
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [cmsPage, setCmsPage] = useState(0);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
-  const CMS_ITEMS_PER_PAGE = 12;
+  const [cmsPageSize, setCmsPageSize] = useState<number>(() => {
+    const v = parseInt(localStorage.getItem("admin_cms_page_size") || "12", 10);
+    return [12, 24, 36].includes(v) ? v : 12;
+  });
+  const CMS_ITEMS_PER_PAGE = cmsPageSize;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -972,11 +976,10 @@ const Admin = () => {
             {/* Collapse/Expand all groups toggle */}
             {(() => {
               const groupIds = [...new Set(items.filter(i => i.group_id).map(i => i.group_id!))];
-              if (groupIds.length === 0) return null;
-              const allCollapsed = groupIds.every(gid => collapsedGroups.has(gid));
+              const allCollapsed = groupIds.length > 0 && groupIds.every(gid => collapsedGroups.has(gid));
               return (
                 <div className="flex items-center gap-2 mb-3">
-                  <button
+                  {groupIds.length > 0 && (<button
                     onClick={() => {
                       if (allCollapsed) {
                         setCollapsedGroups(new Set());
@@ -988,7 +991,27 @@ const Admin = () => {
                   >
                     {allCollapsed ? <ChevronDown size={10} /> : <ChevronUp size={10} />}
                     {allCollapsed ? "EXPAND ALL GROUPS" : "COLLAPSE ALL GROUPS"}
-                  </button>
+                  </button>)}
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] font-display tracking-[0.15em] uppercase text-muted-foreground">Per page:</span>
+                    {[12, 24, 36].map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => {
+                          setCmsPageSize(n);
+                          setCmsPage(0);
+                          localStorage.setItem("admin_cms_page_size", String(n));
+                        }}
+                        className={`text-[10px] font-display tracking-[0.15em] uppercase px-2 py-1 border transition-colors ${
+                          cmsPageSize === n
+                            ? "border-foreground text-foreground"
+                            : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+                        }`}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               );
             })()}

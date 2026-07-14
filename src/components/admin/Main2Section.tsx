@@ -281,6 +281,21 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setUploading(null);
   };
 
+  const handleReplaceWallpaper = async (file: File, index: number) => {
+    setUploading(`replace_wallpaper_${index}`);
+    const ext = file.name.split(".").pop();
+    const path = `cards/bg_wallpaper_extra_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    const updated = bgWallpapers.map((it, i) => i === index ? { ...it, url } : it);
+    setBgWallpapers(updated);
+    await update("card_bg_wallpapers", JSON.stringify(updated));
+    toast.success("Wallpaper replaced");
+    setUploading(null);
+  };
+
   const handleRemoveWallpaper = async (index: number) => {
     const updated = bgWallpapers.filter((_, i) => i !== index);
     setBgWallpapers(updated);
@@ -366,6 +381,10 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm?.startsWith("remove_wallpaper_")) {
       const idx = parseInt(confirm.replace("remove_wallpaper_", ""), 10);
       if (!isNaN(idx)) await handleRemoveWallpaper(idx);
+    }
+    else if (confirm?.startsWith("replace_wallpaper_") && pendingFile) {
+      const idx = parseInt(confirm.replace("replace_wallpaper_", ""), 10);
+      if (!isNaN(idx)) await handleReplaceWallpaper(pendingFile.file, idx);
     }
     setConfirm(null);
     setPendingFile(null);
@@ -488,68 +507,6 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
 
         {bgType === "wallpaper" && (
           <div className="space-y-2">
-            {(previewWallpaper || bgWallpaper) ? (
-              <div className="relative group border border-border aspect-video overflow-hidden">
-                <img src={previewWallpaper || bgWallpaper} alt="Wallpaper" className="w-full h-full object-cover transition-opacity" style={{ opacity: bgOpacity / 100 }} />
-                <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
-                  {confirm === "upload_card_bg_wallpaper" ? (
-                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                  ) : (
-                    <label className="p-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
-                      {uploading === "card_bg_wallpaper" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                      <input
-                        ref={wallpaperRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) handleFileSelect(f, "card_bg_wallpaper", "upload_card_bg_wallpaper");
-                          if (wallpaperRef.current) wallpaperRef.current.value = "";
-                        }}
-                        disabled={!!uploading}
-                      />
-                    </label>
-                  )}
-                  {confirm === "clear_card_bg_wallpaper" ? (
-                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                  ) : (
-                    <button
-                      onClick={() => askConfirm("clear_card_bg_wallpaper")}
-                      className="p-2 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <>
-                {confirm === "upload_card_bg_wallpaper" ? (
-                  <div className="flex items-center justify-center gap-2 border border-dashed border-foreground aspect-video text-foreground">
-                    <span className="text-xs font-display tracking-[0.2em] uppercase">Upload?</span>
-                    <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
-                  </div>
-                ) : (
-                  <label className="flex items-center justify-center gap-2 border border-dashed border-border aspect-video cursor-pointer text-muted-foreground hover:text-foreground hover:border-foreground transition-colors">
-                    {uploading === "card_bg_wallpaper" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                    <span className="text-xs font-display tracking-[0.2em] uppercase">Upload image</span>
-                    <input
-                      ref={wallpaperRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        if (f) handleFileSelect(f, "card_bg_wallpaper", "upload_card_bg_wallpaper");
-                        if (wallpaperRef.current) wallpaperRef.current.value = "";
-                      }}
-                      disabled={!!uploading}
-                    />
-                  </label>
-                )}
-              </>
-            )}
             <div className="flex items-center gap-3 mt-2">
               <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase shrink-0">Opacity</span>
               <input type="range" min="5" max="100" step="5" value={bgOpacity}
@@ -636,15 +593,31 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
                           <div className="relative group border border-border aspect-video overflow-hidden bg-muted/10">
                             <img src={item.url} alt={`Wallpaper ${i + 1}`} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
-                              {confirm === `remove_wallpaper_${i}` ? (
+                              {confirm === `remove_wallpaper_${i}` || confirm === `replace_wallpaper_${i}` ? (
                                 <ConfirmButtons onYes={executeConfirm} onNo={cancelConfirm} />
                               ) : (
-                                <button
-                                  onClick={() => askConfirm(`remove_wallpaper_${i}`)}
-                                  className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
+                                <div className="flex items-center gap-1">
+                                  <label className="p-1.5 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors cursor-pointer">
+                                    {uploading === `replace_wallpaper_${i}` ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const f = e.target.files?.[0];
+                                        if (f) handleFileSelect(f, `replace_wallpaper_${i}`, `replace_wallpaper_${i}`);
+                                        e.currentTarget.value = "";
+                                      }}
+                                      disabled={!!uploading}
+                                    />
+                                  </label>
+                                  <button
+                                    onClick={() => askConfirm(`remove_wallpaper_${i}`)}
+                                    className="p-1.5 border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
                               )}
                             </div>
                             <span className="absolute bottom-0.5 right-1 text-[8px] text-muted-foreground/60 font-display">{pct}%</span>
