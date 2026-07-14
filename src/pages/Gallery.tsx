@@ -302,7 +302,11 @@ const Gallery = () => {
           </motion.div>
         ) : (
           <motion.div
-            className="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4"
+            className={
+              activeTab === "VECTOR"
+                ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
+                : "columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4"
+            }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
@@ -310,7 +314,11 @@ const Gallery = () => {
             {entries.map((entry, i) => (
               <motion.div
                 key={entry.id}
-                className="break-inside-avoid mb-3 sm:mb-4 group cursor-pointer relative overflow-hidden"
+                className={
+                  activeTab === "VECTOR"
+                    ? "group cursor-pointer relative overflow-hidden"
+                    : "break-inside-avoid mb-3 sm:mb-4 group cursor-pointer relative overflow-hidden"
+                }
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.03 * i, duration: 0.4 }}
