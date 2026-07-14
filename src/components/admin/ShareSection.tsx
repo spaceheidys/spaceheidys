@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff, GripVertical, Trash2, Plus, Loader2, Upload, Check } from "lucide-react";
+import { Eye, EyeOff, Move, Trash2, Plus, Loader2, Upload, Check } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -178,7 +178,7 @@ const SortableRow = ({
         {/* Drag handle */}
         <button {...attributes} {...listeners}
           className="text-muted-foreground/30 hover:text-muted-foreground cursor-grab active:cursor-grabbing touch-none shrink-0">
-          <GripVertical size={14} />
+          <Move size={14} />
         </button>
 
         {/* Icon + visibility */}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical, Plus, Eye, EyeOff, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
+import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, Move, Plus, Eye, EyeOff, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 import taroBackside from "@/assets/Taro_backside.png";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
@@ -1040,7 +1040,7 @@ function SortableSection({ id, label, collapsed, onToggle, children }: {
           {...listeners}
           className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors"
         >
-          <GripVertical size={10} />
+          <Move size={10} />
         </button>
         <button
           onClick={onToggle}
