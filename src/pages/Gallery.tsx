@@ -142,6 +142,7 @@ const Gallery = () => {
         .from("portfolio_items")
         .select("id, title, description, image_url, subsection, group_id")
         .eq("section", "gallery")
+        .eq("is_visible", true as any)
         .order("sort_order", { ascending: true });
 
       if (data) {
