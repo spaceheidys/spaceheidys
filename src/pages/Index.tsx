@@ -37,6 +37,7 @@ const getTimeOfDay = (date = new Date()): TimeOfDay => {
 const Index = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(() => !sessionStorage.getItem("loaded"));
+  const [loadProgress, setLoadProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
@@ -315,7 +316,7 @@ const Index = () => {
       />
       <AnimatePresence>
         {loading && (
-          <LoadingScreen onComplete={() => { sessionStorage.setItem("loaded", "1"); setLoading(false); }} />
+          <LoadingScreen progress={loadProgress} />
         )}
       </AnimatePresence>
 
