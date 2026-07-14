@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useGallerySubs } from "@/hooks/useGallerySubs";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, X, ChevronLeft, ChevronRight, Heart, Copy } from "lucide-react";
+import { ArrowLeft, ArrowUp, X, ChevronLeft, ChevronRight, Heart, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
@@ -112,6 +112,27 @@ const Gallery = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const { toggle, isFavorite } = useFavorites();
   const touchStartX = useRef<number | null>(null);
+  const groupScrollRef = useRef<HTMLDivElement | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // When lightbox opens for a group, reset scroll-top state
+  useEffect(() => {
+    setShowScrollTop(false);
+  }, [selectedEntry?.id]);
+
+  const handleGroupScroll = useCallback(() => {
+    const el = groupScrollRef.current;
+    if (!el) return;
+    // "close X" appears in view when we're near the bottom of the scroll container
+    const remaining = el.scrollHeight - (el.scrollTop + el.clientHeight);
+    setShowScrollTop(remaining < 120);
+  }, []);
+
+  const scrollGroupToTop = useCallback(() => {
+    const el = groupScrollRef.current;
+    if (!el) return;
+    el.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
   const { visibility } = useSectionSettings();
   const shareVisible = visibility.share;
 
