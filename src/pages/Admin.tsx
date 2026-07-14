@@ -321,6 +321,7 @@ const Admin = () => {
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [cmsPage, setCmsPage] = useState(0);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [groupDescription, setGroupDescription] = useState("");
   const [cmsPageSize, setCmsPageSize] = useState<number>(() => {
     const v = parseInt(localStorage.getItem("admin_cms_page_size") || "12", 10);
     return [12, 24, 36].includes(v) ? v : 12;
@@ -370,7 +371,7 @@ const Admin = () => {
     setCmsPage(0);
   }, [activeSection, activeSub, user, isAdmin]);
 
-  const uploadFiles = async (files: File[], grouped: boolean) => {
+  const uploadFiles = async (files: File[], grouped: boolean, groupDesc?: string) => {
     setUploading(true);
     const uploadedItems: PortfolioItem[] = [];
     const groupId = grouped ? crypto.randomUUID() : null;
@@ -410,6 +411,9 @@ const Admin = () => {
         created_by: user?.id,
       };
       if (groupId) insertData.group_id = groupId;
+      if (groupId && groupDesc && groupDesc.trim()) {
+        insertData.description = groupDesc.trim();
+      }
 
       const { data, error } = await supabase
         .from("portfolio_items")
@@ -444,7 +448,8 @@ const Admin = () => {
       e.target.value = "";
       return;
     }
-    await uploadFiles(Array.from(files), true);
+    await uploadFiles(Array.from(files), true, groupDescription);
+    setGroupDescription("");
     e.target.value = "";
   };
 
