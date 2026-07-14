@@ -198,6 +198,36 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     await update("card_front_images", JSON.stringify(updated));
   };
 
+  const handleToggleFrontHidden = async (index: number) => {
+    const updated = frontImages.map((item, i) => i === index ? { ...item, hidden: !item.hidden } : item);
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
+    toast.success(updated[index].hidden ? "Card hidden" : "Card shown");
+  };
+
+  const handleMoveFrontImage = async (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= frontImages.length) return;
+    const updated = [...frontImages];
+    [updated[index], updated[target]] = [updated[target], updated[index]];
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
+  };
+
+  const handleReplaceFrontImage = async (index: number, file: File) => {
+    setUploading(`front_replace_${index}`);
+    const ext = file.name.split(".").pop();
+    const path = `cards/front_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const updated = frontImages.map((item, i) => i === index ? { ...item, url: urlData.publicUrl } : item);
+    setFrontImages(updated);
+    await update("card_front_images", JSON.stringify(updated));
+    setUploading(null);
+    toast.success("Card replaced");
+  };
+
   const handleAddBackImage = async (file: File) => {
     setUploading("card_back_images");
     const ext = file.name.split(".").pop();
