@@ -1158,6 +1158,18 @@ const Admin = () => {
                               setItems(prev => prev.map(i => i.id === item.id ? { ...i, image_url: newUrl } : i));
                             }
                           }}
+                          onMoveToGroup={async (targetGroupId, targetSection, targetSub) => {
+                            const updateData: any = { group_id: targetGroupId };
+                            if (targetSection) updateData.section = targetSection;
+                            if (targetSection === "gallery") updateData.subsection = targetSub ?? null;
+                            const { error } = await supabase.from("portfolio_items").update(updateData).eq("id", item.id);
+                            if (error) {
+                              toast.error("Move failed");
+                            } else {
+                              toast.success(targetGroupId ? "Moved to group" : "Removed from group");
+                              fetchItems();
+                            }
+                          }}
                         />
                       </div>
                     ));
