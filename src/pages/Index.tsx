@@ -184,7 +184,7 @@ const Index = () => {
       contentKeys.forEach((k) => { const v = getContent(k); if (v && !v.endsWith(".mp4") && !v.endsWith(".webm")) urls.add(v); });
       try {
         const front = JSON.parse(getContent("card_front_images") || "[]");
-        if (Array.isArray(front)) front.forEach((it: any) => { const u = typeof it === "string" ? it : it?.url; if (u) urls.add(u); });
+        if (Array.isArray(front)) front.forEach((it: any) => { if (it && typeof it === "object" && it.hidden) return; const u = typeof it === "string" ? it : it?.url; if (u) urls.add(u); });
       } catch { /* ignore */ }
       try {
         const back = JSON.parse(getContent("card_back_images") || "[]");
