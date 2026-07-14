@@ -651,14 +651,14 @@ const Admin = () => {
 
   // Renames the folder title for all group members. Per-image "About Project"
   // (description) is intentionally NOT touched here — that field is per image.
-  const handleGroupRename = async (groupId: string, title: string) => {
-    const { error } = await supabase.from("portfolio_items").update({ title } as any).eq("group_id", groupId);
+  const handleGroupRename = async (groupId: string, title: string, tags: string[], project_date: string) => {
+    const { error } = await supabase.from("portfolio_items").update({ title, tags, project_date } as any).eq("group_id", groupId);
     if (error) { toast.error("Rename failed"); return; }
-    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title } as any) : i));
-    toast.success("Folder renamed");
+    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title, tags, project_date } as any) : i));
+    toast.success("Folder updated");
   };
 
-  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string } | null>(null);
+  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string; tags: string; project_date: string } | null>(null);
   const groupAddFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -1192,7 +1192,12 @@ const Admin = () => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const sample = groupItemsAll[0] as any;
-                                    setRenameGroup({ groupId: gid, title: sample?.title || "" });
+                                    setRenameGroup({
+                                      groupId: gid,
+                                      title: sample?.title || "",
+                                      tags: Array.isArray(sample?.tags) ? sample.tags.join(", ") : "",
+                                      project_date: sample?.project_date || "",
+                                    });
                                   }}
                                   className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
                                   title="Rename folder / edit info"
@@ -1321,7 +1326,7 @@ const Admin = () => {
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle>Rename folder</DialogTitle>
-            <DialogDescription>Renames the folder for every image in it. Per-image "About Project" is edited separately on each image.</DialogDescription>
+            <DialogDescription>Applies to every image in this folder. Per-image "Notes" is edited separately on each image.</DialogDescription>
           </DialogHeader>
           {renameGroup && (
             <div className="grid gap-4 py-2">
@@ -1334,6 +1339,24 @@ const Admin = () => {
                   placeholder="Folder title"
                 />
               </div>
+              <div className="grid gap-2">
+                <UILabel htmlFor="rename-date">Date / Year</UILabel>
+                <UIInput
+                  id="rename-date"
+                  value={renameGroup.project_date}
+                  onChange={(e) => setRenameGroup({ ...renameGroup, project_date: e.target.value })}
+                  placeholder="e.g. 2024"
+                />
+              </div>
+              <div className="grid gap-2">
+                <UILabel htmlFor="rename-tags">Tags (comma separated)</UILabel>
+                <UIInput
+                  id="rename-tags"
+                  value={renameGroup.tags}
+                  onChange={(e) => setRenameGroup({ ...renameGroup, tags: e.target.value })}
+                  placeholder="tag1, tag2..."
+                />
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -1341,7 +1364,8 @@ const Admin = () => {
             <UIButton
               onClick={async () => {
                 if (!renameGroup) return;
-                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim());
+                const tagsArr = renameGroup.tags.split(",").map((t) => t.trim()).filter(Boolean);
+                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim(), tagsArr, renameGroup.project_date.trim());
                 setRenameGroup(null);
               }}
             >Save</UIButton>
