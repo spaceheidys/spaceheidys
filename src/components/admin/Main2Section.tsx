@@ -281,6 +281,21 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setUploading(null);
   };
 
+  const handleReplaceWallpaper = async (file: File, index: number) => {
+    setUploading(`replace_wallpaper_${index}`);
+    const ext = file.name.split(".").pop();
+    const path = `cards/bg_wallpaper_extra_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) { toast.error("Upload failed"); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    const url = urlData.publicUrl;
+    const updated = bgWallpapers.map((it, i) => i === index ? { ...it, url } : it);
+    setBgWallpapers(updated);
+    await update("card_bg_wallpapers", JSON.stringify(updated));
+    toast.success("Wallpaper replaced");
+    setUploading(null);
+  };
+
   const handleRemoveWallpaper = async (index: number) => {
     const updated = bgWallpapers.filter((_, i) => i !== index);
     setBgWallpapers(updated);
@@ -366,6 +381,10 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     else if (confirm?.startsWith("remove_wallpaper_")) {
       const idx = parseInt(confirm.replace("remove_wallpaper_", ""), 10);
       if (!isNaN(idx)) await handleRemoveWallpaper(idx);
+    }
+    else if (confirm?.startsWith("replace_wallpaper_") && pendingFile) {
+      const idx = parseInt(confirm.replace("replace_wallpaper_", ""), 10);
+      if (!isNaN(idx)) await handleReplaceWallpaper(pendingFile.file, idx);
     }
     setConfirm(null);
     setPendingFile(null);
