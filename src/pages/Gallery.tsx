@@ -19,6 +19,8 @@ interface GalleryItem {
   image_url: string;
   subsection: string | null;
   group_id: string | null;
+  tags: string[];
+  project_date: string;
 }
 
 interface GroupImageEntry {
@@ -33,6 +35,8 @@ interface GalleryEntry {
   image_url: string;
   subsection: string | null;
   groupImages?: GroupImageEntry[];
+  tags?: string[];
+  project_date?: string;
 }
 
 const SWIPE_THRESHOLD = 50;
@@ -140,7 +144,7 @@ const Gallery = () => {
     const fetch = async () => {
       const { data } = await supabase
         .from("portfolio_items")
-        .select("id, title, description, image_url, subsection, group_id")
+        .select("id, title, description, image_url, subsection, group_id, tags, project_date")
         .eq("section", "gallery")
         .eq("is_visible", true as any)
         .order("sort_order", { ascending: true });
@@ -154,6 +158,8 @@ const Gallery = () => {
             image_url: d.image_url,
             subsection: d.subsection,
             group_id: d.group_id || null,
+            tags: Array.isArray(d.tags) ? d.tags : [],
+            project_date: d.project_date || "",
           }))
         );
       }
@@ -183,6 +189,8 @@ const Gallery = () => {
           image_url: item.image_url,
           subsection: item.subsection,
           groupImages: groupItems.map((g) => ({ url: g.image_url, description: g.description })).filter((g) => g.url),
+          tags: item.tags,
+          project_date: item.project_date,
         });
       } else {
         result.push({
@@ -191,6 +199,8 @@ const Gallery = () => {
           description: item.description,
           image_url: item.image_url,
           subsection: item.subsection,
+          tags: item.tags,
+          project_date: item.project_date,
         });
       }
     }
@@ -443,6 +453,15 @@ const Gallery = () => {
                       )}
                     </div>
                   ))}
+                  {/* Project meta */}
+                  {((selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
+                    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-2 text-[10px] sm:text-xs text-white/50 font-display tracking-wider">
+                      {selectedEntry.tags?.map((t, i) => (
+                        <span key={i}>#{t}</span>
+                      ))}
+                      {selectedEntry.project_date && <span>{selectedEntry.project_date}</span>}
+                    </div>
+                  )}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 py-2">
                     {shareVisible && <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />}
@@ -476,6 +495,15 @@ const Gallery = () => {
                     <p className="text-[11px] sm:text-xs text-white/60 font-display tracking-wide leading-relaxed max-w-[75vw] px-2 text-center">
                       {selectedEntry.description}
                     </p>
+                  )}
+                  {/* Project meta */}
+                  {((selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
+                    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-1 text-[10px] sm:text-xs text-white/50 font-display tracking-wider">
+                      {selectedEntry.tags?.map((t, i) => (
+                        <span key={i}>#{t}</span>
+                      ))}
+                      {selectedEntry.project_date && <span>{selectedEntry.project_date}</span>}
+                    </div>
                   )}
                   {/* Bottom bar */}
                   <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">

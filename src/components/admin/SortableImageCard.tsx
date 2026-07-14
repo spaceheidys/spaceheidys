@@ -544,7 +544,7 @@ const SortableImageCard = ({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="edit-desc">About Project <span className="text-[10px] text-muted-foreground/70 font-normal">(per-image caption — shown under this image)</span></Label>
+              <Label htmlFor="edit-desc">Notes <span className="text-[10px] text-muted-foreground/70 font-normal">(per-image note — shown under this image)</span></Label>
               <Textarea
                 id="edit-desc"
                 value={modalData.description}
@@ -563,32 +563,12 @@ const SortableImageCard = ({
                 />
               </div>
             )}
-            <div className="grid gap-2">
-              <Label htmlFor="edit-date">Date / Year</Label>
-              <Input
-                id="edit-date"
-                value={modalData.project_date}
-                onChange={(e) => setModalData({ ...modalData, project_date: e.target.value })}
-                placeholder="e.g. 2024"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-tags">Tags (comma separated)</Label>
-              <Input
-                id="edit-tags"
-                value={modalData.tags}
-                onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
-                placeholder="tag1, tag2..."
-              />
-            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
             <Button onClick={() => {
               onTitleChange(modalData.title.trim());
               if (onDescriptionChange) onDescriptionChange(modalData.description.trim());
-              if (onTagsChange) onTagsChange(modalData.tags.split(",").map(t => t.trim()).filter(Boolean));
-              if (onProjectDateChange) onProjectDateChange(modalData.project_date.trim());
               if (showProjectUrl && onProjectUrlChange) onProjectUrlChange(modalData.project_url.trim());
               setIsEditModalOpen(false);
             }}>Save</Button>
