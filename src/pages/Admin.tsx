@@ -1124,24 +1124,70 @@ const Admin = () => {
                       .map(({ item, isGroupHeader, groupCount, isCollapsed }) => (
                       <div key={item.id} className="relative">
                         {/* Collapsed group overlay */}
-                        {isCollapsed && isGroupHeader && (
-                          <button
-                            onClick={() => {
-                              const next = new Set(collapsedGroups);
-                              next.delete(item.group_id!);
-                              setCollapsedGroups(next);
-                            }}
-                            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] cursor-pointer hover:bg-black/30 transition-colors"
-                          >
-                            <span className="text-[10px] font-display tracking-widest text-white/90 uppercase mb-1">
-                              GROUP · {groupCount} IMG
-                            </span>
-                            <ChevronDown size={16} className="text-white/70" />
-                            <span className="text-[9px] font-display tracking-widest text-white/50 mt-0.5">
-                              EXPAND
-                            </span>
-                          </button>
-                        )}
+                        {isCollapsed && isGroupHeader && (() => {
+                          const gid = item.group_id!;
+                          const groupItemsAll = items.filter(i => i.group_id === gid);
+                          const folderVisible = groupItemsAll.some(i => (i as any).is_visible !== false);
+                          return (
+                            <>
+                              <button
+                                onClick={() => {
+                                  const next = new Set(collapsedGroups);
+                                  next.delete(gid);
+                                  setCollapsedGroups(next);
+                                }}
+                                className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] cursor-pointer hover:bg-black/30 transition-colors"
+                              >
+                                <span className="text-[10px] font-display tracking-widest text-white/90 uppercase mb-1">
+                                  GROUP · {groupCount} IMG
+                                </span>
+                                <ChevronDown size={16} className="text-white/70" />
+                                <span className="text-[9px] font-display tracking-widest text-white/50 mt-0.5">
+                                  EXPAND
+                                </span>
+                              </button>
+                              {/* Folder action buttons */}
+                              <div className="absolute top-1 right-1 z-30 flex flex-col gap-1">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); groupAddFileRefs.current[gid]?.click(); }}
+                                  className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
+                                  title="Add image to folder"
+                                >
+                                  <ImagePlus size={12} />
+                                </button>
+                                <input
+                                  ref={(el) => { groupAddFileRefs.current[gid] = el; }}
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const f = e.target.files?.[0];
+                                    if (f) await handleGroupAddImage(gid, f);
+                                    e.target.value = "";
+                                  }}
+                                />
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleGroupToggleVisibility(gid); }}
+                                  className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
+                                  title={folderVisible ? "Hide folder from gallery" : "Show folder in gallery"}
+                                >
+                                  {folderVisible ? <Eye size={12} /> : <EyeOff size={12} className="text-destructive/80" />}
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const sample = groupItemsAll[0] as any;
+                                    setRenameGroup({ groupId: gid, title: sample?.title || "", description: sample?.description || "" });
+                                  }}
+                                  className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
+                                  title="Rename folder / edit info"
+                                >
+                                  <Edit2 size={12} />
+                                </button>
+                              </div>
+                            </>
+                          );
+                        })()}
                         {/* Group header collapse button (when expanded) */}
                         {isGroupHeader && !isCollapsed && groupCount > 1 && (
                           <button
