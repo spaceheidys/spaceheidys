@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -333,6 +333,46 @@ const Admin = () => {
   });
   const CMS_ITEMS_PER_PAGE = cmsPageSize;
 
+  const displayItems = useMemo(() => {
+    const seenGroups = new Set<string>();
+    const groupCounts = new Map<string, number>();
+
+    items.forEach((item) => {
+      if (item.group_id) {
+        groupCounts.set(item.group_id, (groupCounts.get(item.group_id) || 0) + 1);
+      }
+    });
+
+    const list: { item: PortfolioItem; isGroupHeader: boolean; groupCount: number; isCollapsed: boolean }[] = [];
+
+    items.forEach((item) => {
+      if (item.group_id && collapsedGroups.has(item.group_id)) {
+        if (!seenGroups.has(item.group_id)) {
+          seenGroups.add(item.group_id);
+          list.push({
+            item,
+            isGroupHeader: true,
+            groupCount: groupCounts.get(item.group_id) || 1,
+            isCollapsed: true,
+          });
+        }
+      } else {
+        list.push({
+          item,
+          isGroupHeader: item.group_id ? !seenGroups.has(item.group_id) : false,
+          groupCount: item.group_id ? (groupCounts.get(item.group_id) || 1) : 1,
+          isCollapsed: false,
+        });
+        if (item.group_id) seenGroups.add(item.group_id);
+      }
+    });
+
+    return list;
+  }, [items, collapsedGroups]);
+
+  const totalCmsPages = Math.max(1, Math.ceil(displayItems.length / CMS_ITEMS_PER_PAGE));
+  const paginatedDisplayItems = displayItems.slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
@@ -375,6 +415,10 @@ const Admin = () => {
     if (user && isAdmin) fetchItems();
     setCmsPage(0);
   }, [activeSection, activeSub, user, isAdmin]);
+
+  useEffect(() => {
+    if (cmsPage > totalCmsPages - 1) setCmsPage(totalCmsPages - 1);
+  }, [cmsPage, totalCmsPages]);
 
   const uploadFiles = async (files: File[], grouped: boolean, groupDesc?: string) => {
     setUploading(true);
@@ -963,7 +1007,7 @@ const Admin = () => {
               <>
                 <button
                   onClick={() => {
-                    const pageIds = items.slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE).map(i => i.id);
+                    const pageIds = paginatedDisplayItems.map(({ item }) => item.id);
                     const allSelected = pageIds.every(id => selectedIds.has(id));
                     const next = new Set(selectedIds);
                     pageIds.forEach(id => allSelected ? next.delete(id) : next.add(id));
@@ -971,7 +1015,7 @@ const Admin = () => {
                   }}
                   className="text-[10px] font-display tracking-[0.15em] uppercase px-2 py-1 border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
                 >
-                  {items.slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE).every(i => selectedIds.has(i.id)) ? "DESELECT ALL" : "SELECT ALL"}
+                  {paginatedDisplayItems.every(({ item }) => selectedIds.has(item.id)) ? "DESELECT ALL" : "SELECT ALL"}
                 </button>
                 {selectedIds.size > 0 && (
                   confirmBulkDelete ? (
@@ -1087,43 +1131,7 @@ const Admin = () => {
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                  {(() => {
-                    // Build display list: for collapsed groups, only show first item
-                    const seenGroups = new Set<string>();
-                    const groupCounts = new Map<string, number>();
-                    items.forEach(item => {
-                      if (item.group_id) {
-                        groupCounts.set(item.group_id, (groupCounts.get(item.group_id) || 0) + 1);
-                      }
-                    });
-
-                    const displayItems: { item: PortfolioItem; isGroupHeader: boolean; groupCount: number; isCollapsed: boolean }[] = [];
-                    items.forEach(item => {
-                      if (item.group_id && collapsedGroups.has(item.group_id)) {
-                        if (!seenGroups.has(item.group_id)) {
-                          seenGroups.add(item.group_id);
-                          displayItems.push({
-                            item,
-                            isGroupHeader: true,
-                            groupCount: groupCounts.get(item.group_id) || 1,
-                            isCollapsed: true,
-                          });
-                        }
-                        // Skip other items in collapsed group
-                      } else {
-                        displayItems.push({
-                          item,
-                          isGroupHeader: item.group_id ? !seenGroups.has(item.group_id) : false,
-                          groupCount: item.group_id ? (groupCounts.get(item.group_id) || 1) : 1,
-                          isCollapsed: false,
-                        });
-                        if (item.group_id) seenGroups.add(item.group_id);
-                      }
-                    });
-
-                    return displayItems
-                      .slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE)
-                      .map(({ item, isGroupHeader, groupCount, isCollapsed }) => (
+                  {paginatedDisplayItems.map(({ item, isGroupHeader, groupCount, isCollapsed }) => (
                       <div key={item.id} className="relative">
                         {/* Collapsed group overlay */}
                         {isCollapsed && isGroupHeader && (() => {
@@ -1277,8 +1285,7 @@ const Admin = () => {
                           }}
                         />
                       </div>
-                    ));
-                  })()}
+                    ))}
                 </div>
               </SortableContext>
             </DndContext>
@@ -1288,17 +1295,17 @@ const Admin = () => {
               <div className="flex items-center justify-center gap-4 mt-6">
                 <button
                   onClick={() => setCmsPage((p) => Math.max(0, p - 1))}
-                  disabled={cmsPage === 0 || items.length <= CMS_ITEMS_PER_PAGE}
+                  disabled={cmsPage === 0}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <span className="text-[10px] font-display tracking-widest text-muted-foreground">
-                  {items.length <= CMS_ITEMS_PER_PAGE ? 1 : cmsPage + 1} / {Math.max(1, Math.ceil(items.length / CMS_ITEMS_PER_PAGE))}
+                  {cmsPage + 1} / {totalCmsPages}
                 </span>
                 <button
-                  onClick={() => setCmsPage((p) => Math.min(Math.ceil(items.length / CMS_ITEMS_PER_PAGE) - 1, p + 1))}
-                  disabled={cmsPage >= Math.ceil(items.length / CMS_ITEMS_PER_PAGE) - 1 || items.length <= CMS_ITEMS_PER_PAGE}
+                  onClick={() => setCmsPage((p) => Math.min(totalCmsPages - 1, p + 1))}
+                  disabled={cmsPage >= totalCmsPages - 1}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
                 >
                   <ChevronRight className="w-5 h-5" />
