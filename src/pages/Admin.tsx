@@ -321,7 +321,11 @@ const Admin = () => {
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [cmsPage, setCmsPage] = useState(0);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
-  const CMS_ITEMS_PER_PAGE = 12;
+  const [cmsPageSize, setCmsPageSize] = useState<number>(() => {
+    const v = parseInt(localStorage.getItem("admin_cms_page_size") || "12", 10);
+    return [12, 24, 36].includes(v) ? v : 12;
+  });
+  const CMS_ITEMS_PER_PAGE = cmsPageSize;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
