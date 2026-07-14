@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical, Plus } from "lucide-react";
+import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, GripVertical, Plus, Eye, EyeOff, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 import taroBackside from "@/assets/Taro_backside.png";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
@@ -35,7 +35,7 @@ function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }
 const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [wisdomText, setWisdomText] = useState("");
   const [frontImage, setFrontImage] = useState("");
-  const [frontImages, setFrontImages] = useState<{url: string; text: string}[]>([]);
+  const [frontImages, setFrontImages] = useState<{url: string; text: string; hidden?: boolean}[]>([]);
   const [backImage, setBackImage] = useState("");
   const [backImages, setBackImages] = useState<{url: string; weight: number}[]>([]);
   const [bgType, setBgType] = useState("polygon");
@@ -59,6 +59,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   });
   const frontRef = useRef<HTMLInputElement>(null);
   const frontMultiRef = useRef<HTMLInputElement>(null);
+  const frontReplaceRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const backRef = useRef<HTMLInputElement>(null);
   const backMultiRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
