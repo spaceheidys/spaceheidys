@@ -1373,6 +1373,16 @@ const Admin = () => {
                   placeholder="tag1, tag2..."
                 />
               </div>
+              <div className="grid gap-2">
+                <UILabel htmlFor="rename-desc">About Project</UILabel>
+                <UITextarea
+                  id="rename-desc"
+                  value={renameGroup.description}
+                  onChange={(e) => setRenameGroup({ ...renameGroup, description: e.target.value })}
+                  rows={4}
+                  placeholder="Project description shared by all images in this folder…"
+                />
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -1381,7 +1391,7 @@ const Admin = () => {
               onClick={async () => {
                 if (!renameGroup) return;
                 const tagsArr = renameGroup.tags.split(",").map((t) => t.trim()).filter(Boolean);
-                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim(), tagsArr, renameGroup.project_date.trim());
+                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim(), tagsArr, renameGroup.project_date.trim(), renameGroup.description.trim());
                 setRenameGroup(null);
               }}
             >Save</UIButton>
