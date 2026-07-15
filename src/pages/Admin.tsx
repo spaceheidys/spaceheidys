@@ -1206,6 +1206,7 @@ const Admin = () => {
                                       title: sample?.title || "",
                                       tags: Array.isArray(sample?.tags) ? sample.tags.join(", ") : "",
                                       project_date: sample?.project_date || "",
+                                      description: sample?.description || "",
                                     });
                                   }}
                                   className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
