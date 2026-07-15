@@ -450,16 +450,19 @@ const Gallery = () => {
                         className="max-w-full max-h-[80vh] object-contain rounded-md"
                         onContextMenu={(e) => e.preventDefault()}
                       />
-                      {img.description && (
+                      {img.notes && (
                         <p className="text-[11px] sm:text-xs text-white/60 font-display tracking-wide leading-relaxed max-w-[75vw] mx-auto px-2">
-                          {img.description}
+                          {img.notes}
                         </p>
                       )}
                     </div>
                   ))}
                   {/* Project meta */}
-                  {((selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
+                  {(selectedEntry.description || (selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
                     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-2 text-[10px] sm:text-xs text-white/50 font-display tracking-wider">
+                      {selectedEntry.description && (
+                        <p className="w-full text-center text-white/70 font-display tracking-wide leading-relaxed max-w-[75vw] mx-auto px-2 mb-1">{selectedEntry.description}</p>
+                      )}
                       {selectedEntry.tags?.map((t, i) => (
                         <span key={i}>#{t}</span>
                       ))}
