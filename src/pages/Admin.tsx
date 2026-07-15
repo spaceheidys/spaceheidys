@@ -1266,6 +1266,7 @@ const Admin = () => {
                           group_id={item.group_id}
                           project_url={(item as any).project_url}
                           description={(item as any).description}
+                          notes={(item as any).notes}
                           tags={(item as any).tags}
                           project_date={(item as any).project_date}
                           showProjectUrl={activeSection === "projects"}
@@ -1276,6 +1277,7 @@ const Admin = () => {
                           onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
                           onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
                           onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
+                          onNotesChange={(n) => handleNotesChange(item.id, n)}
                           onTagsChange={(tags) => handleTagsChange(item.id, tags)}
                           onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
                           is_visible={(item as any).is_visible !== false}
