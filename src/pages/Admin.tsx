@@ -651,14 +651,23 @@ const Admin = () => {
 
   // Renames the folder title for all group members. Per-image "About Project"
   // (description) is intentionally NOT touched here — that field is per image.
-  const handleGroupRename = async (groupId: string, title: string, tags: string[], project_date: string) => {
-    const { error } = await supabase.from("portfolio_items").update({ title, tags, project_date } as any).eq("group_id", groupId);
+  const handleGroupRename = async (groupId: string, title: string, tags: string[], project_date: string, description: string) => {
+    const { error } = await supabase.from("portfolio_items").update({ title, tags, project_date, description } as any).eq("group_id", groupId);
     if (error) { toast.error("Rename failed"); return; }
-    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title, tags, project_date } as any) : i));
+    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title, tags, project_date, description } as any) : i));
     toast.success("Folder updated");
   };
 
-  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string; tags: string; project_date: string } | null>(null);
+  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string; tags: string; project_date: string; description: string } | null>(null);
+
+  const notesTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const handleNotesChange = (id: string, notes: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, notes } as any : i)));
+    if (notesTimers.current[id]) clearTimeout(notesTimers.current[id]);
+    notesTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ notes } as any).eq("id", id);
+    }, 400);
+  };
   const groupAddFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const handleDragEnd = async (event: DragEndEvent) => {
