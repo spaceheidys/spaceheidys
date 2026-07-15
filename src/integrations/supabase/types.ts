@@ -167,6 +167,7 @@ export type Database = {
           image_url: string
           image_zoom: number
           is_visible: boolean
+          notes: string | null
           project_date: string
           project_url: string | null
           section: string
@@ -187,6 +188,7 @@ export type Database = {
           image_url: string
           image_zoom?: number
           is_visible?: boolean
+          notes?: string | null
           project_date?: string
           project_url?: string | null
           section: string
@@ -207,6 +209,7 @@ export type Database = {
           image_url?: string
           image_zoom?: number
           is_visible?: boolean
+          notes?: string | null
           project_date?: string
           project_url?: string | null
           section?: string

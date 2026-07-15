@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Upload, Loader2, Trash2, Check, X, ChevronDown, ChevronUp, Move, Plus, Eye, EyeOff, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 import taroBackside from "@/assets/Taro_backside.png";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import { SortableContext, verticalListSortingStrategy, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 interface Main2SectionProps {
@@ -29,6 +29,22 @@ function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }
         <X size={9} /> NO
       </button>
     </span>
+  );
+}
+
+/** Sortable wrapper for a Front-image card (drag to reorder) */
+function SortableFrontCard({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.7 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="flex flex-col gap-1 cursor-grab active:cursor-grabbing touch-none">
+      {children}
+    </div>
   );
 }
 
@@ -798,11 +814,26 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <p className="text-[10px] text-muted-foreground/60 font-display tracking-wider">
             Each time the card is flipped back to front, a different image is shown in sequence.
           </p>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={async (event) => {
+              const { active, over } = event;
+              if (!over || active.id === over.id) return;
+              const oldIdx = parseInt(String(active.id).replace(/^front-/, ""), 10);
+              const newIdx = parseInt(String(over.id).replace(/^front-/, ""), 10);
+              if (isNaN(oldIdx) || isNaN(newIdx)) return;
+              const updated = arrayMove(frontImages, oldIdx, newIdx);
+              setFrontImages(updated);
+              await update("card_front_images", JSON.stringify(updated));
+            }}
+          >
+            <SortableContext items={frontImages.map((_, i) => `front-${i}`)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {frontImages.map((item, i) => (
-              <div key={i} className="flex flex-col gap-1">
+              <SortableFrontCard key={`front-${i}`} id={`front-${i}`}>
                 <div className={`relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10 ${item.hidden ? "opacity-40" : ""}`}>
-                  <img src={item.url} alt={`Front ${i + 1}`} className="w-full h-full object-cover" />
+                  <img src={item.url} alt={`Front ${i + 1}`} className="w-full h-full object-cover pointer-events-none" />
                   {/* Reorder arrows — always visible on hover */}
                   <div className="absolute top-1 left-1 right-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
@@ -872,7 +903,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
                   placeholder="Text above card..."
                   className="w-full bg-transparent border border-border px-1.5 py-1 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-foreground transition-colors"
                 />
-              </div>
+              </SortableFrontCard>
             ))}
             {/* Add new */}
             <div className="border border-dashed border-border aspect-[2/3] overflow-hidden">
@@ -903,6 +934,8 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
               )}
             </div>
           </div>
+            </SortableContext>
+          </DndContext>
         </div>
 
         {/* Multiple back images — random by weight on each flip */}

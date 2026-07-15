@@ -651,14 +651,23 @@ const Admin = () => {
 
   // Renames the folder title for all group members. Per-image "About Project"
   // (description) is intentionally NOT touched here — that field is per image.
-  const handleGroupRename = async (groupId: string, title: string, tags: string[], project_date: string) => {
-    const { error } = await supabase.from("portfolio_items").update({ title, tags, project_date } as any).eq("group_id", groupId);
+  const handleGroupRename = async (groupId: string, title: string, tags: string[], project_date: string, description: string) => {
+    const { error } = await supabase.from("portfolio_items").update({ title, tags, project_date, description } as any).eq("group_id", groupId);
     if (error) { toast.error("Rename failed"); return; }
-    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title, tags, project_date } as any) : i));
+    setItems((prev) => prev.map((i) => i.group_id === groupId ? ({ ...i, title, tags, project_date, description } as any) : i));
     toast.success("Folder updated");
   };
 
-  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string; tags: string; project_date: string } | null>(null);
+  const [renameGroup, setRenameGroup] = useState<{ groupId: string; title: string; tags: string; project_date: string; description: string } | null>(null);
+
+  const notesTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const handleNotesChange = (id: string, notes: string) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, notes } as any : i)));
+    if (notesTimers.current[id]) clearTimeout(notesTimers.current[id]);
+    notesTimers.current[id] = setTimeout(async () => {
+      await supabase.from("portfolio_items").update({ notes } as any).eq("id", id);
+    }, 400);
+  };
   const groupAddFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -1197,6 +1206,7 @@ const Admin = () => {
                                       title: sample?.title || "",
                                       tags: Array.isArray(sample?.tags) ? sample.tags.join(", ") : "",
                                       project_date: sample?.project_date || "",
+                                      description: sample?.description || "",
                                     });
                                   }}
                                   className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
@@ -1256,6 +1266,7 @@ const Admin = () => {
                           group_id={item.group_id}
                           project_url={(item as any).project_url}
                           description={(item as any).description}
+                          notes={(item as any).notes}
                           tags={(item as any).tags}
                           project_date={(item as any).project_date}
                           showProjectUrl={activeSection === "projects"}
@@ -1266,6 +1277,7 @@ const Admin = () => {
                           onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
                           onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
                           onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
+                          onNotesChange={(n) => handleNotesChange(item.id, n)}
                           onTagsChange={(tags) => handleTagsChange(item.id, tags)}
                           onProjectDateChange={(date) => handleProjectDateChange(item.id, date)}
                           is_visible={(item as any).is_visible !== false}
@@ -1363,6 +1375,16 @@ const Admin = () => {
                   placeholder="tag1, tag2..."
                 />
               </div>
+              <div className="grid gap-2">
+                <UILabel htmlFor="rename-desc">About Project</UILabel>
+                <UITextarea
+                  id="rename-desc"
+                  value={renameGroup.description}
+                  onChange={(e) => setRenameGroup({ ...renameGroup, description: e.target.value })}
+                  rows={4}
+                  placeholder="Project description shared by all images in this folder…"
+                />
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -1371,7 +1393,7 @@ const Admin = () => {
               onClick={async () => {
                 if (!renameGroup) return;
                 const tagsArr = renameGroup.tags.split(",").map((t) => t.trim()).filter(Boolean);
-                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim(), tagsArr, renameGroup.project_date.trim());
+                await handleGroupRename(renameGroup.groupId, renameGroup.title.trim(), tagsArr, renameGroup.project_date.trim(), renameGroup.description.trim());
                 setRenameGroup(null);
               }}
             >Save</UIButton>

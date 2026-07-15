@@ -23,6 +23,7 @@ interface SortableImageCardProps {
   group_id?: string | null;
   project_url?: string | null;
   description?: string;
+  notes?: string;
   tags?: string[];
   project_date?: string;
   showProjectUrl?: boolean;
@@ -34,6 +35,7 @@ interface SortableImageCardProps {
   onTextAlignChange: (align: string) => void;
   onProjectUrlChange?: (url: string) => void;
   onDescriptionChange?: (desc: string) => void;
+  onNotesChange?: (notes: string) => void;
   onTagsChange?: (tags: string[]) => void;
   onProjectDateChange?: (date: string) => void;
   onImageReplace?: (newUrl: string) => void;
@@ -68,6 +70,7 @@ const SortableImageCard = ({
   group_id,
   project_url,
   description,
+  notes,
   tags,
   project_date,
   showProjectUrl,
@@ -79,6 +82,7 @@ const SortableImageCard = ({
   onTextAlignChange,
   onProjectUrlChange,
   onDescriptionChange,
+  onNotesChange,
   onTagsChange,
   onProjectDateChange,
   onImageReplace,
@@ -91,7 +95,7 @@ const SortableImageCard = ({
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [modalData, setModalData] = useState({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  const [modalData, setModalData] = useState({ title, description: description || "", notes: notes || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
   const [pendingReplacePreview, setPendingReplacePreview] = useState<string | null>(null);
@@ -104,8 +108,8 @@ const SortableImageCard = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setModalData({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
-  }, [title, description, tags, project_date, project_url]);
+    setModalData({ title, description: description || "", notes: notes || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  }, [title, description, notes, tags, project_date, project_url]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -543,15 +547,47 @@ const SortableImageCard = ({
                 onChange={(e) => setModalData({ ...modalData, title: e.target.value })}
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-desc">Notes <span className="text-[10px] text-muted-foreground/70 font-normal">(per-image note — shown under this image)</span></Label>
-              <Textarea
-                id="edit-desc"
-                value={modalData.description}
-                onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
-                rows={4}
-              />
-            </div>
+            {group_id ? (
+              <div className="grid gap-2">
+                <Label htmlFor="edit-notes">Notes <span className="text-[10px] text-muted-foreground/70 font-normal">(per-image note — shown under this image)</span></Label>
+                <Textarea
+                  id="edit-notes"
+                  value={modalData.notes}
+                  onChange={(e) => setModalData({ ...modalData, notes: e.target.value })}
+                  rows={4}
+                />
+              </div>
+            ) : (
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-desc">About Project</Label>
+                  <Textarea
+                    id="edit-desc"
+                    value={modalData.description}
+                    onChange={(e) => setModalData({ ...modalData, description: e.target.value })}
+                    rows={4}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-date">Date / Year</Label>
+                  <Input
+                    id="edit-date"
+                    value={modalData.project_date}
+                    onChange={(e) => setModalData({ ...modalData, project_date: e.target.value })}
+                    placeholder="e.g. 2024"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-tags">Tags (comma separated)</Label>
+                  <Input
+                    id="edit-tags"
+                    value={modalData.tags}
+                    onChange={(e) => setModalData({ ...modalData, tags: e.target.value })}
+                    placeholder="tag1, tag2..."
+                  />
+                </div>
+              </>
+            )}
             {showProjectUrl && (
               <div className="grid gap-2">
                 <Label htmlFor="edit-url">Project URL</Label>
@@ -568,7 +604,13 @@ const SortableImageCard = ({
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
             <Button onClick={() => {
               onTitleChange(modalData.title.trim());
-              if (onDescriptionChange) onDescriptionChange(modalData.description.trim());
+              if (group_id) {
+                if (onNotesChange) onNotesChange(modalData.notes.trim());
+              } else {
+                if (onDescriptionChange) onDescriptionChange(modalData.description.trim());
+                if (onProjectDateChange) onProjectDateChange(modalData.project_date.trim());
+                if (onTagsChange) onTagsChange(modalData.tags.split(",").map(t => t.trim()).filter(Boolean));
+              }
               if (showProjectUrl && onProjectUrlChange) onProjectUrlChange(modalData.project_url.trim());
               setIsEditModalOpen(false);
             }}>Save</Button>

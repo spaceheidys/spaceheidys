@@ -16,6 +16,7 @@ interface GalleryItem {
   id: string;
   title: string;
   description: string;
+  notes: string;
   image_url: string;
   subsection: string | null;
   group_id: string | null;
@@ -25,13 +26,14 @@ interface GalleryItem {
 
 interface GroupImageEntry {
   url: string;
-  description: string;
+  notes: string;
 }
 
 interface GalleryEntry {
   id: string;
   title: string;
   description: string;
+  notes?: string;
   image_url: string;
   subsection: string | null;
   groupImages?: GroupImageEntry[];
@@ -144,7 +146,7 @@ const Gallery = () => {
     const fetch = async () => {
       const { data } = await supabase
         .from("portfolio_items")
-        .select("id, title, description, image_url, subsection, group_id, tags, project_date")
+        .select("id, title, description, notes, image_url, subsection, group_id, tags, project_date")
         .eq("section", "gallery")
         .eq("is_visible", true as any)
         .order("sort_order", { ascending: true });
@@ -155,6 +157,7 @@ const Gallery = () => {
             id: d.id,
             title: d.title || "",
             description: d.description || "",
+            notes: d.notes || "",
             image_url: d.image_url,
             subsection: d.subsection,
             group_id: d.group_id || null,
@@ -188,7 +191,7 @@ const Gallery = () => {
           description: item.description,
           image_url: item.image_url,
           subsection: item.subsection,
-          groupImages: groupItems.map((g) => ({ url: g.image_url, description: g.description })).filter((g) => g.url),
+          groupImages: groupItems.map((g) => ({ url: g.image_url, notes: g.notes })).filter((g) => g.url),
           tags: item.tags,
           project_date: item.project_date,
         });
@@ -197,6 +200,7 @@ const Gallery = () => {
           id: item.id,
           title: item.title,
           description: item.description,
+          notes: item.notes,
           image_url: item.image_url,
           subsection: item.subsection,
           tags: item.tags,
@@ -446,16 +450,19 @@ const Gallery = () => {
                         className="max-w-full max-h-[80vh] object-contain rounded-md"
                         onContextMenu={(e) => e.preventDefault()}
                       />
-                      {img.description && (
+                      {img.notes && (
                         <p className="text-[11px] sm:text-xs text-white/60 font-display tracking-wide leading-relaxed max-w-[75vw] mx-auto px-2">
-                          {img.description}
+                          {img.notes}
                         </p>
                       )}
                     </div>
                   ))}
                   {/* Project meta */}
-                  {((selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
+                  {(selectedEntry.description || (selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
                     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-2 text-[10px] sm:text-xs text-white/50 font-display tracking-wider">
+                      {selectedEntry.description && (
+                        <p className="w-full text-center text-white/70 font-display tracking-wide leading-relaxed max-w-[75vw] mx-auto px-2 mb-1">{selectedEntry.description}</p>
+                      )}
                       {selectedEntry.tags?.map((t, i) => (
                         <span key={i}>#{t}</span>
                       ))}
