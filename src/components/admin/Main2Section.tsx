@@ -32,6 +32,22 @@ function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }
   );
 }
 
+/** Sortable wrapper for a Front-image card (drag to reorder) */
+function SortableFrontCard({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.7 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="flex flex-col gap-1 cursor-grab active:cursor-grabbing touch-none">
+      {children}
+    </div>
+  );
+}
+
 const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [wisdomText, setWisdomText] = useState("");
   const [frontImage, setFrontImage] = useState("");
