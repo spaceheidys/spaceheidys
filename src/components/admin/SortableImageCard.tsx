@@ -23,6 +23,7 @@ interface SortableImageCardProps {
   group_id?: string | null;
   project_url?: string | null;
   description?: string;
+  notes?: string;
   tags?: string[];
   project_date?: string;
   showProjectUrl?: boolean;
@@ -34,6 +35,7 @@ interface SortableImageCardProps {
   onTextAlignChange: (align: string) => void;
   onProjectUrlChange?: (url: string) => void;
   onDescriptionChange?: (desc: string) => void;
+  onNotesChange?: (notes: string) => void;
   onTagsChange?: (tags: string[]) => void;
   onProjectDateChange?: (date: string) => void;
   onImageReplace?: (newUrl: string) => void;
@@ -68,6 +70,7 @@ const SortableImageCard = ({
   group_id,
   project_url,
   description,
+  notes,
   tags,
   project_date,
   showProjectUrl,
@@ -79,6 +82,7 @@ const SortableImageCard = ({
   onTextAlignChange,
   onProjectUrlChange,
   onDescriptionChange,
+  onNotesChange,
   onTagsChange,
   onProjectDateChange,
   onImageReplace,
@@ -91,7 +95,7 @@ const SortableImageCard = ({
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [modalData, setModalData] = useState({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  const [modalData, setModalData] = useState({ title, description: description || "", notes: notes || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
   const [pendingReplacePreview, setPendingReplacePreview] = useState<string | null>(null);
@@ -104,8 +108,8 @@ const SortableImageCard = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setModalData({ title, description: description || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
-  }, [title, description, tags, project_date, project_url]);
+    setModalData({ title, description: description || "", notes: notes || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
+  }, [title, description, notes, tags, project_date, project_url]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
