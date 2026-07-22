@@ -33,6 +33,107 @@ import SkillsSection from "@/components/admin/SkillsSection";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { useGallerySubs } from "@/hooks/useGallerySubs";
 import { Plus } from "lucide-react";
+// Collapsed-group tile: dedicated sortable so folders can be dragged/reordered
+// even when the expand overlay is on top of the card.
+interface CollapsedGroupTileProps {
+  id: string;
+  title: string;
+  imageUrl: string;
+  groupCount: number;
+  folderVisible: boolean;
+  onExpand: () => void;
+  onAddImage: () => void;
+  onToggleVisibility: () => void;
+  onRename: () => void;
+  fileInputRef: (el: HTMLInputElement | null) => void;
+  onFileChange: (f: File) => void;
+}
+
+const CollapsedGroupTile = ({
+  id, title, imageUrl, groupCount, folderVisible,
+  onExpand, onAddImage, onToggleVisibility, onRename,
+  fileInputRef, onFileChange,
+}: CollapsedGroupTileProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative aspect-[3/4] border border-border overflow-hidden bg-muted/10"
+    >
+      {imageUrl && (
+        <img src={imageUrl} alt={title} className="w-full h-full object-cover" draggable={false} />
+      )}
+      <button
+        onClick={onExpand}
+        className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] cursor-pointer hover:bg-black/30 transition-colors"
+      >
+        {title && (
+          <span className="text-[11px] font-display tracking-widest text-white uppercase mb-1 px-3 text-center line-clamp-2">
+            {title}
+          </span>
+        )}
+        <span className="text-[9px] font-display tracking-widest text-white/60 uppercase mb-1">
+          GROUP · {groupCount} IMG
+        </span>
+        <ChevronDown size={16} className="text-white/70" />
+        <span className="text-[9px] font-display tracking-widest text-white/50 mt-0.5">
+          EXPAND
+        </span>
+      </button>
+      {/* Drag handle – above overlay */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute top-1 left-1 z-40 p-1 bg-black/70 hover:bg-black/90 rounded cursor-grab active:cursor-grabbing"
+        title="Drag to reorder folder"
+      >
+        <Move size={12} className="text-white/80" />
+      </div>
+      {/* Folder action buttons */}
+      <div className="absolute top-1 right-1 z-40 flex flex-col gap-1">
+        <button
+          onClick={(e) => { e.stopPropagation(); onAddImage(); }}
+          className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
+          title="Add image to folder"
+        >
+          <ImagePlus size={12} />
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={async (e) => {
+            const f = e.target.files?.[0];
+            if (f) await onFileChange(f);
+            e.target.value = "";
+          }}
+        />
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleVisibility(); }}
+          className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
+          title={folderVisible ? "Hide folder from gallery" : "Show folder in gallery"}
+        >
+          {folderVisible ? <Eye size={12} /> : <EyeOff size={12} className="text-destructive/80" />}
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); onRename(); }}
+          className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
+          title="Rename folder / edit info"
+        >
+          <Edit2 size={12} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const PORTFOLIO_SECTION_KEYS = ["gallery", "projects", "skills", "archive", "share"];
 
 import type { SectionSetting } from "@/hooks/useSectionSettings";
