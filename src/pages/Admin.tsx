@@ -333,42 +333,48 @@ const Admin = () => {
   });
   const CMS_ITEMS_PER_PAGE = cmsPageSize;
 
-  const displayItems = useMemo(() => {
-    const seenGroups = new Set<string>();
-    const groupCounts = new Map<string, number>();
-
-    items.forEach((item) => {
-      if (item.group_id) {
-        groupCounts.set(item.group_id, (groupCounts.get(item.group_id) || 0) + 1);
-      }
-    });
-
-    const list: { item: PortfolioItem; isGroupHeader: boolean; groupCount: number; isCollapsed: boolean }[] = [];
-
-    items.forEach((item) => {
-      if (item.group_id && collapsedGroups.has(item.group_id)) {
-        if (!seenGroups.has(item.group_id)) {
-          seenGroups.add(item.group_id);
-          list.push({
-            item,
-            isGroupHeader: true,
-            groupCount: groupCounts.get(item.group_id) || 1,
-            isCollapsed: true,
-          });
-        }
+  // Blocks: each block is either a single (non-group) item or a whole group.
+  // Blocks preserve the first-appearance order of their items so groups
+  // always stay contiguous, even after cross-item reorders.
+  const blocks = useMemo(() => {
+    const seen = new Set<string>();
+    const b: { key: string; groupId: string | null; items: PortfolioItem[] }[] = [];
+    items.forEach((it) => {
+      if (it.group_id) {
+        if (seen.has(it.group_id)) return;
+        seen.add(it.group_id);
+        const groupItems = items.filter((i) => i.group_id === it.group_id);
+        b.push({ key: `g:${it.group_id}`, groupId: it.group_id, items: groupItems });
       } else {
-        list.push({
-          item,
-          isGroupHeader: item.group_id ? !seenGroups.has(item.group_id) : false,
-          groupCount: item.group_id ? (groupCounts.get(item.group_id) || 1) : 1,
-          isCollapsed: false,
-        });
-        if (item.group_id) seenGroups.add(item.group_id);
+        b.push({ key: `i:${it.id}`, groupId: null, items: [it] });
       }
     });
+    return b;
+  }, [items]);
 
+  const displayItems = useMemo(() => {
+    const list: { item: PortfolioItem; isGroupHeader: boolean; groupCount: number; isCollapsed: boolean }[] = [];
+    blocks.forEach((blk) => {
+      if (blk.groupId && collapsedGroups.has(blk.groupId)) {
+        list.push({
+          item: blk.items[0],
+          isGroupHeader: true,
+          groupCount: blk.items.length,
+          isCollapsed: true,
+        });
+      } else {
+        blk.items.forEach((it, idx) => {
+          list.push({
+            item: it,
+            isGroupHeader: !!blk.groupId && idx === 0,
+            groupCount: blk.items.length,
+            isCollapsed: false,
+          });
+        });
+      }
+    });
     return list;
-  }, [items, collapsedGroups]);
+  }, [blocks, collapsedGroups]);
 
   const totalCmsPages = Math.max(1, Math.ceil(displayItems.length / CMS_ITEMS_PER_PAGE));
   const paginatedDisplayItems = displayItems.slice(cmsPage * CMS_ITEMS_PER_PAGE, (cmsPage + 1) * CMS_ITEMS_PER_PAGE);
@@ -674,9 +680,36 @@ const Admin = () => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    const oldIndex = items.findIndex((i) => i.id === active.id);
-    const newIndex = items.findIndex((i) => i.id === over.id);
-    const reordered = arrayMove(items, oldIndex, newIndex);
+    const activeItem = items.find((i) => i.id === active.id);
+    const overItem = items.find((i) => i.id === over.id);
+    if (!activeItem || !overItem) return;
+
+    const activeGid = activeItem.group_id ?? null;
+    const overGid = overItem.group_id ?? null;
+
+    let reordered: PortfolioItem[];
+
+    if (activeGid && activeGid === overGid) {
+      // Reorder inside same expanded group only
+      const groupItems = items.filter((i) => i.group_id === activeGid);
+      const oldIdx = groupItems.findIndex((i) => i.id === active.id);
+      const newIdx = groupItems.findIndex((i) => i.id === over.id);
+      if (oldIdx === -1 || newIdx === -1) return;
+      const newGroupItems = arrayMove(groupItems, oldIdx, newIdx);
+      const newBlocks = blocks.map((b) =>
+        b.groupId === activeGid ? { ...b, items: newGroupItems } : b
+      );
+      reordered = newBlocks.flatMap((b) => b.items);
+    } else {
+      // Move whole block (single item or whole group) among blocks
+      const activeKey = activeGid ? `g:${activeGid}` : `i:${activeItem.id}`;
+      const overKey = overGid ? `g:${overGid}` : `i:${overItem.id}`;
+      const oldIdx = blocks.findIndex((b) => b.key === activeKey);
+      const newIdx = blocks.findIndex((b) => b.key === overKey);
+      if (oldIdx === -1 || newIdx === -1 || oldIdx === newIdx) return;
+      const newBlocks = arrayMove(blocks, oldIdx, newIdx);
+      reordered = newBlocks.flatMap((b) => b.items);
+    }
 
     // Optimistic update
     setItems(reordered);
