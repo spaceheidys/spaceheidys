@@ -1274,84 +1274,43 @@ const Admin = () => {
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                  {paginatedDisplayItems.map(({ item, isGroupHeader, groupCount, isCollapsed }) => (
+                  {paginatedDisplayItems.map(({ item, isGroupHeader, groupCount, isCollapsed }) => {
+                    if (isCollapsed && isGroupHeader) {
+                      const gid = item.group_id!;
+                      const groupItemsAll = items.filter(i => i.group_id === gid);
+                      const folderVisible = groupItemsAll.some(i => (i as any).is_visible !== false);
+                      return (
+                        <CollapsedGroupTile
+                          key={item.id}
+                          id={item.id}
+                          title={item.title}
+                          imageUrl={item.image_url}
+                          groupCount={groupCount}
+                          folderVisible={folderVisible}
+                          onExpand={() => {
+                            const next = new Set(collapsedGroups);
+                            next.delete(gid);
+                            setCollapsedGroups(next);
+                          }}
+                          onAddImage={() => groupAddFileRefs.current[gid]?.click()}
+                          onToggleVisibility={() => handleGroupToggleVisibility(gid)}
+                          onRename={() => {
+                            const sample = groupItemsAll[0] as any;
+                            setRenameGroup({
+                              groupId: gid,
+                              title: sample?.title || "",
+                              tags: Array.isArray(sample?.tags) ? sample.tags.join(", ") : "",
+                              project_date: sample?.project_date || "",
+                              description: sample?.description || "",
+                            });
+                          }}
+                          fileInputRef={(el) => { groupAddFileRefs.current[gid] = el; }}
+                          onFileChange={(f) => handleGroupAddImage(gid, f)}
+                        />
+                      );
+                    }
+                    return (
                       <div key={item.id} className="relative">
-                        {/* Collapsed group overlay */}
-                        {isCollapsed && isGroupHeader && (() => {
-                          const gid = item.group_id!;
-                          const groupItemsAll = items.filter(i => i.group_id === gid);
-                          const folderVisible = groupItemsAll.some(i => (i as any).is_visible !== false);
-                          return (
-                            <>
-                              <button
-                                onClick={() => {
-                                  const next = new Set(collapsedGroups);
-                                  next.delete(gid);
-                                  setCollapsedGroups(next);
-                                }}
-                                className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] cursor-pointer hover:bg-black/30 transition-colors"
-                              >
-                                {item.title && (
-                                  <span className="text-[11px] font-display tracking-widest text-white uppercase mb-1 px-3 text-center line-clamp-2">
-                                    {item.title}
-                                  </span>
-                                )}
-                                <span className="text-[9px] font-display tracking-widest text-white/60 uppercase mb-1">
-                                  GROUP · {groupCount} IMG
-                                </span>
-                                <ChevronDown size={16} className="text-white/70" />
-                                <span className="text-[9px] font-display tracking-widest text-white/50 mt-0.5">
-                                  EXPAND
-                                </span>
-                              </button>
-                              {/* Folder action buttons */}
-                              <div className="absolute top-1 right-1 z-30 flex flex-col gap-1">
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); groupAddFileRefs.current[gid]?.click(); }}
-                                  className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
-                                  title="Add image to folder"
-                                >
-                                  <ImagePlus size={12} />
-                                </button>
-                                <input
-                                  ref={(el) => { groupAddFileRefs.current[gid] = el; }}
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  onChange={async (e) => {
-                                    const f = e.target.files?.[0];
-                                    if (f) await handleGroupAddImage(gid, f);
-                                    e.target.value = "";
-                                  }}
-                                />
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleGroupToggleVisibility(gid); }}
-                                  className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
-                                  title={folderVisible ? "Hide folder from gallery" : "Show folder in gallery"}
-                                >
-                                  {folderVisible ? <Eye size={12} /> : <EyeOff size={12} className="text-destructive/80" />}
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const sample = groupItemsAll[0] as any;
-                                    setRenameGroup({
-                                      groupId: gid,
-                                      title: sample?.title || "",
-                                      tags: Array.isArray(sample?.tags) ? sample.tags.join(", ") : "",
-                                      project_date: sample?.project_date || "",
-                                      description: sample?.description || "",
-                                    });
-                                  }}
-                                  className="p-1 rounded bg-black/70 hover:bg-black/90 text-white/80 hover:text-white transition-colors"
-                                  title="Rename folder / edit info"
-                                >
-                                  <Edit2 size={12} />
-                                </button>
-                              </div>
-                            </>
-                          );
-                        })()}
                         {/* Group header collapse button (when expanded) */}
                         {isGroupHeader && !isCollapsed && groupCount > 1 && (
                           <button
@@ -1436,7 +1395,8 @@ const Admin = () => {
                           }}
                         />
                       </div>
-                    ))}
+                    );
+                  })}
                 </div>
               </SortableContext>
             </DndContext>
