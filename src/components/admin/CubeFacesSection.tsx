@@ -180,21 +180,22 @@ const CubeFacesSection = () => {
             </div>
           </div>
 
+          {face.id === 0 && (
+            <div className="space-y-1.5">
+              <p className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-1.5">
+                <MessageSquare size={10} /> Message
+              </p>
+              <input
+                value={frontMessage}
+                onChange={(e) => update("cube_front_message", e.target.value)}
+                placeholder="Shown on the black strip after the title"
+                className="w-full bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus:border-foreground"
+              />
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <p className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60">Icon</p>
-            {face.id === 0 && (
-              <div className="space-y-1.5 pb-3 mb-2 border-b border-border">
-                <p className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-1.5">
-                  <MessageSquare size={10} /> Message
-                </p>
-                <input
-                  value={frontMessage}
-                  onChange={(e) => update("cube_front_message", e.target.value)}
-                  placeholder="Shown on the black strip after the title"
-                  className="w-full bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus:border-foreground"
-                />
-              </div>
-            )}
             <div className="flex flex-wrap gap-1">
               {ICON_KEYS.map((k) => (
                 <button
