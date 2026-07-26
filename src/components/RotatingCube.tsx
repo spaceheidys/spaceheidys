@@ -20,6 +20,7 @@ import {
   ChevronsDown,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const GLITCH_CHARS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!<>-_\\/[]{}—=+*^?#@%&$~";
