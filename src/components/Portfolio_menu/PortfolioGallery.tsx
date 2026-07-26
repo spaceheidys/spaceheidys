@@ -625,29 +625,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                   </div>
                   {isDesktopLB && selectedEntry.groupImages!.length > GROUP_PAGE_SIZE && (
                     <div className="flex items-center justify-center gap-3 pt-1">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setGroupPage((p) => Math.max(0, p - 1)); }}
-                        disabled={groupPage === 0}
-                        className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        aria-label="Previous page"
-                      >
-                        <ArrowLeft className="w-4 h-4" />
-                      </button>
-                      <span className="text-[10px] font-display tracking-[0.2em] uppercase text-white/60">
-                        {groupPage + 1} / {Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE)}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const max = Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) - 1;
-                          setGroupPage((p) => Math.min(max, p + 1));
-                        }}
-                        disabled={groupPage >= Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) - 1}
-                        className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                        aria-label="Next page"
-                      >
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
+                      {Array.from({ length: Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) }).map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={(e) => { e.stopPropagation(); setGroupPage(i); }}
+                          className={`cursor-pointer transition-all duration-300 w-[14px] h-[14px] bg-white ${groupPage === i ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
+                          aria-label={`Go to page ${i + 1}`}
+                        />
+                      ))}
                     </div>
                   )}
                   {/* Bottom bar: share + heart + close */}
