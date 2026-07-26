@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp, Eye, EyeOff, Infinity as InfinityIcon, Pencil, LayoutGrid, Move } from "lucide-react";
+import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp, Eye, EyeOff, Infinity as InfinityIcon, Pencil, LayoutGrid, Move, MessageSquare } from "lucide-react";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
 const ICON_KEYS = ["none", "star", "heart", "sparkles", "sun", "moon", "cloud", "zap"] as const;
@@ -30,6 +30,8 @@ const CubeFacesSection = () => {
   const indicatorsVisible = get("cube_face_indicators_visible") !== "off";
   const arrowsVisible = get("cube_arrows_visible") !== "off";
   const titleDuration = Math.max(1, Math.min(60, getDuration("cube_title_duration") ?? 5));
+  const messageDuration = Math.max(1, Math.min(60, getDuration("cube_message_duration") ?? 5));
+  const frontMessage = get("cube_front_message") ?? "";
 
   const fetchFaces = async () => {
     setLoading(true);
@@ -107,19 +109,34 @@ const CubeFacesSection = () => {
           Arrows
         </button>
       </div>
-      <label className="flex items-center gap-3 text-[10px] font-display tracking-widest uppercase text-muted-foreground">
-        <span className="w-32">Title hide after</span>
-        <input
-          type="range"
-          min={1}
-          max={60}
-          step={1}
-          value={titleDuration}
-          onChange={(e) => updateDuration("cube_title_duration", Number(e.target.value))}
-          className="flex-1 max-w-[180px]"
-        />
-        <span className="w-12 text-right tabular-nums">{titleDuration}s</span>
-      </label>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <label className="flex items-center gap-3 text-[10px] font-display tracking-widest uppercase text-muted-foreground flex-1">
+          <span className="w-32">Title hide after</span>
+          <input
+            type="range"
+            min={1}
+            max={60}
+            step={1}
+            value={titleDuration}
+            onChange={(e) => updateDuration("cube_title_duration", Number(e.target.value))}
+            className="flex-1 max-w-[180px]"
+          />
+          <span className="w-12 text-right tabular-nums">{titleDuration}s</span>
+        </label>
+        <label className="flex items-center gap-3 text-[10px] font-display tracking-widest uppercase text-muted-foreground flex-1">
+          <span className="w-32">Message hide after</span>
+          <input
+            type="range"
+            min={1}
+            max={60}
+            step={1}
+            value={messageDuration}
+            onChange={(e) => updateDuration("cube_message_duration", Number(e.target.value))}
+            className="flex-1 max-w-[180px]"
+          />
+          <span className="w-12 text-right tabular-nums">{messageDuration}s</span>
+        </label>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {faces.map((face) => (
         <div key={face.id} className="border border-border p-4 space-y-3">
@@ -165,6 +182,19 @@ const CubeFacesSection = () => {
 
           <div className="space-y-1.5">
             <p className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60">Icon</p>
+            {face.id === 0 && (
+              <div className="space-y-1.5 pb-3 mb-2 border-b border-border">
+                <p className="text-[9px] font-display tracking-widest uppercase text-muted-foreground/60 flex items-center gap-1.5">
+                  <MessageSquare size={10} /> Message
+                </p>
+                <input
+                  value={frontMessage}
+                  onChange={(e) => update("cube_front_message", e.target.value)}
+                  placeholder="Shown on the black strip after the title"
+                  className="w-full bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus:border-foreground"
+                />
+              </div>
+            )}
             <div className="flex flex-wrap gap-1">
               {ICON_KEYS.map((k) => (
                 <button
