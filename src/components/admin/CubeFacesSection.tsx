@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp, Eye, EyeOff } from "lucide-react";
+import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp, Eye, EyeOff, Infinity as InfinityIcon, Pencil, LayoutGrid } from "lucide-react";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
 const ICON_KEYS = ["none", "star", "heart", "sparkles", "sun", "moon", "cloud", "zap"] as const;
@@ -25,7 +25,9 @@ const CubeFacesSection = () => {
   const [adjustOpen, setAdjustOpen] = useState<Record<number, boolean>>({});
   const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
   const { get, update } = useSectionContent();
-  const controlsHidden = get("cube_controls_visible") === "off";
+  const freeSpinVisible = get("cube_free_spin_visible") !== "off";
+  const editFaceVisible = get("cube_edit_face_visible") !== "off";
+  const indicatorsVisible = get("cube_face_indicators_visible") !== "off";
 
   const fetchFaces = async () => {
     setLoading(true);
@@ -69,13 +71,32 @@ const CubeFacesSection = () => {
 
   return (
     <div className="space-y-4">
-      <button
-        onClick={() => update("cube_controls_visible", controlsHidden ? "on" : "off")}
-        className="inline-flex items-center gap-2 border border-border px-3 py-2 text-[10px] font-display tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
-      >
-        {controlsHidden ? <EyeOff size={12} /> : <Eye size={12} />}
-        {controlsHidden ? "Free spin / Edit face hidden on site" : "Free spin / Edit face visible on site"}
-      </button>
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          onClick={() => update("cube_free_spin_visible", freeSpinVisible ? "off" : "on")}
+          className={`inline-flex items-center gap-2 border px-3 py-2 text-[10px] font-display tracking-[0.25em] uppercase transition-colors ${freeSpinVisible ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/40"}`}
+        >
+          {freeSpinVisible ? <Eye size={12} /> : <EyeOff size={12} />}
+          <InfinityIcon size={12} />
+          Free spin
+        </button>
+        <button
+          onClick={() => update("cube_edit_face_visible", editFaceVisible ? "off" : "on")}
+          className={`inline-flex items-center gap-2 border px-3 py-2 text-[10px] font-display tracking-[0.25em] uppercase transition-colors ${editFaceVisible ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/40"}`}
+        >
+          {editFaceVisible ? <Eye size={12} /> : <EyeOff size={12} />}
+          <Pencil size={12} />
+          Edit face
+        </button>
+        <button
+          onClick={() => update("cube_face_indicators_visible", indicatorsVisible ? "off" : "on")}
+          className={`inline-flex items-center gap-2 border px-3 py-2 text-[10px] font-display tracking-[0.25em] uppercase transition-colors ${indicatorsVisible ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/40"}`}
+        >
+          {indicatorsVisible ? <Eye size={12} /> : <EyeOff size={12} />}
+          <LayoutGrid size={12} />
+          Indicators
+        </button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {faces.map((face) => (
         <div key={face.id} className="border border-border p-4 space-y-3">
