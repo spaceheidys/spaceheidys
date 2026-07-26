@@ -215,6 +215,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
   const freeSpinVisible = getSection("cube_free_spin_visible") !== "off";
   const editFaceVisible = getSection("cube_edit_face_visible") !== "off";
   const indicatorsVisible = getSection("cube_face_indicators_visible") !== "off";
+  const arrowsVisible = getSection("cube_arrows_visible") !== "off";
 
   const setYaw = (fn: (s: number) => number) => {
     cancelInertia();
