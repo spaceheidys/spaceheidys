@@ -21,8 +21,9 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const messageHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageShowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { get, getDuration } = useSectionContent();
-  const titleDurationSeconds = Math.max(1, Math.min(60, getDuration("cube_title_duration") ?? 5));
+  const titleDurationSeconds = Math.max(0, Math.min(60, getDuration("cube_title_duration") ?? 5));
   const titleVisibleMs = titleDurationSeconds * 1000;
+  const titlePersists = titleDurationSeconds === 0;
   const messageDurationSeconds = Math.max(1, Math.min(60, getDuration("cube_message_duration") ?? 5));
   const messageVisibleMs = messageDurationSeconds * 1000;
   const gapDurationSeconds = Math.max(0, Math.min(30, getDuration("cube_gap_duration") ?? 1));
@@ -57,20 +58,21 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   useEffect(() => {
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     setShowTitle(true);
+    if (titlePersists) return;
     hideTimerRef.current = setTimeout(() => {
       setShowTitle(false);
     }, titleVisibleMs);
     return () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     };
-  }, [activeTitle, titleTrigger, titleVisibleMs]);
+  }, [activeTitle, titleTrigger, titleVisibleMs, titlePersists]);
 
   useEffect(() => {
     if (messageShowTimerRef.current) clearTimeout(messageShowTimerRef.current);
     if (messageHideTimerRef.current) clearTimeout(messageHideTimerRef.current);
     setShowMessage(false);
     if (!hasMessage) return;
-    const delay = titleVisibleMs + gapMs + 700; // wait for title fade + gap
+    const delay = (titlePersists ? 0 : titleVisibleMs + 700) + gapMs;
     messageShowTimerRef.current = setTimeout(() => {
       setShowMessage(true);
       setMessageTrigger((k) => k + 1);
@@ -80,7 +82,7 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
       if (messageShowTimerRef.current) clearTimeout(messageShowTimerRef.current);
       if (messageHideTimerRef.current) clearTimeout(messageHideTimerRef.current);
     };
-  }, [hasMessage, activeMessage, titleTrigger, titleVisibleMs, gapMs, messageVisibleMs]);
+  }, [hasMessage, activeMessage, titleTrigger, titleVisibleMs, titlePersists, gapMs, messageVisibleMs]);
 
   const formatted = visits != null ? visits.toLocaleString("en-US") : null;
   return (
