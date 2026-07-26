@@ -20,6 +20,7 @@ import {
   ChevronsDown,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const GLITCH_CHARS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!<>-_\\/[]{}—=+*^?#@%&$~";
@@ -209,6 +210,9 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
   useEffect(() => {
     freeSpinRef.current = freeSpin;
   }, [freeSpin]);
+
+  const { get: getSection } = useSectionContent();
+  const controlsHidden = getSection("cube_controls_visible") === "off";
 
   const setYaw = (fn: (s: number) => number) => {
     cancelInertia();
@@ -544,7 +548,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-5 mt-2">
-        <button
+        {!controlsHidden && <button
           onClick={() => setFreeSpin((v) => !v)}
           aria-pressed={freeSpin}
           className={`inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] transition-colors ${
@@ -553,7 +557,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
         >
           <InfinityIcon className="h-3.5 w-3.5" />
           Free spin {freeSpin ? "on" : "off"}
-        </button>
+        </button>}
 
         <div className="flex items-center gap-2">
           {faces.map((_, i) => (
@@ -568,13 +572,13 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
           ))}
         </div>
 
-        <button
+        {!controlsHidden && <button
           onClick={() => setEditing(true)}
           className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-white/50 hover:text-white transition-colors"
         >
           <Pencil className="h-3.5 w-3.5" />
           Edit face {LABELS[activeIndex]}
-        </button>
+        </button>}
       </div>
 
       {editing ? (

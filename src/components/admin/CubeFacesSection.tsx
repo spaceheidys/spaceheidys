@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp, Eye, EyeOff } from "lucide-react";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const ICON_KEYS = ["none", "star", "heart", "sparkles", "sun", "moon", "cloud", "zap"] as const;
 const FACE_LABELS = ["01 · Front", "02 · Right", "03 · Back", "04 · Left", "05 · Top", "06 · Bottom"];
@@ -23,6 +24,8 @@ const CubeFacesSection = () => {
   const [uploadingId, setUploadingId] = useState<number | null>(null);
   const [adjustOpen, setAdjustOpen] = useState<Record<number, boolean>>({});
   const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const { get, update } = useSectionContent();
+  const controlsHidden = get("cube_controls_visible") === "off";
 
   const fetchFaces = async () => {
     setLoading(true);
@@ -65,7 +68,15 @@ const CubeFacesSection = () => {
   if (loading) return <div className="flex justify-center py-8"><Loader2 className="animate-spin text-muted-foreground" size={20} /></div>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-4">
+      <button
+        onClick={() => update("cube_controls_visible", controlsHidden ? "on" : "off")}
+        className="inline-flex items-center gap-2 border border-border px-3 py-2 text-[10px] font-display tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+      >
+        {controlsHidden ? <EyeOff size={12} /> : <Eye size={12} />}
+        {controlsHidden ? "Free spin / Edit face hidden on site" : "Free spin / Edit face visible on site"}
+      </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {faces.map((face) => (
         <div key={face.id} className="border border-border p-4 space-y-3">
           <p className="text-[10px] font-display tracking-[0.3em] uppercase text-muted-foreground">{FACE_LABELS[face.id]}</p>
@@ -182,6 +193,7 @@ const CubeFacesSection = () => {
           )}
         </div>
       ))}
+      </div>
     </div>
   );
 };
