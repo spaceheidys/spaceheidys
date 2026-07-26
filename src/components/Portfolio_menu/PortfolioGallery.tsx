@@ -173,6 +173,36 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
     onLightboxChange?.(!!selectedEntry);
   }, [selectedEntry, onLightboxChange]);
 
+  // Lock background scroll while lightbox is open so the page doesn't move
+  useEffect(() => {
+    if (!selectedEntry) return;
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const prev = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow,
+    };
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+    return () => {
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.left = prev.left;
+      body.style.right = prev.right;
+      body.style.width = prev.width;
+      body.style.overflow = prev.overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [selectedEntry]);
+
   useEffect(() => {
     const fetchItems = async () => {
       if (sectionKey === "favorites") {
@@ -473,17 +503,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Back button (hidden inside project view where it sits in the info panel) */}
-              {!isProject && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
-                  className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-200 text-[9px] font-display tracking-[0.2em] uppercase"
-                  aria-label="Back to list"
-                >
-                  <ArrowLeft className="w-3 h-3" />
-                  <span className="hidden sm:inline">Back</span>
-                </button>
-              )}
+              {/* Back button lives inside the bottom bar for group/single views;
+                  project view keeps its own back inside the info panel. */}
 
               {/* ── PROJECT view ── */}
               {isProject ? (
@@ -571,7 +592,13 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                     />
                   ))}
                   {/* Bottom bar: share + heart + close */}
-                  <div className="flex items-center justify-center gap-3 py-2">
+                  <div className="flex flex-col items-center justify-center gap-2 py-2">
+                    {selectedEntry.label && (
+                      <p className="text-[10px] font-display tracking-[0.2em] uppercase text-white/70 text-center px-4">
+                        {selectedEntry.label}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-center gap-3">
                     {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
@@ -588,6 +615,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
+                    </div>
                   </div>
                 </div>
 
@@ -602,7 +630,13 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                     onContextMenu={(e) => e.preventDefault()}
                   />
                   {/* Bottom bar: share + heart + close */}
-                  <div className="flex items-center justify-center gap-3 pt-2 flex-shrink-0">
+                  <div className="flex flex-col items-center justify-center gap-2 pt-2 flex-shrink-0">
+                    {selectedEntry.label && (
+                      <p className="text-[10px] font-display tracking-[0.2em] uppercase text-white/70 text-center px-4">
+                        {selectedEntry.label}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-center gap-3">
                     {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
@@ -619,6 +653,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
+                    </div>
                   </div>
                 </div>
               )}
