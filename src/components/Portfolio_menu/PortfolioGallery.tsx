@@ -511,7 +511,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[95vw] sm:w-[85vw]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
+              className={`relative ${isProject ? "w-[95vw] sm:w-[85vw]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] h-[90vh] flex flex-col overflow-hidden" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
               onTouchStart={handleLbTouchStart}
               onTouchMove={handleLbTouchMove}
               onTouchEnd={handleLbTouchEnd}
@@ -598,7 +598,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
               /* ── GROUP view ── */
               ) : isGroup ? (
-                <div className="flex flex-col gap-3">
+                <>
+                <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                     {(isDesktopLB
                       ? selectedEntry.groupImages!.slice(
@@ -623,8 +624,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                       </button>
                     ))}
                   </div>
-                  {/* Bottom bar: share + heart + pages + close — sticky */}
-                  <div className="sticky bottom-0 z-30 flex flex-col items-center justify-center gap-2 py-2 bg-black/70 backdrop-blur-sm">
+                </div>
+                {/* Bottom bar: share + heart + pages + close */}
+                <div className="flex-shrink-0 flex flex-col items-center justify-center gap-2 py-2 bg-black/70 backdrop-blur-sm">
                     {selectedEntry.label && (
                       <p className="text-[10px] font-display tracking-[0.2em] uppercase text-white/70 text-center px-4">
                         {selectedEntry.label}
@@ -665,7 +667,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                     </button>
                     </div>
                   </div>
-                </div>
+                </>
 
               /* ── SINGLE IMAGE view ── */
               ) : (
