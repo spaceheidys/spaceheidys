@@ -447,9 +447,7 @@ const Gallery = () => {
 
             <motion.div
               key={selectedEntry.id}
-              ref={isGroup ? groupScrollRef : undefined}
-              onScroll={isGroup ? handleGroupScroll : undefined}
-              className={`relative ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] overflow-y-auto" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
+              className={`relative ${isGroup ? "max-w-[90vw] sm:max-w-[75vw] h-[90vh] flex flex-col overflow-hidden" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
               initial={{ scale: 0.7, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.75, opacity: 0, y: 20 }}
@@ -472,7 +470,12 @@ const Gallery = () => {
               )}
 
               {isGroup ? (
-                <div className="flex flex-col gap-6">
+                <>
+                <div
+                  ref={groupScrollRef}
+                  onScroll={handleGroupScroll}
+                  className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-6"
+                >
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                     {(isDesktopLB
                       ? selectedEntry.groupImages!.slice(
@@ -515,8 +518,9 @@ const Gallery = () => {
                       {selectedEntry.project_date && <span>{selectedEntry.project_date}</span>}
                     </div>
                   )}
-                  {/* Bottom bar — sticky so it doesn't jump between pages */}
-                  <div className="sticky bottom-0 z-30 flex items-center justify-center gap-3 py-2 bg-black/70 backdrop-blur-sm">
+                </div>
+                {/* Bottom bar — fixed row so it stays in place across pages */}
+                <div className="flex-shrink-0 flex items-center justify-center gap-3 py-2 bg-black/70 backdrop-blur-sm">
                     {shareVisible && <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
@@ -550,7 +554,7 @@ const Gallery = () => {
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                </div>
+                </>
               ) : (
                 <div className="flex flex-col items-center gap-2 min-h-0 flex-1">
                   <img
