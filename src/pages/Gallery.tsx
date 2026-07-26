@@ -561,6 +561,28 @@ const Gallery = () => {
           );
         })()}
       </AnimatePresence>
+
+      {/* Zoom overlay for individual group images */}
+      <AnimatePresence>
+        {zoomedImg && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 cursor-zoom-out overflow-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setZoomedImg(null)}
+          >
+            <img
+              src={zoomedImg}
+              alt="Full size"
+              className="max-w-none"
+              onClick={(e) => { e.stopPropagation(); setZoomedImg(null); }}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
