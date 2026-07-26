@@ -10,6 +10,8 @@ interface CubeSectionProps {
 const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, backgroundUrl }, ref) => {
   const isVideo = backgroundUrl ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(backgroundUrl) : false;
   const [visits, setVisits] = useState<number | null>(null);
+  const [activeTitle, setActiveTitle] = useState("");
+  const [titleTrigger, setTitleTrigger] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,13 +72,26 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
           )
         )}
         <div className="relative z-10 w-full flex items-center justify-center px-6">
-          <RotatingCube />
+          <RotatingCube
+            onActiveTitleChange={(title) => {
+              if (title !== activeTitle) {
+                setActiveTitle(title);
+                setTitleTrigger((k) => k + 1);
+              }
+            }}
+          />
         </div>
       </div>
 
       {/* Cube category divider strip — moved from the top of the cube to the bottom */}
-      <div className="relative w-full h-8 bg-black overflow-hidden flex items-center justify-center">
+      <div className="relative w-full h-8 bg-black overflow-hidden flex items-center justify-center gap-4">
         <GlitchTitle text="CUBE" triggerKey={0} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
+        {activeTitle && (
+          <>
+            <span className="text-white/20 select-none">·</span>
+            <GlitchTitle text={activeTitle.toUpperCase()} triggerKey={titleTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
+          </>
+        )}
       </div>
 
       {footerText && (
