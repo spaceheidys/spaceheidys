@@ -832,8 +832,18 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {frontImages.map((item, i) => (
               <SortableFrontCard key={`front-${i}`} id={`front-${i}`}>
+                {({ attributes, listeners }) => (<>
                 <div className={`relative group border border-border aspect-[2/3] overflow-hidden bg-muted/10 ${item.hidden ? "opacity-40" : ""}`}>
                   <img src={item.url} alt={`Front ${i + 1}`} className="w-full h-full object-cover pointer-events-none" />
+                  {/* Drag handle (top-center) */}
+                  <div
+                    {...attributes}
+                    {...listeners}
+                    className="absolute top-1 left-1/2 -translate-x-1/2 z-20 p-1 bg-black/70 rounded cursor-grab active:cursor-grabbing touch-none opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Drag to reorder"
+                  >
+                    <Move size={12} className="text-white/80" />
+                  </div>
                   {/* Reorder arrows — always visible on hover */}
                   <div className="absolute top-1 left-1 right-1 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
@@ -903,6 +913,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
                   placeholder="Text above card..."
                   className="w-full bg-transparent border border-border px-1.5 py-1 text-[9px] text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-foreground transition-colors"
                 />
+                </>)}
               </SortableFrontCard>
             ))}
             {/* Add new */}
