@@ -205,7 +205,6 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
   const [faces, setFaces] = useState<FaceContent[]>(DEFAULT_FACES);
   const [editing, setEditing] = useState(false);
   const [freeSpin, setFreeSpin] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
   const freeSpinRef = useRef(freeSpin);
   useEffect(() => {
     freeSpinRef.current = freeSpin;
@@ -523,52 +522,38 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
         </button>
       </div>
 
-      <div className="flex items-center gap-2 mt-2">
-        {faces.map((_, i) => (
-          <span
-            key={i}
-            className={`transition-all ${
-              i === activeIndex
-                ? "h-2.5 w-2.5 rounded-full bg-white"
-                : "h-2 w-2 bg-white/30"
-            }`}
-          />
-        ))}
-      </div>
-
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-5 mt-2">
         <button
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-expanded={menuOpen}
-          aria-label={menuOpen ? "Hide controls" : "Show controls"}
-          className="h-9 w-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors"
-        >
-          {menuOpen ? <ChevronsDown className="h-4 w-4" /> : <ChevronsUp className="h-4 w-4" />}
-        </button>
-
-        <div
-          className={`flex flex-wrap items-center justify-center gap-6 overflow-hidden transition-all duration-300 ease-out ${
-            menuOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+          onClick={() => setFreeSpin((v) => !v)}
+          aria-pressed={freeSpin}
+          className={`inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] transition-colors ${
+            freeSpin ? "text-white" : "text-white/50 hover:text-white"
           }`}
         >
-          <button
-            onClick={() => setFreeSpin((v) => !v)}
-            aria-pressed={freeSpin}
-            className={`inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] transition-colors ${
-              freeSpin ? "text-white" : "text-white/50 hover:text-white"
-            }`}
-          >
-            <InfinityIcon className="h-3.5 w-3.5" />
-            Free spin {freeSpin ? "on" : "off"}
-          </button>
-          <button
-            onClick={() => setEditing(true)}
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-white/50 hover:text-white transition-colors"
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            Edit face {LABELS[activeIndex]}
-          </button>
+          <InfinityIcon className="h-3.5 w-3.5" />
+          Free spin {freeSpin ? "on" : "off"}
+        </button>
+
+        <div className="flex items-center gap-2">
+          {faces.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goToFace(i)}
+              aria-label={`Show face ${LABELS[i]}`}
+              className={`cursor-pointer transition-all duration-300 w-[12px] h-[12px] bg-white ${
+                i === activeIndex ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"
+              }`}
+            />
+          ))}
         </div>
+
+        <button
+          onClick={() => setEditing(true)}
+          className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-white/50 hover:text-white transition-colors"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+          Edit face {LABELS[activeIndex]}
+        </button>
       </div>
 
       {editing ? (
