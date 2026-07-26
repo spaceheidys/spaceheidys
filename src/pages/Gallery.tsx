@@ -120,6 +120,7 @@ const Gallery = () => {
   const touchStartX = useRef<number | null>(null);
   const groupScrollRef = useRef<HTMLDivElement | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [zoomedImg, setZoomedImg] = useState<string | null>(null);
 
   // When lightbox opens for a group, reset scroll-top state
   useEffect(() => {
@@ -440,53 +441,45 @@ const Gallery = () => {
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
             >
-              {/* Back button — sticky on mobile inside group scroller so it follows the scroll */}
-              {isGroup ? (
-                <div className="sticky top-3 left-3 z-20 self-start pointer-events-none">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (showScrollTop) scrollGroupToTop();
-                      else setSelectedEntry(null);
-                    }}
-                    className="pointer-events-auto ml-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-all duration-500 text-[9px] font-display tracking-[0.2em] uppercase backdrop-blur-sm"
-                    aria-label={showScrollTop ? "Scroll to top" : "Back"}
-                  >
-                    <span className="relative w-3 h-3 flex items-center justify-center">
-                      <ArrowLeft className={`w-3 h-3 absolute transition-all duration-500 ${showScrollTop ? "opacity-0 -rotate-90" : "opacity-100 rotate-0"}`} />
-                      <ArrowUp className={`w-3 h-3 absolute transition-all duration-500 ${showScrollTop ? "opacity-100 rotate-0" : "opacity-0 rotate-90"}`} />
-                    </span>
-                    <span className="hidden sm:inline">{showScrollTop ? "Top" : "Back"}</span>
-                  </button>
-                </div>
-              ) : (
+              {/* Back button removed — the bottom X handles closing. Sticky "scroll to top"
+                  arrow stays for long group scrollers. */}
+              {isGroup && showScrollTop && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
-                  className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-200 text-[9px] font-display tracking-[0.2em] uppercase"
-                  aria-label="Back"
+                  onClick={(e) => { e.stopPropagation(); scrollGroupToTop(); }}
+                  className="sticky top-3 float-right mr-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/60 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-300 text-[9px] font-display tracking-[0.2em] uppercase backdrop-blur-sm"
+                  aria-label="Scroll to top"
                 >
-                  <ArrowLeft className="w-3 h-3" />
-                  <span className="hidden sm:inline">Back</span>
+                  <ArrowUp className="w-3 h-3" />
+                  <span className="hidden sm:inline">Top</span>
                 </button>
               )}
 
               {isGroup ? (
                 <div className="flex flex-col gap-6">
-                  {selectedEntry.groupImages!.map((img, idx) => (
-                    <div key={idx} className="flex flex-col gap-2">
-                      <img
-                        src={img.url}
-                        alt={`${selectedEntry.title} ${idx + 1}`}
-                        className="max-w-full max-h-[80vh] object-contain rounded-md"
-                        onContextMenu={(e) => e.preventDefault()}
-                      />
-                      {img.notes && (
-                        <p className="text-[11px] sm:text-xs text-white/60 font-display tracking-wide leading-relaxed max-w-[75vw] mx-auto px-2">
-                          {img.notes}
-                        </p>
-                      )}
-                    </div>
-                  ))}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                    {selectedEntry.groupImages!.map((img, idx) => (
+                      <div key={idx} className="flex flex-col gap-1.5">
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setZoomedImg(img.url); }}
+                          className="group relative overflow-hidden rounded-md bg-white/5 aspect-[3/4]"
+                          aria-label={`Open ${selectedEntry.title} ${idx + 1} at full size`}
+                        >
+                          <img
+                            src={img.url}
+                            alt={`${selectedEntry.title} ${idx + 1}`}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                            onContextMenu={(e) => e.preventDefault()}
+                          />
+                        </button>
+                        {img.notes && (
+                          <p className="text-[10px] sm:text-[11px] text-white/60 font-display tracking-wide leading-relaxed px-1">
+                            {img.notes}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                   {/* Project meta */}
                   {(selectedEntry.description || (selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
                     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-2 text-[10px] sm:text-xs text-white/50 font-display tracking-wider">
@@ -567,6 +560,28 @@ const Gallery = () => {
           </motion.div>
           );
         })()}
+      </AnimatePresence>
+
+      {/* Zoom overlay for individual group images */}
+      <AnimatePresence>
+        {zoomedImg && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 cursor-zoom-out overflow-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setZoomedImg(null)}
+          >
+            <img
+              src={zoomedImg}
+              alt="Full size"
+              className="max-w-none"
+              onClick={(e) => { e.stopPropagation(); setZoomedImg(null); }}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );
