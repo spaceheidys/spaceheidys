@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useState, useRef } from "react";
 import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -12,6 +12,9 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const [visits, setVisits] = useState<number | null>(null);
   const [activeTitle, setActiveTitle] = useState("");
   const [titleTrigger, setTitleTrigger] = useState(0);
+  const [showTitle, setShowTitle] = useState(true);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const TITLE_VISIBLE_MS = 5000;
 
   useEffect(() => {
     let cancelled = false;
@@ -37,9 +40,20 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    setShowTitle(true);
+    hideTimerRef.current = setTimeout(() => {
+      setShowTitle(false);
+    }, TITLE_VISIBLE_MS);
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, [activeTitle, titleTrigger]);
+
   const formatted = visits != null ? visits.toLocaleString("en-US") : null;
   return (
-    <>
+    <div ref={ref}>
       {/* divider with visit counter */}
       <div className="w-full h-8 bg-black flex items-center justify-center">
         {formatted && (
@@ -50,7 +64,6 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
       </div>
 
       <div
-        ref={ref}
         className="relative w-full bg-black flex flex-col items-center justify-center overflow-hidden min-h-[100svh] py-20"
       >
         {backgroundUrl && (
@@ -85,13 +98,17 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
 
       {/* Cube category divider strip — moved from the top of the cube to the bottom */}
       <div className="relative w-full h-8 bg-black overflow-hidden flex items-center justify-center gap-4">
-        <GlitchTitle text="CUBE" triggerKey={0} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
-        {activeTitle && (
-          <>
-            <span className="text-white/20 select-none">·</span>
-            <GlitchTitle text={activeTitle.toUpperCase()} triggerKey={titleTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
-          </>
-        )}
+        <div
+          className={`transition-opacity duration-700 flex items-center justify-center gap-4 ${showTitle ? "opacity-100" : "opacity-0"}`}
+        >
+          <GlitchTitle text="CUBE" triggerKey={0} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
+          {activeTitle && (
+            <>
+              <span className="text-white/20 select-none">·</span>
+              <GlitchTitle text={activeTitle.toUpperCase()} triggerKey={titleTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
+            </>
+          )}
+        </div>
       </div>
 
       {footerText && (
@@ -104,7 +121,7 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 });
 
