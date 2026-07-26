@@ -121,6 +121,23 @@ const Gallery = () => {
   const groupScrollRef = useRef<HTMLDivElement | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [zoomedImg, setZoomedImg] = useState<string | null>(null);
+  const [groupPage, setGroupPage] = useState(0);
+  const [isDesktopLB, setIsDesktopLB] = useState<boolean>(() =>
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 640px)").matches : true
+  );
+  const GROUP_PAGE_SIZE = 6;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(min-width: 640px)");
+    const handler = (e: MediaQueryListEvent) => setIsDesktopLB(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    setGroupPage(0);
+  }, [selectedEntry?.id]);
 
   // When lightbox opens for a group, reset scroll-top state
   useEffect(() => {
@@ -457,7 +474,13 @@ const Gallery = () => {
               {isGroup ? (
                 <div className="flex flex-col gap-6">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                    {selectedEntry.groupImages!.map((img, idx) => (
+                    {(isDesktopLB
+                      ? selectedEntry.groupImages!.slice(
+                          groupPage * GROUP_PAGE_SIZE,
+                          groupPage * GROUP_PAGE_SIZE + GROUP_PAGE_SIZE
+                        )
+                      : selectedEntry.groupImages!
+                    ).map((img, idx) => (
                       <div key={idx} className="flex flex-col gap-1.5">
                         <button
                           type="button"
@@ -480,6 +503,33 @@ const Gallery = () => {
                       </div>
                     ))}
                   </div>
+                  {isDesktopLB && selectedEntry.groupImages!.length > GROUP_PAGE_SIZE && (
+                    <div className="flex items-center justify-center gap-3 pt-1">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setGroupPage((p) => Math.max(0, p - 1)); }}
+                        disabled={groupPage === 0}
+                        className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Previous page"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                      </button>
+                      <span className="text-[10px] font-display tracking-[0.2em] uppercase text-white/60">
+                        {groupPage + 1} / {Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE)}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const max = Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) - 1;
+                          setGroupPage((p) => Math.min(max, p + 1));
+                        }}
+                        disabled={groupPage >= Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) - 1}
+                        className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Next page"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                   {/* Project meta */}
                   {(selectedEntry.description || (selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
                     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-2 text-[10px] sm:text-xs text-white/50 font-display tracking-wider">
