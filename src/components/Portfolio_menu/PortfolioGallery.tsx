@@ -623,20 +623,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                       </button>
                     ))}
                   </div>
-                  {isDesktopLB && selectedEntry.groupImages!.length > GROUP_PAGE_SIZE && (
-                    <div className="flex items-center justify-center gap-3 pt-1">
-                      {Array.from({ length: Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) }).map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={(e) => { e.stopPropagation(); setGroupPage(i); }}
-                          className={`cursor-pointer transition-all duration-300 w-[14px] h-[14px] bg-white ${groupPage === i ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
-                          aria-label={`Go to page ${i + 1}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {/* Bottom bar: share + heart + close */}
-                  <div className="flex flex-col items-center justify-center gap-2 py-2">
+                  {/* Bottom bar: share + heart + pages + close — sticky */}
+                  <div className="sticky bottom-0 z-30 flex flex-col items-center justify-center gap-2 py-2 bg-black/70 backdrop-blur-sm">
                     {selectedEntry.label && (
                       <p className="text-[10px] font-display tracking-[0.2em] uppercase text-white/70 text-center px-4">
                         {selectedEntry.label}
@@ -652,6 +640,22 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                     >
                       <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
                     </button>
+                    {isDesktopLB && selectedEntry.groupImages!.length > GROUP_PAGE_SIZE && (
+                      <>
+                        <div className="w-[1px] h-4 bg-white/10" />
+                        <div className="flex items-center gap-2">
+                          {Array.from({ length: Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) }).map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={(e) => { e.stopPropagation(); setGroupPage(i); }}
+                              className={`cursor-pointer transition-all duration-300 w-[12px] h-[12px] bg-white ${groupPage === i ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
+                              aria-label={`Go to page ${i + 1}`}
+                            />
+                          ))}
+                        </div>
+                        <div className="w-[1px] h-4 bg-white/10" />
+                      </>
+                    )}
                     <button
                       onClick={() => setSelectedEntry(null)}
                       className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"

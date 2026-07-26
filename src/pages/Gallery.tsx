@@ -503,18 +503,6 @@ const Gallery = () => {
                       </div>
                     ))}
                   </div>
-                  {isDesktopLB && selectedEntry.groupImages!.length > GROUP_PAGE_SIZE && (
-                    <div className="flex items-center justify-center gap-3 pt-1">
-                      {Array.from({ length: Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) }).map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={(e) => { e.stopPropagation(); setGroupPage(i); }}
-                          className={`cursor-pointer transition-all duration-300 w-[14px] h-[14px] bg-white ${groupPage === i ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
-                          aria-label={`Go to page ${i + 1}`}
-                        />
-                      ))}
-                    </div>
-                  )}
                   {/* Project meta */}
                   {(selectedEntry.description || (selectedEntry.tags && selectedEntry.tags.length > 0) || selectedEntry.project_date) && (
                     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-2 text-[10px] sm:text-xs text-white/50 font-display tracking-wider">
@@ -527,8 +515,8 @@ const Gallery = () => {
                       {selectedEntry.project_date && <span>{selectedEntry.project_date}</span>}
                     </div>
                   )}
-                  {/* Bottom bar */}
-                  <div className="flex items-center justify-center gap-3 py-2">
+                  {/* Bottom bar — sticky so it doesn't jump between pages */}
+                  <div className="sticky bottom-0 z-30 flex items-center justify-center gap-3 py-2 bg-black/70 backdrop-blur-sm">
                     {shareVisible && <ShareBar shareUrl={shareUrl} title={selectedEntry.title} compact />}
                     <div className="w-[1px] h-4 bg-white/10" />
                     <button
@@ -538,6 +526,22 @@ const Gallery = () => {
                     >
                       <Heart className={`w-3.5 h-3.5 ${isFavorite(selectedEntry.id) ? "fill-white" : ""}`} />
                     </button>
+                    {isDesktopLB && selectedEntry.groupImages!.length > GROUP_PAGE_SIZE && (
+                      <>
+                        <div className="w-[1px] h-4 bg-white/10" />
+                        <div className="flex items-center gap-2">
+                          {Array.from({ length: Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) }).map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={(e) => { e.stopPropagation(); setGroupPage(i); }}
+                              className={`cursor-pointer transition-all duration-300 w-[12px] h-[12px] bg-white ${groupPage === i ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
+                              aria-label={`Go to page ${i + 1}`}
+                            />
+                          ))}
+                        </div>
+                        <div className="w-[1px] h-4 bg-white/10" />
+                      </>
+                    )}
                     <button
                       onClick={() => setSelectedEntry(null)}
                       className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200"
