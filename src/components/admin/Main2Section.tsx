@@ -32,8 +32,8 @@ function ConfirmButtons({ onYes, onNo }: { onYes: () => void; onNo: () => void }
   );
 }
 
-/** Sortable wrapper for a Front-image card (drag to reorder) */
-function SortableFrontCard({ id, children }: { id: string; children: React.ReactNode }) {
+/** Sortable wrapper for a Front-image card (drag by the handle to reorder) */
+function SortableFrontCard({ id, children }: { id: string; children: (handle: { attributes: any; listeners: any }) => React.ReactNode }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -42,8 +42,8 @@ function SortableFrontCard({ id, children }: { id: string; children: React.React
     opacity: isDragging ? 0.7 : 1,
   };
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="flex flex-col gap-1 cursor-grab active:cursor-grabbing touch-none">
-      {children}
+    <div ref={setNodeRef} style={style} className="flex flex-col gap-1">
+      {children({ attributes, listeners })}
     </div>
   );
 }
