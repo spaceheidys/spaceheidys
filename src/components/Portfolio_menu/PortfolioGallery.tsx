@@ -165,6 +165,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [zoomedImg, setZoomedImg] = useState<string | null>(null);
   const { favorites, toggle, isFavorite } = useFavorites();
   const { visibility } = useSectionSettings();
   const shareVisible = visibility.share;
@@ -503,8 +504,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Back button lives inside the bottom bar for group/single views;
-                  project view keeps its own back inside the info panel. */}
+              {/* Close lives in the bottom bar for group/single views; project view keeps its own back inside the info panel. */}
 
               {/* ── PROJECT view ── */}
               {isProject ? (
@@ -582,15 +582,24 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               /* ── GROUP view ── */
               ) : isGroup ? (
                 <div className="flex flex-col gap-3">
-                  {selectedEntry.groupImages!.map((url, idx) => (
-                    <img
-                      key={idx}
-                      src={url}
-                      alt={`${selectedEntry.label} ${idx + 1}`}
-                      className="max-w-full max-h-[80vh] object-contain rounded-md"
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
-                  ))}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                    {selectedEntry.groupImages!.map((url, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setZoomedImg(url); }}
+                        className="group relative overflow-hidden rounded-md bg-white/5 aspect-[3/4]"
+                        aria-label={`Open ${selectedEntry.label} ${idx + 1} at full size`}
+                      >
+                        <img
+                          src={url}
+                          alt={`${selectedEntry.label} ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                          onContextMenu={(e) => e.preventDefault()}
+                        />
+                      </button>
+                    ))}
+                  </div>
                   {/* Bottom bar: share + heart + close */}
                   <div className="flex flex-col items-center justify-center gap-2 py-2">
                     {selectedEntry.label && (
