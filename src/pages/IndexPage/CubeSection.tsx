@@ -12,12 +12,20 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const isVideo = backgroundUrl ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(backgroundUrl) : false;
   const [visits, setVisits] = useState<number | null>(null);
   const [activeTitle, setActiveTitle] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
   const [titleTrigger, setTitleTrigger] = useState(0);
   const [showTitle, setShowTitle] = useState(true);
+  const [showMessage, setShowMessage] = useState(true);
+  const [messageTrigger, setMessageTrigger] = useState(0);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { getDuration } = useSectionContent();
+  const messageHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { get, getDuration } = useSectionContent();
   const titleDurationSeconds = Math.max(1, Math.min(60, getDuration("cube_title_duration") ?? 5));
   const titleVisibleMs = titleDurationSeconds * 1000;
+  const messageDurationSeconds = Math.max(1, Math.min(60, getDuration("cube_message_duration") ?? 5));
+  const messageVisibleMs = messageDurationSeconds * 1000;
+  const frontMessage = (get("cube_front_message") ?? "").trim();
+  const showFrontMessage = activeIndex === 0 && frontMessage.length > 0;
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +62,17 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     };
   }, [activeTitle, titleTrigger, titleVisibleMs]);
 
+  useEffect(() => {
+    if (messageHideTimerRef.current) clearTimeout(messageHideTimerRef.current);
+    if (!showFrontMessage) { setShowMessage(false); return; }
+    setShowMessage(true);
+    setMessageTrigger((k) => k + 1);
+    messageHideTimerRef.current = setTimeout(() => setShowMessage(false), messageVisibleMs);
+    return () => {
+      if (messageHideTimerRef.current) clearTimeout(messageHideTimerRef.current);
+    };
+  }, [showFrontMessage, frontMessage, titleTrigger, messageVisibleMs]);
+
   const formatted = visits != null ? visits.toLocaleString("en-US") : null;
   return (
     <div ref={ref}>
@@ -89,7 +108,8 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
         )}
         <div className="relative z-10 w-full flex items-center justify-center px-6">
           <RotatingCube
-            onActiveTitleChange={(title) => {
+            onActiveTitleChange={(title, index) => {
+              setActiveIndex(index);
               if (title !== activeTitle) {
                 setActiveTitle(title);
                 setTitleTrigger((k) => k + 1);
@@ -109,6 +129,12 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
             <>
               <span className="text-white/20 select-none">·</span>
               <GlitchTitle text={activeTitle.toUpperCase()} triggerKey={titleTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
+            </>
+          )}
+          {showFrontMessage && showMessage && (
+            <>
+              <span className="text-white/20 select-none">·</span>
+              <GlitchTitle text={frontMessage.toUpperCase()} triggerKey={messageTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
             </>
           )}
         </div>
