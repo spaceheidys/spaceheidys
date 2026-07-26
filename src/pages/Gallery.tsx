@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useGallerySubs } from "@/hooks/useGallerySubs";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowUp, X, ChevronLeft, ChevronRight, Heart, Copy } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUp, X, ChevronLeft, ChevronRight, Heart, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
