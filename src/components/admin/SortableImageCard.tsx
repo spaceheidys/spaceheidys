@@ -26,6 +26,7 @@ interface SortableImageCardProps {
   notes?: string;
   tags?: string[];
   project_date?: string;
+  groupImages?: string[];
   showProjectUrl?: boolean;
   is_visible?: boolean;
   onDelete: () => void;
@@ -73,6 +74,7 @@ const SortableImageCard = ({
   notes,
   tags,
   project_date,
+  groupImages,
   showProjectUrl,
   is_visible = true,
   onDelete,
@@ -412,12 +414,25 @@ const SortableImageCard = ({
                 />
               </div>
             ) : image_url ? (
-              <img
-                src={image_url}
-                alt={title}
-                className="max-w-[90vw] max-h-[90vh] object-contain rounded cursor-pointer"
-                onClick={() => setIsPreviewOpen(false)}
-              />
+              groupImages && groupImages.length > 1 ? (
+                <div className="flex flex-col gap-3 max-h-[90vh] overflow-y-auto">
+                  {groupImages.map((url, idx) => (
+                    <img
+                      key={idx}
+                      src={url}
+                      alt={`${title} ${idx + 1}`}
+                      className="max-w-[90vw] max-h-[85vh] object-contain rounded"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <img
+                  src={image_url}
+                  alt={title}
+                  className="max-w-[90vw] max-h-[90vh] object-contain rounded cursor-pointer"
+                  onClick={() => setIsPreviewOpen(false)}
+                />
+              )
             ) : null}
             {title && (
               <div className="absolute top-3 left-3 bg-background/80 px-3 py-1.5 rounded">
