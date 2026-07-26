@@ -183,13 +183,6 @@ const CubeFacesSection = () => {
                 placeholder="Title"
                 className="w-full bg-transparent border border-border px-2 py-1.5 text-xs font-display tracking-widest outline-none focus:border-foreground"
               />
-              <textarea
-                value={face.text}
-                onChange={(e) => { updateLocal(face.id, { text: e.target.value }); persist(face.id, { text: e.target.value }, true); }}
-                placeholder="Text"
-                rows={2}
-                className="w-full bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus:border-foreground resize-none"
-              />
               <input
                 value={get(`cube_face_message_${face.id}`)}
                 onChange={(e) => update(`cube_face_message_${face.id}`, e.target.value)}
