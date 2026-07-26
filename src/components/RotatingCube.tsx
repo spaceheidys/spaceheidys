@@ -211,6 +211,9 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
     freeSpinRef.current = freeSpin;
   }, [freeSpin]);
 
+  const { get: getSection } = useSectionContent();
+  const controlsHidden = getSection("cube_controls_visible") === "off";
+
   const setYaw = (fn: (s: number) => number) => {
     cancelInertia();
     setYawDeg((d) => fn(Math.round(d / 90)) * 90);
