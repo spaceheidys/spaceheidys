@@ -219,6 +219,27 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
     setPitchDeg((d) => fn(Math.round(d / 90)) * 90);
   };
 
+  // Rotate cube so face i becomes active, choosing the shortest path.
+  const goToFace = (i: number) => {
+    cancelInertia();
+    const targets: Array<{ yaw: number; pitch: number }> = [
+      { yaw: 0, pitch: 0 },     // 0 Front
+      { yaw: -90, pitch: 0 },   // 1 Right
+      { yaw: 180, pitch: 0 },   // 2 Back
+      { yaw: 90, pitch: 0 },    // 3 Left
+      { yaw: 0, pitch: -90 },   // 4 Top
+      { yaw: 0, pitch: 90 },    // 5 Bottom
+    ];
+    const t = targets[i];
+    const snap = (cur: number, target: number) => {
+      const base = Math.round((cur - target) / 360) * 360;
+      return target + base;
+    };
+    setYawDeg((y) => snap(y, t.yaw));
+    setPitchDeg((p) => snap(p, t.pitch));
+    setRollDeg((r) => Math.round(r / 360) * 360);
+  };
+
   const cancelInertia = () => {
     if (inertiaRef.current != null) {
       cancelAnimationFrame(inertiaRef.current);
