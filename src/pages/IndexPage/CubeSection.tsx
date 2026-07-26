@@ -48,11 +48,11 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     setShowTitle(true);
     hideTimerRef.current = setTimeout(() => {
       setShowTitle(false);
-    }, TITLE_VISIBLE_MS);
+    }, titleVisibleMs);
     return () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     };
-  }, [activeTitle, titleTrigger]);
+  }, [activeTitle, titleTrigger, titleVisibleMs]);
 
   const formatted = visits != null ? visits.toLocaleString("en-US") : null;
   return (
