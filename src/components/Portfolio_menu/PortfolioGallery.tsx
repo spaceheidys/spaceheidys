@@ -468,17 +468,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Back button */}
-              <button
-                onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
-                className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-white/10 border border-white/15 text-white/50 hover:text-white hover:bg-white/20 hover:border-white/30 transition-colors duration-200 text-[9px] font-display tracking-[0.2em] uppercase"
-                aria-label="Back to list"
-              >
-                <ArrowLeft className="w-3 h-3" />
-                <span className="hidden sm:inline">Back</span>
-              </button>
-
-
               {/* ── PROJECT view ── */}
               {isProject ? (
                 <div className="w-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
@@ -539,6 +528,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                         <ExternalLink size={14} />
                         Visit Project
                       </a>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
+                        className="flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/50 hover:text-white hover:bg-white/10 hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"
+                        aria-label="Back to list"
+                      >
+                        <ArrowLeft size={14} />
+                        Back
+                      </button>
                       {shareVisible && <ShareBar shareUrl={getShareUrl(selectedEntry)} title={selectedEntry.label} />}
                     </div>
                   </div>
