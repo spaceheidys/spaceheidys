@@ -48,11 +48,21 @@ export function useSectionContent() {
   };
 
   const updateDuration = async (key: string, duration: number | null) => {
-    await supabase
-      .from("section_content")
-      .update({ display_duration: duration, updated_at: new Date().toISOString() } as any)
-      .eq("key", key);
-    setItems((prev) => prev.map((i) => (i.key === key ? { ...i, display_duration: duration } : i)));
+    const existing = items.find((i) => i.key === key);
+    if (existing) {
+      await supabase
+        .from("section_content")
+        .update({ display_duration: duration, updated_at: new Date().toISOString() } as any)
+        .eq("key", key);
+      setItems((prev) => prev.map((i) => (i.key === key ? { ...i, display_duration: duration } : i)));
+    } else {
+      const { data } = await supabase
+        .from("section_content")
+        .insert({ key, content: "", display_duration: duration })
+        .select()
+        .single();
+      if (data) setItems((prev) => [...prev, data as SectionContent]);
+    }
   };
 
   return { items, loading, get, getDuration, update, updateDuration, refetch: fetch };
