@@ -10,6 +10,8 @@ interface CubeSectionProps {
 const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, backgroundUrl }, ref) => {
   const isVideo = backgroundUrl ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(backgroundUrl) : false;
   const [visits, setVisits] = useState<number | null>(null);
+  const [activeTitle, setActiveTitle] = useState("");
+  const [titleTrigger, setTitleTrigger] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
