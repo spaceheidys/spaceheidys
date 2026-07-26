@@ -121,9 +121,7 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
 
       {/* Cube category divider strip — moved from the top of the cube to the bottom */}
       <div className="relative w-full h-8 bg-black overflow-hidden flex items-center justify-center gap-4">
-        <div
-          className={`transition-opacity duration-700 flex items-center justify-center gap-4 ${showTitle ? "opacity-100" : "opacity-0"}`}
-        >
+        <div className={`transition-opacity duration-700 flex items-center gap-4 ${showTitle ? "opacity-100" : "opacity-0"}`}>
           <GlitchTitle text="CUBE" triggerKey={0} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
           {activeTitle && (
             <>
@@ -131,13 +129,13 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
               <GlitchTitle text={activeTitle.toUpperCase()} triggerKey={titleTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
             </>
           )}
-          {showFrontMessage && showMessage && (
-            <>
-              <span className="text-white/20 select-none">·</span>
-              <GlitchTitle text={frontMessage.toUpperCase()} triggerKey={messageTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
-            </>
-          )}
         </div>
+        {showFrontMessage && (
+          <div className={`transition-opacity duration-700 flex items-center gap-4 ${showMessage ? "opacity-100" : "opacity-0"}`}>
+            <span className="text-white/20 select-none">·</span>
+            <GlitchTitle text={frontMessage.toUpperCase()} triggerKey={messageTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
+          </div>
+        )}
       </div>
 
       {footerText && (
