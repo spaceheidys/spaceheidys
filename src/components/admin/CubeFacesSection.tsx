@@ -29,7 +29,7 @@ const CubeFacesSection = () => {
   const editFaceVisible = get("cube_edit_face_visible") !== "off";
   const indicatorsVisible = get("cube_face_indicators_visible") !== "off";
   const arrowsVisible = get("cube_arrows_visible") !== "off";
-  const titleDuration = Math.max(1, Math.min(60, getDuration("cube_title_duration") ?? 5));
+  const titleDuration = Math.max(0, Math.min(60, getDuration("cube_title_duration") ?? 5));
   const messageDuration = Math.max(1, Math.min(60, getDuration("cube_message_duration") ?? 5));
   const gapDuration = Math.max(0, Math.min(30, getDuration("cube_gap_duration") ?? 1));
 
@@ -114,14 +114,14 @@ const CubeFacesSection = () => {
           <span className="w-32">Title hide after</span>
           <input
             type="range"
-            min={1}
+            min={0}
             max={60}
             step={1}
             value={titleDuration}
             onChange={(e) => updateDuration("cube_title_duration", Number(e.target.value))}
             className="flex-1 max-w-[180px]"
           />
-          <span className="w-12 text-right tabular-nums">{titleDuration}s</span>
+          <span className="w-12 text-right tabular-nums">{titleDuration === 0 ? "∞" : `${titleDuration}s`}</span>
         </label>
         <label className="flex items-center gap-3 text-[10px] font-display tracking-widest uppercase text-muted-foreground flex-1">
           <span className="w-32">Gap before message</span>
