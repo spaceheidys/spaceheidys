@@ -342,8 +342,8 @@ const Index = () => {
   }, []);
 
   const scrollToCube = useCallback(() => {
-    cubeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
+    slowScrollTo(cubeRef.current, 1400);
+  }, [slowScrollTo]);
 
   const openSecretDoor = useCallback(() => setSecretDoorOpen(true), []);
   const closeSecretDoor = useCallback(() => setSecretDoorOpen(false), []);
