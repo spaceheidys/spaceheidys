@@ -50,7 +50,7 @@ const pickUniqueNum = (used: Set<number>, min: number, max: number, step = 0.5) 
   return min + Math.random() * (max - min);
 };
 
-const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number }) => {
+export const GlitchTitle = ({ text, triggerKey, className = "" }: { text: string; triggerKey: number; className?: string }) => {
   const [display, setDisplay] = useState(text);
   const [glitchKey, setGlitchKey] = useState(0);
   const [fx, setFx] = useState({ tx: 0, ty: 0, skew: 0, clipTop: 0, clipBot: 0, clipTop2: 0, clipBot2: 0, splitR: 0, splitG: 0, hidden: false });
@@ -126,7 +126,7 @@ const GlitchTitle = ({ text, triggerKey }: { text: string; triggerKey: number })
   return (
     <h1
       key={`${triggerKey}-${glitchKey}`}
-      className="text-2xl font-light font-mono relative inline-block leading-none"
+      className={`font-light font-mono relative inline-block leading-none ${className}`}
       style={{
         minHeight: "1.5em",
         transform: `translate(${fx.tx}px, ${fx.ty}px) skewX(${fx.skew}deg)`,
