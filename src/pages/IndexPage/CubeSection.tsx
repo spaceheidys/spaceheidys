@@ -19,13 +19,16 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const [messageTrigger, setMessageTrigger] = useState(0);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const messageShowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { get, getDuration } = useSectionContent();
   const titleDurationSeconds = Math.max(1, Math.min(60, getDuration("cube_title_duration") ?? 5));
   const titleVisibleMs = titleDurationSeconds * 1000;
   const messageDurationSeconds = Math.max(1, Math.min(60, getDuration("cube_message_duration") ?? 5));
   const messageVisibleMs = messageDurationSeconds * 1000;
-  const frontMessage = (get("cube_front_message") ?? "").trim();
-  const showFrontMessage = activeIndex === 0 && frontMessage.length > 0;
+  const gapDurationSeconds = Math.max(0, Math.min(30, getDuration("cube_gap_duration") ?? 1));
+  const gapMs = gapDurationSeconds * 1000;
+  const activeMessage = (get(`cube_face_message_${activeIndex}`) ?? "").trim();
+  const hasMessage = activeMessage.length > 0;
 
   useEffect(() => {
     let cancelled = false;
@@ -63,15 +66,21 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   }, [activeTitle, titleTrigger, titleVisibleMs]);
 
   useEffect(() => {
+    if (messageShowTimerRef.current) clearTimeout(messageShowTimerRef.current);
     if (messageHideTimerRef.current) clearTimeout(messageHideTimerRef.current);
-    if (!showFrontMessage) { setShowMessage(false); return; }
-    setShowMessage(true);
-    setMessageTrigger((k) => k + 1);
-    messageHideTimerRef.current = setTimeout(() => setShowMessage(false), messageVisibleMs);
+    setShowMessage(false);
+    if (!hasMessage) return;
+    const delay = titleVisibleMs + gapMs + 700; // wait for title fade + gap
+    messageShowTimerRef.current = setTimeout(() => {
+      setShowMessage(true);
+      setMessageTrigger((k) => k + 1);
+      messageHideTimerRef.current = setTimeout(() => setShowMessage(false), messageVisibleMs);
+    }, delay);
     return () => {
+      if (messageShowTimerRef.current) clearTimeout(messageShowTimerRef.current);
       if (messageHideTimerRef.current) clearTimeout(messageHideTimerRef.current);
     };
-  }, [showFrontMessage, frontMessage, titleTrigger, messageVisibleMs]);
+  }, [hasMessage, activeMessage, titleTrigger, titleVisibleMs, gapMs, messageVisibleMs]);
 
   const formatted = visits != null ? visits.toLocaleString("en-US") : null;
   return (
@@ -130,10 +139,10 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
             </>
           )}
         </div>
-        {showFrontMessage && (
+        {hasMessage && (
           <div className={`transition-opacity duration-700 flex items-center gap-4 ${showMessage ? "opacity-100" : "opacity-0"}`}>
             <span className="text-white/20 select-none">·</span>
-            <GlitchTitle text={frontMessage.toUpperCase()} triggerKey={messageTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
+            <GlitchTitle text={activeMessage.toUpperCase()} triggerKey={messageTrigger} className="text-sm tracking-[0.4em] uppercase text-white/60 tabular-nums select-none" />
           </div>
         )}
       </div>
