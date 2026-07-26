@@ -424,8 +424,8 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
   }, [activeIndex, active?.title, onActiveTitleChange]);
 
   return (
-    <div className="flex flex-col items-center gap-8 text-white">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col items-center gap-3 text-white">
+      <div className="flex items-center gap-12">
         <button
           onClick={() => setYaw((s) => s - 1)}
           aria-label="Rotate left"
@@ -434,7 +434,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
           <ChevronLeft className="h-4 w-4" />
         </button>
 
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-6">
           <button
             onClick={() => setPitch((s) => s + 1)}
             aria-label="Rotate up"
@@ -523,16 +523,20 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
         </button>
       </div>
 
-      <div className="flex gap-1.5">
+      <div className="flex items-center gap-2 mt-2">
         {faces.map((_, i) => (
           <span
             key={i}
-            className={`h-1 w-6 transition-colors ${i === activeIndex ? "bg-white" : "bg-white/20"}`}
+            className={`transition-all ${
+              i === activeIndex
+                ? "h-2.5 w-2.5 rounded-full bg-white"
+                : "h-2 w-2 bg-white/30"
+            }`}
           />
         ))}
       </div>
 
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-2">
         <button
           onClick={() => setMenuOpen((v) => !v)}
           aria-expanded={menuOpen}
