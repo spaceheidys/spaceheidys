@@ -582,19 +582,19 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               /* ── GROUP view ── */
               ) : isGroup ? (
                 <div className="flex flex-col gap-3">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                     {selectedEntry.groupImages!.map((url, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setZoomedImg(url); }}
-                        className="group relative overflow-hidden rounded-md bg-white/5 aspect-[3/4]"
+                        className="group relative overflow-hidden rounded-md bg-white/5"
                         aria-label={`Open ${selectedEntry.label} ${idx + 1} at full size`}
                       >
                         <img
                           src={url}
                           alt={`${selectedEntry.label} ${idx + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                          className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                           onContextMenu={(e) => e.preventDefault()}
                         />
                       </button>

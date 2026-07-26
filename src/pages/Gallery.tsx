@@ -456,19 +456,19 @@ const Gallery = () => {
 
               {isGroup ? (
                 <div className="flex flex-col gap-6">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                     {selectedEntry.groupImages!.map((img, idx) => (
                       <div key={idx} className="flex flex-col gap-1.5">
                         <button
                           type="button"
                           onClick={(e) => { e.stopPropagation(); setZoomedImg(img.url); }}
-                          className="group relative overflow-hidden rounded-md bg-white/5 aspect-[3/4]"
+                          className="group relative overflow-hidden rounded-md bg-white/5"
                           aria-label={`Open ${selectedEntry.title} ${idx + 1} at full size`}
                         >
                           <img
                             src={img.url}
                             alt={`${selectedEntry.title} ${idx + 1}`}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                            className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                             onContextMenu={(e) => e.preventDefault()}
                           />
                         </button>
