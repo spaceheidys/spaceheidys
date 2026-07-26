@@ -187,7 +187,7 @@ const STORAGE_KEY = "cube-faces-v2";
 const SIZE = 280;
 const HALF = SIZE / 2;
 
-const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: string) => void }) => {
+const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: string, index: number) => void }) => {
   const [yawDeg, setYawDeg] = useState(-30);
   const [pitchDeg, setPitchDeg] = useState(25);
   const [rollDeg, setRollDeg] = useState(0);
@@ -446,7 +446,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
 
   useEffect(() => {
     if (onActiveTitleChange) {
-      onActiveTitleChange(active?.title || FACE_NAMES[activeIndex] || "");
+      onActiveTitleChange(active?.title || FACE_NAMES[activeIndex] || "", activeIndex);
     }
   }, [activeIndex, active?.title, onActiveTitleChange]);
 
