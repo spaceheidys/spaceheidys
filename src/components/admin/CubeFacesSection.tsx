@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp, Eye, EyeOff, Infinity as InfinityIcon, Pencil, LayoutGrid } from "lucide-react";
+import { Loader2, Upload, Trash2, Sliders, ChevronDown, ChevronUp, Eye, EyeOff, Infinity as InfinityIcon, Pencil, LayoutGrid, Move } from "lucide-react";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
 const ICON_KEYS = ["none", "star", "heart", "sparkles", "sun", "moon", "cloud", "zap"] as const;
@@ -24,10 +24,12 @@ const CubeFacesSection = () => {
   const [uploadingId, setUploadingId] = useState<number | null>(null);
   const [adjustOpen, setAdjustOpen] = useState<Record<number, boolean>>({});
   const saveTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
-  const { get, update } = useSectionContent();
+  const { get, getDuration, update, updateDuration } = useSectionContent();
   const freeSpinVisible = get("cube_free_spin_visible") !== "off";
   const editFaceVisible = get("cube_edit_face_visible") !== "off";
   const indicatorsVisible = get("cube_face_indicators_visible") !== "off";
+  const arrowsVisible = get("cube_arrows_visible") !== "off";
+  const titleDuration = Math.max(1, Math.min(60, getDuration("cube_title_duration") ?? 5));
 
   const fetchFaces = async () => {
     setLoading(true);
@@ -96,7 +98,28 @@ const CubeFacesSection = () => {
           <LayoutGrid size={12} />
           Indicators
         </button>
+        <button
+          onClick={() => update("cube_arrows_visible", arrowsVisible ? "off" : "on")}
+          className={`inline-flex items-center gap-2 border px-3 py-2 text-[10px] font-display tracking-[0.25em] uppercase transition-colors ${arrowsVisible ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/40"}`}
+        >
+          {arrowsVisible ? <Eye size={12} /> : <EyeOff size={12} />}
+          <Move size={12} />
+          Arrows
+        </button>
       </div>
+      <label className="flex items-center gap-3 text-[10px] font-display tracking-widest uppercase text-muted-foreground">
+        <span className="w-32">Title hide after</span>
+        <input
+          type="range"
+          min={1}
+          max={60}
+          step={1}
+          value={titleDuration}
+          onChange={(e) => updateDuration("cube_title_duration", Number(e.target.value))}
+          className="flex-1 max-w-[180px]"
+        />
+        <span className="w-12 text-right tabular-nums">{titleDuration}s</span>
+      </label>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {faces.map((face) => (
         <div key={face.id} className="border border-border p-4 space-y-3">

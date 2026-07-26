@@ -215,6 +215,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
   const freeSpinVisible = getSection("cube_free_spin_visible") !== "off";
   const editFaceVisible = getSection("cube_edit_face_visible") !== "off";
   const indicatorsVisible = getSection("cube_face_indicators_visible") !== "off";
+  const arrowsVisible = getSection("cube_arrows_visible") !== "off";
 
   const setYaw = (fn: (s: number) => number) => {
     cancelInertia();
@@ -451,23 +452,23 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
 
   return (
     <div className="flex flex-col items-center gap-3 text-white">
-      <div className="flex items-center gap-12">
-        <button
+      <div className={`flex items-center ${arrowsVisible ? "gap-12" : "gap-0"}`}>
+        {arrowsVisible && <button
           onClick={() => setYaw((s) => s - 1)}
           aria-label="Rotate left"
           className={`h-11 w-11 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
         >
           <ChevronLeft className="h-4 w-4" />
-        </button>
+        </button>}
 
-        <div className="flex flex-col items-center gap-6">
-          <button
+        <div className={`flex flex-col items-center ${arrowsVisible ? "gap-6" : "gap-0"}`}>
+          {arrowsVisible && <button
             onClick={() => setPitch((s) => s + 1)}
             aria-label="Rotate up"
             className={`h-11 w-11 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
           >
             <ChevronUp className="h-4 w-4" />
-          </button>
+          </button>}
 
           <div
             ref={containerRef}
@@ -531,22 +532,22 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
             </div>
           </div>
 
-          <button
+          {arrowsVisible && <button
             onClick={() => setPitch((s) => s - 1)}
             aria-label="Rotate down"
             className={`h-11 w-11 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
           >
             <ChevronDown className="h-4 w-4" />
-          </button>
+          </button>}
         </div>
 
-        <button
+        {arrowsVisible && <button
           onClick={() => setYaw((s) => s + 1)}
           aria-label="Rotate right"
           className={`h-11 w-11 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
         >
           <ChevronRight className="h-4 w-4" />
-        </button>
+        </button>}
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-5 mt-2">

@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useState, useRef } from "react";
 import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
+import { useSectionContent } from "@/hooks/useSectionContent";
 import { supabase } from "@/integrations/supabase/client";
 
 interface CubeSectionProps {
@@ -14,7 +15,9 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const [titleTrigger, setTitleTrigger] = useState(0);
   const [showTitle, setShowTitle] = useState(true);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const TITLE_VISIBLE_MS = 5000;
+  const { getDuration } = useSectionContent();
+  const titleDurationSeconds = Math.max(1, Math.min(60, getDuration("cube_title_duration") ?? 5));
+  const titleVisibleMs = titleDurationSeconds * 1000;
 
   useEffect(() => {
     let cancelled = false;
@@ -45,11 +48,11 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     setShowTitle(true);
     hideTimerRef.current = setTimeout(() => {
       setShowTitle(false);
-    }, TITLE_VISIBLE_MS);
+    }, titleVisibleMs);
     return () => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     };
-  }, [activeTitle, titleTrigger]);
+  }, [activeTitle, titleTrigger, titleVisibleMs]);
 
   const formatted = visits != null ? visits.toLocaleString("en-US") : null;
   return (
