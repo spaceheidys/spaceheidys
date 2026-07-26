@@ -1362,6 +1362,7 @@ const Admin = () => {
                           notes={(item as any).notes}
                           tags={(item as any).tags}
                           project_date={(item as any).project_date}
+                          groupImages={item.group_id ? items.filter(i => i.group_id === item.group_id).map(i => i.image_url).filter(Boolean) : undefined}
                           showProjectUrl={activeSection === "projects"}
                           onDelete={() => handleDelete(item)}
                           onPositionChange={(x, y) => handlePositionChange(item.id, x, y)}

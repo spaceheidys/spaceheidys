@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 const ITEMS_PER_PAGE_MOBILE = 4;
 const ITEMS_PER_PAGE_DESKTOP = 9;
+const ITEMS_PER_PAGE_DESKTOP_PROJECTS = 12;
 
 interface PortfolioItem {
   id: string;
@@ -156,7 +157,11 @@ const PlatformIcon = ({ label }: { label: string }) => {
 // ─── Main component ────────────────────────────────────────────────────────────
 const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLightboxChange }: PortfolioGalleryProps) => {
   const isMobile = useIsMobile();
-  const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE_DESKTOP;
+  const itemsPerPage = isMobile
+    ? ITEMS_PER_PAGE_MOBILE
+    : sectionKey === "projects"
+      ? ITEMS_PER_PAGE_DESKTOP_PROJECTS
+      : ITEMS_PER_PAGE_DESKTOP;
   const [dbItems, setDbItems] = useState<PortfolioItem[] | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
@@ -389,7 +394,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
         <motion.div
           key={`${sectionKey}-${gallerySub}-${page}`}
           ref={gridRef}
-          className="w-full grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-2 px-2 sm:px-2 py-1 sm:p-2 content-center"
+          className={`w-full grid grid-cols-2 sm:grid-cols-3 ${sectionKey === "projects" ? "md:grid-cols-4" : ""} gap-3 sm:gap-2 px-2 sm:px-2 py-1 sm:p-2 content-center`}
           initial={{ opacity: 0, x: 0 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0 }}
