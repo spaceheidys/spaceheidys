@@ -7,6 +7,31 @@ interface CubeSectionProps {
   backgroundUrl?: string | null;
 }
 
+/** Looping typewriter used in the cube divider strip. */
+const LoopTypewriter = ({ text, speed = 140, hold = 2200 }: { text: string; speed?: number; hold?: number }) => {
+  const [n, setN] = useState(0);
+  const [phase, setPhase] = useState<"typing" | "holding" | "erasing">("typing");
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    if (phase === "typing") {
+      if (n < text.length) t = setTimeout(() => setN(n + 1), speed);
+      else t = setTimeout(() => setPhase("holding"), hold);
+    } else if (phase === "holding") {
+      t = setTimeout(() => setPhase("erasing"), hold);
+    } else {
+      if (n > 0) t = setTimeout(() => setN(n - 1), speed / 2);
+      else t = setTimeout(() => setPhase("typing"), 600);
+    }
+    return () => clearTimeout(t);
+  }, [n, phase, text, speed, hold]);
+  return (
+    <span className="font-display text-[10px] tracking-[0.4em] text-white/60 tabular-nums select-none">
+      {text.slice(0, n)}
+      <span className="inline-block w-[1px] h-[10px] bg-white/60 ml-[2px] align-middle animate-pulse" />
+    </span>
+  );
+};
+
 const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, backgroundUrl }, ref) => {
   const isVideo = backgroundUrl ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(backgroundUrl) : false;
   const [visits, setVisits] = useState<number | null>(null);
@@ -83,6 +108,13 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
             </div>
           </div>
         )}
+      </div>
+
+      {/* Cube category divider strip (mirror of the equalizer strip above portfolio) */}
+      <div className="relative w-full h-8 bg-black overflow-hidden">
+        <div className="absolute inset-y-0 left-4 right-4 sm:left-[calc(6rem+1rem)] sm:right-8 md:left-[calc(8rem+1rem)] md:right-16 pointer-events-none flex items-center justify-center">
+          <LoopTypewriter text="CUBE" />
+        </div>
       </div>
     </>
   );
