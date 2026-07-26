@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X, ExternalLink, Heart, Copy, ArrowLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ExternalLink, Heart, Copy, ArrowLeft, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
@@ -166,6 +166,23 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [zoomedImg, setZoomedImg] = useState<string | null>(null);
+  const [groupPage, setGroupPage] = useState(0);
+  const [isDesktopLB, setIsDesktopLB] = useState<boolean>(() =>
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 640px)").matches : true
+  );
+  const GROUP_PAGE_SIZE = 6;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(min-width: 640px)");
+    const handler = (e: MediaQueryListEvent) => setIsDesktopLB(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    setGroupPage(0);
+  }, [selectedEntry?.id]);
   const { favorites, toggle, isFavorite } = useFavorites();
   const { visibility } = useSectionSettings();
   const shareVisible = visibility.share;
@@ -583,7 +600,13 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               ) : isGroup ? (
                 <div className="flex flex-col gap-3">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                    {selectedEntry.groupImages!.map((url, idx) => (
+                    {(isDesktopLB
+                      ? selectedEntry.groupImages!.slice(
+                          groupPage * GROUP_PAGE_SIZE,
+                          groupPage * GROUP_PAGE_SIZE + GROUP_PAGE_SIZE
+                        )
+                      : selectedEntry.groupImages!
+                    ).map((url, idx) => (
                       <button
                         key={idx}
                         type="button"
@@ -600,6 +623,33 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                       </button>
                     ))}
                   </div>
+                  {isDesktopLB && selectedEntry.groupImages!.length > GROUP_PAGE_SIZE && (
+                    <div className="flex items-center justify-center gap-3 pt-1">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setGroupPage((p) => Math.max(0, p - 1)); }}
+                        disabled={groupPage === 0}
+                        className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Previous page"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                      </button>
+                      <span className="text-[10px] font-display tracking-[0.2em] uppercase text-white/60">
+                        {groupPage + 1} / {Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE)}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const max = Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) - 1;
+                          setGroupPage((p) => Math.min(max, p + 1));
+                        }}
+                        disabled={groupPage >= Math.ceil(selectedEntry.groupImages!.length / GROUP_PAGE_SIZE) - 1}
+                        className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Next page"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                   {/* Bottom bar: share + heart + close */}
                   <div className="flex flex-col items-center justify-center gap-2 py-2">
                     {selectedEntry.label && (
