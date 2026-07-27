@@ -67,22 +67,37 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     };
   }, [activeTitle, titleTrigger, titleVisibleMs, titlePersists]);
 
+  // Keep the latest durations in refs so timers can read fresh values
+  // without the effect resetting whenever a duration prop changes.
+  const messageVisibleMsRef = useRef(messageVisibleMs);
+  const gapMsRef = useRef(gapMs);
+  const titleVisibleMsRef = useRef(titleVisibleMs);
+  const titlePersistsRef = useRef(titlePersists);
+  useEffect(() => { messageVisibleMsRef.current = messageVisibleMs; }, [messageVisibleMs]);
+  useEffect(() => { gapMsRef.current = gapMs; }, [gapMs]);
+  useEffect(() => { titleVisibleMsRef.current = titleVisibleMs; }, [titleVisibleMs]);
+  useEffect(() => { titlePersistsRef.current = titlePersists; }, [titlePersists]);
+
+  // Only re-arm the message cycle when the active face changes or the
+  // message content itself changes. Title glitch re-triggers and duration
+  // updates no longer interrupt the hide timer.
   useEffect(() => {
     if (messageShowTimerRef.current) clearTimeout(messageShowTimerRef.current);
     if (messageHideTimerRef.current) clearTimeout(messageHideTimerRef.current);
     setShowMessage(false);
     if (!hasMessage) return;
-    const delay = (titlePersists ? 0 : titleVisibleMs + 700) + gapMs;
+    const delay = (titlePersistsRef.current ? 0 : titleVisibleMsRef.current + 700) + gapMsRef.current;
     messageShowTimerRef.current = setTimeout(() => {
       setShowMessage(true);
       setMessageTrigger((k) => k + 1);
-      messageHideTimerRef.current = setTimeout(() => setShowMessage(false), messageVisibleMs);
+      const hideMs = messageVisibleMsRef.current;
+      messageHideTimerRef.current = setTimeout(() => setShowMessage(false), hideMs);
     }, delay);
     return () => {
       if (messageShowTimerRef.current) clearTimeout(messageShowTimerRef.current);
       if (messageHideTimerRef.current) clearTimeout(messageHideTimerRef.current);
     };
-  }, [hasMessage, activeMessage, titleTrigger, titleVisibleMs, titlePersists, gapMs, messageVisibleMs]);
+  }, [hasMessage, activeMessage, activeIndex]);
 
   const formatted = visits != null ? visits.toLocaleString("en-US") : null;
   return (
