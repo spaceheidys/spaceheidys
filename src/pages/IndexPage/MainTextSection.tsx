@@ -47,13 +47,13 @@ const Typewriter = ({
 /** Pixel dot that travels once around the frame perimeter. */
 const TravelPixel = () => (
   <motion.div
-    className="absolute w-1 h-1 bg-foreground rounded-[1px] pointer-events-none z-10"
+    className="absolute w-2 h-2 bg-foreground rounded-sm pointer-events-none z-10"
     initial={{ top: "8px", left: "0%" }}
     animate={{
       top: ["8px", "8px", "calc(100% - 8px)", "calc(100% - 8px)", "8px"],
       left: ["0%", "calc(100% - 4px)", "calc(100% - 4px)", "0%", "0%"],
     }}
-    transition={{ duration: 2.4, ease: "linear", times: [0, 0.25, 0.5, 0.75, 1] }}
+    transition={{ duration: 6.5, ease: "linear", times: [0, 0.25, 0.5, 0.75, 1] }}
   />
 );
 
