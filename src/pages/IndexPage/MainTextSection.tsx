@@ -53,7 +53,7 @@ const TravelPixel = () => (
       top: ["8px", "8px", "calc(100% - 8px)", "calc(100% - 8px)", "8px"],
       left: ["0%", "calc(100% - 4px)", "calc(100% - 4px)", "0%", "0%"],
     }}
-    transition={{ duration: 0.8, ease: "linear", times: [0, 0.25, 0.5, 0.75, 1] }}
+    transition={{ duration: 2.4, ease: "linear", times: [0, 0.25, 0.5, 0.75, 1] }}
   />
 );
 
@@ -135,7 +135,7 @@ const MainTextSection = memo(
       const typeDelay = !animateReveal
         ? 0.5
         : phase === "switch"
-        ? 0.9
+        ? 2.5
         : 1.55;
 
       // Bounds match the equalizer bar (which sits above), inset a bit so the
