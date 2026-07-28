@@ -135,7 +135,7 @@ const MainTextSection = memo(
       const typeDelay = !animateReveal
         ? 0.5
         : phase === "switch"
-        ? 0.9
+        ? 2.5
         : 1.55;
 
       // Bounds match the equalizer bar (which sits above), inset a bit so the
