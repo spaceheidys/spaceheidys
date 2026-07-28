@@ -130,12 +130,12 @@ const MainTextSection = memo(
 
       // Delay before typewriter starts.
       // - intro: after frame blink+expand (~1.55s)
-      // - switch: after the pixel travels around the frame (~0.85s)
+      // - switch: after the pixel slowly travels around the frame (~6.7s)
       // - no animation: short fade in
       const typeDelay = !animateReveal
         ? 0.5
         : phase === "switch"
-        ? 2.5
+        ? 6.7
         : 1.55;
 
       // Bounds match the equalizer bar (which sits above), inset a bit so the
