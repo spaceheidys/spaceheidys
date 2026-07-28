@@ -44,14 +44,15 @@ const Typewriter = ({
   return <span className={className} style={{ whiteSpace: "pre-line" }}>{text.slice(0, n)}</span>;
 };
 
-/** Pixel dot that travels once around the frame perimeter. */
+/** Pulsing square that travels along the center of the frame border. */
 const TravelPixel = () => (
   <motion.div
     className="absolute w-2 h-2 bg-foreground rounded-sm pointer-events-none z-10"
-    initial={{ top: "8px", left: "0%" }}
+    initial={{ top: "4px", left: "-3.5px" }}
     animate={{
-      top: ["8px", "8px", "calc(100% - 8px)", "calc(100% - 8px)", "8px"],
-      left: ["0%", "calc(100% - 8px)", "calc(100% - 8px)", "0%", "0%"],
+      top: ["4px", "4px", "calc(100% - 12px)", "calc(100% - 12px)", "4px"],
+      left: ["-3.5px", "calc(100% - 4.5px)", "calc(100% - 4.5px)", "-3.5px", "-3.5px"],
+      scale: [1, 1.4, 1, 1.4, 1],
     }}
     transition={{ duration: 6.5, ease: "linear", times: [0, 0.25, 0.5, 0.75, 1] }}
   />
