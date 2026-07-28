@@ -51,7 +51,7 @@ const TravelPixel = () => (
     initial={{ top: "8px", left: "0%" }}
     animate={{
       top: ["8px", "8px", "calc(100% - 8px)", "calc(100% - 8px)", "8px"],
-      left: ["0%", "calc(100% - 4px)", "calc(100% - 4px)", "0%", "0%"],
+      left: ["0%", "calc(100% - 8px)", "calc(100% - 8px)", "0%", "0%"],
     }}
     transition={{ duration: 6.5, ease: "linear", times: [0, 0.25, 0.5, 0.75, 1] }}
   />
