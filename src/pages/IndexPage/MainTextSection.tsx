@@ -44,17 +44,27 @@ const Typewriter = ({
   return <span className={className} style={{ whiteSpace: "pre-line" }}>{text.slice(0, n)}</span>;
 };
 
-/** Pulsing square that travels along the center of the frame border. */
+/** Blinking square that jumps between the four frame corners. */
 const TravelPixel = () => (
   <motion.div
     className="absolute w-2 h-2 bg-foreground rounded-sm pointer-events-none z-10"
-    initial={{ top: "4px", left: "-3.5px" }}
+    initial={{ top: "4px", left: "-3.5px", opacity: 0 }}
     animate={{
-      top: ["4px", "4px", "calc(100% - 12px)", "calc(100% - 12px)", "4px"],
-      left: ["-3.5px", "calc(100% - 4.5px)", "calc(100% - 4.5px)", "-3.5px", "-3.5px"],
-      scale: [1, 1.4, 1, 1.4, 1],
+      top: [
+        "4px", "4px", "4px", "4px", "4px",
+        "4px", "4px", "4px", "4px", "4px",
+        "calc(100% - 12px)", "calc(100% - 12px)", "calc(100% - 12px)", "calc(100% - 12px)", "calc(100% - 12px)",
+        "calc(100% - 12px)", "calc(100% - 12px)", "calc(100% - 12px)", "calc(100% - 12px)", "calc(100% - 12px)",
+      ],
+      left: [
+        "-3.5px", "-3.5px", "-3.5px", "-3.5px", "-3.5px",
+        "calc(100% - 4.5px)", "calc(100% - 4.5px)", "calc(100% - 4.5px)", "calc(100% - 4.5px)", "calc(100% - 4.5px)",
+        "calc(100% - 4.5px)", "calc(100% - 4.5px)", "calc(100% - 4.5px)", "calc(100% - 4.5px)", "calc(100% - 4.5px)",
+        "-3.5px", "-3.5px", "-3.5px", "-3.5px", "-3.5px",
+      ],
+      opacity: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
     }}
-    transition={{ duration: 6.5, ease: "linear", times: [0, 0.25, 0.5, 0.75, 1] }}
+    transition={{ duration: 6.5, ease: "linear", times: [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95] }}
   />
 );
 
