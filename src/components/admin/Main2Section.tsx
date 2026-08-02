@@ -508,35 +508,6 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
             {textRevealAnimation ? "On" : "Off"}
           </button>
         </div>
-        <div className="flex flex-col gap-2 pt-2 border-t border-border/40 mt-2">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">
-                Projects availability badge
-              </span>
-              <span className="text-[9px] text-muted-foreground/60 font-display tracking-wider">
-                Label with status dot shown above the Projects grid.
-              </span>
-            </div>
-            <button
-              onClick={handleToggleAvailable}
-              className={`px-3 py-1 text-[10px] font-display tracking-[0.2em] uppercase transition-colors border ${
-                availableOn
-                  ? "border-foreground text-foreground"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {availableOn ? "On" : "Off"}
-            </button>
-          </div>
-          <input
-            value={availableText}
-            onChange={(e) => setAvailableText(e.target.value)}
-            onBlur={() => update("projects_available_text", availableText)}
-            placeholder="AVAILABLE FOR SELECT PROJECTS"
-            className="bg-transparent border border-border px-2 py-1.5 text-[10px] font-display tracking-[0.2em] uppercase outline-none focus:border-foreground"
-          />
-        </div>
       </div>
     ),
     cards: (
