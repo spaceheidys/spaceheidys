@@ -7,6 +7,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
 import { toast } from "sonner";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
+import { useSectionContent } from "@/hooks/useSectionContent";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -185,6 +186,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   }, [selectedEntry?.id]);
   const { favorites, toggle, isFavorite } = useFavorites();
   const { visibility } = useSectionSettings();
+  const { get: getContent } = useSectionContent();
+  const availableOn = getContent("projects_available_enabled") !== "off";
+  const availableText = getContent("projects_available_text") || "AVAILABLE FOR SELECT PROJECTS";
   const shareVisible = visibility.share;
 
   useEffect(() => {
@@ -427,6 +431,20 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      {sectionKey === "projects" && availableOn && availableText.trim() && (
+        <div className="w-full flex justify-center mb-3 px-2">
+          <div className="inline-flex items-center gap-2 bg-black px-3 py-1.5">
+            <span className="relative flex w-[7px] h-[7px]">
+              <span className="absolute inline-flex w-full h-full rounded-full bg-[#d7f205] opacity-60 animate-ping" />
+              <span className="relative inline-flex w-[7px] h-[7px] rounded-full bg-[#d7f205]" />
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-display tracking-[0.22em] uppercase text-white/90">
+              {availableText}
+            </span>
+          </div>
+        </div>
+      )}
+
       {hasPagination && (
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
