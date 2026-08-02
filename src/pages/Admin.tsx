@@ -414,6 +414,12 @@ const Admin = () => {
   const [editLabel, setEditLabel] = useState("");
   const [editLabelJp, setEditLabelJp] = useState("");
   const { get: getContent, update: updateContent } = useSectionContent();
+  const [availableOn, setAvailableOn] = useState(true);
+  const [availableText, setAvailableText] = useState("AVAILABLE FOR SELECT PROJECTS");
+  useEffect(() => {
+    setAvailableOn(getContent("projects_available_enabled") !== "off");
+    setAvailableText(getContent("projects_available_text") || "AVAILABLE FOR SELECT PROJECTS");
+  }, [getContent]);
   const { subs: gallerySubs, save: saveGallerySubs } = useGallerySubs();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
