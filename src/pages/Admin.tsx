@@ -414,6 +414,12 @@ const Admin = () => {
   const [editLabel, setEditLabel] = useState("");
   const [editLabelJp, setEditLabelJp] = useState("");
   const { get: getContent, update: updateContent } = useSectionContent();
+  const [availableOn, setAvailableOn] = useState(true);
+  const [availableText, setAvailableText] = useState("AVAILABLE FOR SELECT PROJECTS");
+  useEffect(() => {
+    setAvailableOn(getContent("projects_available_enabled") !== "off");
+    setAvailableText(getContent("projects_available_text") || "AVAILABLE FOR SELECT PROJECTS");
+  }, [getContent]);
   const { subs: gallerySubs, save: saveGallerySubs } = useGallerySubs();
   const navigate = useNavigate();
   const [items, setItems] = useState<PortfolioItem[]>([]);
@@ -1127,6 +1133,42 @@ const Admin = () => {
           rows={2}
           className="w-full bg-transparent text-xs font-display tracking-wider text-foreground placeholder:text-muted-foreground/50 outline-none border border-dashed border-border focus:border-foreground/40 transition-colors resize-y px-2 py-1.5"
         />
+        {activeSection === "projects" && (
+          <div className="flex flex-col gap-2 border border-dashed border-border px-3 py-2">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-[10px] text-muted-foreground font-display tracking-widest uppercase">
+                  Projects availability badge
+                </span>
+                <span className="text-[9px] text-muted-foreground/60 font-display tracking-wider">
+                  Label with status dot shown above the Projects grid.
+                </span>
+              </div>
+              <button
+                onClick={async () => {
+                  const next = !availableOn;
+                  setAvailableOn(next);
+                  await updateContent("projects_available_enabled", next ? "on" : "off");
+                  toast.success(next ? "Availability badge shown" : "Availability badge hidden");
+                }}
+                className={`px-3 py-1 text-[10px] font-display tracking-[0.2em] uppercase transition-colors border ${
+                  availableOn
+                    ? "border-foreground text-foreground"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {availableOn ? "On" : "Off"}
+              </button>
+            </div>
+            <input
+              value={availableText}
+              onChange={(e) => setAvailableText(e.target.value)}
+              onBlur={() => updateContent("projects_available_text", availableText)}
+              placeholder="AVAILABLE FOR SELECT PROJECTS"
+              className="bg-transparent border border-border px-2 py-1.5 text-[10px] font-display tracking-[0.2em] uppercase outline-none focus:border-foreground"
+            />
+          </div>
+        )}
         </div>)}
 
         {/* Bulk select toolbar */}
