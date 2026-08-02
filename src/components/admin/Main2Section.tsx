@@ -59,8 +59,6 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [bgWallpaper, setBgWallpaper] = useState("");
   const [bgWallpapers, setBgWallpapers] = useState<{ url: string; weight: number }[]>([]);
   const [textRevealAnimation, setTextRevealAnimation] = useState(true);
-  const [availableOn, setAvailableOn] = useState(true);
-  const [availableText, setAvailableText] = useState("AVAILABLE FOR SELECT PROJECTS");
   const [rotateOn, setRotateOn] = useState(false);
   const [rotateInterval, setRotateInterval] = useState(60);
   const [bgOpacity, setBgOpacity] = useState(40);
@@ -160,8 +158,6 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     } catch { setBgWallpapers([]); }
     setBgOpacity(parseInt(get("card_bg_video_opacity") || "40", 10));
     setTextRevealAnimation(get("text_reveal_animation") !== "off");
-    setAvailableOn(get("projects_available_enabled") !== "off");
-    setAvailableText(get("projects_available_text") || "AVAILABLE FOR SELECT PROJECTS");
     setRotateOn(get("card_bg_wallpaper_rotate") === "on");
     setRotateInterval(Math.max(5, parseInt(get("card_bg_wallpaper_rotate_interval") || "60", 10) || 60));
   }, [get]);
@@ -365,13 +361,6 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     setTextRevealAnimation(next);
     await update("text_reveal_animation", next ? "on" : "off");
     toast.success(next ? "Animated reveal enabled" : "Animated reveal disabled");
-  };
-
-  const handleToggleAvailable = async () => {
-    const next = !availableOn;
-    setAvailableOn(next);
-    await update("projects_available_enabled", next ? "on" : "off");
-    toast.success(next ? "Availability badge shown" : "Availability badge hidden");
   };
 
   const handleToggleRotate = async () => {
