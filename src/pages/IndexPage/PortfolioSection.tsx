@@ -230,7 +230,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                 <div
                   className={`flex items-center justify-center ${
                     activePortfolioKey
-                      ? "w-[88vw] h-[110vw] max-w-[400px] max-h-[530px] sm:w-[320px] sm:h-[400px] md:w-[420px] md:h-[500px] lg:w-[520px] lg:h-[580px] xl:w-[600px] xl:h-[650px] sm:max-w-none sm:max-h-none"
+                      ? "w-[95vw] h-[135vw] max-w-[520px] max-h-[690px] sm:w-[448px] sm:h-[560px] md:w-[588px] md:h-[700px] lg:w-[728px] lg:h-[812px] xl:w-[840px] xl:h-[910px] sm:max-w-none sm:max-h-none"
                       : "w-[60vw] h-[90vw] max-w-[300px] max-h-[450px] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px] sm:max-w-none sm:max-h-none"
                   } transition-all duration-500`}
                 >
