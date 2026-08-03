@@ -98,15 +98,8 @@ const Index = () => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
-          if (activePortfolioKey && !isClosingSection) {
-            setIsClosingSection(true);
-            closingTimeoutRef.current = setTimeout(() => {
-              setActivePortfolioKey(null);
-              setActiveGallerySub(null);
-              setPageInfo(null);
-              setIsClosingSection(false);
-            }, 300);
-          }
+          // Keep an opened portfolio section (with its RETURN button) intact while scrolling.
+          if (activePortfolioKey) return;
           if (!thirdCardFlipped) {
             if (!muted && siteMusicEnabled && getContent("audio_flipcard_sound_muted") !== "true") {
               new Audio(getContent("audio_flipcard_sound") || "/audio/flipcard_sound.mp3").play().catch(() => {});
