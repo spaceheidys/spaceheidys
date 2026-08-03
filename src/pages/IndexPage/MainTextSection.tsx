@@ -64,7 +64,7 @@ const TravelPixel = () => (
       ],
       opacity: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
     }}
-    transition={{ duration: 6.5, ease: "linear", times: [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95] }}
+    transition={{ duration: 3, ease: "linear", times: [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95] }}
   />
 );
 
@@ -141,12 +141,12 @@ const MainTextSection = memo(
 
       // Delay before typewriter starts.
       // - intro: after frame blink+expand (~1.55s)
-      // - switch: after the pixel slowly travels around the frame (~6.7s)
+      // - switch: after the pixel completes its 3s corner cycle (~3.2s)
       // - no animation: short fade in
       const typeDelay = !animateReveal
         ? 0.5
         : phase === "switch"
-        ? 6.7
+        ? 3.2
         : 1.55;
 
       // Bounds match the equalizer bar (which sits above), inset a bit so the
