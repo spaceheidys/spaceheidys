@@ -67,6 +67,7 @@ const Index = () => {
   const { count: favoritesCount } = useFavorites();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [inHero, setInHero] = useState(true);
+  const [atTop, setAtTop] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const siteMusicEnabled = !contentLoading && getContent("site_music_enabled") !== "false";
@@ -84,6 +85,7 @@ const Index = () => {
       setShowScrollTop(rect.top < window.innerHeight * 0.5 && window.scrollY > 200);
       // Hero is "active" while portfolio top is still below the middle of the viewport
       setInHero(rect.top > window.innerHeight * 0.5);
+      setAtTop(window.scrollY < 40);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -465,6 +467,28 @@ const Index = () => {
           />
         </div>
       </motion.header>
+
+      {/* Tagline strip under header — hides on scroll */}
+      <AnimatePresence>
+        {atTop && (getContent("header_tagline_left") || getContent("header_tagline_right")) && (
+          <motion.div
+            className="fixed top-[3.5rem] sm:top-[4.5rem] md:top-[6rem] left-0 right-0 z-[99] pointer-events-none border-t border-foreground/10"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="flex items-center justify-between px-4 sm:px-8 md:px-16 py-2">
+              <span className="text-[9px] sm:text-[10px] tracking-[0.25em] uppercase text-foreground/60 font-display">
+                {getContent("header_tagline_left")}
+              </span>
+              <span className="text-[9px] sm:text-[10px] tracking-[0.25em] uppercase text-foreground/60 font-display">
+                {getContent("header_tagline_right")}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* === MAIN Hero === */}
       <HeroSection bgImage={bgImage} />

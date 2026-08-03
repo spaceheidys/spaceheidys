@@ -11,6 +11,8 @@ interface ContentSectionProps {
 }
 
 const FIELDS = [
+  { key: "header_tagline_left", label: "Header Strip — Left" },
+  { key: "header_tagline_right", label: "Header Strip — Right" },
   { key: "about", label: "About Text" },
   { key: "contact_title", label: "Contact — Title" },
   { key: "contact_body", label: "Contact — Body" },
