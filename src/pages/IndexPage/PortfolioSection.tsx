@@ -238,24 +238,12 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                     {activePortfolioKey === "skills" ? (
                       <motion.div
                         key="skills"
-                        className="w-full h-full relative"
+                        className="w-full h-full"
                         initial={{ opacity: 0, scale: 0.97 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.97, y: 8 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                       >
-                        <button
-                          onClick={handleBack}
-                          className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex flex-col items-center gap-0.5 group cursor-pointer"
-                          aria-label="Back"
-                        >
-                          <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase text-white/50 group-hover:text-white transition-colors duration-300 font-display">
-                            BACK
-                          </span>
-                          <span className="text-[9px] sm:text-[10px] tracking-widest text-white/30 group-hover:text-white/60 transition-colors duration-300 font-jp">
-                            戻る
-                          </span>
-                        </button>
                         <SkillsDisplay />
                       </motion.div>
                     ) : activePortfolioKey ? (
