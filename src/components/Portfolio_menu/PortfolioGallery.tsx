@@ -8,6 +8,7 @@ import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
 import { toast } from "sonner";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { useGallerySubs } from "@/hooks/useGallerySubs";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -424,26 +425,66 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const getShareUrl = (entry: GalleryEntry) =>
     entry.project_url || window.location.href;
 
+  // Build the active section title label (subcategory for gallery, section for others)
+  const { subs: gallerySubs } = useGallerySubs();
+  const titleMeta = useMemo(() => {
+    if (sectionKey === "gallery" && gallerySub) {
+      const sub = gallerySubs.find((s) => s.en === gallerySub);
+      return {
+        key: `gallery-${gallerySub}`,
+        jp: sub?.jp || "ギャラリー",
+        label: gallerySub.toUpperCase(),
+      };
+    }
+    return {
+      key: sectionKey,
+      jp: {
+        gallery: "ギャラリー",
+        projects: "プロジェクト",
+        archive: "アーカイブ",
+      }[sectionKey] || "",
+      label: sectionKey === "projects" ? "PROJECTS" : sectionKey.toUpperCase(),
+    };
+  }, [sectionKey, gallerySub, gallerySubs]);
+
   return (
     <div
-      className="relative w-full h-full flex flex-col items-center justify-center"
+      className="relative w-full h-full flex flex-col items-center justify-between"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {sectionKey === "projects" && availableOn && availableText.trim() && (
-        <div className="w-full flex justify-center mb-3 px-2">
-          <div className="inline-flex items-center gap-2 bg-black px-3 py-1.5">
-            <span className="relative flex w-[7px] h-[7px]">
-              <span className="absolute inline-flex w-full h-full rounded-full bg-[#d7f205] opacity-60 animate-ping" />
-              <span className="relative inline-flex w-[7px] h-[7px] rounded-full bg-[#d7f205]" />
-            </span>
-            <span className="text-[10px] sm:text-[11px] font-display tracking-[0.22em] uppercase text-white/90">
-              {availableText}
-            </span>
+      {/* Active section title — at the top of the gallery card */}
+      <div className="relative z-20 flex items-center justify-center pt-2 sm:pt-3 pb-1 sm:pb-2">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={titleMeta.key}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col items-center text-white"
+          >
+            <span className="text-[10px] sm:text-xs tracking-widest font-jp">{titleMeta.jp}</span>
+            <span className="text-xs sm:text-sm tracking-[0.2em] uppercase font-display">{titleMeta.label}</span>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="w-full flex flex-col items-center">
+        {sectionKey === "projects" && availableOn && availableText.trim() && (
+          <div className="w-full flex justify-center mb-3 px-2">
+            <div className="inline-flex items-center gap-2 bg-black px-3 py-1.5">
+              <span className="relative flex w-[7px] h-[7px]">
+                <span className="absolute inline-flex w-full h-full rounded-full bg-[#d7f205] opacity-60 animate-ping" />
+                <span className="relative inline-flex w-[7px] h-[7px] rounded-full bg-[#d7f205]" />
+              </span>
+              <span className="text-[10px] sm:text-[11px] font-display tracking-[0.22em] uppercase text-white/90">
+                {availableText}
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {hasPagination && (
         <button
@@ -460,7 +501,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
         <motion.div
           key={`${sectionKey}-${gallerySub}-${page}`}
           ref={gridRef}
-          className={`w-full grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-2 px-2 sm:px-2 py-1 sm:p-2 content-center`}
+          className={`w-full grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-2 px-2 sm:px-2 py-1 sm:p-2 content-end`}
           initial={{ opacity: 0, x: 0 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0 }}
@@ -531,6 +572,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
           <ChevronRight className="w-[40px] h-[40px]" />
         </button>
       )}
+      </div>
 
       {/* Lightbox overlay */}
       <AnimatePresence mode="wait">
