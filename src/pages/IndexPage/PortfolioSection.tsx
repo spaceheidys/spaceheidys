@@ -383,27 +383,23 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
               active: boolean;
               onClick: () => void;
             };
-            const scrollToSection = () =>
-              document.getElementById("portfolio-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
-
             let items: BarItem[];
 
             if (activePortfolioKey === "gallery") {
               items = [
-                ...gallerySubs.map((s, idx) => ({
+                ...gallerySubs.map((s) => ({
                   id: s.en,
-                  num: String(idx + 1).padStart(2, "0"),
+                  num: "",
                   label: s.en,
                   jp: s.jp,
                   active: activeGallerySub === s.en,
                   onClick: () => {
                     onSelectGallerySub(s.en);
-                    scrollToSection();
                   },
                 })),
                 {
                   id: "return",
-                  num: String(gallerySubs.length + 1).padStart(2, "0"),
+                  num: "",
                   label: "RETURN",
                   jp: "戻る",
                   active: false,
@@ -414,7 +410,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
               items = [
                 {
                   id: "return",
-                  num: "01",
+                  num: "",
                   label: "RETURN",
                   jp: "戻る",
                   active: false,
@@ -423,9 +419,9 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
               ];
             } else {
               items = [
-                { key: "skills" as PortfolioMenuKey, num: "01", label: "SKILLS", jp: "スキル" },
-                { key: "gallery" as PortfolioMenuKey, num: "02", label: "GALLERY", jp: "ギャラリー" },
-                { key: "projects" as PortfolioMenuKey, num: "03", label: "PROJECTS", jp: "プロジェクト" },
+                { key: "skills" as PortfolioMenuKey, num: "", label: "SKILLS", jp: "スキル" },
+                { key: "gallery" as PortfolioMenuKey, num: "", label: "GALLERY", jp: "ギャラリー" },
+                { key: "projects" as PortfolioMenuKey, num: "", label: "PROJECTS", jp: "プロジェクト" },
               ].map((item) => ({
                 id: item.key,
                 num: item.num,
@@ -434,7 +430,6 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                 active: false,
                 onClick: () => {
                   onSelectPortfolio(item.key);
-                  scrollToSection();
                 },
               }));
             }
