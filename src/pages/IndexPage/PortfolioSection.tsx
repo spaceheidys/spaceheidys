@@ -236,9 +236,9 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             </div>
           )}
 
-          {/* Cards content — aligned to the bottom of the section */}
-          <div className="flex flex-1 items-end justify-center pb-4 sm:pb-6 px-3 sm:px-4 relative z-10">
-            <div className="items-center justify-end flex flex-col w-full">
+          {/* Cards content — centered */}
+          <div className="flex flex-1 items-center justify-center pt-4 sm:pt-8 md:pt-12 pb-4 sm:pb-6 px-3 sm:px-4 relative z-10">
+            <div className="items-center justify-center flex flex-col w-full">
 
               <div className="relative flex items-center justify-center">
                 {/* Fixed-height card wrapper */}
