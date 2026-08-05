@@ -333,8 +333,8 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             </div>
           </div>
 
-          {/* Spacer — only on mobile to push the bottom strip down */}
-          <div className="flex-1 sm:flex-none" />
+          {/* Spacer — only on mobile when the card is closed to push the bottom strip down */}
+          <div className={activePortfolioKey ? "flex-none" : "flex-1 sm:flex-none"} />
 
           {/* Scroll to top arrow */}
           <AnimatePresence>
