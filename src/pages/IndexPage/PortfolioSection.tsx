@@ -209,29 +209,8 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
           )}
 
           {/* Cards content — centered */}
-          <div className="flex flex-1 items-center justify-center pt-12 sm:pt-16 md:pt-20 px-3 sm:px-4 relative z-10">
+          <div className="flex flex-1 items-start justify-center pt-4 sm:pt-8 md:pt-12 px-3 sm:px-4 relative z-10">
             <div className="items-center justify-center flex flex-col w-full">
-              {/* Wisdom text above cards */}
-              <AnimatePresence mode="wait">
-                {activePortfolioKey && (
-                  <motion.p
-                    key={`section-${activePortfolioKey}`}
-                    className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-2 sm:my-[20px] font-display"
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {{ gallery: "Gallery", projects: "Projects", skills: "Skills", archive: "Archive" }[activePortfolioKey]}
-                    {activePortfolioKey === "gallery" && activeGallerySub ? ` | ${activeGallerySub}` : ""}
-                    {pageInfo && pageInfo.total > 1 && (
-                      <span className="text-white/30 ml-2 text-[10px] sm:text-xs">
-                        {pageInfo.current}/{pageInfo.total}
-                      </span>
-                    )}
-                  </motion.p>
-                )}
-              </AnimatePresence>
 
               <div className="relative flex items-center justify-center">
                 {/* Fixed-height card wrapper */}
