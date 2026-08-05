@@ -236,8 +236,12 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             </div>
           )}
 
-          {/* Cards content — centered */}
-          <div className="flex flex-1 items-center justify-center pt-4 sm:pt-8 md:pt-12 pb-4 sm:pb-6 px-3 sm:px-4 relative z-10">
+          {/* Cards content — centered when closed, anchored to the bottom when a section is open */}
+          <div
+            className={`flex flex-1 items-center ${
+              activePortfolioKey ? "justify-end" : "justify-center"
+            } pt-4 sm:pt-8 md:pt-12 pb-2 sm:pb-3 px-3 sm:px-4 relative z-10`}
+          >
             <div className="items-center justify-center flex flex-col w-full">
 
               <div className="relative flex items-center justify-center">
