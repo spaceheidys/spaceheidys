@@ -361,18 +361,29 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
           )}
         </div>
 
-        {/* Segmented section bar — always fixed; menu items only visible when the portfolio card is open */}
+        {/* Segmented section bar — always fixed; shows wisdom text when card is closed, menu items when open */}
         <div
           id="portfolio-nav-bar"
-          className="w-full bg-black border-t border-white/10 min-h-[56px] flex items-center justify-center"
+          className="w-full bg-black border-t border-white/10 h-14 flex items-center justify-center overflow-hidden"
         >
-          <AnimatePresence>
-            {(!thirdCardFlipped || activePortfolioKey) && (
+          <AnimatePresence mode="wait">
+            {thirdCardFlipped && !activePortfolioKey ? (
+              <motion.p
+                key="wisdom"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 5 }}
+                transition={{ duration: 0.3 }}
+                className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-4"
+              >
+                {currentFrontText || getContent("cards_wisdom") || "The cards know what the mind has forgotten"}
+              </motion.p>
+            ) : (
               <motion.div
                 key="portfolio-nav-bar-items"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
+                exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
                 className="w-full"
               >
@@ -438,7 +449,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
 
                   return (
                     <div className="px-4 sm:pl-[calc(6rem+1rem)] sm:pr-8 md:pl-[calc(8rem+1rem)] md:pr-16">
-                      <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-3 sm:py-4">
+                      <div className="flex flex-nowrap items-center justify-center gap-4 sm:gap-6 py-3 sm:py-4 overflow-x-auto scrollbar-hide">
                         {items.map((item) => (
                           <button
                             key={item.id}
