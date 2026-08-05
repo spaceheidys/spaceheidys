@@ -342,21 +342,31 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             )}
           </AnimatePresence>
 
-        {/* Menu at bottom position when section is active (mobile + desktop) */}
+          {/* Active section title above the strip */}
           {activePortfolioKey && (
-            <div
-              className={`relative z-20 flex items-center justify-center pb-6 pt-4 transition-opacity duration-300 ${
-                lightboxOpen ? "opacity-0 pointer-events-none" : "opacity-100"
-              }`}
-            >
-              <PortfolioMenu
-                visible={!thirdCardFlipped}
-                activeKey={activePortfolioKey}
-                onSelect={(key) => onSelectPortfolio(key)}
-                onBack={handleBack}
-                onGallerySubSelect={(label) => onSelectGallerySub(label)}
-                favoritesCount={favoritesCount}
-              />
+            <div className="relative z-20 flex items-center justify-center pb-2 pt-4">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`title-${activePortfolioKey}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col items-center text-white"
+                >
+                  <span className="text-[10px] sm:text-xs tracking-widest font-jp">
+                    {{
+                      skills: "スキル",
+                      gallery: "ギャラリー",
+                      projects: "プロジェクト",
+                      archive: "アーカイブ",
+                    }[activePortfolioKey]}
+                  </span>
+                  <span className="text-xs sm:text-sm tracking-[0.2em] uppercase font-display">
+                    {activePortfolioKey === "projects" ? "PROJECTS" : activePortfolioKey.toUpperCase()}
+                  </span>
+                </motion.div>
+              </AnimatePresence>
             </div>
           )}
         </div>
