@@ -453,11 +453,13 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                         i > 0 ? "border-l border-white/10" : ""
                       } ${item.active ? "bg-[hsl(72,95%,60%)] text-black" : "text-white/70 hover:text-white hover:bg-white/5"}`}
                     >
-                      <span className="flex items-baseline gap-2 sm:gap-3 font-display text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.25em] uppercase truncate">
+                      <span className="flex items-center gap-2 sm:gap-3 font-display text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.25em] uppercase">
                         <span className={item.active ? "text-black/60" : "text-white/35"}>{item.num}</span>
-                        <span>{item.label}</span>
-                        <span className={`tracking-normal text-[9px] sm:text-[10px] font-jp ${item.active ? "text-black/60" : "text-white/35"}`}>
-                          {item.jp}
+                        <span className="flex flex-col items-start leading-none">
+                          <span>{item.label}</span>
+                          <span className={`tracking-normal text-[9px] sm:text-[10px] font-jp normal-case ${item.active ? "text-black/60" : "text-white/35"}`}>
+                            {item.jp}
+                          </span>
                         </span>
                       </span>
                       <ArrowUpRight
