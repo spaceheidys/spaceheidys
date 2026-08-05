@@ -208,33 +208,6 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             </div>
           )}
 
-          {/* Active section title — above the card/gallery */}
-          {activePortfolioKey && (
-            <div className="relative z-20 flex items-center justify-center pb-2 pt-4">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`title-${activePortfolioKey}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-col items-center text-white"
-                >
-                  <span className="text-[10px] sm:text-xs tracking-widest font-jp">
-                    {{
-                      skills: "スキル",
-                      gallery: "ギャラリー",
-                      projects: "プロジェクト",
-                      archive: "アーカイブ",
-                    }[activePortfolioKey]}
-                  </span>
-                  <span className="text-xs sm:text-sm tracking-[0.2em] uppercase font-display">
-                    {activePortfolioKey === "projects" ? "PROJECTS" : activePortfolioKey.toUpperCase()}
-                  </span>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          )}
 
           {/* Cards content — centered when closed, anchored to the bottom when a section is open */}
           <div
