@@ -59,6 +59,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
     },
     ref
   ) => {
+    const { subs: gallerySubs } = useGallerySubs();
     const handleBack = () => {
       onSelectPortfolio(null);
       onSelectGallerySub(null);
