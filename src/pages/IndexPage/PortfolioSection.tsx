@@ -208,9 +208,37 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             </div>
           )}
 
-          {/* Cards content — centered */}
-          <div className="flex flex-1 items-start justify-center pt-4 sm:pt-8 md:pt-12 px-3 sm:px-4 relative z-10">
-            <div className="items-center justify-center flex flex-col w-full">
+          {/* Active section title — above the card/gallery */}
+          {activePortfolioKey && (
+            <div className="relative z-20 flex items-center justify-center pb-2 pt-4">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`title-${activePortfolioKey}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col items-center text-white"
+                >
+                  <span className="text-[10px] sm:text-xs tracking-widest font-jp">
+                    {{
+                      skills: "スキル",
+                      gallery: "ギャラリー",
+                      projects: "プロジェクト",
+                      archive: "アーカイブ",
+                    }[activePortfolioKey]}
+                  </span>
+                  <span className="text-xs sm:text-sm tracking-[0.2em] uppercase font-display">
+                    {activePortfolioKey === "projects" ? "PROJECTS" : activePortfolioKey.toUpperCase()}
+                  </span>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Cards content — aligned to the bottom of the section */}
+          <div className="flex flex-1 items-end justify-center pb-4 sm:pb-6 px-3 sm:px-4 relative z-10">
+            <div className="items-center justify-end flex flex-col w-full">
 
               <div className="relative flex items-center justify-center">
                 {/* Fixed-height card wrapper */}
