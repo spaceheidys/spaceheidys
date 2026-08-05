@@ -315,7 +315,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                 {/* Menu positioned below card without affecting layout (only when no active section) */}
                 <div
                   className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max transition-opacity duration-300 ${
-                    activePortfolioKey ? "hidden" : ""
+                    "hidden"
                   } ${lightboxOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                 >
                   <PortfolioMenu
@@ -371,8 +371,8 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
         </div>
 
         {/* Segmented section bar — sits right before the visit-counter strip */}
-        <div className="w-full bg-black border-t border-white/10">
-          <div className="grid grid-cols-1 sm:grid-cols-3">
+        <div id="portfolio-nav-bar" className="w-full bg-black border-t border-white/10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 px-4 sm:pl-[calc(6rem+1rem)] sm:pr-8 md:pl-[calc(8rem+1rem)] md:pr-16">
             {[
               { key: "skills" as PortfolioMenuKey, num: "01", label: "SKILLS", jp: "スキル" },
               { key: "gallery" as PortfolioMenuKey, num: "02", label: "GALLERY", jp: "ギャラリー" },

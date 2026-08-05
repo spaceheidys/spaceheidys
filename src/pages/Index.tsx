@@ -333,7 +333,9 @@ const Index = () => {
   }, [muted]);
 
   const scrollToPortfolio = useCallback(() => {
-    portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const bar = document.getElementById("portfolio-nav-bar");
+    if (bar) bar.scrollIntoView({ behavior: "smooth", block: "end" });
+    else portfolioRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
   const scrollToCube = useCallback(() => {
