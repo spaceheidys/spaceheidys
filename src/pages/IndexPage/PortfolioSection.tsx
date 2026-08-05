@@ -10,6 +10,7 @@ import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 import SkillsDisplay from "@/components/Portfolio_menu/SkillsDisplay";
 import MusicEqualizer from "@/components/MusicEqualizer";
+import { useGallerySubs } from "@/hooks/useGallerySubs";
 
 interface PortfolioSectionProps {
   activePortfolioKey: PortfolioMenuKey | null;
@@ -58,6 +59,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
     },
     ref
   ) => {
+    const { subs: gallerySubs } = useGallerySubs();
     const handleBack = () => {
       onSelectPortfolio(null);
       onSelectGallerySub(null);
@@ -372,34 +374,101 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
 
         {/* Segmented section bar — sits right before the visit-counter strip */}
         <div id="portfolio-nav-bar" className="w-full bg-black border-t border-white/10">
-          <div className="grid grid-cols-1 sm:grid-cols-3 px-4 sm:pl-[calc(6rem+1rem)] sm:pr-8 md:pl-[calc(8rem+1rem)] md:pr-16">
-            {[
-              { key: "skills" as PortfolioMenuKey, num: "01", label: "SKILLS", jp: "スキル" },
-              { key: "gallery" as PortfolioMenuKey, num: "02", label: "GALLERY", jp: "ギャラリー" },
-              { key: "projects" as PortfolioMenuKey, num: "03", label: "PROJECTS", jp: "プロジェクト" },
-            ].map((item, i) => {
-              const active = activePortfolioKey === item.key;
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => {
-                    onSelectPortfolio(item.key);
-                    document.getElementById("portfolio-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
-                  className={`group relative flex items-center justify-between gap-4 px-5 sm:px-6 h-14 sm:h-16 text-left transition-colors duration-300 ${
-                    i > 0 ? "border-t sm:border-t-0 sm:border-l border-white/10" : ""
-                  } ${active ? "bg-[hsl(72,95%,60%)] text-black" : "text-white/70 hover:text-white hover:bg-white/5"}`}
+          {(() => {
+            type BarItem = {
+              id: string;
+              num: string;
+              label: string;
+              jp: string;
+              active: boolean;
+              onClick: () => void;
+            };
+            const scrollToSection = () =>
+              document.getElementById("portfolio-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+            let items: BarItem[];
+
+            if (activePortfolioKey === "gallery") {
+              items = [
+                ...gallerySubs.map((s, idx) => ({
+                  id: s.en,
+                  num: String(idx + 1).padStart(2, "0"),
+                  label: s.en,
+                  jp: s.jp,
+                  active: activeGallerySub === s.en,
+                  onClick: () => {
+                    onSelectGallerySub(s.en);
+                    scrollToSection();
+                  },
+                })),
+                {
+                  id: "return",
+                  num: String(gallerySubs.length + 1).padStart(2, "0"),
+                  label: "RETURN",
+                  jp: "戻る",
+                  active: false,
+                  onClick: handleBack,
+                },
+              ];
+            } else if (activePortfolioKey) {
+              items = [
+                {
+                  id: "return",
+                  num: "01",
+                  label: "RETURN",
+                  jp: "戻る",
+                  active: false,
+                  onClick: handleBack,
+                },
+              ];
+            } else {
+              items = [
+                { key: "skills" as PortfolioMenuKey, num: "01", label: "SKILLS", jp: "スキル" },
+                { key: "gallery" as PortfolioMenuKey, num: "02", label: "GALLERY", jp: "ギャラリー" },
+                { key: "projects" as PortfolioMenuKey, num: "03", label: "PROJECTS", jp: "プロジェクト" },
+              ].map((item) => ({
+                id: item.key,
+                num: item.num,
+                label: item.label,
+                jp: item.jp,
+                active: false,
+                onClick: () => {
+                  onSelectPortfolio(item.key);
+                  scrollToSection();
+                },
+              }));
+            }
+
+            return (
+              <div className="px-4 sm:pl-[calc(6rem+1rem)] sm:pr-8 md:pl-[calc(8rem+1rem)] md:pr-16">
+                <div
+                  className="grid grid-cols-1"
+                  style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
                 >
-                  <span className="flex items-baseline gap-3 font-display text-[11px] sm:text-xs tracking-[0.25em] uppercase">
-                    <span className={active ? "text-black/60" : "text-white/35"}>{item.num}</span>
-                    <span>{item.label}</span>
-                    <span className={`tracking-normal text-[10px] ${active ? "text-black/60" : "text-white/35"}`}>{item.jp}</span>
-                  </span>
-                  <ArrowUpRight className={`w-3.5 h-3.5 shrink-0 ${active ? "text-black/70" : "text-white/30 group-hover:text-white/70"}`} />
-                </button>
-              );
-            })}
-          </div>
+                  {items.map((item, i) => (
+                    <button
+                      key={item.id}
+                      onClick={item.onClick}
+                      className={`group relative flex items-center justify-between gap-3 px-4 sm:px-6 h-14 sm:h-16 text-left transition-colors duration-300 ${
+                        i > 0 ? "border-l border-white/10" : ""
+                      } ${item.active ? "bg-[hsl(72,95%,60%)] text-black" : "text-white/70 hover:text-white hover:bg-white/5"}`}
+                    >
+                      <span className="flex items-baseline gap-2 sm:gap-3 font-display text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.25em] uppercase truncate">
+                        <span className={item.active ? "text-black/60" : "text-white/35"}>{item.num}</span>
+                        <span>{item.label}</span>
+                        <span className={`tracking-normal text-[9px] sm:text-[10px] font-jp ${item.active ? "text-black/60" : "text-white/35"}`}>
+                          {item.jp}
+                        </span>
+                      </span>
+                      <ArrowUpRight
+                        className={`w-3.5 h-3.5 shrink-0 ${item.active ? "text-black/70" : "text-white/30 group-hover:text-white/70"}`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </>
     );
