@@ -331,6 +331,23 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
 
           {/* Spacer — keeps the bottom strip at the bottom when the card is closed */}
           <div className="flex-1 sm:flex-1" />
+
+          {/* Scroll to top arrow */}
+          <AnimatePresence>
+            {showScrollTop && !activePortfolioKey && (
+              <motion.div
+                className="fixed bottom-6 right-6 z-30 cursor-pointer text-white/40 hover:text-white transition-colors duration-300"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                aria-label="Scroll to top"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ArrowUp className="w-8 h-8 sm:w-10 sm:h-10" />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Segmented section bar — always fixed; shows wisdom text when card is closed, menu items when open */}
