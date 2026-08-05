@@ -1,6 +1,7 @@
 import { forwardRef, memo, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { SectionVisibility } from "@/hooks/useSectionSettings";
+import { useCapabilities } from "@/hooks/useCapabilities";
 
 interface MainTextSectionProps {
   activeSection: "about" | "contact" | "shop" | null;
@@ -82,13 +83,7 @@ const SectionBody = ({
 }) => {
   if (section === "about") {
     if (sectionVisibility.about === false) return null;
-    return (
-      <Typewriter
-        delay={typeDelay}
-        text={getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
-        className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4 block"
-      />
-    );
+    return <AboutBody getContent={getContent} typeDelay={typeDelay} />;
   }
   if (section === "contact") {
     return (
