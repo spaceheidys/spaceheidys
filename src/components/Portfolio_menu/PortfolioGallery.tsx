@@ -572,6 +572,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
           <ChevronRight className="w-[40px] h-[40px]" />
         </button>
       )}
+      </div>
 
       {/* Lightbox overlay */}
       <AnimatePresence mode="wait">
