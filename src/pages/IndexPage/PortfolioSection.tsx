@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp, ArrowUpRight } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import taro01Img from "@/assets/TARO_01.png";
 import taroEyeImg from "@/assets/Taro_backside_eye.png";
 import PortfolioCard from "@/components/PortfolioCard";
@@ -441,30 +441,21 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
 
             return (
               <div className="px-4 sm:pl-[calc(6rem+1rem)] sm:pr-8 md:pl-[calc(8rem+1rem)] md:pr-16">
-                <div
-                  className="grid grid-cols-1"
-                  style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
-                >
-                  {items.map((item, i) => (
+                <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-3 sm:py-4">
+                  {items.map((item) => (
                     <button
                       key={item.id}
                       onClick={item.onClick}
-                      className={`group relative flex items-center justify-between gap-3 px-4 sm:px-6 h-14 sm:h-16 text-left transition-colors duration-300 ${
-                        i > 0 ? "border-l border-white/10" : ""
-                      } ${item.active ? "bg-[hsl(72,95%,60%)] text-black" : "text-white/70 hover:text-white hover:bg-white/5"}`}
+                      className={`group flex flex-col items-center gap-0.5 cursor-pointer transition-colors duration-300 ${
+                        item.active ? "text-[hsl(72,95%,60%)]" : "text-white/50 hover:text-white"
+                      }`}
                     >
-                      <span className="flex items-center gap-2 sm:gap-3 font-display text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.25em] uppercase">
-                        <span className={item.active ? "text-black/60" : "text-white/35"}>{item.num}</span>
-                        <span className="flex flex-col items-start leading-none">
-                          <span>{item.label}</span>
-                          <span className={`tracking-normal text-[9px] sm:text-[10px] font-jp normal-case ${item.active ? "text-black/60" : "text-white/35"}`}>
-                            {item.jp}
-                          </span>
-                        </span>
+                      <span className="text-[9px] sm:text-[10px] tracking-widest font-jp">
+                        {item.jp}
                       </span>
-                      <ArrowUpRight
-                        className={`w-3.5 h-3.5 shrink-0 ${item.active ? "text-black/70" : "text-white/30 group-hover:text-white/70"}`}
-                      />
+                      <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase font-display">
+                        {item.label}
+                      </span>
                     </button>
                   ))}
                 </div>
