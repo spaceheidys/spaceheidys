@@ -154,7 +154,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
         </div>
 
         {/* Portfolio section */}
-        <div id="portfolio-section" ref={ref} className="relative w-full bg-black flex flex-col overflow-hidden min-h-[100svh]">
+        <div id="portfolio-section" ref={ref} className="relative w-full bg-black flex flex-col min-h-[100svh]">
           {/* Portfolio background image */}
           {portfolioBg && (
             <div className="absolute inset-0">
@@ -370,10 +370,8 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
               />
             </div>
           )}
-        </div>
-
-        {/* Segmented section bar — sits right before the visit-counter strip */}
-        <div id="portfolio-nav-bar" className="w-full bg-black border-t border-white/10">
+        {/* Segmented section bar — sticky bottom, up to the visit-counter strip */}
+        <div id="portfolio-nav-bar" className="sticky bottom-0 z-40 w-full bg-black border-t border-white/10">
           {(() => {
             type BarItem = {
               id: string;
@@ -458,6 +456,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             );
           })()}
         </div>
+      </div>
       </>
     );
   }
