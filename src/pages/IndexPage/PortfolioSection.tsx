@@ -448,13 +448,13 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                   }
 
                   return (
-                    <div className="px-4 sm:pl-[calc(6rem+1rem)] sm:pr-8 md:pl-[calc(8rem+1rem)] md:pr-16">
-                      <div className="flex flex-nowrap items-center justify-center gap-4 sm:gap-6 py-3 sm:py-4 overflow-x-auto scrollbar-hide">
+                    <div className="px-4 sm:px-8 md:px-12 lg:px-16">
+                      <div className="flex flex-nowrap items-center justify-center gap-6 sm:gap-8 md:gap-10 py-3 sm:py-4 overflow-x-auto scrollbar-hide">
                         {items.map((item) => (
                           <button
                             key={item.id}
                             onClick={item.onClick}
-                            className={`group flex flex-col items-center gap-0.5 cursor-pointer transition-colors duration-300 ${
+                            className={`group flex flex-col items-center gap-1 cursor-pointer transition-colors duration-300 ${
                               item.active ? "text-[hsl(72,95%,60%)]" : "text-white/50 hover:text-white"
                             }`}
                           >
