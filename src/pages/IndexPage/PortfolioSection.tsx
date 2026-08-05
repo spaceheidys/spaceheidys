@@ -10,6 +10,7 @@ import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu
 import PortfolioGallery from "@/components/Portfolio_menu/PortfolioGallery";
 import SkillsDisplay from "@/components/Portfolio_menu/SkillsDisplay";
 import MusicEqualizer from "@/components/MusicEqualizer";
+import { useGallerySubs } from "@/hooks/useGallerySubs";
 
 interface PortfolioSectionProps {
   activePortfolioKey: PortfolioMenuKey | null;
