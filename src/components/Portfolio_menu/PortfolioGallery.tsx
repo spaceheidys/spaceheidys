@@ -456,8 +456,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
     >
       {/* Active section title + grid grouped and centered in the card */}
       <div className="w-full flex flex-col items-center">
-        {/* Title sits just above the grid */}
-        <div className="mb-1 sm:mb-2">
+        {/* Title sits directly above the grid, tight spacing */}
+        <div className="mb-0 sm:mb-0.5">
           <AnimatePresence mode="wait">
             <motion.div
               key={titleMeta.key}
@@ -465,10 +465,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col items-center text-white"
+              className="flex flex-col items-center text-white leading-none"
             >
-              <span className="text-[10px] sm:text-xs tracking-widest font-jp">{titleMeta.jp}</span>
-              <span className="text-xs sm:text-sm tracking-[0.2em] uppercase font-display">{titleMeta.label}</span>
+              <span className="text-[10px] sm:text-xs tracking-widest font-jp leading-none">{titleMeta.jp}</span>
+              <span className="text-xs sm:text-sm tracking-[0.2em] uppercase font-display leading-none">{titleMeta.label}</span>
             </motion.div>
           </AnimatePresence>
         </div>
