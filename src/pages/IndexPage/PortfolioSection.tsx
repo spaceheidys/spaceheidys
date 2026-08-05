@@ -329,8 +329,8 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             </div>
           </div>
 
-          {/* Spacer — keeps the bottom strip at the bottom when the card is closed */}
-          <div className="flex-1 sm:flex-1" />
+          {/* Spacer — only on mobile to push the bottom strip down */}
+          <div className="flex-1 sm:flex-none" />
 
           {/* Scroll to top arrow */}
           <AnimatePresence>
