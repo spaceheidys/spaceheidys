@@ -449,31 +449,32 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
   return (
     <div
-      className="relative w-full h-full flex flex-col items-center justify-between"
+      className="relative w-full h-full flex flex-col items-center justify-center"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Active section title — at the top of the gallery card */}
-      <div className="relative z-20 flex items-center justify-center pt-2 sm:pt-3 pb-1 sm:pb-2">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={titleMeta.key}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center text-white"
-          >
-            <span className="text-[10px] sm:text-xs tracking-widest font-jp">{titleMeta.jp}</span>
-            <span className="text-xs sm:text-sm tracking-[0.2em] uppercase font-display">{titleMeta.label}</span>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
+      {/* Active section title + grid grouped and centered in the card */}
       <div className="w-full flex flex-col items-center">
+        {/* Title sits just above the grid */}
+        <div className="mb-1 sm:mb-2">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={titleMeta.key}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center text-white"
+            >
+              <span className="text-[10px] sm:text-xs tracking-widest font-jp">{titleMeta.jp}</span>
+              <span className="text-xs sm:text-sm tracking-[0.2em] uppercase font-display">{titleMeta.label}</span>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
         {sectionKey === "projects" && availableOn && availableText.trim() && (
-          <div className="w-full flex justify-center mb-3 px-2">
+          <div className="w-full flex justify-center mb-2 sm:mb-3 px-2">
             <div className="inline-flex items-center gap-2 bg-black px-3 py-1.5">
               <span className="relative flex w-[7px] h-[7px]">
                 <span className="absolute inline-flex w-full h-full rounded-full bg-[#d7f205] opacity-60 animate-ping" />
@@ -501,7 +502,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
         <motion.div
           key={`${sectionKey}-${gallerySub}-${page}`}
           ref={gridRef}
-          className={`w-full grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-2 px-2 sm:px-2 py-1 sm:p-2 content-end`}
+          className={`w-full grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-2 px-2 sm:px-2 py-1 sm:p-2 content-center`}
           initial={{ opacity: 0, x: 0 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0 }}
@@ -546,7 +547,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
       </AnimatePresence>
 
       {hasPagination && (
-        <div className="flex items-center justify-center gap-2 mt-3 sm:mt-4 z-10">
+        <div className="flex items-center justify-center gap-2 mt-2 sm:mt-3 z-10">
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}
