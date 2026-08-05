@@ -1,6 +1,7 @@
 import { forwardRef, memo, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { SectionVisibility } from "@/hooks/useSectionSettings";
+import { useCapabilities } from "@/hooks/useCapabilities";
 
 interface MainTextSectionProps {
   activeSection: "about" | "contact" | "shop" | null;
@@ -69,6 +70,55 @@ const TravelPixel = () => (
 );
 
 /** Section text — typewriter body. */
+const AboutBody = ({
+  getContent,
+  typeDelay,
+}: {
+  getContent: (key: string) => string;
+  typeDelay: number;
+}) => {
+  const { items } = useCapabilities();
+  const caps = items.filter((c) => c.is_visible && c.label.trim());
+
+  return (
+    <div className="w-full h-full flex flex-col md:flex-row items-stretch gap-6 md:gap-10 px-6 sm:px-10 py-6 overflow-auto">
+      {/* Left — about text */}
+      <div className="flex-1 flex items-center">
+        <Typewriter
+          delay={typeDelay}
+          text={getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
+          className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed block"
+        />
+      </div>
+
+      {/* Right — capabilities */}
+      {caps.length > 0 && (
+        <div className="flex-1 md:max-w-[46%] flex flex-col justify-center">
+          <p className="text-[10px] font-display tracking-[0.25em] uppercase text-foreground/40 mb-2">
+            Capabilities
+          </p>
+          <ul className="flex flex-col">
+            {caps.map((c, i) => (
+              <li
+                key={c.id}
+                className="flex items-baseline gap-3 border-t border-foreground/15 py-2 last:border-b"
+              >
+                <span className="text-[10px] font-display tracking-widest text-foreground/35 tabular-nums">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="text-sm font-body text-foreground/85">
+                  <Typewriter delay={typeDelay + 0.25 + i * 0.25} text={c.label} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/** Section text — typewriter body. */
 const SectionBody = ({
   section,
   sectionVisibility,
@@ -82,13 +132,7 @@ const SectionBody = ({
 }) => {
   if (section === "about") {
     if (sectionVisibility.about === false) return null;
-    return (
-      <Typewriter
-        delay={typeDelay}
-        text={getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
-        className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4 block"
-      />
-    );
+    return <AboutBody getContent={getContent} typeDelay={typeDelay} />;
   }
   if (section === "contact") {
     return (

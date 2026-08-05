@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Pencil, Check, X, Eye, EyeOff, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useSectionSettings, SectionVisibility } from "@/hooks/useSectionSettings";
+import CapabilitiesSection from "@/components/admin/CapabilitiesSection";
 
 interface ContentSectionProps {
   get: (key: string) => string;
@@ -128,6 +129,7 @@ const ContentSection = ({ get, getDuration, update, updateDuration }: ContentSec
           );
         })}
       </div>
+      <CapabilitiesSection />
     </div>
   );
 };

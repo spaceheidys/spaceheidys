@@ -56,6 +56,30 @@ export type Database = {
         }
         Relationships: []
       }
+      capabilities: {
+        Row: {
+          created_at: string
+          id: string
+          is_visible: boolean
+          label: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          label?: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          label?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       cube_faces: {
         Row: {
           icon: string
