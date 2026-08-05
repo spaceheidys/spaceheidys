@@ -351,7 +351,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             )}
           </AnimatePresence>
 
-          {/* Menu at bottom position when section is active (mobile + desktop) */}
+        {/* Menu at bottom position when section is active (mobile + desktop) */}
           {activePortfolioKey && (
             <div
               className={`relative z-20 flex items-center justify-center pb-6 pt-4 transition-opacity duration-300 ${
@@ -368,6 +368,38 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
               />
             </div>
           )}
+        </div>
+
+        {/* Segmented section bar — sits right before the visit-counter strip */}
+        <div className="w-full bg-black border-t border-white/10">
+          <div className="grid grid-cols-1 sm:grid-cols-3">
+            {[
+              { key: "skills", num: "01", label: "SKILLS", jp: "スキル" },
+              { key: "gallery", num: "02", label: "GALLERY", jp: "ギャラリー" },
+              { key: "projects", num: "03", label: "PROJECTS", jp: "プロジェクト" },
+            ].map((item, i) => {
+              const active = activePortfolioKey === item.key;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => {
+                    onSelectPortfolio(item.key);
+                    document.getElementById("portfolio-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                  className={`group relative flex items-center justify-between gap-4 px-5 sm:px-6 h-14 sm:h-16 text-left transition-colors duration-300 ${
+                    i > 0 ? "border-t sm:border-t-0 sm:border-l border-white/10" : ""
+                  } ${active ? "bg-[hsl(72,95%,60%)] text-black" : "text-white/70 hover:text-white hover:bg-white/5"}`}
+                >
+                  <span className="flex items-baseline gap-3 font-display text-[11px] sm:text-xs tracking-[0.25em] uppercase">
+                    <span className={active ? "text-black/60" : "text-white/35"}>{item.num}</span>
+                    <span>{item.label}</span>
+                    <span className={`tracking-normal text-[10px] ${active ? "text-black/60" : "text-white/35"}`}>{item.jp}</span>
+                  </span>
+                  <ArrowUpRight className={`w-3.5 h-3.5 shrink-0 ${active ? "text-black/70" : "text-white/30 group-hover:text-white/70"}`} />
+                </button>
+              );
+            })}
+          </div>
         </div>
       </>
     );
