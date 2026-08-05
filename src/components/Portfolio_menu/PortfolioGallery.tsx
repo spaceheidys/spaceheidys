@@ -455,7 +455,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
       onTouchEnd={handleTouchEnd}
     >
       {/* Active section title — at the top of the gallery card */}
-      <div className="relative z-20 flex items-center justify-center pt-2 sm:pt-3 pb-1 sm:pb-2">
+      <div data-debug-sub={gallerySub || "none"} className="relative z-20 flex items-center justify-center pt-2 sm:pt-3 pb-1 sm:pb-2">
         <AnimatePresence mode="wait">
           <motion.div
             key={titleMeta.key}
