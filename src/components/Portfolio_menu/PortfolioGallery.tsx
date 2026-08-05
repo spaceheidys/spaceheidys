@@ -456,8 +456,8 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
     >
       {/* Active section title + grid grouped and centered in the card */}
       <div className="w-full flex flex-col items-center">
-        {/* Title sits directly above the grid, tight spacing */}
-        <div className="mb-0 sm:mb-0.5">
+        {/* Title sits directly above the grid with a small gap */}
+        <div className="mb-0.5 sm:mb-1">
           <AnimatePresence mode="wait">
             <motion.div
               key={titleMeta.key}
