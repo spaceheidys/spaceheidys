@@ -213,7 +213,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             <div className="items-center justify-center flex flex-col w-full">
               {/* Wisdom text above cards */}
               <AnimatePresence mode="wait">
-                {activePortfolioKey ? (
+                {activePortfolioKey && (
                   <motion.p
                     key={`section-${activePortfolioKey}`}
                     className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light px-0 my-2 sm:my-[20px] font-display"
@@ -229,17 +229,6 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                         {pageInfo.current}/{pageInfo.total}
                       </span>
                     )}
-                  </motion.p>
-                ) : (
-                  <motion.p
-                    key="wisdom"
-                    className="text-white/60 text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase text-center font-light italic px-0 my-[20px]"
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {currentFrontText || getContent("cards_wisdom") || "The cards know what the mind has forgotten"}
                   </motion.p>
                 )}
               </AnimatePresence>
