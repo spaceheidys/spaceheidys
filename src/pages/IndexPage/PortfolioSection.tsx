@@ -372,104 +372,108 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
           )}
         </div>
 
-        {/* Segmented section bar — sits right before the visit-counter strip; visible only when the portfolio card is open */}
-        <AnimatePresence>
-          {(!thirdCardFlipped || activePortfolioKey) && (
-            <motion.div
-              id="portfolio-nav-bar"
-              key="portfolio-nav-bar"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.3 }}
-              className="w-full bg-black border-t border-white/10"
-            >
-              {(() => {
-                type BarItem = {
-                  id: string;
-                  num: string;
-                  label: string;
-                  jp: string;
-                  active: boolean;
-                  onClick: () => void;
-                };
-                let items: BarItem[];
+        {/* Segmented section bar — always fixed; menu items only visible when the portfolio card is open */}
+        <div
+          id="portfolio-nav-bar"
+          className="w-full bg-black border-t border-white/10 min-h-[56px] flex items-center justify-center"
+        >
+          <AnimatePresence>
+            {(!thirdCardFlipped || activePortfolioKey) && (
+              <motion.div
+                key="portfolio-nav-bar-items"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                {(() => {
+                  type BarItem = {
+                    id: string;
+                    num: string;
+                    label: string;
+                    jp: string;
+                    active: boolean;
+                    onClick: () => void;
+                  };
+                  let items: BarItem[];
 
-                if (activePortfolioKey === "gallery") {
-                  items = [
-                    ...gallerySubs.map((s) => ({
-                      id: s.en,
-                      num: "",
-                      label: s.en,
-                      jp: s.jp,
-                      active: activeGallerySub === s.en,
-                      onClick: () => {
-                        onSelectGallerySub(s.en);
+                  if (activePortfolioKey === "gallery") {
+                    items = [
+                      ...gallerySubs.map((s) => ({
+                        id: s.en,
+                        num: "",
+                        label: s.en,
+                        jp: s.jp,
+                        active: activeGallerySub === s.en,
+                        onClick: () => {
+                          onSelectGallerySub(s.en);
+                        },
+                      })),
+                      {
+                        id: "return",
+                        num: "",
+                        label: "RETURN",
+                        jp: "戻る",
+                        active: false,
+                        onClick: handleBack,
                       },
-                    })),
-                    {
-                      id: "return",
-                      num: "",
-                      label: "RETURN",
-                      jp: "戻る",
+                    ];
+                  } else if (activePortfolioKey) {
+                    items = [
+                      {
+                        id: "return",
+                        num: "",
+                        label: "RETURN",
+                        jp: "戻る",
+                        active: false,
+                        onClick: handleBack,
+                      },
+                    ];
+                  } else {
+                    items = [
+                      { key: "skills" as PortfolioMenuKey, num: "", label: "SKILLS", jp: "スキル" },
+                      { key: "gallery" as PortfolioMenuKey, num: "", label: "GALLERY", jp: "ギャラリー" },
+                      { key: "projects" as PortfolioMenuKey, num: "", label: "PROJECTS", jp: "プロジェクト" },
+                    ].map((item) => ({
+                      id: item.key,
+                      num: item.num,
+                      label: item.label,
+                      jp: item.jp,
                       active: false,
-                      onClick: handleBack,
-                    },
-                  ];
-                } else if (activePortfolioKey) {
-                  items = [
-                    {
-                      id: "return",
-                      num: "",
-                      label: "RETURN",
-                      jp: "戻る",
-                      active: false,
-                      onClick: handleBack,
-                    },
-                  ];
-                } else {
-                  items = [
-                    { key: "skills" as PortfolioMenuKey, num: "", label: "SKILLS", jp: "スキル" },
-                    { key: "gallery" as PortfolioMenuKey, num: "", label: "GALLERY", jp: "ギャラリー" },
-                    { key: "projects" as PortfolioMenuKey, num: "", label: "PROJECTS", jp: "プロジェクト" },
-                  ].map((item) => ({
-                    id: item.key,
-                    num: item.num,
-                    label: item.label,
-                    jp: item.jp,
-                    active: false,
-                    onClick: () => {
-                      onSelectPortfolio(item.key);
-                    },
-                  }));
-                }
+                      onClick: () => {
+                        onSelectPortfolio(item.key);
+                      },
+                    }));
+                  }
 
-                return (
-                  <div className="px-4 sm:pl-[calc(6rem+1rem)] sm:pr-8 md:pl-[calc(8rem+1rem)] md:pr-16">
-                    <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-3 sm:py-4">
-                      {items.map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={item.onClick}
-                          className={`group flex flex-col items-center gap-0.5 cursor-pointer transition-colors duration-300 ${
-                            item.active ? "text-[hsl(72,95%,60%)]" : "text-white/50 hover:text-white"
-                          }`}
-                        >
-                          <span className="text-[9px] sm:text-[10px] tracking-widest font-jp">
-                            {item.jp}
-                          </span>
-                          <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase font-display">
-                            {item.label}
-                          </span>
-                        </button>
-                      ))}
+                  return (
+                    <div className="px-4 sm:pl-[calc(6rem+1rem)] sm:pr-8 md:pl-[calc(8rem+1rem)] md:pr-16">
+                      <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-3 sm:py-4">
+                        {items.map((item) => (
+                          <button
+                            key={item.id}
+                            onClick={item.onClick}
+                            className={`group flex flex-col items-center gap-0.5 cursor-pointer transition-colors duration-300 ${
+                              item.active ? "text-[hsl(72,95%,60%)]" : "text-white/50 hover:text-white"
+                            }`}
+                          >
+                            <span className="text-[9px] sm:text-[10px] tracking-widest font-jp">
+                              {item.jp}
+                            </span>
+                            <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase font-display">
+                              {item.label}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })()}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  );
+                })()}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
       </>
     );
