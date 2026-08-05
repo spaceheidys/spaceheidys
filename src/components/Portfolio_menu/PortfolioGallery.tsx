@@ -8,6 +8,7 @@ import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
 import { toast } from "sonner";
 import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { useGallerySubs } from "@/hooks/useGallerySubs";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
