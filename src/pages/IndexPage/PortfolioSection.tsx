@@ -315,7 +315,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                 {/* Menu positioned below card without affecting layout (only when no active section) */}
                 <div
                   className={`absolute left-1/2 -translate-x-1/2 top-full mt-4 w-max transition-opacity duration-300 ${
-                    activePortfolioKey ? "hidden" : ""
+                    "hidden"
                   } ${lightboxOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                 >
                   <PortfolioMenu
