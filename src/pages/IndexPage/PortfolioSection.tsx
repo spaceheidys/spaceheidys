@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, ArrowUpRight } from "lucide-react";
 import taro01Img from "@/assets/TARO_01.png";
 import taroEyeImg from "@/assets/Taro_backside_eye.png";
 import PortfolioCard from "@/components/PortfolioCard";
@@ -374,9 +374,9 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
         <div className="w-full bg-black border-t border-white/10">
           <div className="grid grid-cols-1 sm:grid-cols-3">
             {[
-              { key: "skills", num: "01", label: "SKILLS", jp: "スキル" },
-              { key: "gallery", num: "02", label: "GALLERY", jp: "ギャラリー" },
-              { key: "projects", num: "03", label: "PROJECTS", jp: "プロジェクト" },
+              { key: "skills" as PortfolioMenuKey, num: "01", label: "SKILLS", jp: "スキル" },
+              { key: "gallery" as PortfolioMenuKey, num: "02", label: "GALLERY", jp: "ギャラリー" },
+              { key: "projects" as PortfolioMenuKey, num: "03", label: "PROJECTS", jp: "プロジェクト" },
             ].map((item, i) => {
               const active = activePortfolioKey === item.key;
               return (
