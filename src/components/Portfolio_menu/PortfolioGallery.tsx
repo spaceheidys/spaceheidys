@@ -505,6 +505,23 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
       </AnimatePresence>
 
       {hasPagination && (
+        <div className="flex items-center justify-center gap-2 mt-3 sm:mt-4 z-10">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              className={`w-[10px] h-[10px] sm:w-3 sm:h-3 bg-white transition-all duration-300 ${
+                page === i
+                  ? "rounded-full opacity-100"
+                  : "rounded-none opacity-40 hover:opacity-70"
+              }`}
+              aria-label={`Go to page ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+
+      {hasPagination && (
         <button
           onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
           disabled={page === totalPages - 1}
