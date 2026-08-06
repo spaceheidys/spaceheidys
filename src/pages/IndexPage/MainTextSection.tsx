@@ -1,4 +1,4 @@
-import { forwardRef, memo, useEffect, useRef, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { SectionVisibility } from "@/hooks/useSectionSettings";
 import { useCapabilities } from "@/hooks/useCapabilities";
@@ -69,6 +69,83 @@ const TravelPixel = () => (
   />
 );
 
+/** Minimal vertical scrollbar — 1px track with a small square thumb, centered on the right side. */
+const CustomScroll = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [thumbTop, setThumbTop] = useState(0);
+  const [show, setShow] = useState(false);
+
+  const update = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    const overflow = el.scrollHeight > Math.ceil(el.clientHeight);
+    setShow(overflow);
+    const trackH = el.clientHeight * 0.4;
+    const maxScroll = el.scrollHeight - el.clientHeight;
+    const ratio = maxScroll > 0 ? el.scrollTop / maxScroll : 0;
+    const thumbH = 8;
+    const maxThumb = Math.max(0, trackH - thumbH);
+    setThumbTop(ratio * maxThumb);
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    update();
+    el.addEventListener("scroll", update);
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, [update]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = ref.current;
+    if (!el) return;
+    const trackH = el.clientHeight * 0.4;
+    const thumbH = 8;
+    const maxThumb = Math.max(0, trackH - thumbH);
+    const maxScroll = el.scrollHeight - el.clientHeight;
+    const startY = e.clientY;
+    const startScroll = el.scrollTop;
+
+    const onMove = (ev: MouseEvent) => {
+      const deltaY = ev.clientY - startY;
+      el.scrollTop = Math.max(0, Math.min(maxScroll, startScroll + (deltaY / maxThumb) * maxScroll));
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, []);
+
+  return (
+    <div ref={ref} className={`relative overflow-y-auto scrollbar-hide ${className || ""}`}>
+      {children}
+      {show && (
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-[40%] bg-foreground/20 pointer-events-none z-10">
+          <div
+            className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-foreground/70 hover:bg-foreground transition-colors cursor-pointer pointer-events-auto"
+            style={{ top: thumbTop }}
+            onMouseDown={handleMouseDown}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
 /** Section text — typewriter body. */
 const AboutBody = ({
   getContent,
@@ -81,9 +158,9 @@ const AboutBody = ({
   const caps = items.filter((c) => c.is_visible && c.label.trim());
 
   return (
-    <div className="w-full h-full flex flex-col md:flex-row items-stretch gap-6 md:gap-10 px-6 sm:px-10 py-6 overflow-auto">
+    <CustomScroll className="w-full h-full flex flex-col md:flex-row items-stretch gap-6 md:gap-10 px-6 sm:px-10 py-6">
       {/* Left — about text */}
-      <div className="flex-1 flex items-center">
+      <div className="flex-1 min-h-full flex items-center">
         <Typewriter
           delay={typeDelay}
           text={getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
@@ -93,7 +170,7 @@ const AboutBody = ({
 
       {/* Right — capabilities */}
       {caps.length > 0 && (
-        <div className="flex-1 md:max-w-[46%] flex flex-col justify-center">
+        <div className="flex-1 md:max-w-[46%] min-h-full flex flex-col justify-center">
           <p className="text-[10px] font-display tracking-[0.25em] uppercase text-foreground/40 mb-2">
             Capabilities
           </p>
@@ -114,7 +191,7 @@ const AboutBody = ({
           </ul>
         </div>
       )}
-    </div>
+    </CustomScroll>
   );
 };
 
@@ -136,7 +213,7 @@ const SectionBody = ({
   }
   if (section === "contact") {
     return (
-      <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4">
+      <CustomScroll className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4 max-h-full">
         {(sectionVisibility as any).contact_title !== false && (
           <p className="font-display tracking-widest text-foreground/90 mb-2">
             <Typewriter delay={typeDelay} text={getContent("contact_title") || "Cooperation & Commissions"} />
@@ -152,18 +229,18 @@ const SectionBody = ({
             <Typewriter delay={typeDelay + 1.4} text={getContent("contact_email") || "spaceheidys@gmail.com"} />
           </p>
         )}
-      </div>
+      </CustomScroll>
     );
   }
   return (
-    <div className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4">
+    <CustomScroll className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4 max-h-full">
       <p className="font-display tracking-widest text-foreground/90 mb-2">
         <Typewriter delay={typeDelay} text="✦ Shop ✦" />
       </p>
       <p>
         <Typewriter delay={typeDelay + 0.4} text="This section is currently under construction" />
       </p>
-    </div>
+    </CustomScroll>
   );
 };
 
