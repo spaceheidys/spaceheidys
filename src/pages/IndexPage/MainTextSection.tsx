@@ -69,7 +69,7 @@ const TravelPixel = () => (
   />
 );
 
-/** Minimal vertical scrollbar — 1px track with a small square thumb, centered on the right side. */
+/** Minimal vertical scrollbar — 1px solid white track with a small square thumb, centered on the right side. */
 const CustomScroll = ({
   children,
   className,
@@ -86,7 +86,7 @@ const CustomScroll = ({
     if (!el) return;
     const overflow = el.scrollHeight > Math.ceil(el.clientHeight);
     setShow(overflow);
-    const trackH = el.clientHeight * 0.4;
+    const trackH = el.clientHeight * 0.9;
     const maxScroll = el.scrollHeight - el.clientHeight;
     const ratio = maxScroll > 0 ? el.scrollTop / maxScroll : 0;
     const thumbH = 8;
@@ -101,9 +101,12 @@ const CustomScroll = ({
     el.addEventListener("scroll", update);
     const ro = new ResizeObserver(update);
     ro.observe(el);
+    const mo = new MutationObserver(update);
+    mo.observe(el, { childList: true, subtree: true, characterData: true });
     return () => {
       el.removeEventListener("scroll", update);
       ro.disconnect();
+      mo.disconnect();
     };
   }, [update]);
 
@@ -111,7 +114,7 @@ const CustomScroll = ({
     e.preventDefault();
     const el = ref.current;
     if (!el) return;
-    const trackH = el.clientHeight * 0.4;
+    const trackH = el.clientHeight * 0.9;
     const thumbH = 8;
     const maxThumb = Math.max(0, trackH - thumbH);
     const maxScroll = el.scrollHeight - el.clientHeight;
@@ -134,9 +137,9 @@ const CustomScroll = ({
     <div ref={ref} className={`relative overflow-y-auto scrollbar-hide ${className || ""}`}>
       {children}
       {show && (
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-[40%] bg-foreground/20 pointer-events-none z-10">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-[90%] bg-foreground pointer-events-none z-10">
           <div
-            className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-foreground/70 hover:bg-foreground transition-colors cursor-pointer pointer-events-auto"
+            className="absolute left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground cursor-pointer pointer-events-auto"
             style={{ top: thumbTop }}
             onMouseDown={handleMouseDown}
           />
@@ -158,40 +161,44 @@ const AboutBody = ({
   const caps = items.filter((c) => c.is_visible && c.label.trim());
 
   return (
-    <CustomScroll className="w-full h-full flex flex-col md:flex-row items-stretch gap-6 md:gap-10 px-6 sm:px-10 py-6">
+    <div className="w-full h-full flex flex-col md:flex-row items-stretch gap-6 md:gap-10 px-6 sm:px-10 py-6 overflow-hidden">
       {/* Left — about text */}
-      <div className="flex-1 min-h-full flex items-center">
-        <Typewriter
-          delay={typeDelay}
-          text={getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
-          className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed block"
-        />
-      </div>
+      <CustomScroll className="flex-1 min-h-0 max-h-full pr-3">
+        <div className="min-h-full flex items-start">
+          <Typewriter
+            delay={typeDelay}
+            text={getContent("about") || "Welcome to BIKO KU — a creative portfolio showcasing illustration, manga art, and design work."}
+            className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed block"
+          />
+        </div>
+      </CustomScroll>
 
       {/* Right — capabilities */}
       {caps.length > 0 && (
-        <div className="flex-1 md:max-w-[46%] min-h-full flex flex-col justify-center">
-          <p className="text-[10px] font-display tracking-[0.25em] uppercase text-foreground/40 mb-2">
-            Capabilities
-          </p>
-          <ul className="flex flex-col">
-            {caps.map((c, i) => (
-              <li
-                key={c.id}
-                className="flex items-baseline gap-3 border-t border-foreground/15 py-2 last:border-b"
-              >
-                <span className="text-[10px] font-display tracking-widest text-foreground/35 tabular-nums">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="text-sm font-body text-foreground/85">
-                  <Typewriter delay={typeDelay + 0.25 + i * 0.25} text={c.label} />
-                </span>
-              </li>
-            ))}
-          </ul>
+        <div className="flex-1 md:max-w-[46%] min-h-0 max-h-full overflow-y-auto scrollbar-hide">
+          <div className="min-h-full flex flex-col justify-start">
+            <p className="text-[10px] font-display tracking-[0.25em] uppercase text-foreground/40 mb-2">
+              Capabilities
+            </p>
+            <ul className="flex flex-col">
+              {caps.map((c, i) => (
+                <li
+                  key={c.id}
+                  className="flex items-baseline gap-3 border-t border-foreground/15 py-2 last:border-b"
+                >
+                  <span className="text-[10px] font-display tracking-widest text-foreground/35 tabular-nums">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-sm font-body text-foreground/85">
+                    <Typewriter delay={typeDelay + 0.25 + i * 0.25} text={c.label} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
-    </CustomScroll>
+    </div>
   );
 };
 
