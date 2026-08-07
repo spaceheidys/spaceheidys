@@ -69,7 +69,8 @@ const TravelPixel = () => (
   />
 );
 
-/** Minimal vertical scrollbar — 1px solid white track with a small square thumb, centered on the right side. */
+/** Minimal vertical scrollbar — 1px solid white track with a small square thumb,
+ *  inset equally from the top and bottom of the scroll area. */
 const CustomScroll = ({
   children,
   className,
@@ -78,15 +79,17 @@ const CustomScroll = ({
   className?: string;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [thumbTop, setThumbTop] = useState(0);
   const [show, setShow] = useState(false);
 
   const update = useCallback(() => {
     const el = ref.current;
-    if (!el) return;
+    const track = trackRef.current;
+    if (!el || !track) return;
     const overflow = el.scrollHeight > Math.ceil(el.clientHeight);
     setShow(overflow);
-    const trackH = el.clientHeight * 0.9;
+    const trackH = track.clientHeight;
     const maxScroll = el.scrollHeight - el.clientHeight;
     const ratio = maxScroll > 0 ? el.scrollTop / maxScroll : 0;
     const thumbH = 8;
@@ -110,11 +113,16 @@ const CustomScroll = ({
     };
   }, [update]);
 
+  useEffect(() => {
+    if (show) update();
+  }, [show, update]);
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     const el = ref.current;
-    if (!el) return;
-    const trackH = el.clientHeight * 0.9;
+    const track = trackRef.current;
+    if (!el || !track) return;
+    const trackH = track.clientHeight;
     const thumbH = 8;
     const maxThumb = Math.max(0, trackH - thumbH);
     const maxScroll = el.scrollHeight - el.clientHeight;
@@ -137,7 +145,7 @@ const CustomScroll = ({
     <div ref={ref} className={`relative overflow-y-auto scrollbar-hide ${className || ""}`}>
       {children}
       {show && (
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-[90%] bg-foreground pointer-events-none z-10">
+        <div ref={trackRef} className="absolute right-0 top-6 bottom-6 w-px bg-foreground pointer-events-none z-10">
           <div
             className="absolute left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground cursor-pointer pointer-events-auto"
             style={{ top: thumbTop }}
