@@ -163,7 +163,7 @@ const AboutBody = ({
   return (
     <div className="w-full h-full flex flex-col md:flex-row items-stretch gap-6 md:gap-10 px-6 sm:px-10 py-6 overflow-hidden">
       {/* Left — about text */}
-      <CustomScroll className="flex-1 min-h-0 max-h-full pr-3">
+      <CustomScroll className="flex-1 min-h-0 max-h-full pr-6 sm:pr-10">
         <div className="min-h-full flex items-start">
           <Typewriter
             delay={typeDelay}
