@@ -146,15 +146,15 @@ const CustomScroll = ({
       <div ref={ref} className="h-full max-h-full overflow-y-auto scrollbar-hide">
         {children}
       </div>
-      {show && (
-        <div ref={trackRef} className="absolute right-0 top-6 bottom-6 w-px bg-foreground pointer-events-none z-10">
+      <div ref={trackRef} className="absolute right-0 top-6 bottom-6 w-px bg-foreground/25 pointer-events-none z-10">
+        {show && (
           <div
             className="absolute left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground cursor-pointer pointer-events-auto"
             style={{ top: thumbTop }}
             onMouseDown={handleMouseDown}
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
