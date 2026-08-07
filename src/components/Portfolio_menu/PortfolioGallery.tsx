@@ -12,7 +12,8 @@ import { useGallerySubs } from "@/hooks/useGallerySubs";
 import type { PortfolioMenuKey } from "./PortfolioMenu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const ITEMS_PER_PAGE_MOBILE = 4;
+const ITEMS_PER_PAGE_MOBILE_GALLERY = 6;
+const ITEMS_PER_PAGE_MOBILE_OTHER = 4;
 const ITEMS_PER_PAGE_DESKTOP = 9;
 const ITEMS_PER_PAGE_DESKTOP_PROJECTS = 9;
 
@@ -160,7 +161,9 @@ const PlatformIcon = ({ label }: { label: string }) => {
 const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLightboxChange }: PortfolioGalleryProps) => {
   const isMobile = useIsMobile();
   const itemsPerPage = isMobile
-    ? ITEMS_PER_PAGE_MOBILE
+    ? sectionKey === "gallery"
+      ? ITEMS_PER_PAGE_MOBILE_GALLERY
+      : ITEMS_PER_PAGE_MOBILE_OTHER
     : sectionKey === "projects"
       ? ITEMS_PER_PAGE_DESKTOP_PROJECTS
       : ITEMS_PER_PAGE_DESKTOP;
