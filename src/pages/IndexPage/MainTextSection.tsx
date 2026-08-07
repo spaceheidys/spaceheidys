@@ -142,8 +142,10 @@ const CustomScroll = ({
   }, []);
 
   return (
-    <div ref={ref} className={`relative overflow-y-auto scrollbar-hide ${className || ""}`}>
-      {children}
+    <div className={`relative ${className || ""}`}>
+      <div ref={ref} className="h-full max-h-full overflow-y-auto scrollbar-hide">
+        {children}
+      </div>
       {show && (
         <div ref={trackRef} className="absolute right-0 top-6 bottom-6 w-px bg-foreground pointer-events-none z-10">
           <div
