@@ -191,9 +191,9 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             <PolygonBackground triggerKey={flipCount} />
           )}
 
-          {/* Wallpaper switcher — right side, vertically centered */}
+          {/* Wallpaper switcher — bottom row on mobile, right side on desktop */}
           {getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
-            <div className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-2">
+            <div className="absolute z-30 flex items-center gap-2 left-1/2 -translate-x-1/2 bottom-20 flex-row sm:left-auto sm:translate-x-0 sm:bottom-auto sm:right-5 sm:top-1/2 sm:-translate-y-1/2 sm:flex-col">
               {wallpaperPool.map((w, i) => (
                 <div
                   key={`${w.url}-${i}`}
