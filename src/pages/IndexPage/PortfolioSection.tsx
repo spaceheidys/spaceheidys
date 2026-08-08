@@ -141,8 +141,6 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
             <PolygonBackground triggerKey={flipCount} />
           )}
 
-
-
           {/* Cards content — centered when closed, anchored to the bottom when a section is open */}
           <div
             className={`flex flex-1 items-center ${
