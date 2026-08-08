@@ -1,7 +1,9 @@
 import { forwardRef, memo, useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Plus, X } from "lucide-react";
 import type { SectionVisibility } from "@/hooks/useSectionSettings";
 import { useCapabilities } from "@/hooks/useCapabilities";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MainTextSectionProps {
   activeSection: "about" | "contact" | "shop" | null;
