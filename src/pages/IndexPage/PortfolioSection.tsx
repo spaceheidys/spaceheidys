@@ -32,6 +32,7 @@ interface PortfolioSectionProps {
   onFrontTextChange: (text: string) => void;
   favoritesCount: number;
   footerText: string;
+  activeWallpaper?: string;
 }
 
 const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
