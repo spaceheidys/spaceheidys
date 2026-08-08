@@ -125,7 +125,7 @@ const Index = () => {
     setSiteMusicEnabled(siteMusicEnabled);
   }, [siteMusicEnabled, setSiteMusicEnabled]);
 
-  // Show scroll-to-top arrow only when in portfolio section
+  // Show scroll-to-top arrow and track whether the portfolio section is in view
   useEffect(() => {
     const handleScroll = () => {
       if (!portfolioRef.current) return;
@@ -134,6 +134,8 @@ const Index = () => {
       // Hero is "active" while portfolio top is still below the middle of the viewport
       setInHero(rect.top > window.innerHeight * 0.5);
       setAtTop(window.scrollY < 40);
+      // Portfolio is considered in view when its box intersects the viewport
+      setPortfolioInView(rect.top < window.innerHeight && rect.bottom > 0);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
