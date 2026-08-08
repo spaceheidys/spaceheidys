@@ -479,6 +479,19 @@ const Index = () => {
                 onClick={() => setBgImage(bg)}
               />
             ))}
+            {portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
+              <div className="flex items-center gap-2">
+                {wallpaperPool.map((w, i) => (
+                  <div
+                    key={`${w.url}-${i}`}
+                    className={`cursor-pointer transition-all duration-300 w-[18px] h-[18px] bg-foreground ${
+                      activeWallpaper === w.url ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"
+                    }`}
+                    onClick={() => setActiveWallpaper(w.url)}
+                  />
+                ))}
+              </div>
+            )}
             {siteMusicEnabled && (
               <button
                 className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
