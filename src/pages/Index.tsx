@@ -69,6 +69,54 @@ const Index = () => {
   const [inHero, setInHero] = useState(true);
   const [atTop, setAtTop] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [portfolioInView, setPortfolioInView] = useState(false);
+
+  // Portfolio wallpaper pool (lifted from PortfolioSection so switchers can live in the header)
+  const wallpapersJson = getContent("card_bg_wallpapers") || "";
+  const wallpaperPool = useMemo(() => {
+    let list: { url: string; weight: number }[] = [];
+    try {
+      const parsed = JSON.parse(wallpapersJson || "[]");
+      if (Array.isArray(parsed)) {
+        list = parsed
+          .map((it: any) =>
+            typeof it === "string"
+              ? { url: it, weight: 1 }
+              : { url: it?.url, weight: Number(it?.weight) || 1 }
+          )
+          .filter((it) => typeof it.url === "string" && it.url.length > 0);
+      }
+    } catch { /* ignore */ }
+    return list;
+  }, [wallpapersJson]);
+
+  const pickWallpaper = useCallback((list: { url: string; weight: number }[], exclude?: string) => {
+    if (list.length === 0) return "";
+    let pool = list;
+    if (exclude && list.length > 1) pool = list.filter((w) => w.url !== exclude);
+    const total = pool.reduce((s, w) => s + Math.max(0, Number(w.weight) || 0), 0);
+    if (total <= 0) return pool[Math.floor(Math.random() * pool.length)].url;
+    let r = Math.random() * total;
+    for (const w of pool) {
+      r -= Math.max(0, Number(w.weight) || 0);
+      if (r <= 0) return w.url;
+    }
+    return pool[pool.length - 1].url;
+  }, []);
+
+  const [activeWallpaper, setActiveWallpaper] = useState<string>(() => pickWallpaper(wallpaperPool));
+  const rotateEnabled = getContent("card_bg_wallpaper_rotate") === "on";
+  const rotateInterval = Math.max(5, parseInt(getContent("card_bg_wallpaper_rotate_interval") || "60", 10) || 60);
+
+  useEffect(() => {
+    setActiveWallpaper((cur) => (wallpaperPool.some((w) => w.url === cur) ? cur : pickWallpaper(wallpaperPool)));
+  }, [wallpaperPool, pickWallpaper]);
+
+  useEffect(() => {
+    if (!rotateEnabled || wallpaperPool.length < 2) return;
+    const id = setInterval(() => setActiveWallpaper((cur) => pickWallpaper(wallpaperPool, cur)), rotateInterval * 1000);
+    return () => clearInterval(id);
+  }, [rotateEnabled, rotateInterval, wallpaperPool, pickWallpaper]);
 
   const siteMusicEnabled = !contentLoading && getContent("site_music_enabled") !== "false";
 
