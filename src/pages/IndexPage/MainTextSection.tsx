@@ -74,14 +74,17 @@ const TravelPixel = () => (
 const CustomScroll = ({
   children,
   className,
+  autoScroll = false,
 }: {
   children: React.ReactNode;
   className?: string;
+  autoScroll?: boolean;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [thumbTop, setThumbTop] = useState(0);
   const [show, setShow] = useState(false);
+  const lastHeightRef = useRef(0);
 
   const update = useCallback(() => {
     const el = ref.current;
@@ -95,11 +98,17 @@ const CustomScroll = ({
     const thumbH = 8;
     const maxThumb = Math.max(0, trackH - thumbH);
     setThumbTop(ratio * maxThumb);
-  }, []);
+
+    if (autoScroll && overflow && el.scrollHeight > lastHeightRef.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }
+    lastHeightRef.current = el.scrollHeight;
+  }, [autoScroll]);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    lastHeightRef.current = el.scrollHeight;
     update();
     el.addEventListener("scroll", update);
     const ro = new ResizeObserver(update);
