@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import taro01Img from "@/assets/TARO_01.png";
@@ -32,6 +32,7 @@ interface PortfolioSectionProps {
   onFrontTextChange: (text: string) => void;
   favoritesCount: number;
   footerText: string;
+  activeWallpaper?: string;
 }
 
 const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
@@ -56,6 +57,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
       onFrontTextChange,
       favoritesCount,
       footerText,
+      activeWallpaper,
     },
     ref
   ) => {
@@ -91,58 +93,6 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
     };
 
     const bgOpacity = parseInt(getContent("card_bg_video_opacity") || "40", 10) / 100;
-
-    // Build the wallpaper pool (single + rotation), weighted.
-    const wallpapersJson = getContent("card_bg_wallpapers") || "";
-    const wallpaperPool = useMemo(() => {
-      let list: { url: string; weight: number }[] = [];
-      try {
-        const parsed = JSON.parse(wallpapersJson || "[]");
-        if (Array.isArray(parsed)) {
-          list = parsed
-            .map((it: any) =>
-              typeof it === "string"
-                ? { url: it, weight: 1 }
-                : { url: it?.url, weight: Number(it?.weight) || 1 }
-            )
-            .filter((it) => typeof it.url === "string" && it.url.length > 0);
-        }
-      } catch { /* ignore */ }
-      return list;
-    }, [wallpapersJson]);
-
-    const pickWallpaper = (list: { url: string; weight: number }[], exclude?: string) => {
-      if (list.length === 0) return "";
-      let pool = list;
-      if (exclude && list.length > 1) pool = list.filter((w) => w.url !== exclude);
-      const total = pool.reduce((s, w) => s + Math.max(0, Number(w.weight) || 0), 0);
-      if (total <= 0) return pool[Math.floor(Math.random() * pool.length)].url;
-      let r = Math.random() * total;
-      for (const w of pool) {
-        r -= Math.max(0, Number(w.weight) || 0);
-        if (r <= 0) return w.url;
-      }
-      return pool[pool.length - 1].url;
-    };
-
-    const rotateEnabled = getContent("card_bg_wallpaper_rotate") === "on";
-    const rotateInterval = Math.max(5, parseInt(getContent("card_bg_wallpaper_rotate_interval") || "60", 10) || 60);
-
-    const [activeWallpaper, setActiveWallpaper] = useState<string>(() => pickWallpaper(wallpaperPool));
-
-    // Re-seed when pool changes
-    useEffect(() => {
-      setActiveWallpaper((cur) => (wallpaperPool.some((w) => w.url === cur) ? cur : pickWallpaper(wallpaperPool)));
-    }, [wallpaperPool]);
-
-    // Timed rotation
-    useEffect(() => {
-      if (!rotateEnabled || wallpaperPool.length < 2) return;
-      const id = setInterval(() => {
-        setActiveWallpaper((cur) => pickWallpaper(wallpaperPool, cur));
-      }, rotateInterval * 1000);
-      return () => clearInterval(id);
-    }, [rotateEnabled, rotateInterval, wallpaperPool]);
 
     return (
       <>
@@ -190,24 +140,6 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
           ) : (
             <PolygonBackground triggerKey={flipCount} />
           )}
-
-          {/* Wallpaper switcher — bottom row on mobile, right side on desktop */}
-          {getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
-            <div className="absolute z-30 flex items-center gap-2 left-1/2 -translate-x-1/2 bottom-20 flex-row sm:left-auto sm:translate-x-0 sm:bottom-auto sm:right-5 sm:top-1/2 sm:-translate-y-1/2 sm:flex-col">
-              {wallpaperPool.map((w, i) => (
-                <div
-                  key={`${w.url}-${i}`}
-                  onClick={() => setActiveWallpaper(w.url)}
-                  className={`cursor-pointer transition-all duration-300 w-[18px] h-[18px] bg-white ${
-                    activeWallpaper === w.url
-                      ? "opacity-100 rounded-full"
-                      : "opacity-50 hover:opacity-80 rounded-none"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-
 
           {/* Cards content — centered when closed, anchored to the bottom when a section is open */}
           <div
