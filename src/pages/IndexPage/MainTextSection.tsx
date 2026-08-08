@@ -1,7 +1,9 @@
 import { forwardRef, memo, useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Plus, X } from "lucide-react";
 import type { SectionVisibility } from "@/hooks/useSectionSettings";
 import { useCapabilities } from "@/hooks/useCapabilities";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MainTextSectionProps {
   activeSection: "about" | "contact" | "shop" | null;
@@ -277,6 +279,21 @@ const MainTextSection = memo(
       // or introducing the frame for the first time.
       const prevSectionRef = useRef<typeof activeSection>(null);
       const [phase, setPhase] = useState<"idle" | "intro" | "switch">("idle");
+      const isMobile = useIsMobile();
+      const [expanded, setExpanded] = useState(false);
+
+      useEffect(() => {
+        if (!activeSection) setExpanded(false);
+      }, [activeSection]);
+
+      useEffect(() => {
+        if (!expanded) return;
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        return () => {
+          document.body.style.overflow = prev;
+        };
+      }, [expanded]);
 
       useEffect(() => {
         const prev = prevSectionRef.current;
@@ -363,6 +380,50 @@ const MainTextSection = memo(
               )}
             </AnimatePresence>
           </div>
+
+          {/* Mobile — expand to fullscreen */}
+          {isMobile && activeSection && (
+            <button
+              onClick={() => setExpanded(true)}
+              aria-label="Expand text"
+              className="absolute bottom-3 right-8 z-20 w-7 h-7 flex items-center justify-center border border-foreground/40 text-foreground/70 active:text-foreground bg-background/70"
+            >
+              <Plus size={14} />
+            </button>
+          )}
+
+          <AnimatePresence>
+            {expanded && activeSection && (
+              <motion.div
+                className="fixed inset-0 z-[200] bg-background flex flex-col"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className="flex items-center justify-between px-6 py-4 border-b border-foreground/15">
+                  <span className="text-[10px] font-display tracking-[0.25em] uppercase text-foreground/50">
+                    {activeSection}
+                  </span>
+                  <button
+                    onClick={() => setExpanded(false)}
+                    aria-label="Close"
+                    className="text-foreground/70 active:text-foreground"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="flex-1 min-h-0 overflow-hidden py-2">
+                  <SectionBody
+                    section={activeSection}
+                    sectionVisibility={sectionVisibility}
+                    getContent={getContent}
+                    typeDelay={0}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       );
     }
