@@ -57,6 +57,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
       onFrontTextChange,
       favoritesCount,
       footerText,
+      activeWallpaper,
     },
     ref
   ) => {
