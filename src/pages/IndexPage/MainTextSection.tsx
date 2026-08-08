@@ -182,7 +182,7 @@ const AboutBody = ({
   return (
     <div className="w-full h-full flex flex-col md:flex-row items-stretch gap-6 md:gap-10 px-6 sm:px-10 py-6 overflow-hidden">
       {/* Left — about text */}
-      <CustomScroll className="flex-1 min-h-0 max-h-full pr-6 sm:pr-10">
+      <CustomScroll className="flex-1 min-h-0 max-h-full pr-6 sm:pr-10" autoScroll>
         <div className="min-h-full flex items-start">
           <Typewriter
             delay={typeDelay}
@@ -239,7 +239,7 @@ const SectionBody = ({
   }
   if (section === "contact") {
     return (
-      <CustomScroll className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4 max-h-full">
+      <CustomScroll className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4 max-h-full" autoScroll>
         {(sectionVisibility as any).contact_title !== false && (
           <p className="font-display tracking-widest text-foreground/90 mb-2">
             <Typewriter delay={typeDelay} text={getContent("contact_title") || "Cooperation & Commissions"} />
@@ -259,7 +259,7 @@ const SectionBody = ({
     );
   }
   return (
-    <CustomScroll className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4 max-h-full">
+    <CustomScroll className="text-sm sm:text-base text-foreground/80 font-body leading-relaxed max-w-2xl text-center px-4 max-h-full" autoScroll>
       <p className="font-display tracking-widest text-foreground/90 mb-2">
         <Typewriter delay={typeDelay} text="✦ Shop ✦" />
       </p>
