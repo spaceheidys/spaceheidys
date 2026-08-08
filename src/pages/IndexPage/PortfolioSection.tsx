@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import taro01Img from "@/assets/TARO_01.png";
