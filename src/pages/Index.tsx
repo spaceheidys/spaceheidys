@@ -629,6 +629,7 @@ const Index = () => {
         currentFrontText={currentFrontText}
         onFrontTextChange={setCurrentFrontText}
         favoritesCount={favoritesCount}
+        activeWallpaper={activeWallpaper}
         footerText={getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."}
       />
 
