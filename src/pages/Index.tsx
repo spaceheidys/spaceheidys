@@ -532,7 +532,7 @@ const Index = () => {
               onClick={() => setBgImage(bg)}
             />
           ))}
-          {portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
+          {!hidePortfolioSwitchers && portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
             <div className="flex items-center gap-2">
               {wallpaperPool.map((w, i) => (
                 <div
@@ -545,6 +545,7 @@ const Index = () => {
               ))}
             </div>
           )}
+
           <MobileNav
             onSecretDoor={openSecretDoor}
             onShop={goToShop}
