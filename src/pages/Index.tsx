@@ -7,6 +7,7 @@ import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
 import { useSoundContext } from "@/contexts/SoundContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import LoadingScreen from "@/components/LoadingScreen";
 import SecretDoorOverlay from "@/components/SecretDoorOverlay";
@@ -36,6 +37,7 @@ const getTimeOfDay = (date = new Date()): TimeOfDay => {
 
 const Index = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(() => !sessionStorage.getItem("loaded"));
   const [loadProgress, setLoadProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -70,6 +72,9 @@ const Index = () => {
   const [atTop, setAtTop] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [portfolioInView, setPortfolioInView] = useState(false);
+  const [hidePortfolioSwitchers, setHidePortfolioSwitchers] = useState(false);
+  const lastScrollY = useRef(0);
+
 
   // Portfolio wallpaper pool (lifted from PortfolioSection so switchers can live in the header)
   const wallpapersJson = getContent("card_bg_wallpapers") || "";
@@ -130,17 +135,32 @@ const Index = () => {
     const handleScroll = () => {
       if (!portfolioRef.current) return;
       const rect = portfolioRef.current.getBoundingClientRect();
+      const currentScrollY = window.scrollY;
+      const isInPortfolio = rect.top < window.innerHeight && rect.bottom > 0;
       setShowScrollTop(rect.top < window.innerHeight * 0.5 && window.scrollY > 200);
       // Hero is "active" while portfolio top is still below the middle of the viewport
       setInHero(rect.top > window.innerHeight * 0.5);
       setAtTop(window.scrollY < 40);
       // Portfolio is considered in view when its box intersects the viewport
-      setPortfolioInView(rect.top < window.innerHeight && rect.bottom > 0);
+      setPortfolioInView(isInPortfolio);
+
+      // On mobile, hide portfolio wallpaper switchers while scrolling down in an open gallery
+      if (isMobile && activePortfolioKey === "gallery" && isInPortfolio) {
+        if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+          setHidePortfolioSwitchers(true);
+        } else if (currentScrollY < lastScrollY.current) {
+          setHidePortfolioSwitchers(false);
+        }
+      } else {
+        setHidePortfolioSwitchers(false);
+      }
+      lastScrollY.current = currentScrollY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isMobile, activePortfolioKey]);
+
 
   // Reset card to backside when scrolling back to MAIN section
   useEffect(() => {
@@ -479,7 +499,7 @@ const Index = () => {
                 onClick={() => setBgImage(bg)}
               />
             ))}
-            {portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
+            {!hidePortfolioSwitchers && portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
               <div className="flex items-center gap-2">
                 {wallpaperPool.map((w, i) => (
                   <div
@@ -492,6 +512,7 @@ const Index = () => {
                 ))}
               </div>
             )}
+
             {siteMusicEnabled && (
               <button
                 className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
@@ -511,7 +532,7 @@ const Index = () => {
               onClick={() => setBgImage(bg)}
             />
           ))}
-          {portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
+          {!hidePortfolioSwitchers && portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
             <div className="flex items-center gap-2">
               {wallpaperPool.map((w, i) => (
                 <div
@@ -524,6 +545,7 @@ const Index = () => {
               ))}
             </div>
           )}
+
           <MobileNav
             onSecretDoor={openSecretDoor}
             onShop={goToShop}
