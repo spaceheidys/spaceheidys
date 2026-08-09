@@ -499,7 +499,7 @@ const Index = () => {
                 onClick={() => setBgImage(bg)}
               />
             ))}
-            {portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
+            {!hidePortfolioSwitchers && portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
               <div className="flex items-center gap-2">
                 {wallpaperPool.map((w, i) => (
                   <div
@@ -512,6 +512,7 @@ const Index = () => {
                 ))}
               </div>
             )}
+
             {siteMusicEnabled && (
               <button
                 className="cursor-pointer ml-2 text-foreground/60 hover:text-foreground transition-colors duration-300"
