@@ -7,6 +7,7 @@ import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
 import { useSoundContext } from "@/contexts/SoundContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import LoadingScreen from "@/components/LoadingScreen";
 import SecretDoorOverlay from "@/components/SecretDoorOverlay";
@@ -36,6 +37,7 @@ const getTimeOfDay = (date = new Date()): TimeOfDay => {
 
 const Index = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(() => !sessionStorage.getItem("loaded"));
   const [loadProgress, setLoadProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -70,6 +72,9 @@ const Index = () => {
   const [atTop, setAtTop] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [portfolioInView, setPortfolioInView] = useState(false);
+  const [hidePortfolioSwitchers, setHidePortfolioSwitchers] = useState(false);
+  const lastScrollY = useRef(0);
+
 
   // Portfolio wallpaper pool (lifted from PortfolioSection so switchers can live in the header)
   const wallpapersJson = getContent("card_bg_wallpapers") || "";
