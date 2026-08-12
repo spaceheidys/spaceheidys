@@ -8,17 +8,35 @@ import { SoundProvider } from "@/contexts/SoundContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
-const Gallery = lazy(() => import("./pages/Gallery"));
-const SecretPage = lazy(() => import("./pages/SecretPage"));
-const Admin = lazy(() => import("./pages/Admin"));
-const AdminMain = lazy(() => import("./pages/AdminMain"));
-const AdminLogin = lazy(() => import("./pages/AdminLogin"));
-const AdminSecretDoor = lazy(() => import("./pages/AdminSecretDoor"));
-const AdminSEO = lazy(() => import("./pages/AdminSEO"));
-const AdminShop = lazy(() => import("./pages/AdminShop"));
-const AdminVisits = lazy(() => import("./pages/AdminVisits"));
-const Shop = lazy(() => import("./pages/Shop"));
-const Profile = lazy(() => import("./pages/Profile"));
+// Retries a dynamic import once, then force-reloads the page.
+// Fixes "Failed to fetch dynamically imported module" caused by stale chunk
+// hashes after a new deploy.
+const lazyWithRetry = (factory: () => Promise<{ default: React.ComponentType<any> }>) =>
+  lazy(async () => {
+    try {
+      return await factory();
+    } catch (err) {
+      const key = "chunk-reload-attempt";
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        window.location.reload();
+        return new Promise<never>(() => {});
+      }
+      throw err;
+    }
+  });
+
+const Gallery = lazyWithRetry(() => import("./pages/Gallery"));
+const SecretPage = lazyWithRetry(() => import("./pages/SecretPage"));
+const Admin = lazyWithRetry(() => import("./pages/Admin"));
+const AdminMain = lazyWithRetry(() => import("./pages/AdminMain"));
+const AdminLogin = lazyWithRetry(() => import("./pages/AdminLogin"));
+const AdminSecretDoor = lazyWithRetry(() => import("./pages/AdminSecretDoor"));
+const AdminSEO = lazyWithRetry(() => import("./pages/AdminSEO"));
+const AdminShop = lazyWithRetry(() => import("./pages/AdminShop"));
+const AdminVisits = lazyWithRetry(() => import("./pages/AdminVisits"));
+const Shop = lazyWithRetry(() => import("./pages/Shop"));
+const Profile = lazyWithRetry(() => import("./pages/Profile"));
 
 const queryClient = new QueryClient();
 
@@ -28,7 +46,10 @@ const PageLoader = () => (
   </div>
 );
 
-const App = () => (
+const App = () => {
+  // Clear the retry flag once the app has loaded successfully.
+  if (typeof window !== "undefined") sessionStorage.removeItem("chunk-reload-attempt");
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <SoundProvider>
@@ -56,6 +77,7 @@ const App = () => (
       </SoundProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
