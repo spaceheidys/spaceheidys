@@ -14,7 +14,9 @@ import NotFound from "./pages/NotFound";
 const lazyWithRetry = (factory: () => Promise<{ default: React.ComponentType<any> }>) =>
   lazy(async () => {
     try {
-      return await factory();
+      const mod = await factory();
+      sessionStorage.removeItem("chunk-reload-attempt");
+      return mod;
     } catch (err) {
       const key = "chunk-reload-attempt";
       if (!sessionStorage.getItem(key)) {
@@ -47,8 +49,6 @@ const PageLoader = () => (
 );
 
 const App = () => {
-  // Clear the retry flag once the app has loaded successfully.
-  if (typeof window !== "undefined") sessionStorage.removeItem("chunk-reload-attempt");
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
