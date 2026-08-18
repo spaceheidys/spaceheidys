@@ -2,7 +2,6 @@ import { forwardRef, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ArrowLeft } from "lucide-react";
 import { createPortal } from "react-dom";
-import BikoKuLogo from "@/components/BikoKuLogo";
 import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { supabase } from "@/integrations/supabase/client";
