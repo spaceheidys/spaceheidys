@@ -1,4 +1,6 @@
 import { forwardRef, useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronRight, ArrowLeft } from "lucide-react";
 import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,10 +19,13 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const [showTitle, setShowTitle] = useState(true);
   const [showMessage, setShowMessage] = useState(true);
   const [messageTrigger, setMessageTrigger] = useState(0);
+  const [nextOpen, setNextOpen] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageShowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { get, getDuration } = useSectionContent();
+  const nextBg = get("cube_next_bg") || backgroundUrl || "";
+  const nextBgIsVideo = nextBg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(nextBg) : false;
   const titleDurationSeconds = Math.max(0, Math.min(60, getDuration("cube_title_duration") ?? 5));
   const titleVisibleMs = titleDurationSeconds * 1000;
   const titlePersists = titleDurationSeconds === 0;
@@ -143,6 +148,42 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
             }}
           />
         </div>
+
+        {/* Next section arrow */}
+        <button
+          onClick={() => setNextOpen(true)}
+          aria-label="Next section"
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 text-white/50 hover:text-white transition-colors"
+        >
+          <ChevronRight size={32} strokeWidth={1} />
+        </button>
+
+        <AnimatePresence>
+          {nextOpen && (
+            <motion.div
+              className="absolute inset-0 z-30 bg-black overflow-hidden"
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 60 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {nextBg && (
+                nextBgIsVideo ? (
+                  <video src={nextBg} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                ) : (
+                  <img src={nextBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                )
+              )}
+              <button
+                onClick={() => setNextOpen(false)}
+                className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
+              >
+                <ArrowLeft size={16} strokeWidth={1} />
+                Back
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Cube category divider strip — moved from the top of the cube to the bottom */}
