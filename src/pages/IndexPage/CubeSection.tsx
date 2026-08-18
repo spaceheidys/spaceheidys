@@ -1,6 +1,8 @@
 import { forwardRef, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ArrowLeft } from "lucide-react";
+import { createPortal } from "react-dom";
+import BikoKuLogo from "@/components/BikoKuLogo";
 import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { supabase } from "@/integrations/supabase/client";
@@ -158,32 +160,38 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
           <ChevronRight size={32} strokeWidth={1} />
         </button>
 
-        <AnimatePresence>
-          {nextOpen && (
-            <motion.div
-              className="absolute inset-0 z-30 bg-black overflow-hidden"
-              initial={{ opacity: 0, x: 60 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 60 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            >
-              {nextBg && (
-                nextBgIsVideo ? (
-                  <video src={nextBg} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                ) : (
-                  <img src={nextBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                )
-              )}
-              <button
-                onClick={() => setNextOpen(false)}
-                className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
+        {createPortal(
+          <AnimatePresence>
+            {nextOpen && (
+              <motion.div
+                className="fixed inset-0 z-[300] bg-black overflow-hidden"
+                initial={{ opacity: 0, x: 60 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 60 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               >
-                <ArrowLeft size={16} strokeWidth={1} />
-                Back
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                {nextBg && (
+                  nextBgIsVideo ? (
+                    <video src={nextBg} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                  ) : (
+                    <img src={nextBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                  )
+                )}
+                <div className="absolute top-5 left-5 sm:top-8 sm:left-8 z-10">
+                  <BikoKuLogo />
+                </div>
+                <button
+                  onClick={() => setNextOpen(false)}
+                  className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
+                >
+                  <ArrowLeft size={16} strokeWidth={1} />
+                  Back
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
       </div>
 
       {/* Cube category divider strip — moved from the top of the cube to the bottom */}
