@@ -40,6 +40,18 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
 
   useEffect(() => {
     let cancelled = false;
+    return () => { cancelled = true; void cancelled; };
+  }, []);
+
+  useEffect(() => {
+    if (!nextOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [nextOpen]);
+
+  useEffect(() => {
+    let cancelled = false;
     const load = async () => {
       const already = sessionStorage.getItem("visit_counted") === "1";
       if (already) {
