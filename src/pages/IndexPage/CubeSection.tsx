@@ -190,9 +190,9 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                 )}
                 <button
                   onClick={() => setNextOpen(false)}
-                  className="absolute top-5 left-5 sm:top-8 sm:left-8 z-10 flex items-center justify-center text-white/80 hover:text-white transition-colors font-display tracking-[0.2em] select-none h-[200px] sm:h-[300px] md:h-[360px] lg:h-[420px] w-auto leading-none"
+                  className="absolute top-5 left-5 sm:top-8 sm:left-8 z-10 text-white/80 hover:text-white transition-colors font-display text-lg sm:text-xl tracking-[0.2em] select-none"
                 >
-                  <span className="text-[120px] sm:text-[180px] md:text-[220px] lg:text-[260px]">ビコ・ク</span>
+                  ビコ・ク
                 </button>
                 <button
                   onClick={() => setNextOpen(false)}
