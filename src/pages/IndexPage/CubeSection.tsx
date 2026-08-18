@@ -2,7 +2,6 @@ import { forwardRef, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ArrowLeft } from "lucide-react";
 import { createPortal } from "react-dom";
-import BikoKuLogo from "@/components/BikoKuLogo";
 import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { supabase } from "@/integrations/supabase/client";
@@ -189,9 +188,12 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                     <img src={nextBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
                   )
                 )}
-                <div className="absolute top-5 left-5 sm:top-8 sm:left-8 z-10">
-                  <BikoKuLogo />
-                </div>
+                <button
+                  onClick={() => setNextOpen(false)}
+                  className="absolute top-5 left-5 sm:top-8 sm:left-8 z-10 text-white/80 hover:text-white transition-colors font-display text-lg sm:text-xl tracking-[0.2em] select-none"
+                >
+                  ビコ・ク
+                </button>
                 <button
                   onClick={() => setNextOpen(false)}
                   className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
