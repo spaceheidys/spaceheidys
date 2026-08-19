@@ -190,12 +190,6 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                 )}
                 <button
                   onClick={() => setNextOpen(false)}
-                  className="absolute top-5 left-5 sm:top-8 sm:left-8 z-10 text-white/80 hover:text-white transition-colors font-display text-lg sm:text-xl tracking-[0.2em] select-none"
-                >
-                  ビコ・ク
-                </button>
-                <button
-                  onClick={() => setNextOpen(false)}
                   className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
                 >
                   <ArrowLeft size={16} strokeWidth={1} />
