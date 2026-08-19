@@ -2,10 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { ReactNode } from "react";
 import NotesButton from "./NotesButton";
 
-export type AdminPageKey = "main" | "portfolio" | "secret-door" | "seo" | "shop" | "visits";
+export type AdminPageKey = "main" | "lvlup" | "portfolio" | "secret-door" | "seo" | "shop" | "visits";
 
 const LINKS: { key: AdminPageKey; label: string; path: string }[] = [
   { key: "main", label: "Main Page CMS", path: "/admin/main" },
+  { key: "lvlup", label: "Main LVLUP", path: "/admin/lvlup" },
   { key: "portfolio", label: "Portfolio CMS", path: "/admin" },
   { key: "secret-door", label: "Secret Door", path: "/admin/secret-door" },
   { key: "seo", label: "SEO", path: "/admin/seo" },
