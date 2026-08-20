@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ArrowLeft } from "lucide-react";
 import { createPortal } from "react-dom";
 import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
+import LvlupRadio from "@/components/LvlupRadio";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -195,6 +196,11 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   <ArrowLeft size={16} strokeWidth={1} />
                   Back
                 </button>
+                <LvlupRadio
+                  url={get("lvlup_radio_url")}
+                  metaUrl={get("lvlup_radio_meta_url")}
+                  volume={Number(get("lvlup_radio_volume") || 15)}
+                />
               </motion.div>
             )}
           </AnimatePresence>,
