@@ -28,9 +28,6 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const { get, getDuration } = useSectionContent();
   const nextBg = get("lvlup_bg") || get("cube_next_bg") || backgroundUrl || "";
   const nextBgIsVideo = nextBg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(nextBg) : false;
-  const radioUrl = (get("lvlup_radio_url") ?? "").trim();
-  const radioMetaUrl = (get("lvlup_radio_meta_url") ?? "").trim();
-  const radioVolume = Math.max(0, Math.min(100, Number(get("lvlup_radio_volume")) || 20)) / 100;
   const titleDurationSeconds = Math.max(0, Math.min(60, getDuration("cube_title_duration") ?? 5));
   const titleVisibleMs = titleDurationSeconds * 1000;
   const titlePersists = titleDurationSeconds === 0;
@@ -199,9 +196,11 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   <ArrowLeft size={16} strokeWidth={1} />
                   Back
                 </button>
-                {radioUrl && (
-                  <LvlupRadio streamUrl={radioUrl} metaUrl={radioMetaUrl || undefined} volume={radioVolume} />
-                )}
+                <LvlupRadio
+                  url={get("lvlup_radio_url")}
+                  metaUrl={get("lvlup_radio_meta_url")}
+                  volume={Number(get("lvlup_radio_volume") || 15)}
+                />
               </motion.div>
             )}
           </AnimatePresence>,
