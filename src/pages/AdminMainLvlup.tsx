@@ -8,6 +8,9 @@ import AdminTopNav from "@/components/admin/AdminTopNav";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
 const BG_KEY = "lvlup_bg";
+const RADIO_KEY = "lvlup_radio_url";
+const RADIO_META_KEY = "lvlup_radio_meta_url";
+const RADIO_VOL_KEY = "lvlup_radio_volume";
 
 const AdminMainLvlup = () => {
   const { user, isAdmin, loading } = useAuth();
@@ -15,6 +18,16 @@ const AdminMainLvlup = () => {
   const { get, update, loading: contentLoading } = useSectionContent();
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [radioUrl, setRadioUrl] = useState("");
+  const [radioMeta, setRadioMeta] = useState("");
+  const [radioVol, setRadioVol] = useState(20);
+
+  useEffect(() => {
+    if (contentLoading) return;
+    setRadioUrl(get(RADIO_KEY));
+    setRadioMeta(get(RADIO_META_KEY));
+    setRadioVol(Number(get(RADIO_VOL_KEY)) || 20);
+  }, [contentLoading]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
@@ -114,6 +127,56 @@ const AdminMainLvlup = () => {
               </button>
             )}
           </div>
+        </section>
+
+        <section className="border border-border p-4 sm:p-6 mt-6">
+          <h2 className="font-display text-[11px] tracking-[0.3em] uppercase text-foreground mb-4">
+            Radio
+          </h2>
+
+          <label className="block font-display text-[10px] tracking-widest uppercase text-muted-foreground mb-1">
+            Stream URL
+          </label>
+          <input
+            value={radioUrl}
+            onChange={(e) => setRadioUrl(e.target.value)}
+            placeholder="https://stream.example.com/live.mp3"
+            className="w-full bg-transparent border border-border px-3 py-2 text-xs text-foreground mb-4 outline-none focus:border-foreground"
+          />
+
+          <label className="block font-display text-[10px] tracking-widest uppercase text-muted-foreground mb-1">
+            Now-playing URL (optional, JSON)
+          </label>
+          <input
+            value={radioMeta}
+            onChange={(e) => setRadioMeta(e.target.value)}
+            placeholder="https://stream.example.com/status-json.xsl"
+            className="w-full bg-transparent border border-border px-3 py-2 text-xs text-foreground mb-4 outline-none focus:border-foreground"
+          />
+
+          <label className="block font-display text-[10px] tracking-widest uppercase text-muted-foreground mb-2">
+            Volume — {radioVol}%
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={radioVol}
+            onChange={(e) => setRadioVol(Number(e.target.value))}
+            className="w-full mb-4 accent-foreground"
+          />
+
+          <button
+            onClick={async () => {
+              await update(RADIO_KEY, radioUrl.trim());
+              await update(RADIO_META_KEY, radioMeta.trim());
+              await update(RADIO_VOL_KEY, String(radioVol));
+              toast.success("Radio settings saved");
+            }}
+            className="border border-border px-3 py-2 font-display text-[10px] tracking-widest uppercase text-foreground hover:bg-muted transition-colors"
+          >
+            Save
+          </button>
         </section>
       </main>
     </div>
