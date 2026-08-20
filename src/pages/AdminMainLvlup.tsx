@@ -115,6 +115,50 @@ const AdminMainLvlup = () => {
             )}
           </div>
         </section>
+
+        <section className="border border-border p-4 sm:p-6 mt-6 space-y-4">
+          <h2 className="font-display text-[11px] tracking-[0.3em] uppercase text-foreground">
+            Radio
+          </h2>
+
+          <label className="block space-y-1">
+            <span className="font-display text-[10px] tracking-widest uppercase text-muted-foreground">
+              Stream URL (direct audio stream, e.g. https://ice1.somafm.com/dronezone-128-mp3)
+            </span>
+            <input
+              defaultValue={get("lvlup_radio_url")}
+              onBlur={(e) => update("lvlup_radio_url", e.target.value.trim())}
+              className="w-full bg-transparent border border-border px-3 py-2 text-xs text-foreground outline-none focus:border-foreground"
+              placeholder="https://ice1.somafm.com/dronezone-128-mp3"
+            />
+          </label>
+
+          <label className="block space-y-1">
+            <span className="font-display text-[10px] tracking-widest uppercase text-muted-foreground">
+              Now playing URL (optional, JSON)
+            </span>
+            <input
+              defaultValue={get("lvlup_radio_meta_url")}
+              onBlur={(e) => update("lvlup_radio_meta_url", e.target.value.trim())}
+              className="w-full bg-transparent border border-border px-3 py-2 text-xs text-foreground outline-none focus:border-foreground"
+              placeholder="https://somafm.com/songs/dronezone.json"
+            />
+          </label>
+
+          <label className="block space-y-1">
+            <span className="font-display text-[10px] tracking-widest uppercase text-muted-foreground">
+              Volume: {get("lvlup_radio_volume") || 15}%
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              defaultValue={Number(get("lvlup_radio_volume") || 15)}
+              onChange={(e) => update("lvlup_radio_volume", e.target.value)}
+              className="w-full"
+            />
+          </label>
+        </section>
       </main>
     </div>
   );
