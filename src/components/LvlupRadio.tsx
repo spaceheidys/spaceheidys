@@ -146,6 +146,14 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
         </AnimatePresence>
 
         <button
+          onClick={togglePlay}
+          aria-label={playing ? "Pause radio" : "Play radio"}
+          className="text-white/40 hover:text-white transition-colors"
+        >
+          {playing ? <Pause size={16} strokeWidth={1} /> : <Play size={16} strokeWidth={1} />}
+        </button>
+
+        <button
           onClick={() => setMuted((m) => !m)}
           aria-label={muted ? "Unmute radio" : "Mute radio"}
           className="text-white/40 hover:text-white transition-colors"
