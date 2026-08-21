@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2 } from "lucide-react";
+import { Loader2, Upload, Trash2, Play, Pause, Volume2, VolumeX } from "lucide-react";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { normalizeStreamUrl } from "@/components/LvlupRadio";
 
 const BG_KEY = "lvlup_bg";
 
@@ -15,6 +16,47 @@ const AdminMainLvlup = () => {
   const { get, update, loading: contentLoading } = useSectionContent();
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<HTMLAudioElement | null>(null);
+  const [previewPlaying, setPreviewPlaying] = useState(false);
+  const [previewMuted, setPreviewMuted] = useState(false);
+
+  const radioUrl = get("lvlup_radio_url");
+  const radioVolume = Number(get("lvlup_radio_volume") || 15);
+
+  useEffect(() => {
+    return () => {
+      previewRef.current?.pause();
+      previewRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (previewRef.current) previewRef.current.muted = previewMuted;
+  }, [previewMuted]);
+
+  const togglePreview = () => {
+    const src = normalizeStreamUrl(radioUrl);
+    if (!src) {
+      toast.error("Set a stream URL first");
+      return;
+    }
+    let audio = previewRef.current;
+    if (!audio || audio.src !== src) {
+      audio?.pause();
+      audio = new Audio(src);
+      audio.volume = Math.max(0, Math.min(100, radioVolume)) / 100;
+      audio.muted = previewMuted;
+      audio.onplay = () => setPreviewPlaying(true);
+      audio.onpause = () => setPreviewPlaying(false);
+      previewRef.current = audio;
+    }
+    if (audio.paused) {
+      audio.volume = Math.max(0, Math.min(100, radioVolume)) / 100;
+      audio.play().catch(() => toast.error("Cannot play this stream"));
+    } else {
+      audio.pause();
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) navigate("/admin/login");
@@ -144,6 +186,23 @@ const AdminMainLvlup = () => {
               placeholder="https://somafm.com/songs/dronezone.json"
             />
           </label>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={togglePreview}
+              className="flex items-center gap-2 border border-border px-3 py-2 font-display text-[10px] tracking-widest uppercase text-foreground hover:bg-muted transition-colors"
+            >
+              {previewPlaying ? <Pause size={12} /> : <Play size={12} />}
+              {previewPlaying ? "Pause" : "Play"}
+            </button>
+            <button
+              onClick={() => setPreviewMuted((m) => !m)}
+              className="flex items-center gap-2 border border-border px-3 py-2 font-display text-[10px] tracking-widest uppercase text-foreground hover:bg-muted transition-colors"
+            >
+              {previewMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+              {previewMuted ? "Unmute" : "Mute"}
+            </button>
+          </div>
 
           <label className="block space-y-1">
             <span className="font-display text-[10px] tracking-widest uppercase text-muted-foreground">

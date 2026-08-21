@@ -9,7 +9,7 @@ interface Props {
 }
 
 /** Turn a SomaFM player page URL into a real audio stream URL. */
-function normalizeStreamUrl(raw: string): string {
+export function normalizeStreamUrl(raw: string): string {
   const url = (raw || "").trim();
   if (!url) return "";
   const soma = url.match(/somafm\.com\/(?:player\d*\/)?(?:station\/)?([a-z0-9-]+)/i);
