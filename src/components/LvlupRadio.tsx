@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 
 interface Props {
   url: string;
@@ -23,9 +23,23 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const [track, setTrack] = useState("");
   const [showTrack, setShowTrack] = useState(false);
   const hideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userPausedRef = useRef(false);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.paused) {
+      userPausedRef.current = false;
+      audio.play().then(() => setBlocked(false), () => setBlocked(true));
+    } else {
+      userPausedRef.current = true;
+      audio.pause();
+    }
+  };
 
   const src = normalizeStreamUrl(url);
 
@@ -40,7 +54,13 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
     audioRef.current = audio;
 
     let cancelled = false;
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+
     const tryPlay = () => {
+      if (userPausedRef.current) return;
       audio.play().then(
         () => { if (!cancelled) setBlocked(false); },
         () => { if (!cancelled) setBlocked(true); }
@@ -55,6 +75,8 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
 
     return () => {
       cancelled = true;
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
       window.removeEventListener("pointerdown", onGesture);
       window.removeEventListener("keydown", onGesture);
       audio.pause();
@@ -122,6 +144,14 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
             </motion.span>
           )}
         </AnimatePresence>
+
+        <button
+          onClick={togglePlay}
+          aria-label={playing ? "Pause radio" : "Play radio"}
+          className="text-white/40 hover:text-white transition-colors"
+        >
+          {playing ? <Pause size={16} strokeWidth={1} /> : <Play size={16} strokeWidth={1} />}
+        </button>
 
         <button
           onClick={() => setMuted((m) => !m)}
