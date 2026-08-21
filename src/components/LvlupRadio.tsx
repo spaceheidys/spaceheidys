@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 
 interface Props {
   url: string;
@@ -23,6 +23,7 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const [track, setTrack] = useState("");
   const [showTrack, setShowTrack] = useState(false);
   const hideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
