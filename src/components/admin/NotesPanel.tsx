@@ -271,26 +271,60 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     setExportPrompt(true);
   };
 
-  const confirmExport = () => {
-    const data = folderNotes.map(({ content, is_done, is_starred, is_divider, sort_order }) => ({
-      content, is_done, is_starred, is_divider, sort_order,
-    }));
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const buildMarkdown = () =>
+    folderNotes
+      .map((n) => {
+        if (n.is_divider) return "\n---\n";
+        return `- [${n.is_done ? "x" : " "}] ${n.is_starred ? "⭐ " : ""}${n.content || ""}`;
+      })
+      .join("\n");
+
+  const confirmExport = (format: "json" | "md" = "json") => {
+    const isMd = format === "md";
+    const body = isMd
+      ? `# ${folderLabels[activeFolder]}\n\n${buildMarkdown()}\n`
+      : JSON.stringify(
+          folderNotes.map(({ content, is_done, is_starred, is_divider, sort_order }) => ({
+            content, is_done, is_starred, is_divider, sort_order,
+          })),
+          null,
+          2
+        );
+    const blob = new Blob([body], { type: isMd ? "text/markdown" : "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${exportName.trim() || "notes"}.json`;
+    a.download = `${exportName.trim() || "notes"}.${isMd ? "md" : "json"}`;
     a.click();
     URL.revokeObjectURL(url);
     setExportPrompt(false);
   };
+
+  const parseMarkdown = (text: string) =>
+    text
+      .split(/\r?\n/)
+      .map((raw) => raw.trim())
+      .filter((line) => line.length > 0 && !/^#{1,6}\s/.test(line))
+      .map((line) => {
+        if (/^(-{3,}|\*{3,}|_{3,})$/.test(line)) {
+          return { content: "", is_done: false, is_starred: false, is_divider: true };
+        }
+        const task = line.match(/^[-*+]\s*\[( |x|X)\]\s*(.*)$/);
+        let content = task ? task[2] : line.replace(/^[-*+]\s+/, "");
+        const is_done = task ? task[1].toLowerCase() === "x" : false;
+        const is_starred = /^(⭐|\*\*|!)\s*/.test(content);
+        content = content.replace(/^(⭐|\*\*|!)\s*/, "").trim();
+        return { content, is_done, is_starred, is_divider: false };
+      })
+      .filter((n) => n.is_divider || n.content.length > 0);
 
   const importTasks = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
       const text = await file.text();
-      const data = JSON.parse(text);
+      const isMd = /\.(md|markdown|txt)$/i.test(file.name);
+      const data = isMd ? parseMarkdown(text) : JSON.parse(text);
       if (!Array.isArray(data)) return;
       const baseOrder = folderNotes.length;
       for (let i = 0; i < data.length; i++) {
@@ -314,6 +348,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
     } catch { /* invalid file */ }
     if (importInputRef.current) importInputRef.current.value = "";
   };
+
 
   const sortedNotes = [...folderNotes].sort((a, b) => {
     if (!a.is_divider && !b.is_divider) {
@@ -786,14 +821,17 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                   <input
                     value={exportName}
                     onChange={(e) => setExportName(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") confirmExport(); if (e.key === "Escape") setExportPrompt(false); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") confirmExport("json"); if (e.key === "Escape") setExportPrompt(false); }}
                     autoFocus
                     className="w-24 bg-transparent text-[9px] font-display tracking-wider text-foreground outline-none border-b border-foreground/30"
                     placeholder="File name"
                   />
-                  <button onClick={confirmExport} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
+                  <button onClick={() => confirmExport("json")} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">JSON</button>
+                  <span className="text-[8px] text-muted-foreground/40">/</span>
+                  <button onClick={() => confirmExport("md")} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">MD</button>
                   <span className="text-[8px] text-muted-foreground/40">/</span>
                   <button onClick={() => setExportPrompt(false)} className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+
                 </span>
               ) : (
                 <button
