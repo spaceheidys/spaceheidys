@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Upload, Trash2 } from "lucide-react";
+import { Loader2, Upload, Trash2, Play, Pause, Volume2, VolumeX } from "lucide-react";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
