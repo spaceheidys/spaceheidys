@@ -145,6 +145,23 @@ const AdminMainLvlup = () => {
             />
           </label>
 
+          <div className="flex items-center gap-2">
+            <button
+              onClick={togglePreview}
+              className="flex items-center gap-2 border border-border px-3 py-2 font-display text-[10px] tracking-widest uppercase text-foreground hover:bg-muted transition-colors"
+            >
+              {previewPlaying ? <Pause size={12} /> : <Play size={12} />}
+              {previewPlaying ? "Pause" : "Play"}
+            </button>
+            <button
+              onClick={() => setPreviewMuted((m) => !m)}
+              className="flex items-center gap-2 border border-border px-3 py-2 font-display text-[10px] tracking-widest uppercase text-foreground hover:bg-muted transition-colors"
+            >
+              {previewMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+              {previewMuted ? "Unmute" : "Mute"}
+            </button>
+          </div>
+
           <label className="block space-y-1">
             <span className="font-display text-[10px] tracking-widest uppercase text-muted-foreground">
               Volume: {get("lvlup_radio_volume") || 15}%
