@@ -821,14 +821,17 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
                   <input
                     value={exportName}
                     onChange={(e) => setExportName(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") confirmExport(); if (e.key === "Escape") setExportPrompt(false); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") confirmExport("json"); if (e.key === "Escape") setExportPrompt(false); }}
                     autoFocus
                     className="w-24 bg-transparent text-[9px] font-display tracking-wider text-foreground outline-none border-b border-foreground/30"
                     placeholder="File name"
                   />
-                  <button onClick={confirmExport} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">YES</button>
+                  <button onClick={() => confirmExport("json")} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">JSON</button>
+                  <span className="text-[8px] text-muted-foreground/40">/</span>
+                  <button onClick={() => confirmExport("md")} className="text-[8px] font-display tracking-wider text-foreground/70 hover:text-foreground transition-colors">MD</button>
                   <span className="text-[8px] text-muted-foreground/40">/</span>
                   <button onClick={() => setExportPrompt(false)} className="text-[8px] font-display tracking-wider text-muted-foreground hover:text-foreground transition-colors">NO</button>
+
                 </span>
               ) : (
                 <button
