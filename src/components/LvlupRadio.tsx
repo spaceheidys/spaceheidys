@@ -41,7 +41,13 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
     audioRef.current = audio;
 
     let cancelled = false;
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+
     const tryPlay = () => {
+      if (userPausedRef.current) return;
       audio.play().then(
         () => { if (!cancelled) setBlocked(false); },
         () => { if (!cancelled) setBlocked(true); }
@@ -56,6 +62,8 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
 
     return () => {
       cancelled = true;
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
       window.removeEventListener("pointerdown", onGesture);
       window.removeEventListener("keydown", onGesture);
       audio.pause();
