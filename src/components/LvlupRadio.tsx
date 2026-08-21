@@ -27,6 +27,19 @@ const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
   const [track, setTrack] = useState("");
   const [showTrack, setShowTrack] = useState(false);
   const hideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userPausedRef = useRef(false);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.paused) {
+      userPausedRef.current = false;
+      audio.play().then(() => setBlocked(false), () => setBlocked(true));
+    } else {
+      userPausedRef.current = true;
+      audio.pause();
+    }
+  };
 
   const src = normalizeStreamUrl(url);
 
