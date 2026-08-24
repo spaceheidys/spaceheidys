@@ -49,11 +49,11 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   }, []);
 
   useEffect(() => {
-    if (!nextOpen) return;
+    if (!nextOpen && subOpen === 0) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = prev; };
-  }, [nextOpen]);
+  }, [nextOpen, subOpen]);
 
   useEffect(() => {
     let cancelled = false;
