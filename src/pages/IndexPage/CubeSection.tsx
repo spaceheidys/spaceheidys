@@ -22,12 +22,17 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const [showMessage, setShowMessage] = useState(true);
   const [messageTrigger, setMessageTrigger] = useState(0);
   const [nextOpen, setNextOpen] = useState(false);
+  const [subOpen, setSubOpen] = useState<0 | 1 | 2>(0);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageShowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { get, getDuration } = useSectionContent();
   const nextBg = get("lvlup_bg") || get("cube_next_bg") || backgroundUrl || "";
   const nextBgIsVideo = nextBg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(nextBg) : false;
+  const sub1Bg = get("lvlup_sub1_bg") || "";
+  const sub1IsVideo = sub1Bg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(sub1Bg) : false;
+  const sub2Bg = get("lvlup_sub2_bg") || "";
+  const sub2IsVideo = sub2Bg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(sub2Bg) : false;
   const titleDurationSeconds = Math.max(0, Math.min(60, getDuration("cube_title_duration") ?? 5));
   const titleVisibleMs = titleDurationSeconds * 1000;
   const titlePersists = titleDurationSeconds === 0;
