@@ -206,6 +206,58 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   metaUrl={get("lvlup_radio_meta_url")}
                   volume={Number(get("lvlup_radio_volume") || 15)}
                 />
+
+                {/* Sub-screen arrows — top right and bottom right */}
+                <button
+                  onClick={() => setSubOpen(1)}
+                  aria-label="Open screen 1"
+                  className="absolute right-3 sm:right-6 top-6 z-10 text-white/50 hover:text-white transition-colors"
+                >
+                  <ChevronRight size={32} strokeWidth={1} />
+                </button>
+                <button
+                  onClick={() => setSubOpen(2)}
+                  aria-label="Open screen 2"
+                  className="absolute right-3 sm:right-6 bottom-6 z-10 text-white/50 hover:text-white transition-colors"
+                >
+                  <ChevronRight size={32} strokeWidth={1} />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+
+        {/* Sub-screens — each arrow opens its own full-screen wallpaper */}
+        {createPortal(
+          <AnimatePresence>
+            {subOpen > 0 && (
+              <motion.div
+                key={subOpen}
+                className="fixed inset-0 z-[350] bg-black overflow-hidden"
+                initial={{ opacity: 0, x: 60 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 60 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {(() => {
+                  const bg = subOpen === 1 ? sub1Bg : sub2Bg;
+                  const isVid = subOpen === 1 ? sub1IsVideo : sub2IsVideo;
+                  return bg ? (
+                    isVid ? (
+                      <video src={bg} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                    ) : (
+                      <img src={bg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                    )
+                  ) : null;
+                })()}
+                <button
+                  onClick={() => setSubOpen(0)}
+                  className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
+                >
+                  <ArrowLeft size={16} strokeWidth={1} />
+                  Back
+                </button>
               </motion.div>
             )}
           </AnimatePresence>,
