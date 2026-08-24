@@ -68,7 +68,7 @@ const BgSection = ({ storageKey, title, get, update }: BgSectionProps) => {
         <input
           ref={inputRef}
           type="file"
-          accept="image/*,video/*"
+          accept="image/*,video/*,.gif,.webp,.mp4,.webm,.mov,.ogg"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
