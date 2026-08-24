@@ -682,7 +682,7 @@ const NotesPanel = ({ userId, onUpdate }: { userId: string; onUpdate?: () => voi
       {!collapsed && (
         <>
           <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-          <input ref={importInputRef} type="file" accept=".json" className="hidden" onChange={importTasks} />
+          <input ref={importInputRef} type="file" accept=".json,.md,.markdown,.txt" className="hidden" onChange={importTasks} />
 
           {loading ? (
             <div className="flex justify-center py-6">
