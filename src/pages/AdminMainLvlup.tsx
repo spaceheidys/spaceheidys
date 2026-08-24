@@ -68,7 +68,7 @@ const BgSection = ({ storageKey, title, get, update }: BgSectionProps) => {
         <input
           ref={inputRef}
           type="file"
-          accept="image/*,video/*"
+          accept="image/*,video/*,.gif,.webp,.mp4,.webm,.mov,.ogg"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
@@ -93,6 +93,10 @@ const BgSection = ({ storageKey, title, get, update }: BgSectionProps) => {
           </button>
         )}
       </div>
+
+      <p className="mt-3 font-display text-[9px] tracking-widest uppercase text-muted-foreground/60">
+        Supported: images (jpg, png, gif, webp) and video (mp4, webm, mov, ogg)
+      </p>
     </section>
   );
 };
