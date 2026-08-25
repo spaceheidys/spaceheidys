@@ -1,11 +1,81 @@
 import { forwardRef, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ArrowLeft } from "lucide-react";
+import { ChevronRight, ArrowLeft, Play, Volume2, VolumeX } from "lucide-react";
 import { createPortal } from "react-dom";
 import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
-import LvlupRadio from "@/components/LvlupRadio";
+import LvlupRadio, { normalizeStreamUrl } from "@/components/LvlupRadio";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { supabase } from "@/integrations/supabase/client";
+
+interface ScreenAudioProps {
+  url: string;
+  volume: number; // 0-100
+}
+
+/** Plays a per-screen music file or radio stream while its overlay is open. */
+const ScreenAudio = ({ url, volume }: ScreenAudioProps) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [blocked, setBlocked] = useState(false);
+  const src = normalizeStreamUrl(url);
+
+  useEffect(() => {
+    if (!src) return;
+    const audio = new Audio(src);
+    audio.loop = true;
+    audio.volume = Math.max(0, Math.min(100, volume)) / 100;
+    audioRef.current = audio;
+
+    const tryPlay = () => audio.play().then(() => setBlocked(false), () => setBlocked(true));
+    tryPlay();
+
+    // If autoplay is blocked, resume on the first user gesture.
+    const onGesture = () => {
+      if (audio.paused) tryPlay();
+    };
+    window.addEventListener("pointerdown", onGesture);
+    window.addEventListener("keydown", onGesture);
+
+    return () => {
+      window.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("keydown", onGesture);
+      audio.pause();
+      audio.src = "";
+      audioRef.current = null;
+    };
+  }, [src]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = Math.max(0, Math.min(100, volume)) / 100;
+  }, [volume]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.muted = muted;
+  }, [muted]);
+
+  if (!src) return null;
+
+  return (
+    <>
+      <button
+        onClick={() => setMuted((m) => !m)}
+        aria-label={muted ? "Unmute audio" : "Mute audio"}
+        className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 text-white/40 hover:text-white transition-colors"
+      >
+        {muted ? <VolumeX size={16} strokeWidth={1} /> : <Volume2 size={16} strokeWidth={1} />}
+      </button>
+
+      {blocked && (
+        <button
+          onClick={() => audioRef.current?.play().then(() => setBlocked(false), () => {})}
+          className="absolute bottom-6 right-6 z-20 flex items-center gap-2 border border-white/20 px-3 py-2 font-display text-[10px] tracking-[0.3em] uppercase text-white/60 hover:text-white transition-colors"
+        >
+          <Play size={12} strokeWidth={1} /> Play
+        </button>
+      )}
+    </>
+  );
+};
 
 interface CubeSectionProps {
   footerText?: string;
@@ -33,6 +103,13 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const sub1IsVideo = sub1Bg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(sub1Bg) : false;
   const sub2Bg = get("lvlup_sub2_bg") || "";
   const sub2IsVideo = sub2Bg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(sub2Bg) : false;
+  const radioVolume = Number(get("lvlup_radio_volume") || 15);
+  const mainAudioOn = get("lvlup_bg_audio_on") === "1";
+  const mainAudioUrl = get("lvlup_bg_audio_url");
+  const sub1AudioOn = get("lvlup_sub1_bg_audio_on") === "1";
+  const sub1AudioUrl = get("lvlup_sub1_bg_audio_url");
+  const sub2AudioOn = get("lvlup_sub2_bg_audio_on") === "1";
+  const sub2AudioUrl = get("lvlup_sub2_bg_audio_url");
   const titleDurationSeconds = Math.max(0, Math.min(60, getDuration("cube_title_duration") ?? 5));
   const titleVisibleMs = titleDurationSeconds * 1000;
   const titlePersists = titleDurationSeconds === 0;
