@@ -278,11 +278,15 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   <ArrowLeft size={16} strokeWidth={1} />
                   Back
                 </button>
-                <LvlupRadio
-                  url={get("lvlup_radio_url")}
-                  metaUrl={get("lvlup_radio_meta_url")}
-                  volume={Number(get("lvlup_radio_volume") || 15)}
-                />
+                {mainAudioOn && mainAudioUrl ? (
+                  <ScreenAudio url={mainAudioUrl} volume={radioVolume} />
+                ) : (
+                  <LvlupRadio
+                    url={get("lvlup_radio_url")}
+                    metaUrl={get("lvlup_radio_meta_url")}
+                    volume={radioVolume}
+                  />
+                )}
 
                 {/* Sub-screen arrows — top right and bottom right */}
                 <button
@@ -328,6 +332,12 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                     )
                   ) : null;
                 })()}
+                {(subOpen === 1 ? sub1AudioOn : sub2AudioOn) && (
+                  <ScreenAudio
+                    url={subOpen === 1 ? sub1AudioUrl : sub2AudioUrl}
+                    volume={radioVolume}
+                  />
+                )}
                 <button
                   onClick={() => setSubOpen(0)}
                   className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
