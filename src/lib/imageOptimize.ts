@@ -105,8 +105,9 @@ export function installUploadOptimizer() {
           return { data: null, error: { message: "Upload cancelled", name: "Cancelled" } } as any;
         }
         if (chosen !== body) {
-          const newPath = path.replace(/\.[^./]+$/, ".webp");
-          return originalUpload(newPath, chosen, { ...(options || {}), contentType: "image/webp" });
+          // Keep the caller's path (they reuse it for getPublicUrl); only the
+          // bytes and content type change.
+          return originalUpload(path, chosen, { ...(options || {}), contentType: "image/webp" });
         }
       }
       return originalUpload(path, body, options);
