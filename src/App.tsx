@@ -5,8 +5,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SoundProvider } from "@/contexts/SoundContext";
+import ImageOptimizeDialog from "@/components/ImageOptimizeDialog";
+import { installUploadOptimizer } from "@/lib/imageOptimize";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+
+installUploadOptimizer();
+
 
 // Retries a dynamic import once, then force-reloads the page.
 // Fixes "Failed to fetch dynamically imported module" caused by stale chunk
@@ -56,7 +61,10 @@ const App = () => {
       <SoundProvider>
         <Toaster />
         <Sonner />
+        <ImageOptimizeDialog />
         <BrowserRouter>
+
+
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Index />} />

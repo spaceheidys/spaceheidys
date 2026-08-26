@@ -1,0 +1,68 @@
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { subscribeOptimizePrompt, formatBytes, type OptimizePrompt } from "@/lib/imageOptimize";
+
+const ImageOptimizeDialog = () => {
+  const [prompt, setPrompt] = useState<OptimizePrompt | null>(null);
+
+  useEffect(() => subscribeOptimizePrompt(setPrompt) as unknown as () => void, []);
+
+  if (!prompt || !prompt.optimized) return null;
+
+  const { file, optimized, resolve } = prompt;
+  const saved = Math.max(0, Math.round((1 - optimized.size / file.size) * 100));
+
+  return createPortal(
+    <div className="fixed inset-0 z-[300] flex items-center justify-center bg-background/85 backdrop-blur-sm px-4">
+      <div className="w-full max-w-sm border border-border bg-background p-5 space-y-4">
+        <h2 className="font-display text-[11px] tracking-[0.3em] uppercase text-foreground">
+          Optimize image?
+        </h2>
+        <p className="font-display text-[10px] tracking-wider text-muted-foreground break-all">
+          {file.name}
+        </p>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="border border-border p-3 space-y-1">
+            <span className="block font-display text-[9px] tracking-widest uppercase text-muted-foreground">
+              Original
+            </span>
+            <span className="block font-display text-xs text-foreground">{formatBytes(file.size)}</span>
+          </div>
+          <div className="border border-foreground p-3 space-y-1">
+            <span className="block font-display text-[9px] tracking-widest uppercase text-muted-foreground">
+              Optimized · WebP
+            </span>
+            <span className="block font-display text-xs text-foreground">
+              {formatBytes(optimized.size)} <span className="text-muted-foreground">−{saved}%</span>
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => resolve("optimized")}
+            className="w-full border border-foreground px-3 py-2 font-display text-[10px] tracking-[0.2em] uppercase text-foreground hover:bg-foreground hover:text-background transition-colors"
+          >
+            Optimize
+          </button>
+          <button
+            onClick={() => resolve("original")}
+            className="w-full border border-border px-3 py-2 font-display text-[10px] tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+          >
+            Keep original
+          </button>
+          <button
+            onClick={() => resolve("cancel")}
+            className="w-full px-3 py-1 font-display text-[9px] tracking-[0.2em] uppercase text-muted-foreground/60 hover:text-foreground transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+export default ImageOptimizeDialog;
