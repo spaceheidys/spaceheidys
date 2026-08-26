@@ -61,7 +61,8 @@ const App = () => {
       <SoundProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <ImageOptimizeDialog />
+
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Index />} />
