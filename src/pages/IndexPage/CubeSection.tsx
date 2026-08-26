@@ -10,23 +10,61 @@ import { supabase } from "@/integrations/supabase/client";
 interface ScreenAudioProps {
   url: string;
   volume: number; // 0-100
+  /** When false the audio fades out and pauses (used while a sub-screen is open). */
+  active?: boolean;
 }
 
+const FADE_MS = 900;
+
+/** Smoothly ramps an audio element's volume; resolves when done. */
+const fadeTo = (audio: HTMLAudioElement, target: number, ms = FADE_MS, onDone?: () => void) => {
+  const start = audio.volume;
+  const delta = target - start;
+  if (Math.abs(delta) < 0.001 || ms <= 0) {
+    audio.volume = Math.max(0, Math.min(1, target));
+    onDone?.();
+    return () => {};
+  }
+  const t0 = performance.now();
+  let raf = 0;
+  const step = (now: number) => {
+    const p = Math.min(1, (now - t0) / ms);
+    const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    audio.volume = Math.max(0, Math.min(1, start + delta * eased));
+    if (p < 1) raf = requestAnimationFrame(step);
+    else onDone?.();
+  };
+  raf = requestAnimationFrame(step);
+  return () => cancelAnimationFrame(raf);
+};
+
 /** Plays a per-screen music file or radio stream while its overlay is open. */
-const ScreenAudio = ({ url, volume }: ScreenAudioProps) => {
+const ScreenAudio = ({ url, volume, active = true }: ScreenAudioProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const cancelFadeRef = useRef<() => void>(() => {});
   const [muted, setMuted] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const src = normalizeStreamUrl(url);
+  const target = Math.max(0, Math.min(100, volume)) / 100;
+  const targetRef = useRef(target);
+  targetRef.current = target;
 
   useEffect(() => {
     if (!src) return;
     const audio = new Audio(src);
     audio.loop = true;
-    audio.volume = Math.max(0, Math.min(100, volume)) / 100;
+    audio.volume = 0; // fade in
     audioRef.current = audio;
 
-    const tryPlay = () => audio.play().then(() => setBlocked(false), () => setBlocked(true));
+    const tryPlay = () =>
+      audio.play().then(
+        () => {
+          setBlocked(false);
+          cancelFadeRef.current();
+          cancelFadeRef.current = fadeTo(audio, targetRef.current);
+        },
+        () => setBlocked(true)
+      );
     tryPlay();
 
     // If autoplay is blocked, resume on the first user gesture.
@@ -39,15 +77,35 @@ const ScreenAudio = ({ url, volume }: ScreenAudioProps) => {
     return () => {
       window.removeEventListener("pointerdown", onGesture);
       window.removeEventListener("keydown", onGesture);
-      audio.pause();
-      audio.src = "";
+      cancelFadeRef.current();
+      // Fade out before releasing the element so the switch is not abrupt.
+      fadeTo(audio, 0, FADE_MS, () => {
+        audio.pause();
+        audio.src = "";
+      });
       audioRef.current = null;
     };
   }, [src]);
 
+  // Fade out/in when the screen becomes inactive/active.
   useEffect(() => {
-    if (audioRef.current) audioRef.current.volume = Math.max(0, Math.min(100, volume)) / 100;
-  }, [volume]);
+    const audio = audioRef.current;
+    if (!audio) return;
+    cancelFadeRef.current();
+    if (active) {
+      if (audio.paused) audio.play().catch(() => {});
+      cancelFadeRef.current = fadeTo(audio, targetRef.current);
+    } else {
+      cancelFadeRef.current = fadeTo(audio, 0, FADE_MS, () => audio.pause());
+    }
+  }, [active]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !active) return;
+    cancelFadeRef.current();
+    cancelFadeRef.current = fadeTo(audio, target, 200);
+  }, [target, active]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.muted = muted;
@@ -76,6 +134,7 @@ const ScreenAudio = ({ url, volume }: ScreenAudioProps) => {
     </>
   );
 };
+
 
 interface CubeSectionProps {
   footerText?: string;
