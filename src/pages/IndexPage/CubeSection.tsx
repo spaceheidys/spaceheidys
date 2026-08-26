@@ -338,7 +338,7 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   Back
                 </button>
                 {mainAudioOn && mainAudioUrl ? (
-                  <ScreenAudio url={mainAudioUrl} volume={radioVolume} />
+                  <ScreenAudio url={mainAudioUrl} volume={radioVolume} active={subOpen === 0} />
                 ) : (
                   <LvlupRadio
                     url={get("lvlup_radio_url")}
