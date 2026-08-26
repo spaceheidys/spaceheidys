@@ -62,6 +62,8 @@ const App = () => {
         <Toaster />
         <Sonner />
         <ImageOptimizeDialog />
+        <BrowserRouter>
+
 
           <Suspense fallback={<PageLoader />}>
             <Routes>
