@@ -351,16 +351,16 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                 <button
                   onClick={() => setSubOpen(1)}
                   aria-label="Open screen 1"
-                  className="absolute right-3 sm:right-6 top-6 z-10 text-white/50 hover:text-white transition-colors"
+                  className="absolute right-4 sm:right-6 top-4 sm:top-6 z-30 p-2 text-white/70 hover:text-white transition-colors drop-shadow-lg"
                 >
-                  <ChevronRight size={32} strokeWidth={1} />
+                  <ChevronRight size={36} strokeWidth={1} />
                 </button>
                 <button
                   onClick={() => setSubOpen(2)}
                   aria-label="Open screen 2"
-                  className="absolute right-3 sm:right-6 bottom-6 z-10 text-white/50 hover:text-white transition-colors"
+                  className="absolute right-4 sm:right-6 bottom-20 sm:bottom-6 z-30 p-2 text-white/70 hover:text-white transition-colors drop-shadow-lg"
                 >
-                  <ChevronRight size={32} strokeWidth={1} />
+                  <ChevronRight size={36} strokeWidth={1} />
                 </button>
               </motion.div>
             )}
