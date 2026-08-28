@@ -397,9 +397,15 @@ const Index = () => {
       .catch(() => { /* silent */ });
   }, []);
 
-  // Mute/unmute background audio
+  // Mute/unmute background audio.
+  // NOTE: when the element is routed through the Web Audio graph (equalizer),
+  // `muted` alone is ignored by the graph output — volume must be zeroed too.
   useEffect(() => {
-    if (audioRef.current) audioRef.current.muted = muted;
+    mutedRef.current = muted;
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = muted;
+    audio.volume = muted ? 0 : 1;
   }, [muted]);
 
   const scrollToPortfolio = useCallback(() => {
