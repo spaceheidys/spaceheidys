@@ -41,6 +41,7 @@ const Index = () => {
   const [loading, setLoading] = useState(() => !sessionStorage.getItem("loaded"));
   const [loadProgress, setLoadProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const mutedRef = useRef(false);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
   const [bgOptions, setBgOptions] = useState<string[]>(DEFAULT_BG_OPTIONS);
@@ -350,6 +351,8 @@ const Index = () => {
 
     const audio = new Audio(getContent("audio_main_music") || "/audio/main_buddhist.mp3");
     audio.loop = false;
+    audio.muted = mutedRef.current;
+    audio.volume = mutedRef.current ? 0 : 1;
     audioRef.current = audio;
     (window as any).__mainAudio = audio;
 
@@ -397,9 +400,15 @@ const Index = () => {
       .catch(() => { /* silent */ });
   }, []);
 
-  // Mute/unmute background audio
+  // Mute/unmute background audio.
+  // NOTE: when the element is routed through the Web Audio graph (equalizer),
+  // `muted` alone is ignored by the graph output — volume must be zeroed too.
   useEffect(() => {
-    if (audioRef.current) audioRef.current.muted = muted;
+    mutedRef.current = muted;
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = muted;
+    audio.volume = muted ? 0 : 1;
   }, [muted]);
 
   const scrollToPortfolio = useCallback(() => {
