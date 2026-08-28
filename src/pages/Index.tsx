@@ -350,6 +350,8 @@ const Index = () => {
 
     const audio = new Audio(getContent("audio_main_music") || "/audio/main_buddhist.mp3");
     audio.loop = false;
+    audio.muted = mutedRef.current;
+    audio.volume = mutedRef.current ? 0 : 1;
     audioRef.current = audio;
     (window as any).__mainAudio = audio;
 
