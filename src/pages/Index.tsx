@@ -41,6 +41,7 @@ const Index = () => {
   const [loading, setLoading] = useState(() => !sessionStorage.getItem("loaded"));
   const [loadProgress, setLoadProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const mutedRef = useRef(false);
   const [showNav, setShowNav] = useState(true);
   const [activeSection, setActiveSection] = useState<"about" | "contact" | "shop" | null>(null);
   const [bgOptions, setBgOptions] = useState<string[]>(DEFAULT_BG_OPTIONS);
