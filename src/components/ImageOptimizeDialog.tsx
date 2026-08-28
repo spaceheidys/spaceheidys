@@ -2,15 +2,38 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { subscribeOptimizePrompt, formatBytes, type OptimizePrompt } from "@/lib/imageOptimize";
 
+type Meta = { url: string; w: number; h: number } | null;
+
+const useImageMeta = (file: File | null | undefined): Meta => {
+  const [meta, setMeta] = useState<Meta>(null);
+  useEffect(() => {
+    if (!file) {
+      setMeta(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => setMeta({ url, w: img.naturalWidth, h: img.naturalHeight });
+    img.src = url;
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+  return meta;
+};
+
 const ImageOptimizeDialog = () => {
   const [prompt, setPrompt] = useState<OptimizePrompt | null>(null);
+  const [side, setSide] = useState<"original" | "optimized">("optimized");
 
   useEffect(() => subscribeOptimizePrompt(setPrompt) as unknown as () => void, []);
+
+  const origMeta = useImageMeta(prompt?.file);
+  const optMeta = useImageMeta(prompt?.optimized);
 
   if (!prompt || !prompt.optimized) return null;
 
   const { file, optimized, resolve } = prompt;
   const saved = Math.max(0, Math.round((1 - optimized.size / file.size) * 100));
+  const shown = side === "optimized" ? optMeta : origMeta;
 
   return createPortal(
     <div className="fixed inset-0 z-[300] flex items-center justify-center bg-background/85 backdrop-blur-sm px-4">
