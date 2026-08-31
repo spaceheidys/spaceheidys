@@ -184,8 +184,28 @@ const DEFAULT_FACES: FaceContent[] = FACE_NAMES.map((title) => ({
 }));
 
 const STORAGE_KEY = "cube-faces-v2";
-const SIZE = 280;
-const HALF = SIZE / 2;
+const BASE_SIZE = 280;
+
+const useCubeSize = () => {
+  const [size, setSize] = useState(() => {
+    if (typeof window === "undefined") return BASE_SIZE;
+    const w = window.innerWidth;
+    if (w < 380) return 200;
+    if (w < 480) return 220;
+    if (w < 768) return 240;
+    return BASE_SIZE;
+  });
+  useEffect(() => {
+    const onResize = () => {
+      const w = window.innerWidth;
+      setSize(w < 380 ? 200 : w < 480 ? 220 : w < 768 ? 240 : BASE_SIZE);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return size;
+};
+
 
 const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: string, index: number) => void }) => {
   const [yawDeg, setYawDeg] = useState(-30);
