@@ -208,6 +208,8 @@ const useCubeSize = () => {
 
 
 const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: string, index: number) => void }) => {
+  const SIZE = useCubeSize();
+  const HALF = SIZE / 2;
   const [yawDeg, setYawDeg] = useState(-30);
   const [pitchDeg, setPitchDeg] = useState(25);
   const [rollDeg, setRollDeg] = useState(0);
@@ -472,20 +474,20 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
 
   return (
     <div className="flex flex-col items-center gap-3 text-white">
-      <div className={`flex items-center ${arrowsVisible ? "gap-12" : "gap-0"}`}>
+      <div className={`flex items-center ${arrowsVisible ? "gap-2 sm:gap-8 md:gap-12" : "gap-0"}`}>
         {arrowsVisible && <button
           onClick={() => setYaw((s) => s - 1)}
           aria-label="Rotate left"
-          className={`h-11 w-11 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
+          className={`h-9 w-9 sm:h-11 sm:w-11 shrink-0 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
         >
           <ChevronLeft className="h-4 w-4" />
         </button>}
 
-        <div className={`flex flex-col items-center ${arrowsVisible ? "gap-6" : "gap-0"}`}>
+        <div className={`flex flex-col items-center ${arrowsVisible ? "gap-3 sm:gap-6" : "gap-0"}`}>
           {arrowsVisible && <button
             onClick={() => setPitch((s) => s + 1)}
             aria-label="Rotate up"
-            className={`h-11 w-11 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
+            className={`h-9 w-9 sm:h-11 sm:w-11 shrink-0 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
           >
             <ChevronUp className="h-4 w-4" />
           </button>}
@@ -493,7 +495,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
           <div
             ref={containerRef}
             className={`relative touch-none select-none ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
-            style={{ width: SIZE, height: SIZE, perspective: 1200 }}
+            style={{ width: SIZE, height: SIZE, perspective: SIZE * 4.3 }}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
@@ -555,7 +557,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
           {arrowsVisible && <button
             onClick={() => setPitch((s) => s - 1)}
             aria-label="Rotate down"
-            className={`h-11 w-11 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
+            className={`h-9 w-9 sm:h-11 sm:w-11 shrink-0 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
           >
             <ChevronDown className="h-4 w-4" />
           </button>}
@@ -564,7 +566,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
         {arrowsVisible && <button
           onClick={() => setYaw((s) => s + 1)}
           aria-label="Rotate right"
-          className={`h-11 w-11 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
+          className={`h-9 w-9 sm:h-11 sm:w-11 shrink-0 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-opacity ${dragging || spinning ? "opacity-0 duration-200" : "opacity-100 duration-[1200ms] ease-out"}`}
         >
           <ChevronRight className="h-4 w-4" />
         </button>}
