@@ -572,7 +572,7 @@ const RotatingCube = ({ onActiveTitleChange }: { onActiveTitleChange?: (title: s
         </button>}
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-5 mt-2">
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5 mt-2 w-full max-w-full px-4">
         {freeSpinVisible && <button
           onClick={() => setFreeSpin((v) => !v)}
           aria-pressed={freeSpin}
