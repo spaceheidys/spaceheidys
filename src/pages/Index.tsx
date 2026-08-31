@@ -533,20 +533,20 @@ const Index = () => {
             )}
           </motion.div>
         </nav>
-        <div className="md:hidden flex items-center gap-2">
+        <div className="md:hidden flex items-center gap-1.5">
           {inHero && bgOptions.map((bg, i) => (
             <div
               key={i}
-              className={`cursor-pointer transition-all duration-300 w-[18px] h-[18px] bg-foreground ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
+              className={`cursor-pointer transition-all duration-300 w-3 h-3 bg-foreground ${bgImage === bg ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"}`}
               onClick={() => setBgImage(bg)}
             />
           ))}
           {!hidePortfolioSwitchers && portfolioInView && getContent("card_bg_type") === "wallpaper" && wallpaperPool.length > 1 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {wallpaperPool.map((w, i) => (
                 <div
                   key={`${w.url}-${i}`}
-                  className={`cursor-pointer transition-all duration-300 w-[18px] h-[18px] bg-foreground ${
+                  className={`cursor-pointer transition-all duration-300 w-3 h-3 bg-foreground ${
                     activeWallpaper === w.url ? "opacity-100 rounded-full" : "opacity-50 hover:opacity-80 rounded-none"
                   }`}
                   onClick={() => setActiveWallpaper(w.url)}

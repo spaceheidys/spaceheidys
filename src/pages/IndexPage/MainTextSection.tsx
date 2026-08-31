@@ -321,7 +321,7 @@ const MainTextSection = memo(
 
 
       return (
-        <div ref={ref} className="relative w-full bg-background h-[320px] sm:h-[380px] md:h-[420px]">
+        <div ref={ref} className="relative w-full bg-background h-[360px] sm:h-[400px] md:h-[420px]">
           <div className={boundClasses}>
             {/* Persistent frame — only re-animates on first intro; stays put on section switch */}
             <AnimatePresence>
