@@ -570,9 +570,9 @@ const Index = () => {
         </div>
       </motion.header>
 
-      {/* Tagline strip under header — hides on scroll */}
+      {/* Tagline strip under header — hides on scroll and when a portfolio section is open */}
       <AnimatePresence>
-        {atTop && (getContent("header_tagline_left") || getContent("header_tagline_right")) && (
+        {atTop && !activePortfolioKey && (getContent("header_tagline_left") || getContent("header_tagline_right")) && (
           <motion.div
             className="fixed top-[3.5rem] sm:top-[4.5rem] md:top-[6rem] left-0 right-0 z-[99] pointer-events-none border-t border-foreground/10"
             initial={{ opacity: 0, y: -8 }}
