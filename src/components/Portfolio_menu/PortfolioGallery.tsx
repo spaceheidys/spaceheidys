@@ -258,7 +258,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               tags: d.tags || [],
               project_date: d.project_date || "",
             doc_md: d.doc_md || null,
-              doc_md: d.doc_md || null,
             }))
           );
         } else {
@@ -325,7 +324,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
           tags: item.tags,
           project_date: item.project_date,
           doc_md: item.doc_md,
-          doc_md: item.doc_md,
         });
       } else {
         result.push({
@@ -336,7 +334,6 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
           description: item.description,
           tags: item.tags,
           project_date: item.project_date,
-          doc_md: item.doc_md,
           doc_md: item.doc_md,
         });
       }
