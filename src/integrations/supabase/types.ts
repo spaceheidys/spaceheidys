@@ -184,6 +184,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string
+          doc_md: string | null
           group_id: string | null
           id: string
           image_offset_x: number
@@ -205,6 +206,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string
+          doc_md?: string | null
           group_id?: string | null
           id?: string
           image_offset_x?: number
@@ -226,6 +228,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string
+          doc_md?: string | null
           group_id?: string | null
           id?: string
           image_offset_x?: number
