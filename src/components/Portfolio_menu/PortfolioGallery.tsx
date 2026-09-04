@@ -662,15 +662,29 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                       )}
                     </div>
                     <div className="flex flex-col gap-3 mt-auto pt-4">
-                      <a
-                        href={selectedEntry.project_url!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/80 hover:text-white hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"
-                      >
-                        <ExternalLink size={14} />
-                        Visit Project
-                      </a>
+                      <div className="flex items-stretch gap-2">
+                        <a
+                          href={selectedEntry.project_url!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/80 hover:text-white hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"
+                        >
+                          <ExternalLink size={14} />
+                          Visit Project
+                        </a>
+                        {selectedEntry.doc_md && (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setDocOpen(true); }}
+                            className="shrink-0 w-11 flex items-center justify-center border border-white/20 text-white/60 hover:text-white hover:border-white/50 transition-colors"
+                            aria-label="Read project document"
+                            title="Read .md document"
+                          >
+                            <FileText size={16} />
+                          </button>
+                        )}
+                      </div>
+
                       <button
                         onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
                         className="flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/50 hover:text-white hover:bg-white/10 hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"
