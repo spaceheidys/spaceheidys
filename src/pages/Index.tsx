@@ -357,17 +357,20 @@ const Index = () => {
     (window as any).__mainAudio = audio;
 
     const playAudio = () => {
-      audio.play().catch(() => {});
+      if (!mutedRef.current) audio.play().catch(() => {});
       window.removeEventListener("click", playAudio);
       window.removeEventListener("keydown", playAudio);
       window.removeEventListener("touchstart", playAudio);
     };
 
-    audio.play().catch(() => {
-      window.addEventListener("click", playAudio);
-      window.addEventListener("keydown", playAudio);
-      window.addEventListener("touchstart", playAudio);
-    });
+    if (!mutedRef.current) {
+      audio.play().catch(() => {
+        window.addEventListener("click", playAudio);
+        window.addEventListener("keydown", playAudio);
+        window.addEventListener("touchstart", playAudio);
+      });
+    }
+
 
     return () => {
       audio.pause();
@@ -402,14 +405,21 @@ const Index = () => {
 
   // Mute/unmute background audio.
   // NOTE: when the element is routed through the Web Audio graph (equalizer),
-  // `muted` alone is ignored by the graph output — volume must be zeroed too.
+  // `muted`/`volume` on the element can be bypassed — so we also pause playback.
   useEffect(() => {
     mutedRef.current = muted;
     const audio = audioRef.current;
     if (!audio) return;
     audio.muted = muted;
     audio.volume = muted ? 0 : 1;
+    if (muted) {
+      audio.pause();
+    } else {
+      window.__mainAudioCtx?.resume?.().catch(() => {});
+      audio.play().catch(() => {});
+    }
   }, [muted]);
+
 
   const scrollToPortfolio = useCallback(() => {
     const bar = document.getElementById("portfolio-nav-bar");
