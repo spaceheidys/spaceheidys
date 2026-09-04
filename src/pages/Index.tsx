@@ -357,17 +357,20 @@ const Index = () => {
     (window as any).__mainAudio = audio;
 
     const playAudio = () => {
-      audio.play().catch(() => {});
+      if (!mutedRef.current) audio.play().catch(() => {});
       window.removeEventListener("click", playAudio);
       window.removeEventListener("keydown", playAudio);
       window.removeEventListener("touchstart", playAudio);
     };
 
-    audio.play().catch(() => {
-      window.addEventListener("click", playAudio);
-      window.addEventListener("keydown", playAudio);
-      window.addEventListener("touchstart", playAudio);
-    });
+    if (!mutedRef.current) {
+      audio.play().catch(() => {
+        window.addEventListener("click", playAudio);
+        window.addEventListener("keydown", playAudio);
+        window.addEventListener("touchstart", playAudio);
+      });
+    }
+
 
     return () => {
       audio.pause();
