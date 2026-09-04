@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, X, ExternalLink, Heart, Copy, ArrowLeft, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ExternalLink, Heart, Copy, ArrowLeft, ArrowRight, FileText } from "lucide-react";
+import MarkdownView from "@/components/MarkdownView";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSocialLinks, buildShareUrl } from "@/hooks/useSocialLinks";
@@ -26,6 +27,7 @@ interface PortfolioItem {
   description?: string;
   tags?: string[];
   project_date?: string;
+  doc_md?: string | null;
 }
 
 /** A display entry: either a single image or a group (first image as thumbnail, all URLs stored) */
@@ -38,6 +40,7 @@ interface GalleryEntry {
   description?: string;
   tags?: string[];
   project_date?: string;
+  doc_md?: string | null;
 }
 
 const makeItems = (count: number): PortfolioItem[] =>
@@ -239,7 +242,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
         }
         const { data } = await (supabase
           .from("portfolio_items")
-          .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date, section")
+          .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date, doc_md, section")
           .in("id", favIds)
           .eq("is_visible", true as any)
           .order("sort_order", { ascending: true }) as any);
@@ -254,6 +257,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               description: d.description || "",
               tags: d.tags || [],
               project_date: d.project_date || "",
+            doc_md: d.doc_md || null,
             }))
           );
         } else {
@@ -264,7 +268,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
       let query = (supabase
         .from("portfolio_items")
-        .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date")
+        .select("id, title, image_url, sort_order, group_id, project_url, description, tags, project_date, doc_md")
         .eq("section", sectionKey)
         .eq("is_visible", true as any)
         .order("sort_order", { ascending: true }) as any);
@@ -285,6 +289,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
             description: d.description || "",
             tags: d.tags || [],
             project_date: d.project_date || "",
+            doc_md: d.doc_md || null,
           }))
         );
       } else {
@@ -318,6 +323,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
           description: item.description,
           tags: item.tags,
           project_date: item.project_date,
+          doc_md: item.doc_md,
         });
       } else {
         result.push({
@@ -328,6 +334,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
           description: item.description,
           tags: item.tags,
           project_date: item.project_date,
+          doc_md: item.doc_md,
         });
       }
     }
@@ -655,15 +662,29 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                       )}
                     </div>
                     <div className="flex flex-col gap-3 mt-auto pt-4">
-                      <a
-                        href={selectedEntry.project_url!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/80 hover:text-white hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"
-                      >
-                        <ExternalLink size={14} />
-                        Visit Project
-                      </a>
+                      <div className="flex items-stretch gap-2">
+                        <a
+                          href={selectedEntry.project_url!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/80 hover:text-white hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"
+                        >
+                          <ExternalLink size={14} />
+                          Visit Project
+                        </a>
+                        {selectedEntry.doc_md && (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setDocOpen(true); }}
+                            className="shrink-0 w-11 flex items-center justify-center border border-white/20 text-white/60 hover:text-white hover:border-white/50 transition-colors"
+                            aria-label="Read project document"
+                            title="Read .md document"
+                          >
+                            <FileText size={16} />
+                          </button>
+                        )}
+                      </div>
+
                       <button
                         onClick={(e) => { e.stopPropagation(); setSelectedEntry(null); }}
                         className="flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/50 hover:text-white hover:bg-white/10 hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"

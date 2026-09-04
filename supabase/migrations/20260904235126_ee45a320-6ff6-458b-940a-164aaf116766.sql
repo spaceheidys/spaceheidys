@@ -1,0 +1,1 @@
+ALTER TABLE public.portfolio_items ADD COLUMN IF NOT EXISTS doc_md TEXT;
