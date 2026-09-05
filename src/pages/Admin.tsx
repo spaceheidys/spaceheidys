@@ -1128,6 +1128,7 @@ const Admin = () => {
                       created_by: user?.id,
                       project_url: url || null,
                       description: desc,
+                      doc_md: newProjectDocMd || null,
                     };
                     const { error } = await supabase.from("portfolio_items").insert(insertData);
                     if (error) {
@@ -1143,6 +1144,8 @@ const Admin = () => {
                       if (label) label.textContent = "THUMBNAIL (optional)";
                       const txtLabel = document.getElementById("project-txt-label");
                       if (txtLabel) txtLabel.textContent = "LOAD .TXT";
+                      setNewProjectDocMd(null);
+                      setNewProjectDocName("LOAD .MD");
                       fetchItems();
                     }
                     setUploading(false);
