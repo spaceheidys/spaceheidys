@@ -22,6 +22,7 @@ interface SortableImageCardProps {
   text_align: string;
   group_id?: string | null;
   project_url?: string | null;
+  doc_md?: string | null;
   description?: string;
   notes?: string;
   tags?: string[];
@@ -35,6 +36,7 @@ interface SortableImageCardProps {
   onTitleChange: (title: string) => void;
   onTextAlignChange: (align: string) => void;
   onProjectUrlChange?: (url: string) => void;
+  onDocMdChange?: (md: string | null) => void;
   onDescriptionChange?: (desc: string) => void;
   onNotesChange?: (notes: string) => void;
   onTagsChange?: (tags: string[]) => void;
@@ -70,6 +72,7 @@ const SortableImageCard = ({
   text_align,
   group_id,
   project_url,
+  doc_md,
   description,
   notes,
   tags,
@@ -83,6 +86,7 @@ const SortableImageCard = ({
   onTitleChange,
   onTextAlignChange,
   onProjectUrlChange,
+  onDocMdChange,
   onDescriptionChange,
   onNotesChange,
   onTagsChange,
@@ -105,6 +109,8 @@ const SortableImageCard = ({
   const [isMoveOpen, setIsMoveOpen] = useState(false);
   const [availableGroups, setAvailableGroups] = useState<Array<{ group_id: string; section: string; subsection: string | null; count: number; preview: string; sampleTitle: string; description?: string }>>([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
+  const [mdDraft, setMdDraft] = useState(doc_md || "");
+  const mdFileRef = useRef<HTMLInputElement>(null);
   const replaceFileRef = useRef<HTMLInputElement>(null);
   const panStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -112,6 +118,8 @@ const SortableImageCard = ({
   useEffect(() => {
     setModalData({ title, description: description || "", notes: notes || "", tags: (tags || []).join(", "), project_date: project_date || "", project_url: project_url || "" });
   }, [title, description, notes, tags, project_date, project_url]);
+
+  useEffect(() => { setMdDraft(doc_md || ""); }, [doc_md]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -604,15 +612,53 @@ const SortableImageCard = ({
               </>
             )}
             {showProjectUrl && (
-              <div className="grid gap-2">
-                <Label htmlFor="edit-url">Project URL</Label>
-                <Input
-                  id="edit-url"
-                  value={modalData.project_url}
-                  onChange={(e) => setModalData({ ...modalData, project_url: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
+              <>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-url">Project URL</Label>
+                  <Input
+                    id="edit-url"
+                    value={modalData.project_url}
+                    onChange={(e) => setModalData({ ...modalData, project_url: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Project document (.md)</Label>
+                  <input
+                    ref={mdFileRef}
+                    type="file"
+                    accept=".md,.markdown,text/markdown,text/plain"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (!file) return;
+                      const text = await file.text();
+                      setMdDraft(text);
+                      toast.success(`Loaded ${file.name}`);
+                    }}
+                  />
+                  <div className="flex items-center gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => mdFileRef.current?.click()}>
+                      <Upload className="w-3.5 h-3.5 mr-1.5" /> Upload .md
+                    </Button>
+                    {mdDraft ? (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setMdDraft("")}>
+                        <X className="w-3.5 h-3.5 mr-1.5" /> Remove
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">No document</span>
+                    )}
+                  </div>
+                  <Textarea
+                    value={mdDraft}
+                    onChange={(e) => setMdDraft(e.target.value)}
+                    rows={6}
+                    placeholder="# Project notes in markdown..."
+                    className="font-mono text-xs"
+                  />
+                </div>
+              </>
             )}
           </div>
           <DialogFooter>
@@ -627,6 +673,7 @@ const SortableImageCard = ({
                 if (onTagsChange) onTagsChange(modalData.tags.split(",").map(t => t.trim()).filter(Boolean));
               }
               if (showProjectUrl && onProjectUrlChange) onProjectUrlChange(modalData.project_url.trim());
+              if (showProjectUrl && onDocMdChange) onDocMdChange(mdDraft.trim() ? mdDraft : null);
               setIsEditModalOpen(false);
             }}>Save</Button>
           </DialogFooter>

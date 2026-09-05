@@ -700,6 +700,13 @@ const Admin = () => {
     }, 400);
   };
 
+  const handleDocMdChange = async (id: string, md: string | null) => {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, doc_md: md } as any : i)));
+    const { error } = await supabase.from("portfolio_items").update({ doc_md: md } as any).eq("id", id);
+    if (error) toast.error("Failed to save document");
+    else toast.success(md ? "Document saved" : "Document removed");
+  };
+
   const tagsTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const handleTagsChange = (id: string, tags: string[]) => {
@@ -1400,6 +1407,7 @@ const Admin = () => {
                           text_align={(item as any).text_align ?? 'left'}
                           group_id={item.group_id}
                           project_url={(item as any).project_url}
+                          doc_md={(item as any).doc_md}
                           description={(item as any).description}
                           notes={(item as any).notes}
                           tags={(item as any).tags}
@@ -1412,6 +1420,7 @@ const Admin = () => {
                           onTitleChange={(title) => handleTitleChange(item.id, title)}
                           onTextAlignChange={(align) => handleTextAlignChange(item.id, align)}
                           onProjectUrlChange={(url) => handleProjectUrlChange(item.id, url)}
+                          onDocMdChange={(md) => handleDocMdChange(item.id, md)}
                           onDescriptionChange={(desc) => handleDescriptionChange(item.id, desc)}
                           onNotesChange={(n) => handleNotesChange(item.id, n)}
                           onTagsChange={(tags) => handleTagsChange(item.id, tags)}
