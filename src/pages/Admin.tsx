@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, Move, FolderInput, Edit2, ImagePlus } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, FileText, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, Move, FolderInput, Edit2, ImagePlus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input as UIInput } from "@/components/ui/input";
 import { Textarea as UITextarea } from "@/components/ui/textarea";
