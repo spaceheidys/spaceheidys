@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, Move, FolderInput, Edit2, ImagePlus } from "lucide-react";
+import { Upload, Images, LogOut, Loader2, Check, X, ChevronLeft, ChevronRight, Eye, EyeOff, FileCode, FileText, Trash2, CheckSquare, Square, ChevronDown, ChevronUp, Move, FolderInput, Edit2, ImagePlus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input as UIInput } from "@/components/ui/input";
 import { Textarea as UITextarea } from "@/components/ui/textarea";
@@ -434,6 +434,8 @@ const Admin = () => {
   const [cmsPage, setCmsPage] = useState(0);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [groupDescription, setGroupDescription] = useState("");
+  const [newProjectDocMd, setNewProjectDocMd] = useState<string | null>(null);
+  const [newProjectDocName, setNewProjectDocName] = useState("LOAD .MD");
   const [cmsPageSize, setCmsPageSize] = useState<number>(() => {
     const v = parseInt(localStorage.getItem("admin_cms_page_size") || "12", 10);
     return [12, 24, 36].includes(v) ? v : 12;
@@ -1066,6 +1068,25 @@ const Admin = () => {
                     }}
                   />
                 </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                  <FileText className="w-3 h-3" />
+                  <span className="text-[10px] font-display tracking-widest">{newProjectDocName}</span>
+                  <input
+                    type="file"
+                    accept=".md,.markdown,text/markdown,text/plain"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        setNewProjectDocMd(ev.target?.result as string);
+                        setNewProjectDocName(file.name);
+                      };
+                      reader.readAsText(file);
+                    }}
+                  />
+                </label>
                 <button
                   className="ml-auto text-[10px] font-display tracking-[0.2em] uppercase px-3 py-1 border border-border text-muted-foreground hover:border-foreground hover:text-foreground transition-colors disabled:opacity-30"
                   disabled={uploading}
@@ -1107,6 +1128,7 @@ const Admin = () => {
                       created_by: user?.id,
                       project_url: url || null,
                       description: desc,
+                      doc_md: newProjectDocMd || null,
                     };
                     const { error } = await supabase.from("portfolio_items").insert(insertData);
                     if (error) {
@@ -1122,6 +1144,8 @@ const Admin = () => {
                       if (label) label.textContent = "THUMBNAIL (optional)";
                       const txtLabel = document.getElementById("project-txt-label");
                       if (txtLabel) txtLabel.textContent = "LOAD .TXT";
+                      setNewProjectDocMd(null);
+                      setNewProjectDocName("LOAD .MD");
                       fetchItems();
                     }
                     setUploading(false);
