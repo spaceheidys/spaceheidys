@@ -174,6 +174,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [zoomedImg, setZoomedImg] = useState<string | null>(null);
+  const [docOpen, setDocOpen] = useState(false);
   const [groupPage, setGroupPage] = useState(0);
   const [isDesktopLB, setIsDesktopLB] = useState<boolean>(() =>
     typeof window !== "undefined" ? window.matchMedia("(min-width: 640px)").matches : true
