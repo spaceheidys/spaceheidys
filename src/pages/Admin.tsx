@@ -434,6 +434,8 @@ const Admin = () => {
   const [cmsPage, setCmsPage] = useState(0);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [groupDescription, setGroupDescription] = useState("");
+  const [newProjectDocMd, setNewProjectDocMd] = useState<string | null>(null);
+  const [newProjectDocName, setNewProjectDocName] = useState("LOAD .MD");
   const [cmsPageSize, setCmsPageSize] = useState<number>(() => {
     const v = parseInt(localStorage.getItem("admin_cms_page_size") || "12", 10);
     return [12, 24, 36].includes(v) ? v : 12;
@@ -1063,6 +1065,25 @@ const Admin = () => {
                       const file = e.target.files?.[0];
                       const label = document.getElementById("project-thumb-label");
                       if (label) label.textContent = file ? file.name : "THUMBNAIL (optional)";
+                    }}
+                  />
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                  <FileText className="w-3 h-3" />
+                  <span className="text-[10px] font-display tracking-widest">{newProjectDocName}</span>
+                  <input
+                    type="file"
+                    accept=".md,.markdown,text/markdown,text/plain"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        setNewProjectDocMd(ev.target?.result as string);
+                        setNewProjectDocName(file.name);
+                      };
+                      reader.readAsText(file);
                     }}
                   />
                 </label>
