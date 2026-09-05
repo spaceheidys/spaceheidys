@@ -174,6 +174,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
   const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [zoomedImg, setZoomedImg] = useState<string | null>(null);
+  const [docOpen, setDocOpen] = useState(false);
   const [groupPage, setGroupPage] = useState(0);
   const [isDesktopLB, setIsDesktopLB] = useState<boolean>(() =>
     typeof window !== "undefined" ? window.matchMedia("(min-width: 640px)").matches : true
@@ -835,7 +836,43 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Project document (.md) overlay */}
+      <AnimatePresence>
+        {docOpen && selectedEntry?.doc_md && (
+          <motion.div
+            className="fixed inset-0 z-[320] flex items-center justify-center bg-black/90 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setDocOpen(false)}
+          >
+            <motion.div
+              className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-black border border-white/15 rounded-lg p-5 sm:p-8"
+              initial={{ scale: 0.95, y: 12 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 12 }}
+              transition={{ duration: 0.25 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setDocOpen(false)}
+                className="absolute top-3 right-3 text-white/40 hover:text-white transition-colors"
+                aria-label="Close document"
+              >
+                <X size={18} />
+              </button>
+              <h3 className="text-sm font-display tracking-[0.2em] uppercase text-white/80 mb-4 pr-8">
+                {selectedEntry.label}
+              </h3>
+              <MarkdownView source={selectedEntry.doc_md} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+
   );
 };
 
