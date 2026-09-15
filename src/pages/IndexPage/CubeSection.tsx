@@ -6,6 +6,7 @@ import RotatingCube, { GlitchTitle } from "@/components/RotatingCube";
 import LvlupRadio, { normalizeStreamUrl } from "@/components/LvlupRadio";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { supabase } from "@/integrations/supabase/client";
+import ScratchReveal from "@/components/ScratchReveal";
 
 interface ScreenAudioProps {
   url: string;
@@ -162,6 +163,7 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const sub1IsVideo = sub1Bg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(sub1Bg) : false;
   const sub2Bg = get("lvlup_sub2_bg") || "";
   const sub2IsVideo = sub2Bg ? /\.(mp4|webm|mov|ogg)(\?|$)/i.test(sub2Bg) : false;
+  const sub2Layer2 = get("lvlup_sub2_bg_layer2") || "";
   const radioVolume = Number(get("lvlup_radio_volume") || 15);
   const mainAudioOn = get("lvlup_bg_audio_on") === "1";
   const mainAudioUrl = get("lvlup_bg_audio_url");
@@ -391,6 +393,9 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                     )
                   ) : null;
                 })()}
+                {subOpen === 2 && sub2Layer2 && (
+                  <ScratchReveal topImageUrl={sub2Layer2} className="z-[1] opacity-60" />
+                )}
                 {(subOpen === 1 ? sub1AudioOn : sub2AudioOn) && (
                   <ScreenAudio
                     url={subOpen === 1 ? sub1AudioUrl : sub2AudioUrl}
