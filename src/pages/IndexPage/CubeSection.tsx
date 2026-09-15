@@ -387,14 +387,14 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   const isVid = subOpen === 1 ? sub1IsVideo : sub2IsVideo;
                   return bg ? (
                     isVid ? (
-                      <video src={bg} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                      <video src={bg} autoPlay muted loop playsInline className={`absolute inset-0 w-full h-full object-cover ${subOpen === 2 ? "opacity-100" : "opacity-60"}`} />
                     ) : (
-                      <img src={bg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                      <img src={bg} alt="" className={`absolute inset-0 w-full h-full object-cover ${subOpen === 2 ? "opacity-100" : "opacity-60"}`} />
                     )
                   ) : null;
                 })()}
                 {subOpen === 2 && sub2Layer2 && (
-                  <ScratchReveal topImageUrl={sub2Layer2} className="z-[1] opacity-60" />
+                  <ScratchReveal topImageUrl={sub2Layer2} className="z-[1]" />
                 )}
                 {(subOpen === 1 ? sub1AudioOn : sub2AudioOn) && (
                   <ScreenAudio

@@ -146,7 +146,7 @@ const BgSection = ({ storageKey, title, get, update, layer2Key }: BgSectionProps
         )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <input
           ref={inputRef}
           type="file"
