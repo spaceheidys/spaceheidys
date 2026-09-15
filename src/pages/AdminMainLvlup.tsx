@@ -15,17 +15,21 @@ interface BgSectionProps {
   title: string;
   get: (key: string) => string;
   update: (key: string, content: string) => Promise<void>;
+  layer2Key?: string;
 }
 
-const BgSection = ({ storageKey, title, get, update }: BgSectionProps) => {
+const BgSection = ({ storageKey, title, get, update, layer2Key }: BgSectionProps) => {
   const [uploading, setUploading] = useState(false);
+  const [layer2Uploading, setLayer2Uploading] = useState(false);
   const [audioUploading, setAudioUploading] = useState(false);
   const [previewPlaying, setPreviewPlaying] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const layer2InputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLAudioElement | null>(null);
 
   const bg = get(storageKey);
+  const layer2 = layer2Key ? get(layer2Key) : "";
   const isVideo = /\.(mp4|webm|mov|ogg)(\?|$)/i.test(bg);
 
   const audioOnKey = `${storageKey}_audio_on`;
@@ -53,6 +57,22 @@ const BgSection = ({ storageKey, title, get, update }: BgSectionProps) => {
     await update(storageKey, data.publicUrl);
     setUploading(false);
     toast.success("Background updated");
+  };
+
+  const handleLayer2Upload = async (file: File) => {
+    if (!layer2Key) return;
+    setLayer2Uploading(true);
+    const path = `lvlup/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+    const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+    if (error) {
+      toast.error(error.message);
+      setLayer2Uploading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("portfolio-images").getPublicUrl(path);
+    await update(layer2Key, data.publicUrl);
+    setLayer2Uploading(false);
+    toast.success("Layer 2 updated");
   };
 
   const handleClear = async () => {
@@ -104,25 +124,33 @@ const BgSection = ({ storageKey, title, get, update }: BgSectionProps) => {
         {title}
       </h2>
 
-      <div className="aspect-video w-full border border-border bg-muted/20 overflow-hidden flex items-center justify-center mb-4">
+      <div className="relative aspect-video w-full border border-border bg-muted/20 overflow-hidden flex items-center justify-center mb-4">
         {bg ? (
           isVideo ? (
-            <video src={bg} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+            <video src={bg} className="absolute inset-0 w-full h-full object-cover" autoPlay loop muted playsInline />
           ) : (
-            <img src={bg} alt={`${title} preview`} className="w-full h-full object-cover" />
+            <img src={bg} alt={`${title} Layer 1 preview`} className="absolute inset-0 w-full h-full object-cover" />
           )
         ) : (
           <span className="font-display text-[10px] tracking-widest uppercase text-muted-foreground">
             No background
           </span>
         )}
+        {layer2 && (
+          <img src={layer2} alt={`${title} Layer 2 preview`} className="absolute inset-0 w-full h-full object-cover" />
+        )}
+        {layer2Key && (bg || layer2) && (
+          <div className="absolute inset-x-0 bottom-0 flex justify-between bg-background/80 px-2 py-1 font-display text-[8px] tracking-widest uppercase text-foreground">
+            <span>Layer 1 below</span><span>Layer 2 above</span>
+          </div>
+        )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <input
           ref={inputRef}
           type="file"
-          accept="image/*,video/*,.gif,.webp,.mp4,.webm,.mov,.ogg"
+          accept={layer2Key ? "image/*,.gif,.webp" : "image/*,video/*,.gif,.webp,.mp4,.webm,.mov,.ogg"}
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
@@ -136,7 +164,7 @@ const BgSection = ({ storageKey, title, get, update }: BgSectionProps) => {
           className="flex items-center gap-2 border border-border px-3 py-2 font-display text-[10px] tracking-widest uppercase text-foreground hover:bg-muted transition-colors disabled:opacity-50"
         >
           {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-          {bg ? "Replace" : "Upload"}
+          {layer2Key ? (bg ? "Replace Layer 1" : "Upload Layer 1") : (bg ? "Replace" : "Upload")}
         </button>
         {bg && (
           <button
@@ -146,10 +174,47 @@ const BgSection = ({ storageKey, title, get, update }: BgSectionProps) => {
             <Trash2 size={12} /> Clear
           </button>
         )}
+        {layer2Key && (
+          <>
+            <input
+              ref={layer2InputRef}
+              type="file"
+              accept="image/*,.gif,.webp"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleLayer2Upload(file);
+                e.target.value = "";
+              }}
+            />
+            <button
+              onClick={() => layer2InputRef.current?.click()}
+              disabled={layer2Uploading}
+              className="flex items-center gap-2 border border-border px-3 py-2 font-display text-[10px] tracking-widest uppercase text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+            >
+              {layer2Uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+              {layer2 ? "Replace Layer 2" : "Upload Layer 2"}
+            </button>
+            {layer2 && (
+              <button
+                onClick={async () => {
+                  await update(layer2Key, "");
+                  toast.success("Layer 2 cleared");
+                }}
+                aria-label="Clear Layer 2"
+                className="flex h-8 w-8 items-center justify-center border border-border text-muted-foreground hover:text-destructive transition-colors"
+              >
+                <Trash2 size={12} />
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       <p className="mt-3 font-display text-[9px] tracking-widest uppercase text-muted-foreground/60">
-        Supported: images (jpg, png, gif, webp) and video (mp4, webm, mov, ogg)
+        {layer2Key
+          ? "Layer 2 is erased by dragging on Screen 2. Images: jpg, png, gif, webp"
+          : "Supported: images (jpg, png, gif, webp) and video (mp4, webm, mov, ogg)"}
       </p>
 
       {/* Per-screen audio: uploaded music file or stream URL, toggled on/off */}
@@ -303,7 +368,13 @@ const AdminMainLvlup = () => {
       <main className="px-3 sm:px-8 py-8 max-w-3xl mx-auto space-y-6">
         <BgSection storageKey={BG_KEY} title="Background" get={get} update={update} />
         <BgSection storageKey="lvlup_sub1_bg" title="Screen 1 Background (top-right arrow)" get={get} update={update} />
-        <BgSection storageKey="lvlup_sub2_bg" title="Screen 2 Background (bottom-right arrow)" get={get} update={update} />
+        <BgSection
+          storageKey="lvlup_sub2_bg"
+          layer2Key="lvlup_sub2_bg_layer2"
+          title="Screen 2 Background (bottom-right arrow)"
+          get={get}
+          update={update}
+        />
 
         <section className="border border-border p-4 sm:p-6 space-y-4">
           <h2 className="font-display text-[11px] tracking-[0.3em] uppercase text-foreground">
