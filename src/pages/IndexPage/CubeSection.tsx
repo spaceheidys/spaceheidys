@@ -390,7 +390,7 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                    )
                  )}
                  {subOpen === 2 && (
-                   <div className="absolute inset-4 overflow-hidden sm:inset-8 md:inset-10">
+                   <div className="absolute inset-y-4 right-4 left-20 overflow-hidden sm:inset-y-8 sm:right-8 sm:left-32 md:left-36">
                      {sub2Bg && (
                        sub2IsVideo ? (
                          <video src={sub2Bg} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
