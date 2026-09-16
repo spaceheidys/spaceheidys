@@ -97,6 +97,7 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
 
   // Mouse wheel over the canvas resizes the brush.
   useEffect(() => {
+    applyCursorSize(false);
     const canvas = canvasRef.current;
     if (!canvas) return;
     const onWheel = (event: WheelEvent) => {
@@ -108,6 +109,7 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
     canvas.addEventListener("wheel", onWheel, { passive: false });
     return () => canvas.removeEventListener("wheel", onWheel);
   }, [applyCursorSize]);
+
 
 
   const pointFromEvent = (event: React.PointerEvent<HTMLCanvasElement>): Point => {
