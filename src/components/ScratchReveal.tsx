@@ -14,13 +14,50 @@ const drawCover = (ctx: CanvasRenderingContext2D, image: HTMLImageElement, width
   ctx.drawImage(image, (width - drawnWidth) / 2, (height - drawnHeight) / 2, drawnWidth, drawnHeight);
 };
 
-/** A full-size image canvas whose pixels are erased by mouse or touch dragging. */
+const BRUSH_MIN = 12;
+const BRUSH_MAX = 200;
+
+/** A full-size image canvas whose pixels are erased by mouse or touch dragging. Brush size changes with the mouse wheel. */
 const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const drawingRef = useRef(false);
   const lastPointRef = useRef<Point | null>(null);
+  const cursorPointRef = useRef<Point | null>(null);
+  const brushSizeRef = useRef(window.matchMedia("(max-width: 640px)").matches ? 42 : 64);
+  const hintTimerRef = useRef<number | null>(null);
+
+  const applyCursorSize = useCallback((showHint = false) => {
+    const cursor = cursorRef.current;
+    if (cursor) {
+      const size = brushSizeRef.current;
+      cursor.style.width = `${size}px`;
+      cursor.style.height = `${size}px`;
+      const point = cursorPointRef.current;
+      if (point) {
+        cursor.style.transform = `translate3d(${point.x - size / 2}px, ${point.y - size / 2}px, 0)`;
+      }
+    }
+    const hint = hintRef.current;
+    if (hint) {
+      if (showHint) {
+        hint.textContent = `${Math.round(brushSizeRef.current)}`;
+        hint.style.opacity = "1";
+        if (hintTimerRef.current) window.clearTimeout(hintTimerRef.current);
+        hintTimerRef.current = window.setTimeout(() => {
+          if (hintRef.current) hintRef.current.style.opacity = "0";
+        }, 700);
+      }
+    }
+  }, []);
+
+  useEffect(() => () => {
+    if (hintTimerRef.current) window.clearTimeout(hintTimerRef.current);
+  }, []);
+
+
 
   const paintImage = useCallback(() => {
     const canvas = canvasRef.current;
@@ -58,6 +95,23 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
     };
   }, [topImageUrl, paintImage]);
 
+  // Mouse wheel over the canvas resizes the brush.
+  useEffect(() => {
+    applyCursorSize(false);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const step = event.deltaY < 0 ? 8 : -8;
+      brushSizeRef.current = Math.min(BRUSH_MAX, Math.max(BRUSH_MIN, brushSizeRef.current + step));
+      applyCursorSize(true);
+    };
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    return () => canvas.removeEventListener("wheel", onWheel);
+  }, [applyCursorSize]);
+
+
+
   const pointFromEvent = (event: React.PointerEvent<HTMLCanvasElement>): Point => {
     const rect = event.currentTarget.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
@@ -66,9 +120,15 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
   const moveCursor = (point: Point, pointerType: string) => {
     const cursor = cursorRef.current;
     if (!cursor) return;
-    const brushSize = window.matchMedia("(max-width: 640px)").matches ? 42 : 64;
+    cursorPointRef.current = point;
+    const brushSize = brushSizeRef.current;
     cursor.style.transform = `translate3d(${point.x - brushSize / 2}px, ${point.y - brushSize / 2}px, 0)`;
     cursor.style.opacity = pointerType === "touch" ? "0" : "1";
+    const hint = hintRef.current;
+    if (hint) {
+      hint.style.transform = `translate3d(${point.x + brushSize / 2 + 8}px, ${point.y - 10}px, 0)`;
+      hint.style.opacity = pointerType === "touch" ? "0" : hint.style.opacity;
+    }
   };
 
   const eraseTo = (point: Point) => {
@@ -77,7 +137,8 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
     if (!canvas || !ctx) return;
 
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    const brushSize = window.matchMedia("(max-width: 640px)").matches ? 42 : 64;
+    const brushSize = brushSizeRef.current;
+
     const previous = lastPointRef.current ?? point;
     ctx.save();
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -115,8 +176,12 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
           eraseTo(point);
         }}
         onPointerLeave={() => {
-          if (!drawingRef.current && cursorRef.current) cursorRef.current.style.opacity = "0";
+          if (!drawingRef.current) {
+            if (cursorRef.current) cursorRef.current.style.opacity = "0";
+            if (hintRef.current) hintRef.current.style.opacity = "0";
+          }
         }}
+
         onPointerUp={(event) => {
           drawingRef.current = false;
           lastPointRef.current = null;
@@ -133,10 +198,16 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
       <div
         ref={cursorRef}
         aria-hidden="true"
-        className="pointer-events-none absolute left-0 top-0 z-10 size-[42px] rounded-full border border-foreground opacity-0 shadow-[0_0_0_1px_hsl(var(--background)/0.65)] transition-opacity duration-100 sm:size-16"
+        className="pointer-events-none absolute left-0 top-0 z-10 rounded-full border border-foreground opacity-0 shadow-[0_0_0_1px_hsl(var(--background)/0.65)] transition-opacity duration-100"
+      />
+      <div
+        ref={hintRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 top-0 z-10 rounded-sm border border-foreground/60 bg-background/80 px-1.5 py-0.5 text-[10px] leading-none text-foreground opacity-0 transition-opacity duration-200"
       />
     </div>
   );
 };
+
 
 export default ScratchReveal;
