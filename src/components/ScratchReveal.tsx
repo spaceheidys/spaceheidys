@@ -192,10 +192,16 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
       <div
         ref={cursorRef}
         aria-hidden="true"
-        className="pointer-events-none absolute left-0 top-0 z-10 size-[42px] rounded-full border border-foreground opacity-0 shadow-[0_0_0_1px_hsl(var(--background)/0.65)] transition-opacity duration-100 sm:size-16"
+        className="pointer-events-none absolute left-0 top-0 z-10 rounded-full border border-foreground opacity-0 shadow-[0_0_0_1px_hsl(var(--background)/0.65)] transition-opacity duration-100"
+      />
+      <div
+        ref={hintRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 top-0 z-10 rounded-sm border border-foreground/60 bg-background/80 px-1.5 py-0.5 text-[10px] leading-none text-foreground opacity-0 transition-opacity duration-200"
       />
     </div>
   );
 };
+
 
 export default ScratchReveal;
