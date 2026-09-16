@@ -21,6 +21,16 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const drawingRef = useRef(false);
   const lastPointRef = useRef<Point | null>(null);
+  const brushSizeRef = useRef(window.matchMedia("(max-width: 640px)").matches ? 42 : 64);
+
+  const applyCursorSize = useCallback(() => {
+    const cursor = cursorRef.current;
+    if (!cursor) return;
+    const size = brushSizeRef.current;
+    cursor.style.width = `${size}px`;
+    cursor.style.height = `${size}px`;
+  }, []);
+
 
   const paintImage = useCallback(() => {
     const canvas = canvasRef.current;
