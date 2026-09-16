@@ -6,6 +6,9 @@ interface Props {
   url: string;
   metaUrl?: string;
   volume?: number; // 0-100
+  /** Optional controlled mute so an external button can toggle sound. */
+  muted?: boolean;
+  onMutedChange?: (muted: boolean) => void;
 }
 
 /** Turn a SomaFM player page URL into a real audio stream URL. */
@@ -19,10 +22,16 @@ export function normalizeStreamUrl(raw: string): string {
   return url;
 }
 
-const LvlupRadio = ({ url, metaUrl, volume = 15 }: Props) => {
+const LvlupRadio = ({ url, metaUrl, volume = 15, muted: mutedProp, onMutedChange }: Props) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [blocked, setBlocked] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [internalMuted, setInternalMuted] = useState(false);
+  const muted = mutedProp ?? internalMuted;
+  const setMuted = (value: boolean | ((prev: boolean) => boolean)) => {
+    const next = typeof value === "function" ? value(muted) : value;
+    if (onMutedChange) onMutedChange(next);
+    else setInternalMuted(next);
+  };
   const [playing, setPlaying] = useState(false);
   const [track, setTrack] = useState("");
   const [showTrack, setShowTrack] = useState(false);
