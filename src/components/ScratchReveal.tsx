@@ -95,6 +95,21 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
     };
   }, [topImageUrl, paintImage]);
 
+  // Mouse wheel over the canvas resizes the brush.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const step = event.deltaY < 0 ? 8 : -8;
+      brushSizeRef.current = Math.min(BRUSH_MAX, Math.max(BRUSH_MIN, brushSizeRef.current + step));
+      applyCursorSize(true);
+    };
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    return () => canvas.removeEventListener("wheel", onWheel);
+  }, [applyCursorSize]);
+
+
   const pointFromEvent = (event: React.PointerEvent<HTMLCanvasElement>): Point => {
     const rect = event.currentTarget.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
