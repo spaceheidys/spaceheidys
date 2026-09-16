@@ -176,8 +176,12 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
           eraseTo(point);
         }}
         onPointerLeave={() => {
-          if (!drawingRef.current && cursorRef.current) cursorRef.current.style.opacity = "0";
+          if (!drawingRef.current) {
+            if (cursorRef.current) cursorRef.current.style.opacity = "0";
+            if (hintRef.current) hintRef.current.style.opacity = "0";
+          }
         }}
+
         onPointerUp={(event) => {
           drawingRef.current = false;
           lastPointRef.current = null;
