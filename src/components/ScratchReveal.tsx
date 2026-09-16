@@ -14,22 +14,49 @@ const drawCover = (ctx: CanvasRenderingContext2D, image: HTMLImageElement, width
   ctx.drawImage(image, (width - drawnWidth) / 2, (height - drawnHeight) / 2, drawnWidth, drawnHeight);
 };
 
-/** A full-size image canvas whose pixels are erased by mouse or touch dragging. */
+const BRUSH_MIN = 12;
+const BRUSH_MAX = 200;
+
+/** A full-size image canvas whose pixels are erased by mouse or touch dragging. Brush size changes with the mouse wheel. */
 const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const drawingRef = useRef(false);
   const lastPointRef = useRef<Point | null>(null);
+  const cursorPointRef = useRef<Point | null>(null);
   const brushSizeRef = useRef(window.matchMedia("(max-width: 640px)").matches ? 42 : 64);
+  const hintTimerRef = useRef<number | null>(null);
 
-  const applyCursorSize = useCallback(() => {
+  const applyCursorSize = useCallback((showHint = false) => {
     const cursor = cursorRef.current;
-    if (!cursor) return;
-    const size = brushSizeRef.current;
-    cursor.style.width = `${size}px`;
-    cursor.style.height = `${size}px`;
+    if (cursor) {
+      const size = brushSizeRef.current;
+      cursor.style.width = `${size}px`;
+      cursor.style.height = `${size}px`;
+      const point = cursorPointRef.current;
+      if (point) {
+        cursor.style.transform = `translate3d(${point.x - size / 2}px, ${point.y - size / 2}px, 0)`;
+      }
+    }
+    const hint = hintRef.current;
+    if (hint) {
+      if (showHint) {
+        hint.textContent = `${Math.round(brushSizeRef.current)}`;
+        hint.style.opacity = "1";
+        if (hintTimerRef.current) window.clearTimeout(hintTimerRef.current);
+        hintTimerRef.current = window.setTimeout(() => {
+          if (hintRef.current) hintRef.current.style.opacity = "0";
+        }, 700);
+      }
+    }
   }, []);
+
+  useEffect(() => () => {
+    if (hintTimerRef.current) window.clearTimeout(hintTimerRef.current);
+  }, []);
+
 
 
   const paintImage = useCallback(() => {
