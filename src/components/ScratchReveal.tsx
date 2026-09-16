@@ -17,6 +17,7 @@ const drawCover = (ctx: CanvasRenderingContext2D, image: HTMLImageElement, width
 /** A full-size image canvas whose pixels are erased by mouse or touch dragging. */
 const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const drawingRef = useRef(false);
   const lastPointRef = useRef<Point | null>(null);
@@ -62,6 +63,14 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   };
 
+  const moveCursor = (point: Point, pointerType: string) => {
+    const cursor = cursorRef.current;
+    if (!cursor) return;
+    const brushSize = window.matchMedia("(max-width: 640px)").matches ? 42 : 64;
+    cursor.style.transform = `translate3d(${point.x - brushSize / 2}px, ${point.y - brushSize / 2}px, 0)`;
+    cursor.style.opacity = pointerType === "touch" ? "0" : "1";
+  };
+
   const eraseTo = (point: Point) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -85,33 +94,48 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
   };
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-label="Scratch away the upper image to reveal the image below"
-      className={`absolute inset-0 h-full w-full cursor-crosshair touch-none ${className}`}
-      onPointerDown={(event) => {
-        if (event.pointerType === "mouse" && event.button !== 0) return;
-        event.currentTarget.setPointerCapture(event.pointerId);
-        drawingRef.current = true;
-        lastPointRef.current = pointFromEvent(event);
-        eraseTo(lastPointRef.current);
-      }}
-      onPointerMove={(event) => {
-        if (!drawingRef.current) return;
-        eraseTo(pointFromEvent(event));
-      }}
-      onPointerUp={(event) => {
-        drawingRef.current = false;
-        lastPointRef.current = null;
-        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-          event.currentTarget.releasePointerCapture(event.pointerId);
-        }
-      }}
-      onPointerCancel={() => {
-        drawingRef.current = false;
-        lastPointRef.current = null;
-      }}
-    />
+    <div className={`absolute inset-0 ${className}`}>
+      <canvas
+        ref={canvasRef}
+        aria-label="Scratch away the upper image to reveal the image below"
+        className="absolute inset-0 h-full w-full cursor-none touch-none"
+        onPointerEnter={(event) => moveCursor(pointFromEvent(event), event.pointerType)}
+        onPointerDown={(event) => {
+          if (event.pointerType === "mouse" && event.button !== 0) return;
+          event.currentTarget.setPointerCapture(event.pointerId);
+          drawingRef.current = true;
+          lastPointRef.current = pointFromEvent(event);
+          moveCursor(lastPointRef.current, event.pointerType);
+          eraseTo(lastPointRef.current);
+        }}
+        onPointerMove={(event) => {
+          const point = pointFromEvent(event);
+          moveCursor(point, event.pointerType);
+          if (!drawingRef.current) return;
+          eraseTo(point);
+        }}
+        onPointerLeave={() => {
+          if (!drawingRef.current && cursorRef.current) cursorRef.current.style.opacity = "0";
+        }}
+        onPointerUp={(event) => {
+          drawingRef.current = false;
+          lastPointRef.current = null;
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          }
+        }}
+        onPointerCancel={() => {
+          drawingRef.current = false;
+          lastPointRef.current = null;
+          if (cursorRef.current) cursorRef.current.style.opacity = "0";
+        }}
+      />
+      <div
+        ref={cursorRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 top-0 z-10 size-[42px] rounded-full border border-foreground opacity-0 shadow-[0_0_0_1px_hsl(var(--background)/0.65)] transition-opacity duration-100 sm:size-16"
+      />
+    </div>
   );
 };
 
