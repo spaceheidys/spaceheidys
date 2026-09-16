@@ -103,9 +103,15 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
   const moveCursor = (point: Point, pointerType: string) => {
     const cursor = cursorRef.current;
     if (!cursor) return;
-    const brushSize = window.matchMedia("(max-width: 640px)").matches ? 42 : 64;
+    cursorPointRef.current = point;
+    const brushSize = brushSizeRef.current;
     cursor.style.transform = `translate3d(${point.x - brushSize / 2}px, ${point.y - brushSize / 2}px, 0)`;
     cursor.style.opacity = pointerType === "touch" ? "0" : "1";
+    const hint = hintRef.current;
+    if (hint) {
+      hint.style.transform = `translate3d(${point.x + brushSize / 2 + 8}px, ${point.y - 10}px, 0)`;
+      hint.style.opacity = pointerType === "touch" ? "0" : hint.style.opacity;
+    }
   };
 
   const eraseTo = (point: Point) => {
@@ -114,7 +120,8 @@ const ScratchReveal = ({ topImageUrl, className = "" }: ScratchRevealProps) => {
     if (!canvas || !ctx) return;
 
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    const brushSize = window.matchMedia("(max-width: 640px)").matches ? 42 : 64;
+    const brushSize = brushSizeRef.current;
+
     const previous = lastPointRef.current ?? point;
     ctx.save();
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
