@@ -382,20 +382,25 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                 exit={{ opacity: 0, x: 60 }}
                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               >
-                {(() => {
-                  const bg = subOpen === 1 ? sub1Bg : sub2Bg;
-                  const isVid = subOpen === 1 ? sub1IsVideo : sub2IsVideo;
-                  return bg ? (
-                    isVid ? (
-                      <video src={bg} autoPlay muted loop playsInline className={`absolute inset-0 w-full h-full object-cover ${subOpen === 2 ? "opacity-100" : "opacity-60"}`} />
-                    ) : (
-                      <img src={bg} alt="" className={`absolute inset-0 w-full h-full object-cover ${subOpen === 2 ? "opacity-100" : "opacity-60"}`} />
-                    )
-                  ) : null;
-                })()}
-                {subOpen === 2 && sub2Layer2 && (
-                  <ScratchReveal topImageUrl={sub2Layer2} className="z-[1]" />
-                )}
+                 {subOpen === 1 && sub1Bg && (
+                   sub1IsVideo ? (
+                     <video src={sub1Bg} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover opacity-60" />
+                   ) : (
+                     <img src={sub1Bg} alt="" className="absolute inset-0 h-full w-full object-cover opacity-60" />
+                   )
+                 )}
+                 {subOpen === 2 && (
+                   <div className="absolute inset-4 overflow-hidden sm:inset-8 md:inset-10">
+                     {sub2Bg && (
+                       sub2IsVideo ? (
+                         <video src={sub2Bg} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
+                       ) : (
+                         <img src={sub2Bg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                       )
+                     )}
+                     {sub2Layer2 && <ScratchReveal topImageUrl={sub2Layer2} className="z-[1]" />}
+                   </div>
+                 )}
                 {(subOpen === 1 ? sub1AudioOn : sub2AudioOn) && (
                   <ScreenAudio
                     url={subOpen === 1 ? sub1AudioUrl : sub2AudioUrl}
