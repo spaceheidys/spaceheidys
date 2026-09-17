@@ -174,7 +174,6 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const [nextOpen, setNextOpen] = useState(false);
   const [subOpen, setSubOpen] = useState<0 | 1 | 2>(0);
   const [lvlupMuted, setLvlupMuted] = useState(false);
-  const [subMuted, setSubMuted] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageShowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -214,11 +213,6 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = prev; };
   }, [nextOpen, subOpen]);
-
-  // Sound is unmuted again when a different sub-screen opens.
-  useEffect(() => {
-    setSubMuted(false);
-  }, [subOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -441,11 +435,11 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   <ScreenAudio
                     url={subOpen === 1 ? sub1AudioUrl : sub2AudioUrl}
                     volume={radioVolume}
-                    muted={subMuted}
-                    onMutedChange={setSubMuted}
+                     muted={lvlupMuted}
+                     onMutedChange={setLvlupMuted}
                   />
                 )}
-                <SoundToggle muted={subMuted} onToggle={() => setSubMuted((m) => !m)} />
+                <SoundToggle muted={lvlupMuted} onToggle={() => setLvlupMuted((m) => !m)} />
                 <button
                   onClick={() => setSubOpen(0)}
                   className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
