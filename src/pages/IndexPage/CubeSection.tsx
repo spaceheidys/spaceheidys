@@ -445,9 +445,7 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                     onMutedChange={setSubMuted}
                   />
                 )}
-                {(subOpen === 1 ? sub1AudioOn : sub2AudioOn) && (
-                  <SoundToggle muted={subMuted} onToggle={() => setSubMuted((m) => !m)} />
-                )}
+                <SoundToggle muted={subMuted} onToggle={() => setSubMuted((m) => !m)} />
                 <button
                   onClick={() => setSubOpen(0)}
                   className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
