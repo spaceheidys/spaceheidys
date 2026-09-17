@@ -215,6 +215,11 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     return () => { document.body.style.overflow = prev; };
   }, [nextOpen, subOpen]);
 
+  // Sound is unmuted again when a different sub-screen opens.
+  useEffect(() => {
+    setSubMuted(false);
+  }, [subOpen]);
+
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
