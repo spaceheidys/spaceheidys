@@ -13,6 +13,9 @@ interface ScreenAudioProps {
   volume: number; // 0-100
   /** When false the audio fades out and pauses (used while a sub-screen is open). */
   active?: boolean;
+  /** Optional controlled mute so an external button can toggle sound. */
+  muted?: boolean;
+  onMutedChange?: (muted: boolean) => void;
 }
 
 const FADE_MS = 900;
