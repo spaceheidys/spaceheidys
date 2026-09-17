@@ -441,7 +441,12 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   <ScreenAudio
                     url={subOpen === 1 ? sub1AudioUrl : sub2AudioUrl}
                     volume={radioVolume}
+                    muted={subMuted}
+                    onMutedChange={setSubMuted}
                   />
+                )}
+                {(subOpen === 1 ? sub1AudioOn : sub2AudioOn) && (
+                  <SoundToggle muted={subMuted} onToggle={() => setSubMuted((m) => !m)} />
                 )}
                 <button
                   onClick={() => setSubOpen(0)}
