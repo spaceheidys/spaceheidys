@@ -13,6 +13,9 @@ interface ScreenAudioProps {
   volume: number; // 0-100
   /** When false the audio fades out and pauses (used while a sub-screen is open). */
   active?: boolean;
+  /** Optional controlled mute so an external button can toggle sound. */
+  muted?: boolean;
+  onMutedChange?: (muted: boolean) => void;
 }
 
 const FADE_MS = 900;
@@ -40,10 +43,16 @@ const fadeTo = (audio: HTMLAudioElement, target: number, ms = FADE_MS, onDone?: 
 };
 
 /** Plays a per-screen music file or radio stream while its overlay is open. */
-const ScreenAudio = ({ url, volume, active = true }: ScreenAudioProps) => {
+const ScreenAudio = ({ url, volume, active = true, muted: mutedProp, onMutedChange }: ScreenAudioProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cancelFadeRef = useRef<() => void>(() => {});
-  const [muted, setMuted] = useState(false);
+  const [internalMuted, setInternalMuted] = useState(false);
+  const muted = mutedProp ?? internalMuted;
+  const setMuted = (value: boolean | ((prev: boolean) => boolean)) => {
+    const next = typeof value === "function" ? value(muted) : value;
+    if (onMutedChange) onMutedChange(next);
+    else setInternalMuted(next);
+  };
   const [blocked, setBlocked] = useState(false);
   const src = normalizeStreamUrl(url);
   const target = Math.max(0, Math.min(100, volume)) / 100;
@@ -137,6 +146,17 @@ const ScreenAudio = ({ url, volume, active = true }: ScreenAudioProps) => {
 };
 
 
+/** Sound on/off toggle shown under the Back button in the bottom-left corner. */
+const SoundToggle = ({ muted, onToggle }: { muted: boolean; onToggle: () => void }) => (
+  <button
+    onClick={onToggle}
+    aria-label={muted ? "Unmute sound" : "Mute sound"}
+    className="absolute left-5 sm:left-8 bottom-5 sm:bottom-8 z-20 text-white/60 hover:text-white transition-colors drop-shadow-lg"
+  >
+    {muted ? <VolumeX size={18} strokeWidth={1} /> : <Volume2 size={18} strokeWidth={1} />}
+  </button>
+);
+
 interface CubeSectionProps {
   footerText?: string;
   backgroundUrl?: string | null;
@@ -153,6 +173,8 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
   const [messageTrigger, setMessageTrigger] = useState(0);
   const [nextOpen, setNextOpen] = useState(false);
   const [subOpen, setSubOpen] = useState<0 | 1 | 2>(0);
+  const [lvlupMuted, setLvlupMuted] = useState(false);
+  const [subMuted, setSubMuted] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageShowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -192,6 +214,11 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = prev; };
   }, [nextOpen, subOpen]);
+
+  // Sound is unmuted again when a different sub-screen opens.
+  useEffect(() => {
+    setSubMuted(false);
+  }, [subOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -340,14 +367,23 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   Back
                 </button>
                 {mainAudioOn && mainAudioUrl ? (
-                  <ScreenAudio url={mainAudioUrl} volume={radioVolume} active={subOpen === 0} />
+                  <ScreenAudio
+                    url={mainAudioUrl}
+                    volume={radioVolume}
+                    active={subOpen === 0}
+                    muted={lvlupMuted}
+                    onMutedChange={setLvlupMuted}
+                  />
                 ) : (
                   <LvlupRadio
                     url={get("lvlup_radio_url")}
                     metaUrl={get("lvlup_radio_meta_url")}
                     volume={radioVolume}
+                    muted={lvlupMuted}
+                    onMutedChange={setLvlupMuted}
                   />
                 )}
+                <SoundToggle muted={lvlupMuted} onToggle={() => setLvlupMuted((m) => !m)} />
 
                 {/* Sub-screen arrows — top right and bottom right */}
                 <button
@@ -405,7 +441,12 @@ const CubeSection = forwardRef<HTMLDivElement, CubeSectionProps>(({ footerText, 
                   <ScreenAudio
                     url={subOpen === 1 ? sub1AudioUrl : sub2AudioUrl}
                     volume={radioVolume}
+                    muted={subMuted}
+                    onMutedChange={setSubMuted}
                   />
+                )}
+                {(subOpen === 1 ? sub1AudioOn : sub2AudioOn) && (
+                  <SoundToggle muted={subMuted} onToggle={() => setSubMuted((m) => !m)} />
                 )}
                 <button
                   onClick={() => setSubOpen(0)}
