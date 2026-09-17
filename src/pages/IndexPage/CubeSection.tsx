@@ -43,10 +43,16 @@ const fadeTo = (audio: HTMLAudioElement, target: number, ms = FADE_MS, onDone?: 
 };
 
 /** Plays a per-screen music file or radio stream while its overlay is open. */
-const ScreenAudio = ({ url, volume, active = true }: ScreenAudioProps) => {
+const ScreenAudio = ({ url, volume, active = true, muted: mutedProp, onMutedChange }: ScreenAudioProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cancelFadeRef = useRef<() => void>(() => {});
-  const [muted, setMuted] = useState(false);
+  const [internalMuted, setInternalMuted] = useState(false);
+  const muted = mutedProp ?? internalMuted;
+  const setMuted = (value: boolean | ((prev: boolean) => boolean)) => {
+    const next = typeof value === "function" ? value(muted) : value;
+    if (onMutedChange) onMutedChange(next);
+    else setInternalMuted(next);
+  };
   const [blocked, setBlocked] = useState(false);
   const src = normalizeStreamUrl(url);
   const target = Math.max(0, Math.min(100, volume)) / 100;
