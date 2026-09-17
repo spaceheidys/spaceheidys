@@ -146,6 +146,17 @@ const ScreenAudio = ({ url, volume, active = true, muted: mutedProp, onMutedChan
 };
 
 
+/** Sound on/off toggle shown under the Back button in the bottom-left corner. */
+const SoundToggle = ({ muted, onToggle }: { muted: boolean; onToggle: () => void }) => (
+  <button
+    onClick={onToggle}
+    aria-label={muted ? "Unmute sound" : "Mute sound"}
+    className="absolute left-5 sm:left-8 bottom-5 sm:bottom-8 z-20 text-white/60 hover:text-white transition-colors drop-shadow-lg"
+  >
+    {muted ? <VolumeX size={18} strokeWidth={1} /> : <Volume2 size={18} strokeWidth={1} />}
+  </button>
+);
+
 interface CubeSectionProps {
   footerText?: string;
   backgroundUrl?: string | null;
