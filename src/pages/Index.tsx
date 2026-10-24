@@ -697,6 +697,32 @@ const Index = () => {
       {/* === CUBE === */}
       <CubeSection ref={cubeRef} backgroundUrl={cubeBg} footerText={getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."} />
 
+      {/* === NEW SECTION (empty screen for now) === */}
+      {createPortal(
+        <AnimatePresence>
+          {newScreenOpen && (
+            <motion.div
+              className="fixed inset-0 z-[300] bg-black overflow-hidden"
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 60 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setNewScreenOpen(false)}
+                aria-label="Back"
+                className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
+              >
+                <ArrowLeft size={16} strokeWidth={1} />
+                Back
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
       <SecretDoorOverlay
         isOpen={secretDoorOpen}
         onClose={closeSecretDoor}
