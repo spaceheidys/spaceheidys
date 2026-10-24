@@ -607,6 +607,24 @@ const Index = () => {
       {/* === MAIN Hero === */}
       <HeroSection bgImage={bgImage} />
 
+      {/* Arrow to the next section — middle-right of the main screen */}
+      <AnimatePresence>
+        {inHero && !newScreenOpen && (
+          <motion.button
+            onClick={() => setNewScreenOpen(true)}
+            aria-label="Next section"
+            className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[95] p-1 text-foreground/50 hover:text-foreground transition-colors drop-shadow-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <ChevronRight size={32} strokeWidth={1} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+
       {/* Fixed left side nav */}
       <AnimatePresence>
         {showNav && (
