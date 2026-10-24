@@ -72,6 +72,7 @@ const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [inHero, setInHero] = useState(true);
   const [atTop, setAtTop] = useState(true);
+  const [newScreenOpen, setNewScreenOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [portfolioInView, setPortfolioInView] = useState(false);
   const [hidePortfolioSwitchers, setHidePortfolioSwitchers] = useState(false);
