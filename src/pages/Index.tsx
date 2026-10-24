@@ -73,6 +73,17 @@ const Index = () => {
   const [inHero, setInHero] = useState(true);
   const [atTop, setAtTop] = useState(true);
   const [newScreenOpen, setNewScreenOpen] = useState(false);
+
+  // Lock page scroll while the new section screen is open.
+  useEffect(() => {
+    if (!newScreenOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [newScreenOpen]);
+
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [portfolioInView, setPortfolioInView] = useState(false);
   const [hidePortfolioSwitchers, setHidePortfolioSwitchers] = useState(false);
