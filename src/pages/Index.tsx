@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
+import { ChevronRight, ArrowLeft, Volume2, VolumeX } from "lucide-react";
 import lostInTime01 from "@/assets/lost_in_time_01.png";
 import lostInTime02 from "@/assets/lost_in_time_02.png";
 import lostInTime03 from "@/assets/lost_in_time_03.png";
@@ -71,6 +72,18 @@ const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [inHero, setInHero] = useState(true);
   const [atTop, setAtTop] = useState(true);
+  const [newScreenOpen, setNewScreenOpen] = useState(false);
+
+  // Lock page scroll while the new section screen is open.
+  useEffect(() => {
+    if (!newScreenOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [newScreenOpen]);
+
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [portfolioInView, setPortfolioInView] = useState(false);
   const [hidePortfolioSwitchers, setHidePortfolioSwitchers] = useState(false);
@@ -605,6 +618,24 @@ const Index = () => {
       {/* === MAIN Hero === */}
       <HeroSection bgImage={bgImage} />
 
+      {/* Arrow to the next section — middle-right of the main screen */}
+      <AnimatePresence>
+        {inHero && !newScreenOpen && (
+          <motion.button
+            onClick={() => setNewScreenOpen(true)}
+            aria-label="Next section"
+            className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-[95] p-1 text-foreground/50 hover:text-foreground transition-colors drop-shadow-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <ChevronRight size={32} strokeWidth={1} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+
       {/* Fixed left side nav */}
       <AnimatePresence>
         {showNav && (
@@ -676,6 +707,32 @@ const Index = () => {
 
       {/* === CUBE === */}
       <CubeSection ref={cubeRef} backgroundUrl={cubeBg} footerText={getContent("footer") || "© 2018 - 2026 Spaceheidys. All rights reserved."} />
+
+      {/* === NEW SECTION (empty screen for now) === */}
+      {createPortal(
+        <AnimatePresence>
+          {newScreenOpen && (
+            <motion.div
+              className="fixed inset-0 z-[300] bg-black overflow-hidden"
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 60 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setNewScreenOpen(false)}
+                aria-label="Back"
+                className="absolute left-5 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 text-white/60 hover:text-white transition-colors font-display text-[10px] tracking-[0.3em] uppercase"
+              >
+                <ArrowLeft size={16} strokeWidth={1} />
+                Back
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       <SecretDoorOverlay
         isOpen={secretDoorOpen}
