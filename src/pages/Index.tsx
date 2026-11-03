@@ -18,6 +18,7 @@ import { useSectionSettings } from "@/hooks/useSectionSettings";
 import { useNavButtons } from "@/hooks/useNavButtons";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { useFavorites } from "@/hooks/useFavorites";
+import { SECRET_DOOR_PUBLIC_ENTRY_KEY, secretDoorEntryTarget } from "@/lib/secretDoorEntry";
 
 import HeroSection from "@/pages/IndexPage/HeroSection";
 import MainTextSection from "@/pages/IndexPage/MainTextSection";
@@ -444,7 +445,11 @@ const Index = () => {
     slowScrollTo(cubeRef.current, 1400);
   }, [slowScrollTo]);
 
-  const openSecretDoor = useCallback(() => setSecretDoorOpen(true), []);
+  const openSecretDoor = useCallback(() => {
+    const target = secretDoorEntryTarget(getContent(SECRET_DOOR_PUBLIC_ENTRY_KEY));
+    if (target) navigate(target);
+    else setSecretDoorOpen(true);
+  }, [getContent, navigate]);
   const closeSecretDoor = useCallback(() => setSecretDoorOpen(false), []);
   const goToShop = useCallback(() => navigate("/shop"), [navigate]);
   const goToGallery = useCallback(() => navigate("/gallery"), [navigate]);
