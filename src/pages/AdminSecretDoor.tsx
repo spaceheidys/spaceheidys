@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, Eye, EyeOff, ArrowLeft, Code2 } from "lucide-react";
+import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, Eye, EyeOff, ArrowLeft, Code2, DoorOpen } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { verifySecretDoorAdminAccess } from "@/hooks/useSecretDoorSettings";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 
 interface SecretDoorSettings {
@@ -47,6 +49,7 @@ const AdminSecretDoor = () => {
   const [files, setFiles] = useState<SecretDoorFile[]>([]);
   const [fetching, setFetching] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [openingDoor, setOpeningDoor] = useState(false);
 
   // Editable fields
   const [draftCode, setDraftCode] = useState("");
@@ -117,6 +120,18 @@ const AdminSecretDoor = () => {
       setQuadrants(map);
     }
     setFetching(false);
+  };
+
+  const openSecretDoor = async () => {
+    if (openingDoor || !user || !isAdmin) return;
+    setOpeningDoor(true);
+    const allowed = await verifySecretDoorAdminAccess();
+    setOpeningDoor(false);
+    if (!allowed) {
+      toast.error("Could not verify admin access. Please try again.");
+      return;
+    }
+    navigate("/secret");
   };
 
   const saveCode = async () => {
@@ -326,6 +341,17 @@ const AdminSecretDoor = () => {
       />
 
       <div className="px-4 sm:px-8 py-6 max-w-3xl mx-auto space-y-8">
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            onClick={openSecretDoor}
+            disabled={openingDoor}
+            className="font-display text-[10px] tracking-[0.2em] uppercase"
+          >
+            {openingDoor ? <Loader2 className="animate-spin" /> : <DoorOpen />}
+            Open without password
+          </Button>
+        </div>
         {/* SECRET CODE */}
         <section className="border border-border p-4 space-y-3">
           <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
