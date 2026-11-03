@@ -7,6 +7,7 @@ import { LogOut, Loader2, Upload, Trash2, Check, X, Download, Volume2, VolumeX, 
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { verifySecretDoorAdminAccess } from "@/hooks/useSecretDoorSettings";
+import { SECRET_DOOR_PUBLIC_ENTRY_KEY } from "@/lib/secretDoorEntry";
 import AdminTopNav from "@/components/admin/AdminTopNav";
 
 interface SecretDoorSettings {
@@ -50,6 +51,9 @@ const AdminSecretDoor = () => {
   const [fetching, setFetching] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [openingDoor, setOpeningDoor] = useState(false);
+  const [publicEntryEnabled, setPublicEntryEnabled] = useState(false);
+  const [savingPublicEntry, setSavingPublicEntry] = useState(false);
+  const [confirmPublicEntry, setConfirmPublicEntry] = useState<boolean | null>(null);
 
   // Editable fields
   const [draftCode, setDraftCode] = useState("");
@@ -97,11 +101,13 @@ const AdminSecretDoor = () => {
 
   const fetchAll = async () => {
     setFetching(true);
-    const [settingsRes, filesRes, quadRes] = await Promise.all([
+    const [settingsRes, filesRes, quadRes, entryRes] = await Promise.all([
       supabase.from("secret_door_settings" as any).select("id, timer_seconds, background_url, music_enabled, impulse_speed, impulse_color, impulse_enabled, impulse_mode").limit(1).single(),
       supabase.from("secret_door_files" as any).select("*").order("sort_order"),
       supabase.from("secret_door_quadrants" as any).select("id, html_content, file_name"),
+      supabase.from("section_content").select("content").eq("key", SECRET_DOOR_PUBLIC_ENTRY_KEY).maybeSingle(),
     ]);
+    setPublicEntryEnabled(entryRes.data?.content === "true");
     if (settingsRes.data) {
       const s = settingsRes.data as any as SecretDoorSettings;
       setSettings(s);
@@ -120,6 +126,25 @@ const AdminSecretDoor = () => {
       setQuadrants(map);
     }
     setFetching(false);
+  };
+
+  const savePublicEntry = async () => {
+    if (confirmPublicEntry === null || savingPublicEntry) return;
+    const enabled = confirmPublicEntry;
+    setSavingPublicEntry(true);
+    const { error } = await supabase.from("section_content").upsert({
+      key: SECRET_DOOR_PUBLIC_ENTRY_KEY,
+      content: String(enabled),
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "key" });
+    setSavingPublicEntry(false);
+    if (error) {
+      toast.error("Failed to update visitor entry");
+      return;
+    }
+    setPublicEntryEnabled(enabled);
+    setConfirmPublicEntry(null);
+    toast.success(enabled ? "Visitors can enter without a password" : "Visitor password restored");
   };
 
   const openSecretDoor = async () => {
@@ -352,6 +377,32 @@ const AdminSecretDoor = () => {
             Open without password
           </Button>
         </div>
+        <section className="border border-border p-4 space-y-3">
+          <div className="flex items-center justify-between gap-4">
+            <label htmlFor="secret-door-visitor-entry" className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
+              Visitor entry without password
+            </label>
+            <Switch
+              id="secret-door-visitor-entry"
+              checked={publicEntryEnabled}
+              disabled={savingPublicEntry || confirmPublicEntry !== null}
+              onCheckedChange={setConfirmPublicEntry}
+            />
+          </div>
+          {confirmPublicEntry !== null && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-muted-foreground">
+                {confirmPublicEntry ? "Allow visitors to enter without a password?" : "Require the visitor password again?"}
+              </span>
+              <Button variant="outline" size="sm" onClick={savePublicEntry} disabled={savingPublicEntry}>
+                {savingPublicEntry ? <Loader2 className="animate-spin" /> : <Check />} YES
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setConfirmPublicEntry(null)} disabled={savingPublicEntry}>
+                <X /> NO
+              </Button>
+            </div>
+          )}
+        </section>
         {/* SECRET CODE */}
         <section className="border border-border p-4 space-y-3">
           <p className="text-[10px] font-display tracking-[0.2em] uppercase text-muted-foreground">
