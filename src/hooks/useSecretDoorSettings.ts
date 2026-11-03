@@ -58,6 +58,20 @@ export interface SecretDoorFile {
   file_size: number;
 }
 
+export async function verifySecretDoorAdminAccess(): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) return false;
+    const role = await supabase.rpc("has_role", {
+      _user_id: data.user.id,
+      _role: "admin",
+    });
+    return !role.error && role.data === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function verifySecretCode(code: string): Promise<{ valid: boolean; files?: SecretDoorFile[] }> {
   try {
     const { data, error } = await supabase.functions.invoke("verify-secret-code", {
