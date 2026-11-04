@@ -4,6 +4,8 @@ import { Plus, X } from "lucide-react";
 import type { SectionVisibility } from "@/hooks/useSectionSettings";
 import { useCapabilities } from "@/hooks/useCapabilities";
 import { useIsMobile } from "@/hooks/use-mobile";
+import AboutNoAccess from "@/components/AboutNoAccess";
+import { ABOUT_ACCESS_KEY, isAboutMasked } from "@/lib/aboutAccess";
 
 interface MainTextSectionProps {
   activeSection: "about" | "contact" | "shop" | null;
@@ -250,6 +252,7 @@ const SectionBody = ({
 }) => {
   if (section === "about") {
     if (sectionVisibility.about === false) return null;
+    if (isAboutMasked(section, getContent(ABOUT_ACCESS_KEY))) return <AboutNoAccess />;
     return <AboutBody getContent={getContent} typeDelay={typeDelay} />;
   }
   if (section === "contact") {
