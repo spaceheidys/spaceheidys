@@ -3,6 +3,9 @@ import { Pencil, Check, X, Eye, EyeOff, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useSectionSettings, SectionVisibility } from "@/hooks/useSectionSettings";
 import CapabilitiesSection from "@/components/admin/CapabilitiesSection";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { ABOUT_ACCESS_KEY } from "@/lib/aboutAccess";
 
 interface ContentSectionProps {
   get: (key: string) => string;
@@ -34,6 +37,7 @@ const DURATION_OPTIONS = [
 const ContentSection = ({ get, getDuration, update, updateDuration }: ContentSectionProps) => {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [accessSaving, setAccessSaving] = useState(false);
   const { visibility, toggle } = useSectionSettings();
 
   const startEdit = (key: string) => {
@@ -56,6 +60,25 @@ const ContentSection = ({ get, getDuration, update, updateDuration }: ContentSec
         Section Content
       </p>
       <div className="flex flex-col gap-3 max-w-lg">
+        <div className="flex items-center justify-between gap-4 border border-border px-3 py-3">
+          <Label htmlFor="about-no-access" className="font-display text-xs">ABOUT: NO ACCESS</Label>
+          <Switch
+            id="about-no-access"
+            checked={get(ABOUT_ACCESS_KEY) === "true"}
+            disabled={accessSaving}
+            onCheckedChange={async (checked) => {
+              setAccessSaving(true);
+              try {
+                await update(ABOUT_ACCESS_KEY, String(checked));
+                toast.success(checked ? "ABOUT: NO ACCESS enabled" : "ABOUT content restored");
+              } catch {
+                toast.error("Could not save ABOUT setting");
+              } finally {
+                setAccessSaving(false);
+              }
+            }}
+          />
+        </div>
         {FIELDS.map((field) => {
           const isVisible = visibility[field.key as keyof SectionVisibility] ?? true;
           const duration = getDuration(field.key);
