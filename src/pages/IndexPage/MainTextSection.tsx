@@ -194,28 +194,41 @@ const AboutBody = ({
         </div>
       </CustomScroll>
 
-      {/* Right — capabilities */}
+      {/* Right — capabilities (RPG character card) */}
       {caps.length > 0 && (
         <div className="flex-1 md:max-w-[46%] min-h-0 max-h-full overflow-y-auto scrollbar-hide">
           <div className="min-h-full flex flex-col justify-start">
             <p className="text-[10px] font-display tracking-[0.25em] uppercase text-foreground/40 mb-2">
               Capabilities
             </p>
-            <ul className="flex flex-col">
-              {caps.map((c, i) => (
-                <li
-                  key={c.id}
-                  className="flex items-baseline gap-3 border-t border-foreground/15 py-2 last:border-b"
-                >
-                  <span className="text-[10px] font-display tracking-widest text-foreground/35 tabular-nums">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-sm font-body text-foreground/85">
-                    <Typewriter delay={typeDelay + 0.25 + i * 0.25} text={c.label} />
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="flex items-stretch gap-4">
+              {/* 2:3 portrait placeholder — RPG character frame */}
+              <div className="relative shrink-0 w-24 sm:w-28 md:w-32 aspect-[2/3] border border-foreground/30 bg-foreground/[0.03] self-stretch">
+                {/* corner accents */}
+                <span className="absolute -top-px -left-px w-2.5 h-2.5 border-t-2 border-l-2 border-foreground/70" />
+                <span className="absolute -top-px -right-px w-2.5 h-2.5 border-t-2 border-r-2 border-foreground/70" />
+                <span className="absolute -bottom-px -left-px w-2.5 h-2.5 border-b-2 border-l-2 border-foreground/70" />
+                <span className="absolute -bottom-px -right-px w-2.5 h-2.5 border-b-2 border-r-2 border-foreground/70" />
+                <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display tracking-[0.3em] uppercase text-foreground/25">
+                  LV.?
+                </span>
+              </div>
+              <ul className="flex-1 flex flex-col">
+                {caps.map((c, i) => (
+                  <li
+                    key={c.id}
+                    className="flex items-baseline gap-3 border-t border-foreground/15 py-2 last:border-b"
+                  >
+                    <span className="text-[10px] font-display tracking-widest text-foreground/35 tabular-nums">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="text-sm font-body text-foreground/85">
+                      <Typewriter delay={typeDelay + 0.25 + i * 0.25} text={c.label} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       )}
