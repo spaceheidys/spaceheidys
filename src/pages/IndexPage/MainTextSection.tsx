@@ -203,7 +203,7 @@ const AboutBody = ({
             </p>
             <div className="flex items-stretch gap-4">
               {/* 2:3 portrait placeholder — RPG character frame */}
-              <div className="relative shrink-0 w-24 sm:w-28 md:w-32 aspect-[2/3] border border-foreground/30 bg-foreground/[0.03] self-stretch">
+              <div className="relative shrink-0 w-24 sm:w-28 md:w-32 aspect-[2/3] border border-foreground/30 bg-foreground/[0.03] self-start">
                 {/* corner accents */}
                 <span className="absolute -top-px -left-px w-2.5 h-2.5 border-t-2 border-l-2 border-foreground/70" />
                 <span className="absolute -top-px -right-px w-2.5 h-2.5 border-t-2 border-r-2 border-foreground/70" />
