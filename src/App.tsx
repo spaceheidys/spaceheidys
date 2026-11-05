@@ -39,6 +39,7 @@ const Admin = lazyWithRetry(() => import("./pages/Admin"));
 const AdminMain = lazyWithRetry(() => import("./pages/AdminMain"));
 const AdminMainLvlup = lazyWithRetry(() => import("./pages/AdminMainLvlup"));
 const AdminLogin = lazyWithRetry(() => import("./pages/AdminLogin"));
+const ResetPassword = lazyWithRetry(() => import("./pages/ResetPassword"));
 const AdminSecretDoor = lazyWithRetry(() => import("./pages/AdminSecretDoor"));
 const AdminSEO = lazyWithRetry(() => import("./pages/AdminSEO"));
 const AdminShop = lazyWithRetry(() => import("./pages/AdminShop"));
@@ -75,6 +76,7 @@ const App = () => {
               <Route path="/admin/main" element={<AdminMain />} />
               <Route path="/admin/lvlup" element={<AdminMainLvlup />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/admin/secret-door" element={<AdminSecretDoor />} />
               <Route path="/admin/seo" element={<AdminSEO />} />
               <Route path="/admin/shop" element={<AdminShop />} />
