@@ -1,5 +1,5 @@
 import { forwardRef, memo, useCallback, useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Plus, X } from "lucide-react";
 import type { SectionVisibility } from "@/hooks/useSectionSettings";
 import { useCapabilities } from "@/hooks/useCapabilities";
@@ -20,25 +20,33 @@ const Typewriter = ({
   delay = 0,
   speed = 22,
   className,
+  onComplete,
 }: {
   text: string;
   delay?: number;
   speed?: number;
   className?: string;
+  onComplete?: () => void;
 }) => {
   const [n, setN] = useState(0);
+  const completionRef = useRef(onComplete);
+  completionRef.current = onComplete;
   useEffect(() => {
     setN(0);
+    let count = 0;
     let iv: ReturnType<typeof setInterval> | null = null;
     const t = setTimeout(() => {
+      if (!text.length) {
+        completionRef.current?.();
+        return;
+      }
       iv = setInterval(() => {
-        setN((prev) => {
-          if (prev >= text.length) {
-            if (iv) clearInterval(iv);
-            return prev;
-          }
-          return prev + 1;
-        });
+        count += 1;
+        setN(count);
+        if (count >= text.length) {
+          if (iv) clearInterval(iv);
+          completionRef.current?.();
+        }
       }, speed);
     }, delay * 1000);
     return () => {
@@ -182,6 +190,9 @@ const AboutBody = ({
 }) => {
   const { items } = useCapabilities();
   const caps = items.filter((c) => c.is_visible && c.label.trim());
+  const reduceMotion = useReducedMotion();
+  const [assembly, setAssembly] = useState<"lines" | "text" | "avatar">("lines");
+  const completedLabels = useRef(new Set<string>());
 
   return (
     <div className="w-full h-full flex flex-col md:flex-row items-stretch gap-6 md:gap-10 px-6 sm:px-10 py-6 overflow-hidden">
@@ -200,12 +211,26 @@ const AboutBody = ({
       {caps.length > 0 && (
         <div className="flex-1 md:max-w-[46%] min-h-0 max-h-full overflow-y-auto scrollbar-hide">
           <div className="min-h-full flex flex-col justify-start">
-            <p className="text-[10px] font-display tracking-[0.25em] uppercase text-foreground/40 mb-2">
+            <motion.p
+              className="text-[10px] font-display tracking-[0.25em] uppercase text-foreground/40 mb-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: assembly === "lines" ? 0 : 1 }}
+              transition={{ duration: reduceMotion ? 0 : 0.2 }}
+            >
               Capabilities
-            </p>
+            </motion.p>
             <div className="flex items-stretch gap-4">
               {/* 2:3 portrait placeholder — RPG character frame */}
-              <div className="relative shrink-0 w-24 sm:w-28 md:w-32 aspect-[2/3] border border-foreground/30 bg-foreground/[0.03] self-start">
+              <motion.div
+                aria-label="Avatar frame"
+                className="relative shrink-0 w-24 sm:w-28 md:w-32 aspect-[2/3] border border-foreground/30 bg-foreground/[0.03] self-start"
+                initial={{ opacity: 0, clipPath: "inset(50% 50% 50% 50%)" }}
+                animate={{
+                  opacity: assembly === "avatar" ? 1 : 0,
+                  clipPath: assembly === "avatar" ? "inset(0% 0% 0% 0%)" : "inset(50% 50% 50% 50%)",
+                }}
+                transition={{ duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
+              >
                 {/* corner accents */}
                 <span className="absolute -top-px -left-px w-2.5 h-2.5 border-t-2 border-l-2 border-foreground/70" />
                 <span className="absolute -top-px -right-px w-2.5 h-2.5 border-t-2 border-r-2 border-foreground/70" />
@@ -214,18 +239,50 @@ const AboutBody = ({
                 <span className="absolute inset-0 flex items-center justify-center text-[9px] font-display tracking-[0.3em] uppercase text-foreground/25">
                   LV.?
                 </span>
-              </div>
+              </motion.div>
               <ul className="flex-1 flex flex-col">
                 {caps.map((c, i) => (
                   <li
                     key={c.id}
-                    className="flex items-baseline gap-3 border-t border-foreground/15 py-2 last:border-b"
+                    className="relative flex items-baseline gap-3 min-h-[37px] py-2"
                   >
-                    <span className="text-[10px] font-display tracking-widest text-foreground/35 tabular-nums">
+                    <motion.span
+                      className="absolute inset-x-0 top-0 h-px bg-foreground/15 origin-left"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: reduceMotion ? 0 : 0.35, delay: reduceMotion ? 0 : typeDelay + i * 0.09 }}
+                      onAnimationComplete={() => {
+                        if (i === caps.length - 1) setAssembly("text");
+                      }}
+                    />
+                    {i === caps.length - 1 && (
+                      <motion.span
+                        className="absolute inset-x-0 bottom-0 h-px bg-foreground/15 origin-left"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: reduceMotion ? 0 : 0.35, delay: reduceMotion ? 0 : typeDelay + i * 0.09 }}
+                      />
+                    )}
+                    <motion.span
+                      className="text-[10px] font-display tracking-widest text-foreground/35 tabular-nums"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: assembly === "lines" ? 0 : 1 }}
+                      transition={{ duration: reduceMotion ? 0 : 0.2, delay: reduceMotion ? 0 : i * 0.09 }}
+                    >
                       {String(i + 1).padStart(2, "0")}
-                    </span>
+                    </motion.span>
                     <span className="text-sm font-body text-foreground/85">
-                      <Typewriter delay={typeDelay + 0.25 + i * 0.25} text={c.label} />
+                      {assembly !== "lines" && (
+                        <Typewriter
+                          delay={reduceMotion ? 0 : i * 0.15}
+                          speed={reduceMotion ? 1 : 22}
+                          text={c.label}
+                          onComplete={() => {
+                            completedLabels.current.add(c.id);
+                            if (caps.every((cap) => completedLabels.current.has(cap.id))) setAssembly("avatar");
+                          }}
+                        />
+                      )}
                     </span>
                   </li>
                 ))}
