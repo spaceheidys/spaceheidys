@@ -295,6 +295,7 @@ const MainTextSection = memo(
       // or introducing the frame for the first time.
       const prevSectionRef = useRef<typeof activeSection>(null);
       const [phase, setPhase] = useState<"idle" | "intro" | "switch">("idle");
+      const [frameReady, setFrameReady] = useState(false);
       const isMobile = useIsMobile();
       const [expanded, setExpanded] = useState(false);
 
@@ -314,13 +315,16 @@ const MainTextSection = memo(
       useEffect(() => {
         const prev = prevSectionRef.current;
         prevSectionRef.current = activeSection;
-        if (!activeSection) setPhase("idle");
+        if (!activeSection) {
+          setPhase("idle");
+          setFrameReady(false);
+        }
         else if (!prev) setPhase("intro");
         else if (prev !== activeSection) setPhase("switch");
       }, [activeSection]);
 
       // Delay before typewriter starts.
-      // - intro: after frame blink+expand (~1.55s)
+      // - intro: body mounts only after frame expansion completes
       // - switch: text should appear much earlier while the pixel is still
       //   running its corner cycle, so start after a short beat (~0.55s)
       // - no animation: short fade in
@@ -328,7 +332,7 @@ const MainTextSection = memo(
         ? 0.5
         : phase === "switch"
         ? 0.55
-        : 1.55;
+        : 0.05;
 
       // Bounds match the equalizer bar (which sits above), inset a bit so the
       // frame is visibly narrower than the equalizer.
@@ -367,6 +371,9 @@ const MainTextSection = memo(
                     },
                   }}
                   exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                  onAnimationComplete={() => {
+                    if (prevSectionRef.current) setFrameReady(true);
+                  }}
                 />
               )}
             </AnimatePresence>
@@ -378,7 +385,7 @@ const MainTextSection = memo(
 
             {/* Text — swaps on section change */}
             <AnimatePresence mode="wait">
-              {activeSection && (
+              {activeSection && (!animateReveal || frameReady) && (
                 <motion.div
                   key={activeSection}
                   className="absolute inset-0 flex items-center justify-center"
@@ -398,7 +405,7 @@ const MainTextSection = memo(
           </div>
 
           {/* Mobile — expand to fullscreen */}
-          {isMobile && activeSection && (
+          {isMobile && activeSection && (!animateReveal || frameReady) && (
             <button
               onClick={() => setExpanded(true)}
               aria-label="Expand text"
