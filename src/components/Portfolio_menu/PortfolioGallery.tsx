@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, X, ExternalLink, Heart, Copy, ArrowLeft, ArrowRight, FileText } from "lucide-react";
@@ -587,7 +588,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
       </div>
 
       {/* Lightbox overlay */}
-      <AnimatePresence mode="wait">
+      {createPortal(<AnimatePresence mode="wait">
         {selectedEntry && (
           <motion.div
             className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer pt-16 sm:pt-16 sm:pl-32"
@@ -600,7 +601,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[95vw] sm:w-[85vw] max-h-[calc(100svh-5rem)] flex min-h-0" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] h-[90vh] flex flex-col overflow-hidden" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
+              className={`relative ${isProject ? "w-full max-w-[95vw] sm:max-w-[85vw] h-[calc(100svh-5rem)] flex min-h-0" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] h-[90vh] flex flex-col overflow-hidden" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
               onTouchStart={handleLbTouchStart}
               onTouchMove={handleLbTouchMove}
               onTouchEnd={handleLbTouchEnd}
@@ -616,9 +617,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               {isProject ? (
                 <div className="w-full max-h-full min-h-0 flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
                   {/* Preview iframe - sized by aspect ratio */}
-                  <div className="flex-1 min-w-0 relative overflow-hidden shrink-0 sm:shrink max-h-[38svh] sm:max-h-none" style={{ aspectRatio: '1440 / 900' }}>
+                  <div className="h-[30svh] sm:h-full sm:flex-1 min-w-0 relative overflow-hidden shrink-0">
                     <iframe
-                      src={selectedEntry.project_url!}
+                      src={selectedEntry.project_url || undefined}
                       title={selectedEntry.label}
                       className="absolute origin-top-left border-0"
                       style={{ width: '1440px', height: '900px' }}
@@ -627,18 +628,29 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                         if (el) {
                           const container = el.parentElement;
                           if (container) {
-                            const scaleX = container.clientWidth / 1440;
-                            const scaleY = container.clientHeight / 900;
-                            const scale = Math.min(scaleX, scaleY);
-                            el.style.transform = `scale(${scale})`;
+                            const resize = () => {
+                              const scale = Math.min(container.clientWidth / 1440, container.clientHeight / 900);
+                              el.style.transform = `scale(${scale})`;
+                              el.style.left = `${(container.clientWidth - 1440 * scale) / 2}px`;
+                              el.style.top = `${(container.clientHeight - 900 * scale) / 2}px`;
+                            };
+                            resize();
+                            const observer = new ResizeObserver(resize);
+                            observer.observe(container);
+                            el.addEventListener("load", resize, { once: true });
+                            // Disconnect once this preview leaves the document.
+                            const removal = new MutationObserver(() => {
+                              if (!el.isConnected) { observer.disconnect(); removal.disconnect(); }
+                            });
+                            removal.observe(document.body, { childList: true, subtree: true });
                           }
                         }
                       }}
                     />
                   </div>
                   {/* Info panel - matches preview height */}
-                  <div className="min-h-0 min-w-0 sm:w-[280px] lg:w-[320px] flex flex-col p-4 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95 overflow-y-auto shrink-0">
-                    <div className="flex-1 min-w-0">
+                  <div className="flex-1 sm:flex-none min-h-0 min-w-0 sm:w-[280px] lg:w-[320px] flex flex-col p-4 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95 overflow-hidden">
+                    <div className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain">
                       <h3 className="text-lg break-words [overflow-wrap:anywhere] font-display tracking-[0.15em] uppercase text-white mb-1">
                         {selectedEntry.label}
                       </h3>
@@ -655,17 +667,17 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                       {selectedEntry.tags && selectedEntry.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mb-4">
                           {selectedEntry.tags.map((tag, i) => (
-                            <span key={i} className="px-2 py-0.5 text-[9px] font-display tracking-widest uppercase border border-white/15 text-white/50 rounded-sm">
+                            <span key={i} className="max-w-full break-words [overflow-wrap:anywhere] px-2 py-0.5 text-[9px] font-display tracking-widest uppercase border border-white/15 text-white/50 rounded-sm">
                               {tag}
                             </span>
                           ))}
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-col gap-3 mt-auto pt-4">
+                    <div className="shrink-0 flex flex-col gap-3 mt-auto pt-4">
                       <div className="flex items-stretch gap-2">
                         <a
-                          href={selectedEntry.project_url!}
+                          href={selectedEntry.project_url || undefined}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-white/20 text-white/80 hover:text-white hover:border-white/50 transition-colors text-xs font-display tracking-[0.2em] uppercase"
@@ -813,7 +825,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>, document.body)}
 
       {/* Zoom overlay for individual group images */}
       <AnimatePresence>
