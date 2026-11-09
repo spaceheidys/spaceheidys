@@ -600,7 +600,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
             <motion.div
               key={selectedEntry.id}
-              className={`relative ${isProject ? "w-[95vw] sm:w-[85vw]" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] h-[90vh] flex flex-col overflow-hidden" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
+              className={`relative ${isProject ? "w-[95vw] sm:w-[85vw] max-h-[calc(100svh-5rem)] flex min-h-0" : isGroup ? "max-w-[90vw] sm:max-w-[75vw] h-[90vh] flex flex-col overflow-hidden" : "max-w-[90vw] sm:max-w-[75vw] max-h-[90vh] flex flex-col"}`}
               onTouchStart={handleLbTouchStart}
               onTouchMove={handleLbTouchMove}
               onTouchEnd={handleLbTouchEnd}
@@ -614,9 +614,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
 
               {/* ── PROJECT view ── */}
               {isProject ? (
-                <div className="w-full flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
+                <div className="w-full max-h-full min-h-0 flex flex-col sm:flex-row gap-0 rounded-lg overflow-hidden border border-white/10 bg-black/90">
                   {/* Preview iframe - sized by aspect ratio */}
-                  <div className="flex-1 relative overflow-hidden" style={{ aspectRatio: '1440 / 900' }}>
+                  <div className="flex-1 min-w-0 relative overflow-hidden shrink-0 sm:shrink max-h-[38svh] sm:max-h-none" style={{ aspectRatio: '1440 / 900' }}>
                     <iframe
                       src={selectedEntry.project_url!}
                       title={selectedEntry.label}
@@ -637,9 +637,9 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                     />
                   </div>
                   {/* Info panel - matches preview height */}
-                  <div className="sm:w-[280px] lg:w-[320px] flex flex-col p-4 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95 overflow-y-auto shrink-0">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-display tracking-[0.15em] uppercase text-white mb-1">
+                  <div className="min-h-0 min-w-0 sm:w-[280px] lg:w-[320px] flex flex-col p-4 sm:p-6 border-t sm:border-t-0 sm:border-l border-white/10 bg-black/95 overflow-y-auto shrink-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg break-words [overflow-wrap:anywhere] font-display tracking-[0.15em] uppercase text-white mb-1">
                         {selectedEntry.label}
                       </h3>
                       {selectedEntry.project_date && (
@@ -648,7 +648,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
                         </p>
                       )}
                       {selectedEntry.description && (
-                        <p className="text-sm text-white/60 leading-relaxed font-body mb-4">
+                        <p className="text-sm text-white/60 leading-relaxed font-body mb-4 break-words [overflow-wrap:anywhere]">
                           {selectedEntry.description}
                         </p>
                       )}
