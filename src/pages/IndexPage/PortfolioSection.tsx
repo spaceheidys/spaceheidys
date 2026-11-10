@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import taro01Img from "@/assets/TARO_01.png";
 import taroEyeImg from "@/assets/Taro_backside_eye.png";
-import PortfolioCard from "@/components/PortfolioCard";
+import PortfolioCardSpread from "@/components/PortfolioCardSpread";
 import PolygonBackground from "@/components/PolygonBackground";
 import PortfolioMenu from "@/components/Portfolio_menu/PortfolioMenu";
 import type { PortfolioMenuKey } from "@/components/Portfolio_menu/PortfolioMenu";
@@ -155,7 +155,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                   className={`flex items-center justify-center ${
                     activePortfolioKey
                       ? "w-[95vw] h-[135vw] max-w-[520px] max-h-[690px] sm:w-[448px] sm:h-[560px] md:w-[588px] md:h-[700px] lg:w-[728px] lg:h-[812px] xl:w-[840px] xl:h-[910px] sm:max-w-none sm:max-h-none"
-                      : "w-[60vw] h-[90vw] max-w-[300px] max-h-[450px] sm:w-[130px] sm:h-[195px] md:w-[170px] md:h-[255px] lg:w-[220px] lg:h-[330px] xl:w-[250px] xl:h-[374px] sm:max-w-none sm:max-h-none"
+                      : "w-[94vw] max-w-[1000px] h-[min(680px,72svh)] min-h-[400px]"
                   } transition-all duration-500`}
                 >
                   <AnimatePresence mode="wait">
@@ -195,7 +195,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <PortfolioCard
+                        <PortfolioCardSpread
                           name="Card_03"
                           flipAxis="y-center"
                           frontImage={getContent("card_front_image") || taro01Img}

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSoundContext } from "@/contexts/SoundContext";
 import taroBackside from "@/assets/Taro_backside.png";
@@ -26,9 +26,10 @@ interface PortfolioCardProps {
   onFlip?: (flipped: boolean) => void;
   onFrontTextChange?: (text: string) => void;
   flipSoundUrl?: string;
+  onVisibleImagesChange?: (front: string, back: string) => void;
 }
 
-const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, backImages, width, height, flipped: controlledFlipped, onFlip, onFrontTextChange, flipSoundUrl }: PortfolioCardProps) => {
+const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, backImages, width, height, flipped: controlledFlipped, onFlip, onFrontTextChange, flipSoundUrl, onVisibleImagesChange }: PortfolioCardProps) => {
   const [internalFlipped, setInternalFlipped] = useState(true);
   const flipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped;
   const { muted, siteMusicEnabled } = useSoundContext();
@@ -83,6 +84,10 @@ const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, bac
     ? (currentBackImage || allBackItems[0].url)
     : backImage;
 
+  useEffect(() => {
+    onVisibleImagesChange?.(displayFrontImage || "", displayBackImage || taroBackside);
+  }, [displayFrontImage, displayBackImage, onVisibleImagesChange]);
+
   if (!flipAxis) {
     return (
       <div
@@ -123,7 +128,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, bac
           style={{ backfaceVisibility: "hidden" }}>
           
           {displayFrontImage ? (
-            <img src={displayFrontImage} alt={name} className="w-full h-full object-cover" />
+            <img src={displayFrontImage} alt={name} draggable={false} className="w-full h-full object-cover" />
           ) : name}
         </div>
         {/* Back */}
@@ -131,7 +136,7 @@ const PortfolioCard = ({ name, flipAxis, frontImage, frontImages, backImage, bac
           className="absolute inset-0 flex items-center justify-center"
           style={{ backfaceVisibility: "hidden", transform: backTransform }}>
           
-          <img src={displayBackImage || taroBackside} alt={`${name} back`} className="w-full h-full object-cover" />
+          <img src={displayBackImage || taroBackside} alt={`${name} back`} draggable={false} className="w-full h-full object-cover" />
         </div>
       </motion.div>
     </div>);
