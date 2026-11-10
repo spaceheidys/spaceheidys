@@ -828,7 +828,7 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
       </AnimatePresence>, document.body)}
 
       {/* Zoom overlay for individual group images */}
-      <AnimatePresence>
+      {createPortal(<AnimatePresence>
         {zoomedImg && (
           <motion.div
             className="fixed inset-0 z-[300] flex items-center justify-center bg-black/90 cursor-zoom-out overflow-auto"
@@ -847,10 +847,10 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
             />
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>, document.body)}
 
       {/* Project document (.md) overlay */}
-      <AnimatePresence>
+      {createPortal(<AnimatePresence>
         {docOpen && selectedEntry?.doc_md && (
           <motion.div
             className="fixed inset-0 z-[320] flex items-center justify-center bg-black/90 p-4"
@@ -875,14 +875,14 @@ const PortfolioGallery = ({ sectionKey = "gallery", gallerySub, onPageInfo, onLi
               >
                 <X size={18} />
               </button>
-              <h3 className="text-sm font-display tracking-[0.2em] uppercase text-white/80 mb-4 pr-8">
+              <h3 className="text-sm break-words [overflow-wrap:anywhere] font-display tracking-[0.2em] uppercase text-white/80 mb-4 pr-8">
                 {selectedEntry.label}
               </h3>
               <MarkdownView source={selectedEntry.doc_md} />
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>, document.body)}
     </div>
 
   );
