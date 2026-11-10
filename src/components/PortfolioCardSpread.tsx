@@ -65,9 +65,9 @@ export default function PortfolioCardSpread(props: Props) {
     return null;
   }
   function start(event: PointerEvent<HTMLDivElement>) {
+    suppressClick.current = false;
     if (props.flipped !== false || full || event.button !== 0) return;
     gesture.current = { x: event.clientX, y: event.clientY, moved: false };
-    suppressClick.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
   }
   function move(event: PointerEvent<HTMLDivElement>) {
