@@ -42,7 +42,7 @@ export default function PortfolioCardSpread(props: Props) {
 
   useEffect(() => {
     if (!complete) return;
-    const timer = window.setTimeout(reset, reduceMotion ? 150 : 850);
+    const timer = window.setTimeout(reset, reduceMotion ? 150 : 1100);
     return () => window.clearTimeout(timer);
   }, [complete, reset, reduceMotion]);
 
@@ -89,7 +89,6 @@ export default function PortfolioCardSpread(props: Props) {
     const slot = !cancelled && startPoint.moved ? hitSlot(event.clientX, event.clientY) : null;
     if (slot) {
       setSpread(previous => placeSpreadCard(previous, slot, { ...images.current, turned: false }));
-      setDeckKey(key => key + 1);
       props.onFlip?.(true);
       props.onFrontTextChange?.("");
     }
