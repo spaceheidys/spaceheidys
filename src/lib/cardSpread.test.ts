@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { placeSpreadCard, turnSpreadCard, spreadFull, spreadComplete, type CardSpread } from "./cardSpread";
+import { isCardDrag, placeSpreadCard, turnSpreadCard, spreadFull, spreadComplete, type CardSpread } from "./cardSpread";
 const card = { front: "chosen-image", back: "back", turned: false };
 function filled() {
   let spread: CardSpread = {};
@@ -7,6 +7,11 @@ function filled() {
   return spread;
 }
 describe("three-card spread", () => {
+  it("keeps clicks and small pointer movements as ordinary card flips", () => {
+    expect(isCardDrag(0, 0)).toBe(false);
+    expect(isCardDrag(3, 4)).toBe(false);
+    expect(isCardDrag(8, 0)).toBe(true);
+  });
   it("hides the deck only when all three places are filled", () => {
     expect(spreadFull(placeSpreadCard({}, "left", card))).toBe(false);
     expect(spreadFull(filled())).toBe(true);
