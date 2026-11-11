@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Plus } from "lucide-react";
 import PortfolioCard from "@/components/PortfolioCard";
 import { Button } from "@/components/ui/button";
-import { CARD_SLOTS, placeSpreadCard, turnSpreadCard, spreadFull, spreadComplete, type CardSlot, type CardSpread } from "@/lib/cardSpread";
+import { CARD_SLOTS, isCardDrag, placeSpreadCard, turnSpreadCard, spreadFull, spreadComplete, type CardSlot, type CardSpread } from "@/lib/cardSpread";
 
 type Props = ComponentProps<typeof PortfolioCard>;
 const positions = {
@@ -68,14 +68,14 @@ export default function PortfolioCardSpread(props: Props) {
     suppressClick.current = false;
     if (props.flipped !== false || full || event.button !== 0) return;
     gesture.current = { x: event.clientX, y: event.clientY, moved: false };
-    event.currentTarget.setPointerCapture(event.pointerId);
   }
   function move(event: PointerEvent<HTMLDivElement>) {
     const startPoint = gesture.current;
     if (!startPoint) return;
     const x = event.clientX - startPoint.x;
     const y = event.clientY - startPoint.y;
-    if (!startPoint.moved && Math.hypot(x, y) < 8) return;
+    if (!startPoint.moved && !isCardDrag(x, y)) return;
+    if (!startPoint.moved) event.currentTarget.setPointerCapture(event.pointerId);
     startPoint.moved = true;
     suppressClick.current = true;
     setDragging(true);

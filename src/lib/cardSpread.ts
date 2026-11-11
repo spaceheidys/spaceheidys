@@ -2,6 +2,7 @@ export const CARD_SLOTS = ["left", "top", "right"] as const;
 export type CardSlot = typeof CARD_SLOTS[number];
 export interface SpreadCard { front: string; back: string; turned: boolean }
 export type CardSpread = Partial<Record<CardSlot, SpreadCard>>;
+export const isCardDrag = (x: number, y: number) => Math.hypot(x, y) >= 8;
 export const spreadFull = (spread: CardSpread) => CARD_SLOTS.every(slot => Boolean(spread[slot]));
 export const spreadComplete = (spread: CardSpread) => CARD_SLOTS.every(slot => spread[slot]?.turned === true);
 export function placeSpreadCard(spread: CardSpread, slot: CardSlot, card: SpreadCard): CardSpread {
