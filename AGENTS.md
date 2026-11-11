@@ -8,3 +8,4 @@
 - Store the visitor direct-entry toggle in the existing admin-write/public-read section content settings; it controls navigation to the existing public sector only and must never authorize private asset access.
 - Store the ABOUT mask toggle in section content settings and replace the shared ABOUT body in normal and expanded views; this is presentation-only, not encryption or private-data authorization.
 - Keep portfolio dealing in PortfolioCardSpread with pure cardSpread transitions; capture actual visible images so pinned cards do not change when the deck advances, and reset the spread on section exit.
+- Store the card-spread presentation toggle in existing section content settings; off renders the original PortfolioCard and its original sizing without drag targets.
