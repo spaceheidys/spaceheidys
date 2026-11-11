@@ -155,7 +155,7 @@ const PortfolioSection = forwardRef<HTMLDivElement, PortfolioSectionProps>(
                   className={`flex items-center justify-center ${
                     activePortfolioKey
                       ? "w-[95vw] h-[135vw] max-w-[520px] max-h-[690px] sm:w-[448px] sm:h-[560px] md:w-[588px] md:h-[700px] lg:w-[728px] lg:h-[812px] xl:w-[840px] xl:h-[910px] sm:max-w-none sm:max-h-none"
-                      : "w-[94vw] max-w-[1000px] h-[min(680px,72svh)] min-h-[400px]"
+                      : "w-[94vw] md:w-[calc(100vw-240px)] md:ml-[160px] lg:w-[calc(100vw-300px)] lg:ml-[120px] max-w-[1000px] h-[min(680px,72svh)] min-h-[400px]"
                   } transition-all duration-500`}
                 >
                   <AnimatePresence mode="wait">
