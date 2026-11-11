@@ -7,9 +7,9 @@ import { CARD_SLOTS, placeSpreadCard, turnSpreadCard, spreadFull, spreadComplete
 
 type Props = ComponentProps<typeof PortfolioCard>;
 const positions = {
-  left: { left: "21%", top: "53%", rotate: -38 },
-  top: { left: "50%", top: "23%", rotate: 0 },
-  right: { left: "79%", top: "53%", rotate: 38 },
+  left: { left: "21%", top: "40%", rotate: -38 },
+  top: { left: "50%", top: "18%", rotate: 0 },
+  right: { left: "79%", top: "40%", rotate: 38 },
 };
 
 export default function PortfolioCardSpread(props: Props) {
@@ -121,11 +121,11 @@ export default function PortfolioCardSpread(props: Props) {
                   exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.4, delay: complete ? 0.6 : 0 }}>
                   <Button variant="ghost" disabled={!full || card.turned} aria-label={`Turn ${slot} card`}
                     onClick={() => setSpread(previous => turnSpreadCard(previous, slot))}
-                    className="block relative w-full h-full p-0 rounded-lg bg-transparent hover:bg-transparent disabled:opacity-100 overflow-visible">
+                    className="block relative w-full h-full p-0 rounded-[12px] sm:rounded-[16px] bg-transparent hover:bg-transparent disabled:opacity-100 overflow-visible">
                     <motion.span className="block relative w-full h-full" style={{ transformStyle: "preserve-3d" }}
                       animate={{ rotateY: card.turned ? -180 : 0 }} transition={{ duration: reduceMotion ? 0 : 0.6 }}>
-                      <img src={card.front} alt={`${slot} chosen card`} draggable={false} className="absolute inset-0 w-full h-full object-cover rounded-lg border border-foreground/30" style={{ backfaceVisibility: "hidden" }} />
-                      <img src={card.back} alt="Card back" draggable={false} className="absolute inset-0 w-full h-full object-cover rounded-lg border border-foreground/30" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }} />
+                      <img src={card.front} alt={`${slot} chosen card`} draggable={false} className="absolute inset-0 w-full h-full object-cover rounded-[12px] sm:rounded-[16px] border border-foreground/30" style={{ backfaceVisibility: "hidden" }} />
+                      <img src={card.back} alt="Card back" draggable={false} className="absolute inset-0 w-full h-full object-cover rounded-[12px] sm:rounded-[16px] border border-foreground/30" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }} />
                     </motion.span>
                   </Button>
                 </motion.div>
@@ -136,7 +136,7 @@ export default function PortfolioCardSpread(props: Props) {
       })}
       <AnimatePresence>
         {!full && (
-          <motion.div key="deck" className="absolute left-1/2 top-[66%] w-[34%] sm:w-[25%] max-w-[250px] aspect-[2/3] -translate-x-1/2 -translate-y-1/2 z-20"
+          <motion.div key="deck" className="absolute left-1/2 top-1/2 w-[34%] sm:w-[25%] max-w-[250px] aspect-[2/3] -translate-x-1/2 -translate-y-1/2 z-20"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div className={`w-full h-full ${props.flipped === false ? "touch-none cursor-grab active:cursor-grabbing" : "touch-pan-y"}`}
               animate={{ x: offset.x, y: offset.y, scale: dragging ? 0.9 : 1 }}

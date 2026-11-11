@@ -6,6 +6,8 @@ import taroBackside from "@/assets/Taro_backside.png";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Switch } from "@/components/ui/switch";
+import { cardSpreadEnabled } from "@/lib/cardSpreadSettings";
 
 interface Main2SectionProps {
   get: (key: string) => string;
@@ -50,6 +52,8 @@ function SortableFrontCard({ id, children }: { id: string; children: (handle: { 
 
 const Main2Section = ({ get, update }: Main2SectionProps) => {
   const [wisdomText, setWisdomText] = useState("");
+  const [spreadOn, setSpreadOn] = useState(true);
+  const [savingSpread, setSavingSpread] = useState(false);
   const [frontImage, setFrontImage] = useState("");
   const [frontImages, setFrontImages] = useState<{url: string; text: string; hidden?: boolean}[]>([]);
   const [backImage, setBackImage] = useState("");
@@ -123,6 +127,7 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
   };
 
   useEffect(() => {
+    setSpreadOn(cardSpreadEnabled(get("card_spread_enabled")));
     setWisdomText(get("cards_wisdom"));
     setFrontImage(get("card_front_image"));
     try {
@@ -773,6 +778,20 @@ const Main2Section = ({ get, update }: Main2SectionProps) => {
     ),
     card_images: (
       <div className="space-y-6">
+        <div className="flex items-center justify-between gap-4 max-w-[320px]">
+          <label htmlFor="card-spread-toggle" className="text-xs font-display uppercase">Three-card spread</label>
+          <Switch id="card-spread-toggle" checked={spreadOn} disabled={savingSpread}
+            onCheckedChange={async (checked) => {
+              setSavingSpread(true);
+              try {
+                await update("card_spread_enabled", checked ? "on" : "off");
+                setSpreadOn(checked);
+                toast.success("Saved");
+              } catch {
+                toast.error("Could not save card mode");
+              } finally { setSavingSpread(false); }
+            }} />
+        </div>
         <div className="grid grid-cols-2 gap-6 max-w-[320px]">
           <CardImageUpload
             label="Card front (default)"

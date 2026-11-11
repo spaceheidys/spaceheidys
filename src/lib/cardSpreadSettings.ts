@@ -1,0 +1,1 @@
+export const cardSpreadEnabled = (value: string) => value !== "off";
