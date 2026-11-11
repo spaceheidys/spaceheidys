@@ -4,4 +4,4 @@
 - [x] Fit the project preview and controls on one screen without page scrolling.
 - [x] Verify desktop and mobile project opening and closing.
 - [x] Add three-slot portfolio card dragging and the completed-spread reset.
-- [ ] Verify the complete card cycle on desktop and touch screens.
+- [x] Verify the complete card cycle on desktop and touch screens.
