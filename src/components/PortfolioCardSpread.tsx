@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Plus } from "lucide-react";
 import PortfolioCard from "@/components/PortfolioCard";
 import { Button } from "@/components/ui/button";
+import { useSoundContext } from "@/contexts/SoundContext";
 import { CARD_SLOTS, isCardDrag, placeSpreadCard, turnSpreadCard, spreadFull, spreadComplete, type CardSlot, type CardSpread } from "@/lib/cardSpread";
 
 type Props = ComponentProps<typeof PortfolioCard>;
@@ -26,6 +27,7 @@ export default function PortfolioCardSpread(props: Props) {
   const latestProps = useRef(props);
   latestProps.current = props;
   const reduceMotion = useReducedMotion();
+  const { muted, siteMusicEnabled } = useSoundContext();
   const full = spreadFull(spread);
   const complete = spreadComplete(spread);
   const captureImages = useCallback((front: string, back: string) => { images.current = { front, back }; }, []);
@@ -120,7 +122,12 @@ export default function PortfolioCardSpread(props: Props) {
                   initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: complete ? 0 : 1, scale: complete ? 0.9 : 1, rotate: position.rotate }}
                   exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.4, delay: complete ? 0.6 : 0 }}>
                   <Button variant="ghost" disabled={!full || card.turned} aria-label={`Turn ${slot} card`}
-                    onClick={() => setSpread(previous => turnSpreadCard(previous, slot))}
+                    onClick={() => {
+                      if (!muted && siteMusicEnabled && props.flipSoundUrl !== "muted") {
+                        new Audio(props.flipSoundUrl || "/audio/flipcard_sound.mp3").play().catch(() => {});
+                      }
+                      setSpread(previous => turnSpreadCard(previous, slot));
+                    }}
                     className="block relative w-full h-full p-0 rounded-[12px] sm:rounded-[16px] bg-transparent hover:bg-transparent disabled:opacity-100 overflow-visible">
                     <motion.span className="block relative w-full h-full" style={{ transformStyle: "preserve-3d" }}
                       animate={{ rotateY: card.turned ? -180 : 0 }} transition={{ duration: reduceMotion ? 0 : 0.6 }}>
