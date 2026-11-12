@@ -7,4 +7,4 @@
 - [x] Verify the complete card cycle on desktop and touch screens.
 - [x] Center the deck and match all card corner rounding.
 - [x] Add and verify the admin three-card spread toggle and original single-card mode.
-- [ ] Play the configured flip sound when each pinned spread card closes.
+- [x] Play the configured flip sound when each pinned spread card closes.
