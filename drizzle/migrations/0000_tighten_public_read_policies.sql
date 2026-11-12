@@ -1,0 +1,11 @@
+DROP POLICY IF EXISTS "Anyone can view portfolio items" ON public.portfolio_items;
+CREATE POLICY "Anyone can view visible portfolio items" ON public.portfolio_items FOR SELECT USING (is_visible = true OR public.has_role(auth.uid(), 'admin'::public.app_role));
+DROP POLICY IF EXISTS "Anyone can view skills" ON public.skills;
+CREATE POLICY "Anyone can view visible skills" ON public.skills FOR SELECT USING (is_visible = true OR public.has_role(auth.uid(), 'admin'::public.app_role));
+DROP POLICY IF EXISTS "Anyone can view social links" ON public.social_links;
+CREATE POLICY "Anyone can view visible social links" ON public.social_links FOR SELECT TO anon, authenticated USING (is_visible = true OR public.has_role(auth.uid(), 'admin'::public.app_role));
+DROP POLICY IF EXISTS "Anyone can view capabilities" ON public.capabilities;
+CREATE POLICY "Anyone can view visible capabilities" ON public.capabilities FOR SELECT USING (is_visible = true OR public.has_role(auth.uid(), 'admin'::public.app_role));
+DROP POLICY IF EXISTS "Anyone can view nav buttons" ON public.nav_buttons;
+CREATE POLICY "Anyone can view visible nav buttons" ON public.nav_buttons FOR SELECT USING (is_visible = true OR public.has_role(auth.uid(), 'admin'::public.app_role));
+DROP POLICY IF EXISTS "Anyone can view portfolio images" ON storage.objects;
